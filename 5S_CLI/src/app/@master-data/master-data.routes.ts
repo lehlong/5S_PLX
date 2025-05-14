@@ -8,9 +8,9 @@ export const masterDataRoutes: Routes = [
   { path: 'account-type', component: AccountTypeComponent },
   { path: 'doi-tuong', component: DoiTuongComponent },
   { path: 'chuc-vu', component: ChucVuComponent },
-   { path: 'store', component: StoreComponent }, 
+  { path: 'store', component: StoreComponent },
 
 
- 
+
 
 ]

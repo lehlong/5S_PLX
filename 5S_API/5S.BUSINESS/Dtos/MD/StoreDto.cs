@@ -17,18 +17,25 @@ namespace PLX5S.BUSINESS.Dtos.MD
         [Key]
         [Description("Mã kiểu người dùng")]
         public string Id { get; set; }
+
         [Description("Tên kiểu người dùng")]
         public string Name { get; set; }
+
         [Description("Số điện thoại")]
         public string Phone { get; set; }
+
         [Description("Cửa hàng trưởng")]
         public string CuaHangTruong { get; set; }
+
         [Description("Người phụ trách")]
         public string NguoiPhuTrach { get; set; }
+
         [Description("Kinh độ")]
         public string KinhDo { get; set; }
+
         [Description("Vĩ độ")]
         public string ViDo { get; set; }
+
         [Description("Trạng Thái cửa hàng")]
         public bool TrangThaiCuaHang { get; set; }
         public List<string> ATVSV { get; set; }

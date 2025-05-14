@@ -15,12 +15,11 @@ namespace PLX5S.CORE.Entities.MD
         [Key]
         [Column("ID")]
         public string Id { get; set; }
+        
         [Column("NAME", TypeName = "NVARCHAR(255)")]
         public string Name { get; set; }
-        [Column("HEADER_ID")]
-        public string HeaderId { get; set; }
-        [Column("ACCOUNT_ID")]
-        public string AccountId { get; set; }
 
+        [Column("STORE_ID")]
+        public string StoreId { get; set; }
     }
 }

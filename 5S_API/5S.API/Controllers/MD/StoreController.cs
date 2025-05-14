@@ -52,10 +52,12 @@ namespace PLX5S.API.Controllers.MD
         public async Task<IActionResult> Insert([FromBody] StoreDto time)
         {
             var transferObject = new TransferObject();
-            var result = await _service.Add(time);
+
+            await _service.Insert(time);
+            
             if (_service.Status)
             {
-                transferObject.Data = result;
+                //transferObject.Data = result;
                 transferObject.Status = true;
                 transferObject.MessageObject.MessageType = MessageType.Success;
                 transferObject.GetMessage("0100", _service);

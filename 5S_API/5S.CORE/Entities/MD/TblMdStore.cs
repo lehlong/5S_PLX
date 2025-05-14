@@ -15,20 +15,27 @@ namespace PLX5S.CORE.Entities.MD
         [Key]
         [Column("ID")]
         public string Id { get; set; }
+
         [Column("NAME", TypeName = "NVARCHAR(255)")]
         public string Name { get; set; }
+
         [Column("PHONE_NUMBER")]
         public string PhoneNumber { get; set; }
+
         [Column("CUA_HANG_TRUONG")]
-        public string? CuaHangTruong { get; set; }
+        public string CuaHangTruong { get; set; }
+
         [Column("NGUOI_PHU_TRACH")]
-        public string? NguoiPhuTrach { get; set; }
+        public string NguoiPhuTrach { get; set; }
+
         [Column("KINH_DO")]
-        public string? KinhDo { get; set; }
+        public string KinhDo { get; set; }
+
         [Column("VI_DO")]
-        public string? ViDo { get; set; }
-        [Column("TRANG_THAI_CUA_HANG")]
-        public string TrangThaiCuaHang { get; set; }
+        public string ViDo { get; set; }
+
+        [Column("TRANG_THAI_CUA_HANG", TypeName = "BIT")]
+        public bool TrangThaiCuaHang { get; set; }
 
     }
 }
