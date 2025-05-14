@@ -1,0 +1,47 @@
+// Quản trị hệ thống
+export enum ADMIN_RIGHTS {
+  ADMIN = 'R100',
+  ORGANIZE = 'R110',
+  RIGHT = 'R111',
+  MENU = 'R112',
+  ACCOUNT_GROUPS = 'R113',
+  ACCOUNT = 'R114',
+  TEMPLATE_EMAIL = 'R115',
+  TEMPLATE_SMS = 'R116',
+  EMAIL = 'R117',
+  SCREEN = 'R118',
+}
+
+// Quản lý danh mục
+export enum MASTER_DATA_RIGHTS {
+  MASTER_DATA = 'R200',
+  POSITION = 'R210',
+  WAREHOUSE = 'R211',  
+  PUMP_RIG = 'R212',  
+  PUMP_THROAT = 'R213', 
+  CAMERA = 'R214',
+  COMMODITY = 'R215',
+  UNIT = 'R216',
+  REGION = 'R217',     
+  ACCOUNT_TYPE = 'R218',     
+}
+
+// Mời lấy ticket
+export enum TICKET_RIGHTS {
+  TICKET = 'R300',
+  INVITE_VEHICLE = 'R310',
+  CHECK_PRINT_TICKET = 'R311',
+  ARRANGE_VEHICLE = 'R312',
+  PROCESSED = 'R313',
+  NOT_PROCESSED = 'R314',
+}
+
+// App client
+export enum CLIENT_APP_RIGHTS {
+  CLIENT_APP = 'R400',
+  ENTRANCE_MANAGEMENT = 'R410',
+  EXIT_MANAGEMENT = 'R411',
+  IN_OUT_HISTORY = 'R412',
+  GENERAL_CONFIG = 'R413',
+  CONNECTION_STATUS = 'R414',
+}

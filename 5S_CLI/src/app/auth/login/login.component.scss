@@ -1,0 +1,21 @@
+.login {
+    background-image: url(/img/bg-auth.png);
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.login-form{
+    width: 16%;
+}
+.btn-login{
+    width: 100%;
+    margin-top: 12px;
+}
+nz-input-group{
+    margin-bottom: 12px;
+}

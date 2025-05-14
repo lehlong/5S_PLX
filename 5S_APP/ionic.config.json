@@ -1,0 +1,7 @@
+{
+  "name": "5S_APP",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

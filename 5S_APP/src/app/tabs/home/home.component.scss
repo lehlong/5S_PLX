@@ -1,0 +1,72 @@
+:root {
+  --box-shadow-color: rgb(0 0 0 / 0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --box-shadow-color: rgb(255 255 255 / 0.1);
+  }
+}
+
+.main-home {
+  display: flex;
+  flex-flow: column;
+  gap: 12px;
+  padding: 18px 12px 12px 12px;
+}
+
+h4 {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  gap: 12px;
+  margin: 0;
+}
+
+.p-5s {
+  border-radius: 4px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 10px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:active {
+    transform: scale(0.97);
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 6px;
+  }
+
+  &:hover {
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 4px 12px;
+  }
+}
+
+.card-news {
+  border-radius: 4px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 10px;
+  background: var(--ion-card-background);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:active {
+    transform: scale(0.97);
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 6px;
+  }
+
+  &:hover {
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 4px 12px;
+  }
+}
+
+.card-news img {
+  border-top-right-radius: 4px;
+  border-top-left-radius: 4px;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.card-news .news-title {
+  font-weight: 600;
+  padding:12px;
+  color: var(--ion-text-color);
+}
+

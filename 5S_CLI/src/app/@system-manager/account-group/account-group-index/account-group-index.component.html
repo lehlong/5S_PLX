@@ -1,0 +1,67 @@
+<nz-page-header nzBackIcon>
+  <nz-page-header-title>NHÓM TÀI KHOẢN</nz-page-header-title>
+  <nz-page-header-subtitle>Danh sách nhóm tài khoản</nz-page-header-subtitle>
+  <nz-page-header-extra>
+    <div class="flex-grow-2 flex">
+      <nz-space>
+        <app-input-clear placeholder="Tìm kiếm" (enterEvent)="search()" [(value)]="filter.keyWord"></app-input-clear>
+        <button (click)="search()" class="flex !items-center !border-l-0 gray-btn" nzType="default" nz-button
+          nzType="default">
+          <span nz-icon nzType="search"></span>
+        </button>
+        <button (click)="reset()" class="flex !items-center !border-l-0 gray-btn" nzType="default" nz-button
+          nzType="default">
+          <span nz-icon nzType="redo"></span>
+        </button>
+      </nz-space>
+      <button (click)="openCreate()" class="!flex !items-center space-btn" nzType="primary" nz-button>
+        <span nz-icon nzType="plus-circle"></span> Thêm mới
+      </button>
+    </div>
+  </nz-page-header-extra>
+  <nz-page-header-content class="main-content">
+    <nz-table  class="auto-scroll-table" #lstAccountGroup [nzData]="paginationResult.data" [nzFrontPagination]="false" [nzScroll]="{ y: 'calc(100vh - 244px)' }">
+      <thead>
+        <tr>
+          <th nzWidth="60px">STT</th>
+          <th>Tên nhóm tài khoản</th>
+          <th>Ghi chú</th>
+          <th>Số lượng tài khoản</th>
+          <th>Trạng thái</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of lstAccountGroup.data; let i = index">
+          <td>{{(paginationResult.currentPage - 1) * paginationResult.pageSize +i +1}}</td>
+          <td><a (click)="openEdit(data.id)">{{ data.name }}</a></td>
+          <td>{{ data.notes }}</td>
+          <td nzAlign="right">{{ data.totalAccount }}</td>
+          <td nzAlign="center">
+            <nz-tag nzColor="success" *ngIf="data.isActive">
+              <nz-icon nzType="check-circle" />
+              <span>Kích hoạt</span>
+            </nz-tag>
+            <nz-tag nzColor="error" *ngIf="!data.isActive">
+              <nz-icon nzType="close-circle" />
+              <span>Khoá</span>
+            </nz-tag>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-page-header-content>
+  <nz-page-header-content class="footer-content">
+    <div *ngIf="paginationResult?.data" class="flex justify-end p-[10px] border-t border-custom-gray border-solid">
+      <nz-pagination nzShowSizeChanger [nzPageIndex]="filter.currentPage" [nzTotal]="paginationResult.totalRecord"
+        [nzPageSize]="filter.pageSize" (nzPageIndexChange)="pageIndexChange($event)"
+        (nzPageSizeChange)="pageSizeChange($event)"></nz-pagination>
+    </div>
+  </nz-page-header-content>
+</nz-page-header>
+
+<app-account-group-create [loading]="loading" [close]="close.bind(this)" [reset]="loadInit.bind(this)"
+  [visible]="showCreate"></app-account-group-create>
+
+<app-account-group-edit [loading]="loading" [id]="idDetail" [close]="close.bind(this)" [reset]="loadInit.bind(this)"
+  [visible]="showEdit">
+</app-account-group-edit>

@@ -1,0 +1,11 @@
+<div class="login">
+    <div class="login-form">
+        <nz-input-group nzPrefixIcon="user">
+            <input type="text" nz-input placeholder="Tên đăng nhập" [(ngModel)]="model.userName" (keydown.enter)="processLogin()"/>
+        </nz-input-group>
+        <nz-input-group nzPrefixIcon="lock">
+            <input type="password" nz-input placeholder="Mật khẩu"  [(ngModel)]="model.password" (keydown.enter)="processLogin()"/>
+        </nz-input-group>
+        <button nz-button class="btn-login" [nzType]="'primary'" (click)="processLogin()">Đăng nhập</button>
+    </div>
+</div>

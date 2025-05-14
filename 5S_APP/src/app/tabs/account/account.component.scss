@@ -1,0 +1,28 @@
+.main-account {
+  display: flex;
+  flex-flow: column;
+  gap: 12px;
+  padding: 18px 12px 12px 12px;
+}
+
+h4 {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  gap: 12px;
+  margin: 0;
+}
+
+ion-label {
+  display: flex;
+  align-items: center;
+}
+
+.line-info {
+  display: flex;
+  gap: 6px;
+}
+
+ion-button{
+  margin-top: auto;
+}

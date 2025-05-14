@@ -1,0 +1,102 @@
+.trigger {
+    font-size: 18px;
+    line-height: 64px;
+    padding: 0 24px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.trigger:hover {
+    color: #1890ff;
+}
+
+.logo {
+    height: 32px;
+    background: rgba(255, 255, 255, 0.2);
+    margin: 16px;
+}
+
+nz-header {
+    background: #fff;
+    padding: 0;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+}
+
+nz-content {
+    margin: 0 16px;
+}
+
+nz-breadcrumb {
+    margin: 16px 0;
+}
+
+.inner-content {
+    padding: 24px;
+    background: white;
+    min-height: 360px;
+}
+
+nz-footer {
+    text-align: center;
+}
+
+.ant-layout-sider {
+    background: white;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+    height: 100vh;
+}
+
+nz-content {
+    margin: 6px 0px 0px 6px !important;
+}
+
+.ant-menu {
+    height: calc(100vh - 64px);
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.inner-content {
+    padding: 0 !important;
+    background: white;
+    height: calc(100vh - 70px) !important;
+}
+
+.ant-collapse-content {
+    visibility: hidden;
+    transition: visibility 0.3s ease-in-out;
+}
+
+.ant-collapse-content-active {
+    visibility: visible;
+}
+.ant-layout-header{
+    height: 64px !important;
+    display: flex;
+    align-items: center;
+    padding-right: 22px;
+}
+.user{
+    display: flex; 
+    align-items: center; 
+    cursor: pointer;
+    margin-left: auto;
+}
+.full-name{
+    margin-left: 6px;
+}
+.circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .circle img {
+    height: 36px;
+    width: auto;
+  }

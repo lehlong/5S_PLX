@@ -1,0 +1,65 @@
+<nz-layout>
+    <nz-sider nzCollapsible [(nzCollapsed)]="isCollapsed" [nzTrigger]="null" [nzWidth]="'240px'">
+        <div class="logo"></div>
+        <ul nz-menu nzTheme="light" nzMode="inline">
+            <ng-container *ngTemplateOutlet="menuTpl; context: { $implicit: dataSidebarMenu }"></ng-container>
+            <ng-template #menuTpl let-menus>
+                <ng-container *ngFor="let menu of menus">
+                    <ng-container *ngIf="!menu.children; else submenuTpl">
+                        <li [nzDisabled]="loading" nz-menu-item [nzPaddingLeft]="!isCollapsed ? menu.level * 24 : 0"
+                            [nzDisabled]="menu.disabled" [nzSelected]="menu.selected" (click)="navigateTo(menu.url)">
+                            <ng-container *ngIf="menu.icon">
+                                <span nz-icon [nzType]="menu.icon"></span>
+                            </ng-container>
+                            <span>{{ menu.title }}</span>
+                        </li>
+                    </ng-container>
+                    <ng-template #submenuTpl>
+                        <li nz-submenu [nzPaddingLeft]="!isCollapsed ? menu.level * 24 : 0" [nzOpen]="menu.open"
+                            [nzTitle]="menu.title" [nzIcon]="menu.level == 1 && menu?.icon ? menu.icon : ''"
+                            [nzDisabled]="menu.disabled">
+                            <ul>
+                                <ng-container
+                                    *ngTemplateOutlet="menuTpl;context: { $implicit: menu.children }"></ng-container>
+                            </ul>
+                        </li>
+                    </ng-template>
+                </ng-container>
+            </ng-template>
+        </ul>
+    </nz-sider>
+    <nz-layout>
+        <nz-header>
+            <nz-icon class="trigger" [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"
+                (click)="isCollapsed = !isCollapsed" />
+            <div>
+                <nz-breadcrumb>
+                    <nz-breadcrumb-item><a routerLink="/home"><span nz-icon nzType="home"></span></a></nz-breadcrumb-item>
+                    <nz-breadcrumb-item *ngFor="let breadcrumb of breadcrumbs">
+                        <a [routerLink]="breadcrumb?.path">{{ breadcrumb?.name }}</a>
+                    </nz-breadcrumb-item>
+                </nz-breadcrumb>
+            </div>
+
+            <div nz-dropdown [nzDropdownMenu]="dropdownUser" class="user">
+                <div class="circle">
+                    <img [src]="userAvatar" alt="Avatar User">
+                </div>
+                <div class="full-name">{{user.fullName}}</div>
+            </div>
+            <nz-dropdown-menu #dropdownUser="nzDropdownMenu">
+                <ul nz-menu nzSelectable>
+                    <li nz-menu-item (click)="changePass()"><nz-icon nzType="lock" nzTheme="outline" /> Đổi mật khẩu</li>
+                    <li nz-menu-item (click)="logOut()"><nz-icon nzType="login" nzTheme="outline" /> Đăng xuất</li>
+                </ul>
+            </nz-dropdown-menu>
+        </nz-header>
+        <nz-content>
+            <div class="inner-content">
+                <nz-spin [nzSpinning]="loading">
+                    <router-outlet></router-outlet>
+                </nz-spin>
+            </div>
+        </nz-content>
+    </nz-layout>
+</nz-layout>
