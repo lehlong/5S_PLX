@@ -8,6 +8,7 @@ import { LoginComponent } from './auth/login/login.component';
 import { NotFoundComponent } from './layouts/not-found/not-found.component';
 import { systemManagerRoutes } from './@system-manager/system-manager.routes';
 import { masterDataRoutes } from './@master-data/master-data.routes';
+import { KiKhaoSatComponent } from './ki-khao-sat/ki-khao-sat.component';
 
 export const routes: Routes = [
   {
@@ -18,6 +19,7 @@ export const routes: Routes = [
       {path: 'home', component: HomeComponent, canActivate: [AuthGuard]},
       {path: 'system-manager', children: systemManagerRoutes, canActivate: [AuthGuard]},
       {path: 'master-data', children: masterDataRoutes, canActivate: [AuthGuard]},
+      {path: 'ki', component: KiKhaoSatComponent, canActivate: [AuthGuard]},
     ],
   },
   {

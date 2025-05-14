@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using PLX5S.CORE.Entities.BU;
 
 namespace PLX5S.CORE
 {
@@ -133,6 +134,9 @@ namespace PLX5S.CORE
         public DbSet<TblMdAtvsv> tblMdAtvsv { get; set; }
         #endregion
 
+        #region Business 
+        public DbSet<TblBuKiKhaoSat> TblBuKiKhaoSat { get; set; }
+        #endregion
 
     }
 }
