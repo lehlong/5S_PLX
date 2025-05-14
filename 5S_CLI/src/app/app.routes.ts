@@ -9,6 +9,7 @@ import { NotFoundComponent } from './layouts/not-found/not-found.component';
 import { systemManagerRoutes } from './@system-manager/system-manager.routes';
 import { masterDataRoutes } from './@master-data/master-data.routes';
 import { KiKhaoSatComponent } from './ki-khao-sat/ki-khao-sat.component';
+import { SurveyMgmtComponent } from './survey-mgmt/survey-mgmt.component';
 
 export const routes: Routes = [
   {
@@ -20,6 +21,8 @@ export const routes: Routes = [
       {path: 'system-manager', children: systemManagerRoutes, canActivate: [AuthGuard]},
       {path: 'master-data', children: masterDataRoutes, canActivate: [AuthGuard]},
       {path: 'ki', component: KiKhaoSatComponent, canActivate: [AuthGuard]},
+      { path: 'survey-mgmt', component: SurveyMgmtComponent },
+
     ],
   },
   {
