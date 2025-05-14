@@ -44,12 +44,12 @@ export class AccountCreateComponent {
       phoneNumber: ['', [Validators.pattern("^[0-9]*$"),]],
       email: ['', [Validators.email]],
       isActive: [true],
-      accountType: ['', [Validators.required]],
+      // accountType: ['', [Validators.required]],
     })
   }
 
   ngOnInit(): void {
-    this.loadInit()
+    // this.loadInit()
     this.getAllAccountType()
     this.getAllOrg()
   }
@@ -98,9 +98,7 @@ export class AccountCreateComponent {
   submitForm(): void {
     if (this.validateForm.valid) {
       const formValue = this.validateForm.value
-      if(this.avatarBase64 != '' && this.isBase64Image(this.avatarBase64)){
-        formValue.imageBase64 = this.avatarBase64
-      }
+     
       this._service.create(formValue).subscribe({
         next: (data) => {
           this.reset()

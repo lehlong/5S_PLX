@@ -74,7 +74,7 @@
             [control]="$any(validateForm).controls['email']"
           ></app-input-clear>
         </div>
-        <div nz-col [nzXs]="24" [nzMd]="12">
+        <!-- <div nz-col [nzXs]="24" [nzMd]="12">
           <nz-form-item>
             <nz-form-label>Kiểu người dùng</nz-form-label>
             <nz-form-control nzErrorTip="Không được để trống">
@@ -94,9 +94,9 @@
               </nz-select>
             </nz-form-control>
           </nz-form-item>
-        </div>
+        </div> -->
 
-        <div nz-col [nzXs]="24" [nzMd]="12">
+        <!-- <div nz-col [nzXs]="24" [nzMd]="12">
           <nz-form-item>
             <nz-form-label>Chức vụ</nz-form-label>
             <nz-form-control nzErrorTip="Không được để trống">
@@ -116,8 +116,8 @@
               </nz-select>
             </nz-form-control>
           </nz-form-item>
-        </div>
-        <div nz-col [nzXs]="24" [nzMd]="12">
+        </div> -->
+        <!-- <div nz-col [nzXs]="24" [nzMd]="12">
           <nz-form-item>
             <nz-form-label>Đơn vị</nz-form-label>
             <nz-form-control nzErrorTip="Không được để trống">
@@ -138,8 +138,8 @@
               </nz-select>
             </nz-form-control>
           </nz-form-item>
-        </div>
-        <div nz-col [nzXs]="24" [nzMd]="12">
+        </div> -->
+        <!-- <div nz-col [nzXs]="24" [nzMd]="12">
           <nz-form-item>
             <nz-form-label>Kho hàng</nz-form-label>
             <nz-form-control nzErrorTip="Không được để trống">
@@ -159,7 +159,7 @@
               </nz-select>
             </nz-form-control>
           </nz-form-item>
-        </div>
+        </div> -->
         <!-- <div nz-col [nzXs]="24" [nzMd]="12" *ngIf="isShowSelectPartner">
           <nz-form-item>
             <nz-form-label>Chọn đối tác</nz-form-label>
@@ -186,7 +186,8 @@
       </div>
     </form>
 
-    <label>Chọn ảnh</label>
+    
+    <!-- <label>Chọn ảnh</label>
     <div class="main-upload">
       <div class="upload-avatar" (click)="fileInput.click()">
         <nz-icon nzType="cloud-upload" nzTheme="outline" style="font-size: 24px;"/>
@@ -195,9 +196,9 @@
       <div class="avatar-preview" *ngIf="avatarBase64 != null && avatarBase64 != ''">
         <img [src]="avatarBase64" width="128" height="128"/>
       </div>
-    </div>
-    <input type="file" #fileInput accept="image/*" (change)="onFileSelected($event)" style="display: none;" />
-    
+    </div> -->
+    <!-- <input type="file" #fileInput accept="image/*" (change)="onFileSelected($event)" style="display: none;" />
+     -->
   </ng-container>
 </nz-drawer>
 <ng-template #extra>

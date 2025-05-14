@@ -43,4 +43,7 @@ export class AccountService {
   exportExcelASO(params: any): Observable<any> {
     return this.commonService.downloadFile('Account/ExportASO', params)
   }
+  getall(): Observable<any> {
+    return this.commonService.get('Account/GetAll')
+  }
 }
