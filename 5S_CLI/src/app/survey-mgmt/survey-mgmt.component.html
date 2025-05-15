@@ -1,150 +1,204 @@
 <nz-page-header nzBackIcon>
-    <nz-page-header-title>QUẢN LÝ KHẢO SÁT</nz-page-header-title>
-    <nz-page-header-extra>
-      <div class="flex-grow-2 flex">
-        <nz-space>
-          <app-input-clear placeholder="Tìm kiếm" (enterEvent)="search()" [(value)]="filter.keyWord"></app-input-clear>
-          <button (click)="search()" class="flex !items-center !border-l-0 gray-btn" nzType="default" nz-button
-            nzType="default">
-            <span nz-icon nzType="search"></span>
-          </button>
-          <button (click)="reset()" class="flex !items-center !border-l-0 gray-btn" nzType="default" nz-button
-            nzType="default">
-            <span nz-icon nzType="redo"></span>
-          </button>
-        </nz-space>
-        <button (click)="openCreate()" class="!flex !items-center space-btn" nzType="primary" nz-button>
-          <span nz-icon nzType="plus-circle"></span> Thêm mới
+  <nz-page-header-title>QUẢN LÝ KHẢO SÁT</nz-page-header-title>
+  <nz-page-header-extra>
+    <div class="flex-grow-2 flex">
+      <nz-space>
+        <app-input-clear placeholder="Tìm kiếm" (enterEvent)="search()" [(value)]="filter.keyWord"></app-input-clear>
+        <button (click)="search()" class="flex !items-center !border-l-0 gray-btn" nzType="default" nz-button
+          nzType="default">
+          <span nz-icon nzType="search"></span>
         </button>
-      </div>
-    </nz-page-header-extra>
-    <nz-page-header-content class="main-content">
-      <nz-table class="auto-scroll-table" #headerTable [nzData]="paginationResult.data" [nzFrontPagination]="false"
-        [nzScroll]="{ y: 'calc(100vh - 244px)' }">
-        <thead>
-          <tr>
-            <th nzWidth="60px">STT</th>
-            <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('id', $event)">
-              Mã
-            </th>
-            <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('name', $event)">
-              Tên
-            </th>
-            <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('name', $event)">
-              Mô tả
-            </th>
-            <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('name', $event)">
-              Đối tượng chấm diểm
-            </th>
-            <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('name', $event)">
-              Thời gian gần nhất
-            </th>
-            <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('isActive', $event)" nzAlign="center">
-              Trạng thái
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let data of headerTable.data; let i = index" (dblclick)="openEdit(data)">
-            <td>
-              {{
-              (paginationResult.currentPage - 1) * paginationResult.pageSize +
-              i +
-              1
-              }}
-            </td>
-            <td>
-              <a (click)="openEdit(data)">{{ data.id }}</a>
-            </td>
-            <td><a (click)="openEdit(data)">{{ data.name }}</a></td>
-            <td><a (click)="openEdit(data)">{{ data.name }}</a></td>
-            <td><a (click)="openEdit(data)">{{ data.name }}</a></td>
-            <td><a (click)="openEdit(data)">{{ data.name }}</a></td>
-            <td nzAlign="center">
-              <nz-tag nzColor="success" *ngIf="data.isActive">
-                <nz-icon nzType="check-circle" />
-                <span>Kích hoạt</span>
-              </nz-tag>
-              <nz-tag nzColor="error" *ngIf="!data.isActive">
-                <nz-icon nzType="close-circle" />
-                <span>Khoá</span>
-              </nz-tag>
-            </td>
-          </tr>
-        </tbody>
-      </nz-table>
-    </nz-page-header-content>
-    <nz-page-header-content class="footer-content">
-      <div *ngIf="paginationResult?.data" class="flex justify-end p-[10px] border-t border-custom-gray border-solid">
-        <nz-pagination nzShowSizeChanger [nzPageIndex]="filter.currentPage" [nzTotal]="paginationResult.totalRecord"
-          [nzPageSize]="filter.pageSize" (nzPageIndexChange)="pageIndexChange($event)"
-          (nzPageSizeChange)="pageSizeChange($event)"></nz-pagination>
-      </div>
-    </nz-page-header-content>
-  </nz-page-header>
+        <button (click)="reset()" class="flex !items-center !border-l-0 gray-btn" nzType="default" nz-button
+          nzType="default">
+          <span nz-icon nzType="redo"></span>
+        </button>
+      </nz-space>
+      <button (click)="openCreate()" class="!flex !items-center space-btn" nzType="primary" nz-button>
+        <span nz-icon nzType="plus-circle"></span> Thêm mới
+      </button>
+    </div>
+  </nz-page-header-extra>
+  <nz-page-header-content class="main-content">
+    <nz-table class="auto-scroll-table" #headerTable [nzData]="paginationResult.data" [nzFrontPagination]="false"
+      [nzScroll]="{ y: 'calc(100vh - 244px)' }">
+      <thead>
+        <tr>
+          <th nzWidth="60px">STT</th>
+          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('id', $event)">
+            Mã
+          </th>
+          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('name', $event)">
+            Tên
+          </th>
+          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('name', $event)">
+            Mô tả
+          </th>
+          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('name', $event)">
+            Đối tượng chấm diểm
+          </th>
+          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('name', $event)">
+            Thời gian gần nhất
+          </th>
+          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('isActive', $event)" nzAlign="center">
+            Trạng thái
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of headerTable.data; let i = index" (dblclick)="openEdit(data)">
+          <td>
+            {{
+            (paginationResult.currentPage - 1) * paginationResult.pageSize +
+            i +
+            1
+            }}
+          </td>
+          <td>
+            <a (click)="openEdit(data)">{{ data.id }}</a>
+          </td>
+          <td><a (click)="openEdit(data)">{{ data.name }}</a></td>
+          <td><a (click)="openEdit(data)">{{ data.name }}</a></td>
+          <td><a (click)="openEdit(data)">{{ data.name }}</a></td>
+          <td><a (click)="openEdit(data)">{{ data.name }}</a></td>
+          <td nzAlign="center">
+            <nz-tag nzColor="success" *ngIf="data.isActive">
+              <nz-icon nzType="check-circle" />
+              <span>Kích hoạt</span>
+            </nz-tag>
+            <nz-tag nzColor="error" *ngIf="!data.isActive">
+              <nz-icon nzType="close-circle" />
+              <span>Khoá</span>
+            </nz-tag>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-page-header-content>
+  <nz-page-header-content class="footer-content">
+    <div *ngIf="paginationResult?.data" class="flex justify-end p-[10px] border-t border-custom-gray border-solid">
+      <nz-pagination nzShowSizeChanger [nzPageIndex]="filter.currentPage" [nzTotal]="paginationResult.totalRecord"
+        [nzPageSize]="filter.pageSize" (nzPageIndexChange)="pageIndexChange($event)"
+        (nzPageSizeChange)="pageSizeChange($event)"></nz-pagination>
+    </div>
+  </nz-page-header-content>
+</nz-page-header>
 
-  <!--Create Update-->
-  <nz-drawer [nzMask]="!edit" nzWidth="60%" nzSize="default" [nzVisible]="visible" nzPlacement="right"
-    [nzTitle]="edit ? ' Chỉnh sửa  ' : ' Tạo mới  '" [nzExtra]="extra" (nzOnClose)="close()">
-    <ng-container *nzDrawerContent>
-      <form nz-form nzLayout="vertical" [formGroup]="validateForm" (ngSubmit)="submitForm()">
-        <app-input-clear placeholder="Nhập mã" [required]="true" label="Mã "
+<!--Create Update-->
+<nz-drawer [nzMask]="!edit" nzWidth="60%" nzSize="default" [nzVisible]="visible" nzPlacement="right"
+  [nzTitle]="edit ? ' Chỉnh sửa  ' : ' Tạo mới  '" [nzExtra]="extra" (nzOnClose)="close()">
+  <ng-container *nzDrawerContent>
+    <form nz-form nzLayout="vertical" [formGroup]="validateForm" (ngSubmit)="submitForm()">
+      <div nz-row [nzGutter]="12">
+        <app-input-clear nz-col [nzXs]="24" [nzMd]="12" placeholder="Nhập mã" [required]="true" label="Mã "
           [control]="$any(validateForm).controls['id']" [required]="true"
           [disabled]="edit ? true : false"></app-input-clear>
 
-        <app-input-clear placeholder="Nhập tên chức vụ" [required]="true" label="Tên"
+        <app-input-clear nz-col [nzXs]="24" [nzMd]="12" placeholder="Nhập tên chức vụ" [required]="true" label="Tên"
           [control]="$any(validateForm).controls['name']"></app-input-clear>
 
-        <app-input-clear placeholder="Nhập tên chức vụ" [required]="true" label="Mô tả"
+        <app-input-clear nz-col [nzXs]="24" [nzMd]="12" placeholder="Nhập tên chức vụ" [required]="true" label="Mô tả"
           [control]="$any(validateForm).controls['name']"></app-input-clear>
 
-        <app-input-clear placeholder="Nhập tên chức vụ" [required]="true" label="Đối tượng áp dụng"
-          [control]="$any(validateForm).controls['name']"></app-input-clear>
-        <nz-upload
-          nzAction="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-          [nzHeaders]="{ authorization: 'authorization-text' }"
-          (nzChange)="handleChange($event)"
-        >
+        <div nz-col [nzXs]="24" [nzMd]="12">
+          <nz-form-item >
+          <nz-form-label [nzRequired]="true">Đối tượng áp dung</nz-form-label>
+          <nz-form-control nzErrorTip="Không được để trống">
+            <nz-select nzShowSearch nzAllowClear placeholder="Chọn Đối tượng" formControlName="doiTuongCode" (ngModelChange)="getTblCreate($event)">
+              <nz-option cdkScrollable
+                *ngFor="let item of lstDoiTuong"
+                [nzLabel]="item.name"
+                [nzValue]="item.id">
+              </nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+        </div>
+
+
+          <nz-upload nzAction="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+          [nzHeaders]="{ authorization: 'authorization-text' }" (nzChange)="handleChange($event)">
           <button nz-button>
             <nz-icon nzType="upload" />
             Click to Upload
           </button>
         </nz-upload>
-        <app-input-clear placeholder="Nhập tên chức vụ" [required]="true" label="Tên chức vụ"
-          [control]="$any(validateForm).controls['name']"></app-input-clear>
+      </div>
 
-        <app-input-clear placeholder="Nhập tên chức vụ" [required]="true" label="Tên chức vụ"
-          [control]="$any(validateForm).controls['name']"></app-input-clear>
+      <nz-table *ngIf="isStore" #rowSelectionTable nzShowSizeChanger [nzData]="lstStore" nzFooter=" " [nzFrontPagination]="'false'">
+        <thead>
+          <tr>
+            <th [(nzChecked)]="checked" [nzIndeterminate]="indeterminate" (nzCheckedChange)="onAllChecked($event)"></th>
+            <th>Mã</th>
+            <th>Tên cửa hàng</th>
+            <th>Cửa hàng trường</th>
+            <th>Người phụ trách</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let data of rowSelectionTable.data">
+            <td [nzChecked]="isCheckedId(data.id)" (nzCheckedChange)="onItemChecked(data.id, $event)">
+            </td>
+            <td>{{ data.id }}</td>
+            <td>{{ data.name }}</td>
+            <ng-container  *ngFor="let item of lstAccount">
+              <td *ngIf="item.userName === data.cuaHangTruong">{{ item.fullName }}</td>
+            </ng-container >
+            <ng-container  *ngFor="let item of lstAccount">
+              <td *ngIf="item.userName === data.nguoiPhuTrach">{{ item.fullName }}</td>
+            </ng-container >
+          </tr>
+        </tbody>
+      </nz-table>
 
-        <nz-form-item>
-          <nz-form-label>Trạng thái</nz-form-label>
-          <nz-form-control>
-            <nz-radio-group formControlName="isActive">
-              <label nz-radio [nzValue]="true">Kích hoạt</label>
-              <label nz-radio [nzValue]="false">Khoá</label>
-            </nz-radio-group>
-          </nz-form-control>
-        </nz-form-item>
-      </form>
-    </ng-container>
-  </nz-drawer>
-  <ng-template #extra>
-    <nz-space>
-      <ng-container *ngIf="edit">
-        <button [nzLoading]="loading" *nzSpaceItem nz-button nzType="primary" class="!flex !items-center"
-          (click)="submitForm()">
-          <span nz-icon nzType="save" nzTheme="outline"></span>Lưu
-        </button>
-      </ng-container>
-      <ng-container *ngIf="!edit">
-        <button [nzLoading]="loading" *nzSpaceItem nz-button nzType="primary" class="!flex !items-center"
-          (click)="submitForm()">
-          <span nz-icon nzType="save" nzTheme="outline"></span>Lưu
-        </button>
-      </ng-container>
-      <button *nzSpaceItem nz-button nzType="default" nzType="primary" class="!flex !items-center" nzDanger
-        (click)="close()">
-        <span nz-icon nzType="close-circle" nzTheme="outline"></span>Huỷ
+      <nz-table *ngIf="isKho" #rowSelectionTable nzShowSizeChanger [nzData]="lstKho" nzFooter=" " [nzFrontPagination]="'false'">
+        <thead>
+          <tr>
+            <th [(nzChecked)]="checked" [nzIndeterminate]="indeterminate" (nzCheckedChange)="onAllChecked($event)"></th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Address</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let data of rowSelectionTable.data; track trackById">
+            <td [nzChecked]="isCheckedId(data.id)" (nzCheckedChange)="onItemChecked(data.id, $event)">
+            </td>
+            <td>{{ data.name }}</td>
+            <td>{{ data.age }}</td>
+            <td>{{ data.address }}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+
+      <!-- <nz-form-item>
+        <nz-form-label>Trạng thái</nz-form-label>
+        <nz-form-control>
+          <nz-radio-group formControlName="isActive">
+            <label nz-radio [nzValue]="true">Kích hoạt</label>
+            <label nz-radio [nzValue]="false">Khoá</label>
+          </nz-radio-group>
+        </nz-form-control>
+      </nz-form-item> -->
+    </form>
+  </ng-container>
+</nz-drawer>
+<ng-template #extra>
+  <nz-space>
+    <ng-container *ngIf="edit">
+      <button [nzLoading]="loading" *nzSpaceItem nz-button nzType="primary" class="!flex !items-center"
+        (click)="submitForm()">
+        <span nz-icon nzType="save" nzTheme="outline"></span>Lưu
       </button>
-    </nz-space>
-  </ng-template>
+    </ng-container>
+    <ng-container *ngIf="!edit">
+      <button [nzLoading]="loading" *nzSpaceItem nz-button nzType="primary" class="!flex !items-center"
+        (click)="submitForm()">
+        <span nz-icon nzType="save" nzTheme="outline"></span>Lưu
+      </button>
+    </ng-container>
+    <button *nzSpaceItem nz-button nzType="default" nzType="primary" class="!flex !items-center" nzDanger
+      (click)="close()">
+      <span nz-icon nzType="close-circle" nzTheme="outline"></span>Huỷ
+    </button>
+  </nz-space>
+</ng-template>

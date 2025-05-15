@@ -23,8 +23,8 @@ namespace PLX5S.CORE.Entities.BU
         [Column("MO_TA", TypeName = "NVARCHAR(255)")]
         public string MoTa { get; set; }
 
-        [Column("DOI_TUONG_SU_DUNG", TypeName = "NVARCHAR(255)")]
-        public string DoiTuongSuDung { get; set; }
+        [Column("DOI_TUONG_CODE", TypeName = "NVARCHAR(255)")]
+        public string DoiTuongId { get; set; }
 
         [Column("IMAGE", TypeName = "NVARCHAR(255)")]
         public string Image { get; set; }

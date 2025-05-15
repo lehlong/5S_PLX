@@ -16,6 +16,10 @@ export class SurveyMgmtService {
     return this.commonService.get('SurveyMgmt/GetAll')
   }
 
+  buildInput(): Observable<any>{
+    return this.commonService.get('SurveyMgmt/BuildInput')
+  }
+
   create(params: any): Observable<any> {
     return this.commonService.post('SurveyMgmt/Insert', params)
   }

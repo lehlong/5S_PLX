@@ -32,21 +32,21 @@
             Tên của hàng
           </th>
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('CuaHangTruong', $event)">
-            Của hàng trưởng 
+            Của hàng trưởng
           </th>
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('NguoiPhuTrach', $event)">
-            Người Phụ trách  
+            Người Phụ trách
           </th>
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('phone', $event)">
-            số điện thoại 
+            số điện thoại
           </th>
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('KinhDo', $event)">
             Kinh Độ
           </th>
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('ViDo', $event)">
-           Vĩ Độ
+            Vĩ Độ
           </th>
-          
+
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('isActive', $event)" nzAlign="center">
             Trạng thái
           </th>
@@ -100,117 +100,94 @@
   <ng-container *nzDrawerContent>
     <form nz-form nzLayout="vertical" [formGroup]="validateForm" (ngSubmit)="submitForm()">
       <div nz-row [nzGutter]="12">
-         <div nz-col [nzXs]="24" [nzMd]="12"> 
-      <app-input-clear placeholder="Nhập tên cửa hàng " [required]="true" label="Tên cửa hàng"
-        [control]="$any(validateForm).controls['name']" [required]="true"
-        [disabled]="edit ? true : false"></app-input-clear>
+        <div nz-col [nzXs]="24" [nzMd]="12">
+          <app-input-clear placeholder="Nhập tên cửa hàng " [required]="true" label="Tên cửa hàng"
+            [control]="$any(validateForm).controls['name']" [required]="true"
+            [disabled]="edit ? true : false"></app-input-clear>
         </div>
         <div nz-col [nzXs]="24" [nzMd]="12">
-          <app-input-clear placeholder="Nhập mã cửa hàng " [required]="true" label="Mã "
-        [control]="$any(validateForm).controls['id']" [required]="true"
-        [disabled]="edit ? true : false"></app-input-clear>
+          <app-input-clear placeholder="Nhập tên kinh độ " [required]="true" label="Kinh độ"
+            [control]="$any(validateForm).controls['KinhDo']" [required]="true"
+            [disabled]="edit ? true : false"></app-input-clear>
         </div>
         <div nz-col [nzXs]="24" [nzMd]="12">
-         <app-input-clear placeholder="Nhập tên kinh độ " [required]="true" label="Kinh độ"
-        [control]="$any(validateForm).controls['KinhDo']" [required]="true"
-        [disabled]="edit ? true : false"></app-input-clear>
-          </div>
-          <div nz-col [nzXs]="24" [nzMd]="12">
-         <app-input-clear placeholder="Nhập tên vĩ độ " [required]="true" label="Vĩ độ"
-        [control]="$any(validateForm).controls['ViDo']" [required]="true"
-        [disabled]="edit ? true : false"></app-input-clear>
+          <app-input-clear placeholder="Nhập tên vĩ độ " [required]="true" label="Vĩ độ"
+            [control]="$any(validateForm).controls['ViDo']" [required]="true"
+            [disabled]="edit ? true : false"></app-input-clear>
         </div>
         <div nz-col [nzXs]="24" [nzMd]="12">
-      <app-input-clear placeholder="Nhập số điện thoại " [required]="true" label="Số điện thoại"
-        [control]="$any(validateForm).controls['Phone']" [required]="true"></app-input-clear>
+          <app-input-clear placeholder="Nhập số điện thoại " [required]="true" label="Số điện thoại"
+            [control]="$any(validateForm).controls['Phone']" [required]="true"></app-input-clear>
         </div>
-     
-               <div nz-col [nzXs]="24" [nzMd]="12">
-           <nz-form-item>
-            <nz-form-label>Trạng thái cửa hàng</nz-form-label>
-            <nz-form-control nzErrorTip="Không được để trống">
-              <nz-select
-                nzShowSearch
-  nzAllowClear
-  placeholder="Chọn trạng thái cửa hàng"
-  formControlName="TrangThaiCuaHang"
->
-  <nz-option [nzLabel]="'Đóng cửa'" [nzValue]="false"></nz-option>
-  <nz-option [nzLabel]="'Mở cửa'" [nzValue]="true"></nz-option>
-
-</nz-select>
-            </nz-form-control>
-          </nz-form-item>
-          </div>
-          <div nz-col [nzXs]="24" [nzMd]="12">
-           <nz-form-item>
-            <nz-form-label>Chon cửa hàng trưởng</nz-form-label>
-            <nz-form-control nzErrorTip="Không được để trống">
-               <nz-select
+        <!-- <nz-select
                 nzShowSearch
                 nzAllowClear
                 placeholder="Chọn cửa hàng trưởng"
-                formControlName="CuaHangTruong"
+                formControlName="accountType"
               >
                 <nz-option
                   cdkScrollable
-                  *ngFor="let item of Account"
-                  [nzLabel]="item.fullName"
-                  [nzValue]="item.userName"
+                  *ngFor="let item of "
+                  [nzLabel]="item."
+                  [nzValue]="item.id"
                 >
+                </nz-option>
+              </nz-select> -->
+        <div nz-col [nzXs]="24" [nzMd]="12">
+          <nz-form-item>
+            <nz-form-label>Trạng thái cửa hàng</nz-form-label>
+            <nz-form-control nzErrorTip="Không được để trống">
+              <nz-select nzShowSearch nzAllowClear placeholder="Chọn trạng thái cửa hàng"
+                formControlName="TrangThaiCuaHang">
+                <nz-option [nzLabel]="'Đóng cửa'" [nzValue]="false"></nz-option>
+                <nz-option [nzLabel]="'Mở cửa'" [nzValue]="true"></nz-option>
+
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzXs]="24" [nzMd]="12">
+          <nz-form-item>
+            <nz-form-label>Chon cửa hàng trưởng</nz-form-label>
+            <nz-form-control nzErrorTip="Không được để trống">
+              <nz-select nzShowSearch nzAllowClear placeholder="Chọn cửa hàng trưởng" formControlName="CuaHangTruong">
+                <nz-option cdkScrollable *ngFor="let item of Account" [nzLabel]="item.fullName"
+                  [nzValue]="item.userName">
                 </nz-option>
               </nz-select>
             </nz-form-control>
           </nz-form-item>
-          </div>
-           <div nz-col [nzXs]="24" [nzMd]="12">
-           <nz-form-item>
+        </div>
+        <div nz-col [nzXs]="24" [nzMd]="12">
+          <nz-form-item>
             <nz-form-label>người phụ trách</nz-form-label>
             <nz-form-control nzErrorTip="Không được để trống">
-               <nz-select
-                nzShowSearch
-                nzAllowClear
-                placeholder="Chọn người phụ trách"
-                formControlName="NguoiPhuTrach"
-              >
-                <nz-option
-                  cdkScrollable
-                  *ngFor="let item of Account"
-                  [nzLabel]="item.fullName"
-                  [nzValue]="item.userName"
-                >
+              <nz-select nzShowSearch nzAllowClear placeholder="Chọn người phụ trách" formControlName="NguoiPhuTrach">
+                <nz-option cdkScrollable *ngFor="let item of Account" [nzLabel]="item.fullName"
+                  [nzValue]="item.userName">
                 </nz-option>
               </nz-select>
             </nz-form-control>
           </nz-form-item>
-          </div>
-          <div nz-col [nzXs]="24" [nzMd]="12">
-      <nz-form-item>
-        <nz-form-label>ATVSV</nz-form-label>
-        <nz-form-control nzErrorTip="Không được để trống">
-           <nz-select
-              [nzMaxTagCount]="3"
-              [nzMaxTagPlaceholder]="tagPlaceHolder"
-              nzMode="multiple"
-              nzPlaceHolder="Please select"
-              formControlName="ATVSV"
-    >
-       <nz-option
-                  cdkScrollable
-                  *ngFor="let item of Account"
-                  [nzLabel]="item.fullName"
-                  [nzValue]="item.userName"
-                >
-       </nz-option>
-    </nz-select>
-    <ng-template #tagPlaceHolder let-selectedList>and {{ selectedList.length }} more selected</ng-template>
- 
-</nz-form-control>
-</nz-form-item>
-</div>
-    
+        </div>
+        <div nz-col [nzXs]="24" [nzMd]="12">
+          <nz-form-item>
+            <nz-form-label>ATVSV</nz-form-label>
+            <nz-form-control nzErrorTip="Không được để trống">
+              <nz-select [nzMaxTagCount]="3" [nzMaxTagPlaceholder]="tagPlaceHolder" nzMode="multiple"
+                nzPlaceHolder="Please select" formControlName="ATVSV">
+                <nz-option cdkScrollable *ngFor="let item of Account" [nzLabel]="item.fullName"
+                  [nzValue]="item.userName">
+                </nz-option>
+              </nz-select>
+              <ng-template #tagPlaceHolder let-selectedList>and {{ selectedList.length }} more selected</ng-template>
+
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+
       </div>
-          
+
       <nz-form-item>
         <nz-form-label>Trạng thái</nz-form-label>
         <nz-form-control>

@@ -31,6 +31,26 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
+
+
+        [HttpGet("BuildInput")]
+        public async Task<IActionResult> BuildInput([FromQuery] string doiTuongId)
+        {
+            var transferObject = new TransferObject();
+            var result = await _service.BuildInput(doiTuongId);
+            if (_service.Status)
+            {
+                transferObject.Data = result;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
+
         //[HttpGet("GetAll")]
         //public async Task<IActionResult> GetAll([FromQuery] BaseMdFilter filter)
         //{

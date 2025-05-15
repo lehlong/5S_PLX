@@ -11,6 +11,9 @@ namespace PLX5S.BUSINESS.Dtos.BU
         [Description("Mã cửa hàng")]
         public string Id { get; set; }
 
+        [Description("Mã cửa hàng")]
+        public string Ma { get; set; }
+
         [Description("Mã kỳ khảo sát")]
         public string SurveyMgmtId { get; set; }
 

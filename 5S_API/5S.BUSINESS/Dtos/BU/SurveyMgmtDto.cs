@@ -16,8 +16,22 @@ namespace PLX5S.BUSINESS.Dtos.BU
         [Key]
         [Description("Mã chức vụ")]
         public string Id { get; set; }
-        [Description("Tên chức vụ")]
+
+        [Description("Tên")]
         public string Name { get; set; }
+
+        [Description("mô tả")]
+        public string MoTa { get; set; }
+
+        [Description("mã đối tượng")]
+        public string DoiTuongId { get; set; }
+
+        [Description("Ảnh")]
+        public string? Image { get; set; }
+
+        [Description("Tên chức vụ")]
+        public List<TblBuInputStore> InputStore { get; set; } = new List<TblBuInputStore>();
+
 
         [Description("Trạng thái")]
         public string State { get => this.IsActive == true ? "Đang hoạt động" : "Khóa"; }

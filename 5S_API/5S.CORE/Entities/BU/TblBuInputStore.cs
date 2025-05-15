@@ -11,6 +11,9 @@ namespace PLX5S.CORE.Entities.BU
         [Column("ID", TypeName = "NVARCHAR(50)")]
         public string Id { get; set; }
 
+        [Column("MA", TypeName = "NVARCHAR(50)")]
+        public string Ma { get; set; }
+
         [Column("SURVEY_MGMT_ID", TypeName = "NVARCHAR(50)")]
         public string SurveyMgmtId { get; set; }
 
