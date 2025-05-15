@@ -33,7 +33,7 @@ export class StoreComponent {
     private accountService: AccountService,
   ) {
     this.validateForm= this.fb.group({
-      id: [''],
+      id: ['',[Validators.required]],
       name: ['', [Validators.required]],
       KinhDo: ['', [Validators.required]],
       ViDo: ['', [Validators.required]],

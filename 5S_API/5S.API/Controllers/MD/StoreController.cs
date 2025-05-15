@@ -6,7 +6,7 @@ using PLX5S.BUSINESS.Services.MD;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace PLX5S.API.Controllers.MD
+namespace PLX5S.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

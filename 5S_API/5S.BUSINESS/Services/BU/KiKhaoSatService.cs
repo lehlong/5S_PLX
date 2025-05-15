@@ -1,25 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Common;
 using Microsoft.EntityFrameworkCore;
 using PLX5S.BUSINESS.Common;
 using PLX5S.BUSINESS.Dtos.BU;
 using PLX5S.CORE.Entities.BU;
 using PLX5S.CORE;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace PLX5S.BUSINESS.Services.BU
 {
 
     public interface IKikhaosatService : IGenericService<TblBuKiKhaoSat, KiKhaoSatDto>
     {
-        Task<IList<KiKhaoSatDto>> GetAll(BaseMdFilter filter);
-        Task<byte[]> Export(BaseMdFilter filter);
+        //Task<IList<SurveyMgmtDto>> GetAll(BaseMdFilter filter);
+        //Task<byte[]> Export(BaseMdFilter filter);
+        Task Insert(TblBuKiKhaoSat data);
     }
-    public class KiKhaoSatService(AppDbContext dbContext, IMapper mapper) : GenericService<TblBuKiKhaoSat, KiKhaoSatDto>(dbContext, mapper), IKikhaosatService
+    public class KikhaosatService(AppDbContext dbContext, IMapper mapper) : GenericService<TblBuKiKhaoSat, KiKhaoSatDto>(dbContext, mapper), IKikhaosatService
     {
         public override async Task<PagedResponseDto> Search(BaseFilter filter)
         {
@@ -28,7 +29,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 var query = _dbContext.TblBuKiKhaoSat.AsQueryable();
                 if (!string.IsNullOrWhiteSpace(filter.KeyWord))
                 {
-                    query = query.Where(x => x.Id.ToString().Contains(filter.KeyWord));
+                    query = query.Where(x => x.Code.ToString().Contains(filter.KeyWord) || x.Name.Contains(filter.KeyWord));
                 }
                 if (filter.IsActive.HasValue)
                 {
@@ -44,52 +45,32 @@ namespace PLX5S.BUSINESS.Services.BU
                 return null;
             }
         }
-        public async Task<byte[]> Export(BaseMdFilter filter)
+        public async Task Insert(TblBuKiKhaoSat data)
         {
             try
             {
-                var query = _dbContext.TblBuKiKhaoSat.AsQueryable();
-                if (!string.IsNullOrWhiteSpace(filter.KeyWord))
+                var datakks = new TblBuKiKhaoSat()
                 {
-                    query = query.Where(x => x.Name.Contains(filter.KeyWord));
-                }
-                if (filter.IsActive.HasValue)
-                {
-                    query = query.Where(x => x.IsActive == filter.IsActive);
-                }
-                var data = await base.GetAllMd(query, filter);
-                int i = 1;
-                //data.ForEach(x =>
-                //{
-                //    x.OrdinalNumber = i++;
-                //});
-                return await ExportExtension.ExportToExcel(data);
+                    Code = data.Code,
+                    InputStoreId = data.InputStoreId,
+                    Des = data.Des,
+                    StartDate = data.StartDate,
+                    EndDate = data.EndDate,
+                    IsActive=data.IsActive,
+                    Name=data.Name
+                };
+                
+                _dbContext.TblBuKiKhaoSat.Add(datakks);
+                _dbContext.SaveChanges();
             }
             catch (Exception ex)
             {
                 Status = false;
                 Exception = ex;
-                return null;
             }
         }
 
-        public async Task<IList<KiKhaoSatDto>> GetAll(BaseMdFilter filter)
-        {
-            try
-            {
-                var query = _dbContext.TblBuKiKhaoSat.AsQueryable();
-                if (filter.IsActive.HasValue)
-                {
-                    query = query.Where(x => x.IsActive == filter.IsActive);
-                }
-                return await base.GetAllMd(query, filter);
-            }
-            catch (Exception ex)
-            {
-                Status = false;
-                Exception = ex;
-                return null;
-            }
-        }
+        //public async Task List<input>
+        
     }
 }

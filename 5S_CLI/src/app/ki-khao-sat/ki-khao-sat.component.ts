@@ -3,7 +3,7 @@ import { ShareModule } from '../shared/share-module'
 import { FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms'
 import { AccountTypeFilter } from '../models/master-data/account-type.model'
 import { PaginationResult } from '../models/base.model'
-import { StoreService} from '../service/master-data/store.service'
+import { KiKhaoSatService } from '../service/master-data/ki-khao-sat.service'
 import { AccountService } from '../service/system-manager/account.service'
 import { GlobalService } from '../service/global.service'
 import { NzMessageService } from 'ng-zorro-antd/message'
@@ -20,28 +20,27 @@ export class KiKhaoSatComponent {
   isSubmit: boolean = false
   visible: boolean = false
   edit: boolean = false
+  EndDate: Date | null = null;
+  
   filter = new AccountTypeFilter()
   paginationResult = new PaginationResult()
   loading: boolean = false
   Account:any=[] 
   constructor(
-    private _service: StoreService,
+    private _service: KiKhaoSatService,
     private fb: NonNullableFormBuilder,
     private globalService: GlobalService,
     private message: NzMessageService,
     private accountService: AccountService,
   ) {
     this.validateForm= this.fb.group({
-      id: [''],
-      name: ['', [Validators.required]],
-      KinhDo: ['', [Validators.required]],
-      ViDo: ['', [Validators.required]],
-      Phone: ['', [Validators.required]],
+      Code: [''],
+      Name: ['', [Validators.required]],
+      Des: ['', [Validators.required]],
+      StartDate: ['', [Validators.required]],
+      EndDate: ['', [Validators.required]],
       isActive: [true, [Validators.required]],
-      TrangThaiCuaHang: [true],
-      CuaHangTruong: ['', [Validators.required]],
-      ATVSV: [[], [Validators.required]],
-      NguoiPhuTrach: ['', [Validators.required]],
+      InputStoreId: ['adeqewqsdasdsad',],
      
     })
     this.globalService.setBreadcrumb([

@@ -10,7 +10,7 @@ namespace PLX5S.BUSINESS.Dtos.BU
     public class KiKhaoSatDto : IMapFrom, IDto
     {
         [Description("Mã kỳ khảo sát")]
-        public string Id { get; set; }
+        public string Code { get; set; }
 
         [Description("Tên kỳ khảo sát")]
         public string Name { get; set; }
@@ -24,6 +24,8 @@ namespace PLX5S.BUSINESS.Dtos.BU
         [Description("Ngày kết thúc")]
         public DateTime? EndDate { get; set; }
 
+        [Description("InputStoreId")]
+        public string InputStoreId { get; set; }
         public void Mapping(Profile profile)
         {
             profile.CreateMap<TblBuKiKhaoSat, KiKhaoSatDto>().ReverseMap();

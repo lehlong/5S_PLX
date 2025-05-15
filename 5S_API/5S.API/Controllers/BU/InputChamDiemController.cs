@@ -1,19 +1,17 @@
 ﻿using Common;
+using Microsoft.AspNetCore.Mvc;
 using PLX5S.API.AppCode.Enum;
 using PLX5S.API.AppCode.Extensions;
 using PLX5S.BUSINESS.Dtos.BU;
-using PLX5S.BUSINESS.Services.BU;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using PLX5S.CORE.Entities.BU;
+using Services.BU;
 
 namespace PLX5S.API.Controllers.BU
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class KiKhaoSatController(IKikhaosatService service) : ControllerBase
+    public class InputChamDiemController(IInputChamDiemService service) : ControllerBase
     {
-        public readonly IKikhaosatService _service = service;
+        private readonly IInputChamDiemService _service = service;
 
         [HttpGet("Search")]
         public async Task<IActionResult> Search([FromQuery] BaseFilter filter)
@@ -32,18 +30,14 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
- 
-      
+
         [HttpPost("Insert")]
-        public async Task<IActionResult> Insert([FromBody] TblBuKiKhaoSat time)
+        public async Task<IActionResult> Insert([FromBody] InputChamDiemDto dto)
         {
             var transferObject = new TransferObject();
-
-            await _service.Insert(time);
-
+            await _service.Insert(dto);
             if (_service.Status)
             {
-                //transferObject.Data = result;
                 transferObject.Status = true;
                 transferObject.MessageObject.MessageType = MessageType.Success;
                 transferObject.GetMessage("0100", _service);
@@ -56,11 +50,12 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
+
         [HttpPut("Update")]
-        public async Task<IActionResult> Update([FromBody] KiKhaoSatDto time)
+        public async Task<IActionResult> Update([FromBody] InputChamDiemDto dto)
         {
             var transferObject = new TransferObject();
-            await _service.Update(time);
+            await _service.Update(dto);
             if (_service.Status)
             {
                 transferObject.Status = true;
@@ -75,44 +70,26 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
-        [HttpDelete("Delete/{id}")]
-        public async Task<IActionResult> Delete([FromRoute] string id)
-        {
-            var transferObject = new TransferObject();
-            await _service.Delete(id);
-            if (_service.Status)
-            {
-                transferObject.Status = true;
-                transferObject.MessageObject.MessageType = MessageType.Success;
-                transferObject.GetMessage("0105", _service);
-            }
-            else
-            {
-                transferObject.Status = false;
-                transferObject.MessageObject.MessageType = MessageType.Error;
-                transferObject.GetMessage("0106", _service);
-            }
-            return Ok(transferObject);
-        }
-        [HttpGet("GetAll")]
-        public async Task<IActionResult> Getall()
-        {
-            var transferObject = new TransferObject();
-            //await _service.Delete();
-            if (_service.Status)
-            {
-                transferObject.Status = true;
-                transferObject.MessageObject.MessageType = MessageType.Success;
-                transferObject.GetMessage("0105", _service);
-            }
-            else
-            {
-                transferObject.Status = false;
-                transferObject.MessageObject.MessageType = MessageType.Error;
-                transferObject.GetMessage("0106", _service);
-            }
-            return Ok(transferObject);
-        }
 
+        [HttpDelete("Delete")]
+        public async Task<IActionResult> Delete([FromQuery] string storeId, [FromQuery] string kiKhaoSatId, [FromQuery] string userName)
+        {
+            var transferObject = new TransferObject();
+            var key = new { StoreId = storeId, KiKhaoSatId = kiKhaoSatId, UserName = userName };
+            await _service.Delete(key);
+            if (_service.Status)
+            {
+                transferObject.Status = true;
+                transferObject.MessageObject.MessageType = MessageType.Success;
+                transferObject.GetMessage("0105", _service);
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0106", _service);
+            }
+            return Ok(transferObject);
+        }
     }
 }

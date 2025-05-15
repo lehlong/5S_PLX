@@ -1,19 +1,18 @@
 ﻿using Common;
-using PLX5S.API.AppCode.Enum;
-using PLX5S.API.AppCode.Extensions;
-using PLX5S.BUSINESS.Dtos.BU;
-using PLX5S.BUSINESS.Services.BU;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using PLX5S.CORE.Entities.BU;
+using PLX5S.API.AppCode.Enum;
+using PLX5S.BUSINESS.Dtos.BU;
+//using PlX5S.BUSINESS.Services.BU;
+using PLX5S.BUSINESS.Services.BU;
+using PLX5S.API.AppCode.Extensions;
 
 namespace PLX5S.API.Controllers.BU
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class KiKhaoSatController(IKikhaosatService service) : ControllerBase
+    public class InputStoreController(IInputStoreService service) : ControllerBase
     {
-        public readonly IKikhaosatService _service = service;
+        public readonly IInputStoreService _service = service;
 
         [HttpGet("Search")]
         public async Task<IActionResult> Search([FromQuery] BaseFilter filter)
@@ -32,18 +31,16 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
- 
-      
+       
         [HttpPost("Insert")]
-        public async Task<IActionResult> Insert([FromBody] TblBuKiKhaoSat time)
+        public async Task<IActionResult> Insert([FromBody] InputStoreDto time)
         {
             var transferObject = new TransferObject();
-
-            await _service.Insert(time);
-
+            time.Id = Guid.NewGuid().ToString();
+            var result = await _service.Add(time);
             if (_service.Status)
             {
-                //transferObject.Data = result;
+                transferObject.Data = result;
                 transferObject.Status = true;
                 transferObject.MessageObject.MessageType = MessageType.Success;
                 transferObject.GetMessage("0100", _service);
@@ -57,7 +54,7 @@ namespace PLX5S.API.Controllers.BU
             return Ok(transferObject);
         }
         [HttpPut("Update")]
-        public async Task<IActionResult> Update([FromBody] KiKhaoSatDto time)
+        public async Task<IActionResult> Update([FromBody] InputStoreDto time)
         {
             var transferObject = new TransferObject();
             await _service.Update(time);
@@ -94,25 +91,6 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
-        [HttpGet("GetAll")]
-        public async Task<IActionResult> Getall()
-        {
-            var transferObject = new TransferObject();
-            //await _service.Delete();
-            if (_service.Status)
-            {
-                transferObject.Status = true;
-                transferObject.MessageObject.MessageType = MessageType.Success;
-                transferObject.GetMessage("0105", _service);
-            }
-            else
-            {
-                transferObject.Status = false;
-                transferObject.MessageObject.MessageType = MessageType.Error;
-                transferObject.GetMessage("0106", _service);
-            }
-            return Ok(transferObject);
-        }
-
+       
     }
 }

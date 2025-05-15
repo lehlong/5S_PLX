@@ -50,7 +50,7 @@ namespace PLX5S.BUSINESS.Services.MD
         {
             try
             {
-                data.Id = Guid.NewGuid().ToString();
+                
                 var store = new TblMdStore()
                 {
                     Id = data.Id,

@@ -9,8 +9,8 @@ namespace PLX5S.CORE.Entities.BU
     {
         [Key]   
         
-        [Column("ID", TypeName = "NVARCHAR(50)")]
-        public string Id { get; set; }
+        [Column("CODE", TypeName = "NVARCHAR(50)")]
+        public string Code { get; set; }
 
         [Column("NAME", TypeName = "NVARCHAR(50)")]
         public string Name { get; set; }
@@ -19,7 +19,13 @@ namespace PLX5S.CORE.Entities.BU
         public string Des { get; set; }
 
         [Column("START_DATE")]
+     
+
+        
         public DateTime? StartDate { get; set; }
+        //INPUT_STORE_ID
+        [Column("INPUT_STORE_ID")]
+        public string InputStoreId { get; set; }
 
         [Column("END_DATE")]
         public DateTime? EndDate { get; set; }
