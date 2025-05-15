@@ -1,74 +1,106 @@
-<div class="container">
-  <nz-page-header nzTitle="Cập Nhật Tiêu Chí Chấm Điểm">
-    <nz-breadcrumb>
-      <nz-breadcrumb-item>Cập Nhật Tiêu Chí Chấm Điểm</nz-breadcrumb-item>
-    </nz-breadcrumb>
-  </nz-page-header>
+<!-- Main View with Button -->
+<div class="main-container p-6">
+  <h1>Đánh Giá Tiêu Chí</h1>
+  <button 
+    nz-button 
+    nzType="primary" 
+    (click)="openDrawer()" 
+    class="mt-4 flex items-center">
+    <span nz-icon nzType="appstore" nzTheme="outline"></span>
+    <span class="ml-2">Mở cây tiêu chí chấm điểm</span>
+  </button>
+</div>
 
-  <div class="content">
-    <div class="left-panel">
-      <h3>Cây tiêu chí chấm điểm</h3>
-      <ul>
-        <li>
-          <strong>Tháng 6 - 2024</strong>
-          <ul>
-            <li>
-              <strong>I. CHUẨN KHU VỰC BÁN HÀNG</strong>
-              <ul>
-                <li>Sàn bãi</li>
-                <li>Tiêu đào trụ bơm</li>
-                <li>Tủ trưng bày</li>
-                <li>Khu vệ sinh của khách, CBCNV</li>
-              </ul>
-            </li>
-            <li>
-              <strong>II. CHUẨN ĐỒNG PHỤC</strong>
-              <ul>
-                <li>Đồng phục khi bán hàng</li>
-              </ul>
-            </li>
-            <li>
-              <strong>III. CHUẨN KHU VỰC KHO - BỂ</strong>
-              <ul>
-                <li>Kho DMN, bể chứa</li>
-                <li>Tủ lưu mẫu</li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-      </ul>
-      <div class="buttons">
-        <button nz-button nzType="primary">Thêm</button>
-        <button nz-button nzType="default">Sửa</button>
-        <button nz-button nzType="default" nzDanger>Xóa</button>
+<!-- Drawer Component -->
+<nz-drawer
+  [nzVisible]="drawerVisible"
+  [nzWidth]="1600"
+  nzPlacement="right"
+  nzTitle="Cây tiêu chí chấm điểm"
+  (nzOnClose)="closeDrawer()">
+  <div class="container" *nzDrawerContent>
+    <div class="content flex">
+      <!-- Left Panel: Tree View -->
+      <div class="left-panel w-1/3 pr-4">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="m-0">Cây tiêu chí chấm điểm</h3>
+          <div class="buttons flex gap-2">
+            <button nz-button nzType="primary" (click)="openCreate()">Thêm</button>
+            <button nz-button nzType="default" (click)="openEdit(selectedNode)">Sửa</button>
+            <button nz-button nzType="default" nzDanger (click)="deleteNode(selectedNode)">Xóa</button>
+          </div>
+        </div>
+        <nz-tree
+          #treeCom
+          [nzData]="treeData"
+          nzDraggable
+          nzBlockNode
+          [nzExpandAll]="true"
+          (nzOnDrop)="onDrop($event)"
+          (nzClick)="onTreeNodeClick($event)"
+        ></nz-tree>
+      </div>
+
+      <!-- Right Panel: Table View -->
+      <div class="right-panel w-2/3 pl-4">
+        <nz-page-header nzBackIcon>
+          <nz-page-header-title>Chi tiết tiêu chí</nz-page-header-title>
+          <nz-page-header-extra>
+            <button (click)="openCreate()" class="flex items-center" nzType="primary" nz-button>
+              <span nz-icon nzType="plus-circle"></span> Thêm mới
+            </button>
+          </nz-page-header-extra>
+        </nz-page-header>
+        <nz-table
+          class="auto-scroll-table"
+          #headerTable
+          [nzData]="selectedNodeDetails"
+          [nzBordered]="true"
+          [nzFrontPagination]="false"
+        >
+          <thead>
+            <tr>
+              <th nzWidth="60px">STT</th>
+              <th>Mã tiêu chí</th>
+              <th>Tên tiêu chí</th>
+              <th>Bắt buộc chọn hình ảnh</th>
+              <th nzAlign="center">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of headerTable.data; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td>{{ data.code }}</td>
+              <td>{{ data.name }}</td>
+              <td>{{ data.requiredImage ? 'Có' : 'Không' }}</td>
+              <td nzAlign="center">
+                <button nz-button nzType="link" (click)="openEdit(data)">Sửa</button>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
       </div>
     </div>
-
-    <div class="right-panel">
-      <h3>Chọn tiêu chí để xem thông tin tiêu chí</h3>
-      <nz-table [nzBordered]="true" [nzData]="tableData" [nzBordered]="true" [nzSize]="'middle'">
-        <thead>
-          <tr>
-            <th>STT</th>
-            <th>MÃ TIÊU CHÍ</th>
-            <th>TÊN TIÊU CHÍ</th>
-            <th>BẮT BUỘC CHỌN HÌNH ẢNH</th>
-            <th>THAO TÁC</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let data of tableData; let i = index">
-            <td>{{ i + 1 }}</td>
-            <td>{{ data.code }}</td>
-            <td>{{ data.name }}</td>
-            <td>{{ data.requiredImage ? 'Có' : 'Không' }}</td>
-            <td>
-              <button nz-button nzType="link">Sửa</button>
-              <button nz-button nzType="link" nzDanger>Xóa</button>
-            </td>
-          </tr>
-        </tbody>
-      </nz-table>
-    </div>
   </div>
-</div>
+</nz-drawer>
+
+<!-- Create/Edit Form Modal -->
+<nz-modal
+  [(nzVisible)]="visible"
+  [nzTitle]="edit ? 'Chỉnh sửa tiêu chí' : 'Thêm tiêu chí mới'"
+  (nzOnCancel)="visible = false"
+  [nzFooter]="modalFooter">
+  <form nz-form [formGroup]="validateForm">
+    <nz-form-item>
+      <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired>Tên tiêu chí</nz-form-label>
+      <nz-form-control [nzSm]="14" [nzXs]="24" nzErrorTip="Vui lòng nhập tên tiêu chí!">
+        <input nz-input formControlName="name" />
+      </nz-form-control>
+    </nz-form-item>
+    <!-- Add other form fields as needed -->
+  </form>
+  <ng-template #modalFooter>
+    <button nz-button nzType="default" (click)="visible = false">Hủy</button>
+    <button nz-button nzType="primary" [disabled]="validateForm.invalid">Lưu</button>
+  </ng-template>
+</nz-modal>

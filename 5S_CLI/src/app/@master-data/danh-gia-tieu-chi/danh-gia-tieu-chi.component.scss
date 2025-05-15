@@ -1,0 +1,66 @@
+/* Styling for drawer content */
+.container {
+  width: 100%; /* Ensure container takes full width of the drawer */
+  height: 100%; /* Maintain full height */
+  display: flex; /* Use flex to control child layout */
+  flex-direction: column; /* Stack children vertically if needed */
+}
+
+.content {
+  width: 100%; /* Ensure content takes full width */
+  height: 100%; /* Ensure content takes full height */
+  display: flex;
+  flex-direction: row; /* Keep left and right panels side by side */
+  flex: 1; /* Allow content to grow and fill available space */
+}
+
+.left-panel {
+  width: 30%; /* Keep 1/4 width for left panel */
+  border-right: 1px solid #eee;
+  overflow: auto;
+  padding-right: 16px; /* Match the pr-4 utility */
+}
+
+.right-panel {
+  width: 70%; /* Keep 3/4 width for right panel */
+  overflow: auto;
+  padding-left: 16px; /* Match the pl-4 utility */
+}
+
+/* Tree styling */
+:host ::ng-deep .ant-tree {
+  padding: 10px 0;
+}
+
+/* Table styling */
+.auto-scroll-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Button styling */
+button.space-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .content {
+    flex-direction: column;
+    height: auto; /* Allow height to adjust for stacked layout */
+  }
+
+  .left-panel, .right-panel {
+    width: 100%;
+    border-right: none;
+    padding: 0;
+  }
+
+  .left-panel {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+  }
+}

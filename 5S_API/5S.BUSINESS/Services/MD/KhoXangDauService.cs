@@ -82,6 +82,11 @@ public class KhoXangDauService(AppDbContext dbContext, IMapper mapper) : Generic
             throw;
         }
     }
+        public async Task Update(KhoXangDauDto data)
+        {
+
+        }
+
     //public async Task<byte[]> Export(BaseMdFilter filter)
     //{
     //    try
