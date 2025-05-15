@@ -132,12 +132,13 @@ namespace PLX5S.CORE
         public DbSet<TblMdDoiTuong> tblMdDoituong { get; set; }
         public DbSet<TblMdStore> tblMdStore { get; set; }
         public DbSet<TblMdAtvsv> tblMdAtvsv { get; set; }
+        public DbSet<TblMdKhoXangDau> tblMdKhoXangDau { get; set; }
+
         #endregion
 
         #region Business 
         public DbSet<TblBuKiKhaoSat> TblBuKiKhaoSat { get; set; }
         public DbSet<TblBuSurveyMgmt> TblBuSurveyMgmt { get; set; }
-
         #endregion
     }
 }

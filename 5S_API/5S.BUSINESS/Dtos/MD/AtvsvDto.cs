@@ -17,7 +17,7 @@ namespace PLX5S.BUSINESS.Dtos.MD
         [Key]
         public string Id { get; set; }
         public string Name { get; set; }
-        public string HeaderId { get; set; }
+        public string StoreId { get; set; }
 
         public void Mapping(Profile profile)
         {
