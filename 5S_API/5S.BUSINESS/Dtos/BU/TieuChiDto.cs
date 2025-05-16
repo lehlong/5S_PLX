@@ -26,10 +26,12 @@ namespace PLX5S.BUSINESS.Dtos.BU
         public int? OrderNumber { get; set; }
 
         public bool? IsGroup { get; set; }
+
         public bool? IsImg { get; set; }
 
         public string Report { get; set; }
 
+        public List<TieuChiDto>? Children { set; get; }
 
         public void Mapping(Profile profile)
         {

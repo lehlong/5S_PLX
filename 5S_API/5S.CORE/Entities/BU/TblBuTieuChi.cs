@@ -31,7 +31,7 @@ public class TblBuTieuChi : SoftDeleteEntity
         public bool? IsGroup { get; set; }
 
         [Column("IS_IMG")]
-        public bool? IsIMG { get; set; }
+        public bool? IsImg { get; set; }
 
         [Column("ORDER_NUMBER")]
         public int OrderNumber { get; set; }

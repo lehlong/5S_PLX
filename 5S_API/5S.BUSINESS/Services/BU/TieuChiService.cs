@@ -17,68 +17,97 @@ namespace PLX5S.BUSINESS.Services.BU
 {
     public interface ITieuChiService : IGenericService<TblBuTieuChi, TieuChiDto>
     {
-        //Task<TieuChiDto> BuildDataForTree();
-        //Task UpdateOrderTree(TieuChiDto moduleDto);
-        //Task<TieuChiDto> GetMenuOfUser(string userName);
-        //Task<TieuChiDto> Delete(string code);
+        Task<TieuChiDto> BuildDataForTree(string kiKhaoSatId);
+        Task InsertTreeGroup(TblBuTieuChi data);
+        Task InsertTreeLeaves(TblBuTieuChi data);
     }
 
     public class TieuChiService(AppDbContext dbContext, IMapper mapper) : GenericService<TblBuTieuChi, TieuChiDto>(dbContext, mapper), ITieuChiService
     {
-        //    public async Task<TieuChiDto> BuildDataForTree()
-        //    {
-        //        var lstNode = new List<TieuChiDto>();
-        //        var rootNode = new TieuChiDto() { 
-        //            Id = "MNU", 
-        //            PId = "-MNU", 
-        //            Name = "Danh sách menu", 
-        //            //Key = "MNU", 
-        //            IsGroup = true 
-        //        };
-        //        lstNode.Add(rootNode);
+        public async Task InsertTreeGroup(TblBuTieuChi data)
+        {
+            try
+            {
+                _dbContext.TblBuTieuChi.Add(data);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
 
-        /// <summary>
-        /// Dựng cấu trúc nested tree
-        /// </summary>
-        /// <returns></returns>
-        //public async Task<TieuChiDto> BuildDataForTree()
-        //{
-        //    var lstNode = new List<TieuChiDto>();
-        //    var rootNode = new TieuChiDto() { Id = "MNU", PId = "-MNU", Name = "Danh sách menu", Title = "MNU - Danh sách menu", Expanded = true, Key = "MNU" };
-        //    lstNode.Add(rootNode);
+            }
+        }
+        public async Task InsertTreeLeaves(TblBuTieuChi data)
+        {
+            try
+            {
+                _dbContext.TblBuTieuChi.Add(data);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
 
-        //    var lstAllMenu = await _dbContext.TblAdMenu.OrderBy(x => x.OrderNumber).ToListAsync();
-        //    foreach (var menu in lstAllMenu)
-        //    {
-        //        var node = new TieuChiDto()
-        //        {
-        //            Id = menu.Id,
-        //            Name = menu.Name,
-        //            PId = menu.PId,
-        //            OrderNumber = menu.OrderNumber,
-        //            Icon = menu.Icon,
-        //            Url = menu.Url,
-        //            Title = $"{menu.Id} - {menu.Name}",
-        //            Key = menu.Id,
-        //            IsActive = menu.IsActive,
-        //            Expanded = true,
-        //        };
-        //        lstNode.Add(node);
-        //    }
-        //    var nodeDict = lstNode.ToDictionary(n => n.Id);
-        //    foreach (var item in lstNode)
-        //    {
-        //        if (item.PId == "-MNU" || !nodeDict.TryGetValue(item.PId, out TieuChiDto parentNode))
-        //        {
-        //            continue;
-        //        }
+            }
+        }
 
-        //        parentNode.Children ??= [];
-        //        parentNode.Children.Add(item);
-        //    }
-        //    return rootNode;
+        public async Task<TieuChiDto> BuildDataForTree(string kiKhaoSatId)
+        {
+            var lstNode = new List<TieuChiDto>();
+            var node = _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == kiKhaoSatId && x.PId == "-1" && x.IsDeleted != true).FirstOrDefault();
+            var rootNode = new TieuChiDto()
+            {
+                Id = node.Id,
+                Name = node.Name,
+                PId = node.PId,
+                IsGroup = node.IsGroup,
+                KiKhaoSatId = node.KiKhaoSatId,
+                OrderNumber = 1,
+                IsImg = node.IsImg,
+                Report = node.Report,
+            };
+            lstNode.Add(rootNode);
 
-        //}
+            var lstAllTieuChi = await _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == kiKhaoSatId && x.IsGroup == true && x.PId != "-1" && x.IsDeleted != true).OrderBy(x => x.OrderNumber).ToListAsync();
+            foreach (var menu in lstAllTieuChi)
+            {
+                var node1 = new TieuChiDto()
+                {
+                    Id = menu.Id,
+                    Name = menu.Name,
+                    PId = menu.PId,
+                    IsGroup = menu.IsGroup,
+                    KiKhaoSatId = menu.KiKhaoSatId,
+                    OrderNumber = menu.OrderNumber,
+                    IsImg = menu.IsImg,
+                    Report = menu.Report,
+                };
+                lstNode.Add(node1);
+            }
+            var nodeDict = lstNode.ToDictionary(n => n.Id);
+            foreach (var item in lstNode)
+            {
+                if (item.PId == "-1" || !nodeDict.TryGetValue(item.PId, out TieuChiDto parentNode))
+                {
+                    continue;
+                }
+
+                parentNode.Children ??= [];
+                parentNode.Children.Add(item);
+            }
+            return rootNode;
+
+        }
+
+        public async Task<List<TblBuTieuChi>> getLeaves(string id)
+        {
+            try
+            {
+                return null;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
 
         //public async Task UpdateOrderTree(TieuChiDto moduleDto)
         //{

@@ -57,7 +57,7 @@ namespace PLX5S.BUSINESS.Services.BU
                     IsGroup = true,
                     PId = "-1",
                     KiKhaoSatId = data.Code,
-                    IsIMG = false,
+                    IsImg = false,
                     OrderNumber = 0,
                     Report = "-"
                 };
