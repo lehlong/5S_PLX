@@ -64,7 +64,8 @@ namespace PLX5S.BUSINESS.Services.BU
                 OrderNumber = 1,
                 IsImg = node.IsImg,
                 Report = node.Report,
-                IsExpanded= false
+                IsExpanded = true,
+                IsLeaf = true
             };
             lstNode.Add(rootNode);
 
@@ -82,7 +83,8 @@ namespace PLX5S.BUSINESS.Services.BU
                     OrderNumber = menu.OrderNumber,
                     IsImg = menu.IsImg,
                     Report = menu.Report,
-                    IsExpanded = false
+                    IsExpanded = true,
+                    IsLeaf = true
                 };
                 lstNode.Add(node1);
             }

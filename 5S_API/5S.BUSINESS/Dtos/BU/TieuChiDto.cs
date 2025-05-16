@@ -22,6 +22,8 @@ namespace PLX5S.BUSINESS.Dtos.BU
         public string Title { get; set; }
 
         public bool IsExpanded { set; get; }
+        public bool IsLeaf { set; get; }
+
 
         public string? PId { get; set; }
 
