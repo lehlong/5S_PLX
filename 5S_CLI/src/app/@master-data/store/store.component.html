@@ -100,6 +100,11 @@
   <ng-container *nzDrawerContent>
     <form nz-form nzLayout="vertical" [formGroup]="validateForm" (ngSubmit)="submitForm()">
       <div nz-row [nzGutter]="12">
+         <div nz-col [nzXs]="24" [nzMd]="12">
+         <app-input-clear placeholder="Nhập mã kiểu người dùng " [required]="true" label="Mã "
+        [control]="$any(validateForm).controls['id']" [required]="true"
+        [disabled]="edit ? true : false"></app-input-clear>
+        </div>
         <div nz-col [nzXs]="24" [nzMd]="12">
           <app-input-clear placeholder="Nhập tên cửa hàng " [required]="true" label="Tên cửa hàng"
             [control]="$any(validateForm).controls['name']" [required]="true"

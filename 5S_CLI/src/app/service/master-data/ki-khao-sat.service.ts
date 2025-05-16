@@ -15,6 +15,9 @@ export class KiKhaoSatService {
   getAll(): Observable<any> {
     return this.commonService.get('KiKhaoSat/GetAll')
   }
+  getAlldata(): Observable<any> {
+    return this.commonService.get('KiKhaoSat/GetAllData')
+  }
 
   create(params: any): Observable<any> {
     return this.commonService.post('KiKhaoSat/Insert', params)
@@ -27,4 +30,5 @@ export class KiKhaoSatService {
   delete(id: string): Observable<any> {
     return this.commonService.delete(`KiKhaoSat/Delete/${id}`)
   }
+
 }

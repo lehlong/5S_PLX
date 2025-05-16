@@ -92,7 +92,7 @@
       <nz-tab nzTitle="Thông tin kì chấm điểm">
         <div nz-row [nzGutter]="12">
           <div nz-col [nzXs]="24" >
-            <app-input-clear placeholder="Nhập mã kì " [required]="true" label="Mã "
+            <app-input-clear placeholder="Nhập mã kì" [required]="true" label="Mã "
         [control]="$any(validateForm).controls['Code']" [required]="true"
         [disabled]="edit ? true : false"></app-input-clear>
          </div>
@@ -134,7 +134,7 @@
         </nz-tab>
         <nz-tab nzTitle="Người chấm điểm">
 
-           <nz-table class="auto-scroll-table" #headerTable [nzData]="paginationResult.data" [nzFrontPagination]="false"
+           <nz-table class="auto-scroll-table" #headerTable [nzData]="DataChamdiem" [nzFrontPagination]="false"
       [nzScroll]="{ y: 'calc(100vh - 244px)' }">
       <thead>
         <tr>
@@ -158,7 +158,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let data of headerTable.data; let i = index">
+        <tr *ngFor="let data of DataChamdiem; let i = index">
           <td>
             {{
             (paginationResult.currentPage - 1) * paginationResult.pageSize +
@@ -167,22 +167,31 @@
             }}
           </td>
           <td>
-            <a (click)="openEdit(data)">{{ data.code }}</a>
+            <a (click)="openEdit(data)">{{ data.ma }}</a>
           </td>
-          <td>{{ data.name }}</td>
-          <td>{{ data.cuaHangTruong }}</td>
-          <td>{{ data.nguoiPhuTrach }}</td>
-          <td>{{ data.phone }}</td>
-          <td>{{ data.kinhDo }}</td>
-          <td>{{ data.viDo }}</td>
-          <td>{{data.trangThaiCuaHang}}</td>
+          <td nzAlign="center">{{ data.name }}</td>
+         
+          <td nzAlign="center">{{ data.cuaHangTruong }}</td>
+          <td nzAlign="center">{{ data.nguoiPhuTrach }}</td>
+         
+          <td nzAlign="center">
+            
+             <nz-select  style="width: 100%;" [nzMaxTagCount]="3" [nzMaxTagPlaceholder]="tagPlaceHolder" nzMode="multiple"
+                                nzPlaceHolder="Please select" formControlName="NguoichamDiem">
+                                <nz-option cdkScrollable *ngFor="let item of Account" [nzLabel]="item.fullName"
+                                    [nzValue]="item.userName">
+                                </nz-option>
+            </nz-select>
+          </td>
+
+          
          
         </tr>
       </tbody>
     </nz-table>
         </nz-tab>
         </nz-tabset>  
-      
+        <ng-template #tagPlaceHolder let-selectedList>and {{ selectedList.length }} more selected</ng-template>
     </form>
   </ng-container>
 </nz-modal>

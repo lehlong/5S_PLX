@@ -46,4 +46,7 @@ export class AccountService {
   getall(): Observable<any> {
     return this.commonService.get('Account/GetAll')
   }
+    getalldata(): Observable<any> {
+    return this.commonService.get('Account/GetAllData')
+  }
 }

@@ -26,6 +26,7 @@ export class KiKhaoSatComponent {
   paginationResult = new PaginationResult()
   loading: boolean = false
   Account:any=[] 
+  DataChamdiem:any=[]
   constructor(
     private _service: KiKhaoSatService,
     private fb: NonNullableFormBuilder,
@@ -40,7 +41,8 @@ export class KiKhaoSatComponent {
       StartDate: ['', [Validators.required]],
       EndDate: ['', [Validators.required]],
       isActive: [true, [Validators.required]],
-      InputStoreId: ['adeqewqsdasdsad',],
+      Survey_Mgmt_Id: ['Survey_Mgmt_Id',],
+      NguoichamDiem: [[], [Validators.required]],
      
     })
     this.globalService.setBreadcrumb([
@@ -59,7 +61,9 @@ export class KiKhaoSatComponent {
 
   ngOnInit(): void {
     this.search()
+    this.getAlldata()
     this.getAllAccount()
+    
   }
 
   onSortChange(name: string, value: any) {
@@ -82,17 +86,18 @@ export class KiKhaoSatComponent {
       },
     })
   }
-
-  getAllAccount() {
-    this.accountService.getall().subscribe({
+  getAlldata() {
+    this._service.getAlldata().subscribe({
       next: (data) => {
-        this.Account = data
+      this.DataChamdiem=data
+     
       },
       error: (response) => {
         console.log(response)
       },
     })
   }
+ 
  
   isCodeExist(code: string): boolean {
     return this.paginationResult.data?.some(
@@ -149,6 +154,19 @@ export class KiKhaoSatComponent {
   reset() {
     this.filter = new AccountTypeFilter()
     this.search()
+  }
+    getAllAccount() {
+    this.accountService.getall().subscribe({
+      next: (data) => {
+        this.Account = data
+        
+      },
+        
+
+      error: (response) => {
+        console.log(response)
+      },
+    })
   }
 
   openCreate() {

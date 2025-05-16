@@ -19,6 +19,7 @@ namespace PLX5S.BUSINESS.Services.BU
         //Task<IList<SurveyMgmtDto>> GetAll(BaseMdFilter filter);
         //Task<byte[]> Export(BaseMdFilter filter);
         Task Insert(TblBuKiKhaoSat data);
+        //Task<List<InputStoreDto>> GetallData();
     }
     public class KikhaosatService(AppDbContext dbContext, IMapper mapper) : GenericService<TblBuKiKhaoSat, KiKhaoSatDto>(dbContext, mapper), IKikhaosatService
     {
@@ -52,7 +53,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 var datakks = new TblBuKiKhaoSat()
                 {
                     Code = data.Code,
-                    InputStoreId = data.InputStoreId,
+                    Survey_Mgmt_Id = data.Survey_Mgmt_Id,
                     Des = data.Des,
                     StartDate = data.StartDate,
                     EndDate = data.EndDate,
@@ -70,7 +71,40 @@ namespace PLX5S.BUSINESS.Services.BU
             }
         }
 
-        //public async Task List<input>
-        
+        public class ListdataKikhaosat
+        {
+          public List<InputStoreDto> InputStore { get; set; }
+         public List<NameUser> NameUsers { get; set; }
+
+        }
+        public class NameUser
+        {
+            public string UserName { get; set; }
+            public string Fullname { get; set; }
+         }
+
+        //public async Task<List<ListdataKikhaosat> GetallData()
+        //{
+
+        //    try
+        //    {
+        //        var headerId = "12345";
+        //        var data = _dbContext.TblBuInputStore.AsQueryable().ToList();
+        //        var dataDto = _mapper.Map<List<InputStoreDto>>(data);
+        //        var NguoiChamDiem = _dbContext.TblBuInputChamDiem.Where(x => x.KiKhaoSatId == headerId).ToList();
+        //        var NguoiChamDiemDto = _mapper.Map<List<NameUser>>(NguoiChamDiem);
+
+        //        return dataDto;
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Status = false;
+        //        Exception = ex;
+        //        return null;
+        //    }
+        //}
+
+
     }
 }

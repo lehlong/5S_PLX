@@ -24,8 +24,8 @@ namespace PLX5S.BUSINESS.Dtos.BU
         [Description("Ngày kết thúc")]
         public DateTime? EndDate { get; set; }
 
-        [Description("InputStoreId")]
-        public string InputStoreId { get; set; }
+        [Description("header id")]
+        public string Survey_Mgmt_Id { get; set; }
         public void Mapping(Profile profile)
         {
             profile.CreateMap<TblBuKiKhaoSat, KiKhaoSatDto>().ReverseMap();

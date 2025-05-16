@@ -6,6 +6,7 @@ using PLX5S.BUSINESS.Services.BU;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PLX5S.CORE.Entities.BU;
+using NPOI.SS.Formula.Functions;
 
 namespace PLX5S.API.Controllers.BU
 {
@@ -94,13 +95,14 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
-        [HttpGet("GetAll")]
-        public async Task<IActionResult> Getall()
+        [HttpGet("GetAllData")]
+        public async Task<IActionResult> GetAllData()
         {
             var transferObject = new TransferObject();
-            //await _service.Delete();
+           //var result=  await  _service.GetallData();
             if (_service.Status)
             {
+                //transferObject.Data = result;
                 transferObject.Status = true;
                 transferObject.MessageObject.MessageType = MessageType.Success;
                 transferObject.GetMessage("0105", _service);

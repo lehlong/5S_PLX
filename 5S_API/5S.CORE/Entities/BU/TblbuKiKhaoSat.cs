@@ -24,8 +24,8 @@ namespace PLX5S.CORE.Entities.BU
         
         public DateTime? StartDate { get; set; }
         //INPUT_STORE_ID
-        [Column("INPUT_STORE_ID")]
-        public string InputStoreId { get; set; }
+        [Column("SURVEY_MGMT_ID")]
+        public string Survey_Mgmt_Id { get; set; }
 
         [Column("END_DATE")]
         public DateTime? EndDate { get; set; }
