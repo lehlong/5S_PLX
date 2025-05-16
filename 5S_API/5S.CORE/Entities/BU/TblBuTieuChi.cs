@@ -22,7 +22,7 @@ public class TblBuTieuChi : SoftDeleteEntity
         public string Name { get; set; }
 
         [Column("PARENT_ID", TypeName = "VARCHAR(50)")]
-        public string? ParentId { get; set; }
+        public string? PId { get; set; }
 
         [Column("KI_KHAO_SAT_ID", TypeName = "VARCHAR(50)")]
         public string? KiKhaoSatId { get; set; }

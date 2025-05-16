@@ -50,18 +50,20 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
-                var datakks = new TblBuKiKhaoSat()
+                var tree = new TblBuTieuChi()
                 {
-                    Code = data.Code,
-                    SurveyMgmtId = data.SurveyMgmtId,
-                    Des = data.Des,
-                    StartDate = data.StartDate,
-                    EndDate = data.EndDate,
-                    IsActive=data.IsActive,
-                    Name=data.Name
+                    Id = Guid.NewGuid().ToString(),
+                    Name = data.Name,
+                    IsGroup = true,
+                    PId = "-1",
+                    KiKhaoSatId = data.Code,
+                    IsIMG = false,
+                    OrderNumber = 0,
+                    Report = "-"
                 };
-                
-                _dbContext.TblBuKiKhaoSat.Add(datakks);
+                _dbContext.TblBuTieuChi.Add(tree);
+                _dbContext.TblBuKiKhaoSat.Add(data);
+
                 _dbContext.SaveChanges();
             }
             catch (Exception ex)
