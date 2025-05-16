@@ -141,6 +141,7 @@ namespace PLX5S.CORE
         public DbSet<TblBuSurveyMgmt> TblBuSurveyMgmt { get; set; }
 
         public DbSet<TblBuInputChamDiem> TblBuInputChamDiem { get; set; }
+        public DbSet<TblBuInputAtvsv> TblBuInputAtvsv { get; set; }
 
         public DbSet<TblBuInputStore> TblBuInputStore { get; set; }
 

@@ -14,8 +14,11 @@ namespace PLX5S.BUSINESS.Dtos.BU
     public class SurveyMgmtDto : BaseMdDto, IMapFrom, IDto
     {
         [Key]
-        [Description("Mã chức vụ")]
+        [Description("Mã")]
         public string Id { get; set; }
+
+        [Description("Mã")]
+        public string? Ma { get; set; }
 
         [Description("Tên")]
         public string Name { get; set; }
@@ -29,8 +32,8 @@ namespace PLX5S.BUSINESS.Dtos.BU
         [Description("Ảnh")]
         public string? Image { get; set; }
 
-        [Description("Tên chức vụ")]
-        public List<TblBuInputStore> InputStore { get; set; } = new List<TblBuInputStore>();
+        //[Dsescription("Tên chức vụ")]
+        //public List<TblBuInputStore> InputStore { get; set; } = new List<TblBuInputStore>();
 
 
         [Description("Trạng thái")]

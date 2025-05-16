@@ -16,8 +16,12 @@ export class SurveyMgmtService {
     return this.commonService.get('SurveyMgmt/GetAll')
   }
 
-  buildInput(): Observable<any>{
-    return this.commonService.get('SurveyMgmt/BuildInput')
+  buildInput(doiTuongId: string): Observable<any>{
+    return this.commonService.get(`SurveyMgmt/BuildInput?doiTuongId=${doiTuongId}`)
+  }
+
+  getInput(id: string): Observable<any>{
+    return this.commonService.get(`SurveyMgmt/GetInput?id=${id}`)
   }
 
   create(params: any): Observable<any> {

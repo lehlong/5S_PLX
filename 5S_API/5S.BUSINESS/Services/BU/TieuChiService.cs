@@ -25,6 +25,17 @@ namespace PLX5S.BUSINESS.Services.BU
 
     public class TieuChiService(AppDbContext dbContext, IMapper mapper) : GenericService<TblBuTieuChi, TieuChiDto>(dbContext, mapper), ITieuChiService
     {
+        //    public async Task<TieuChiDto> BuildDataForTree()
+        //    {
+        //        var lstNode = new List<TieuChiDto>();
+        //        var rootNode = new TieuChiDto() { 
+        //            Id = "MNU", 
+        //            PId = "-MNU", 
+        //            Name = "Danh sách menu", 
+        //            //Key = "MNU", 
+        //            IsGroup = true 
+        //        };
+        //        lstNode.Add(rootNode);
 
         /// <summary>
         /// Dựng cấu trúc nested tree

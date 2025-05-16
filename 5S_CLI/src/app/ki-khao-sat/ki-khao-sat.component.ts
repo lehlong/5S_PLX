@@ -7,6 +7,7 @@ import { KiKhaoSatService } from '../service/master-data/ki-khao-sat.service'
 import { AccountService } from '../service/system-manager/account.service'
 import { GlobalService } from '../service/global.service'
 import { NzMessageService } from 'ng-zorro-antd/message'
+import { ActivatedRoute } from '@angular/router'
 @Component({
   selector: 'app-ki-khao-sat',
   imports: [ShareModule],
@@ -21,14 +22,15 @@ export class KiKhaoSatComponent {
   visible: boolean = false
   edit: boolean = false
   EndDate: Date | null = null;
-  
+
   filter = new AccountTypeFilter()
   paginationResult = new PaginationResult()
   loading: boolean = false
-  Account:any=[] 
+  Account:any=[]
   DataChamdiem:any=[]
   constructor(
     private _service: KiKhaoSatService,
+    private route: ActivatedRoute,
     private fb: NonNullableFormBuilder,
     private globalService: GlobalService,
     private message: NzMessageService,
@@ -43,7 +45,7 @@ export class KiKhaoSatComponent {
       isActive: [true, [Validators.required]],
       Survey_Mgmt_Id: ['Survey_Mgmt_Id',],
       NguoichamDiem: [[], [Validators.required]],
-     
+
     })
     this.globalService.setBreadcrumb([
       {
@@ -60,10 +62,17 @@ export class KiKhaoSatComponent {
   }
 
   ngOnInit(): void {
+    this.route.paramMap.subscribe({
+      next: (params) => {
+        const id = params.get('id')
+
+      },
+    })
     this.search()
     this.getAlldata()
     this.getAllAccount()
-    
+
+
   }
 
   onSortChange(name: string, value: any) {
@@ -90,15 +99,14 @@ export class KiKhaoSatComponent {
     this._service.getAlldata().subscribe({
       next: (data) => {
       this.DataChamdiem=data
-     
+
       },
       error: (response) => {
         console.log(response)
       },
     })
   }
- 
- 
+
   isCodeExist(code: string): boolean {
     return this.paginationResult.data?.some(
       (accType: any) => accType.id === code,
@@ -159,9 +167,9 @@ export class KiKhaoSatComponent {
     this.accountService.getall().subscribe({
       next: (data) => {
         this.Account = data
-        
+
       },
-        
+
 
       error: (response) => {
         console.log(response)

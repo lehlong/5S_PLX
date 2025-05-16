@@ -5,6 +5,7 @@ using PLX5S.BUSINESS.Dtos.BU;
 //using PlX5S.BUSINESS.Services.BU;
 using PLX5S.BUSINESS.Services.BU;
 using PLX5S.API.AppCode.Extensions;
+using PLX5S.BUSINESS.Models;
 
 namespace PLX5S.API.Controllers.BU
 {
@@ -51,32 +52,15 @@ namespace PLX5S.API.Controllers.BU
             return Ok(transferObject);
         }
 
-        //[HttpGet("GetAll")]
-        //public async Task<IActionResult> GetAll([FromQuery] BaseMdFilter filter)
-        //{
-        //    var transferObject = new TransferObject();
-        //    var result = await _service.GetAll(filter);
-        //    if (_service.Status)
-        //    {
-        //        transferObject.Data = result;
-        //    }
-        //    else
-        //    {
-        //        transferObject.Status = false;
-        //        transferObject.MessageObject.MessageType = MessageType.Error;
-        //        transferObject.GetMessage("0001", _service);
-        //    }
-        //    return Ok(transferObject);
-        //}
         [HttpPost("Insert")]
-        public async Task<IActionResult> Insert([FromBody] SurveyMgmtDto time)
+        public async Task<IActionResult> Insert([FromBody] SurveyMgmtModel time)
         {
             var transferObject = new TransferObject();
-            time.Id = Guid.NewGuid().ToString();
-            var result = await _service.Add(time);
+            //time.Id = Guid.NewGuid().ToString();
+            await _service.Insert(time);
             if (_service.Status)
             {
-                transferObject.Data = result;
+                //transferObject.Data = result;
                 transferObject.Status = true;
                 transferObject.MessageObject.MessageType = MessageType.Success;
                 transferObject.GetMessage("0100", _service);
@@ -89,11 +73,31 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
-        [HttpPut("Update")]
-        public async Task<IActionResult> Update([FromBody] SurveyMgmtDto time)
+
+
+        [HttpGet("GetInput")]
+        public async Task<IActionResult> GetInput([FromQuery] string id)
         {
             var transferObject = new TransferObject();
-            await _service.Update(time);
+            var result = await _service.GetInput(id);
+            if (_service.Status)
+            {
+                transferObject.Data = result;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
+
+        [HttpPut("Update")]
+        public async Task<IActionResult> Update([FromBody] SurveyMgmtModel time)
+        {
+            var transferObject = new TransferObject();
+            await _service.UpdateInput(time);
             if (_service.Status)
             {
                 transferObject.Status = true;

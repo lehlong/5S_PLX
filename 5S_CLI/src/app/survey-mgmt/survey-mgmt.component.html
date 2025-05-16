@@ -40,12 +40,12 @@
             Thời gian gần nhất
           </th>
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('isActive', $event)" nzAlign="center">
-            Trạng thái
+            Thao Tác
           </th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let data of headerTable.data; let i = index" (dblclick)="openEdit(data)">
+        <tr *ngFor="let data of headerTable.data; let i = index" (dblclick)="openKiKhaoSat(data)">
           <td>
             {{
             (paginationResult.currentPage - 1) * paginationResult.pageSize +
@@ -54,21 +54,19 @@
             }}
           </td>
           <td>
-            <a (click)="openEdit(data)">{{ data.id }}</a>
+            <a (click)="openKiKhaoSat(data.ma)">{{ data.ma }}</a>
           </td>
-          <td><a (click)="openEdit(data)">{{ data.name }}</a></td>
-          <td><a (click)="openEdit(data)">{{ data.name }}</a></td>
-          <td><a (click)="openEdit(data)">{{ data.name }}</a></td>
-          <td><a (click)="openEdit(data)">{{ data.name }}</a></td>
+          <td>{{ data.name }}</td>
+          <td>{{ data.moTa }}</td>
+          <ng-container *ngFor="let i of lstDoiTuong">
+            <td *ngIf="i.id == data.doiTuongId">{{ i.name }}</td>
+          </ng-container>
+          <td>{{ data.name }}</td>
           <td nzAlign="center">
-            <nz-tag nzColor="success" *ngIf="data.isActive">
-              <nz-icon nzType="check-circle" />
-              <span>Kích hoạt</span>
-            </nz-tag>
-            <nz-tag nzColor="error" *ngIf="!data.isActive">
-              <nz-icon nzType="close-circle" />
-              <span>Khoá</span>
-            </nz-tag>
+
+          <button class="!flex !items-center" nzType="default" nz-button (click)="getInput(data.id)">
+            <span nz-icon nzType="edit"></span>  Sửa
+          </button>
           </td>
         </tr>
       </tbody>
@@ -87,35 +85,44 @@
 <nz-drawer [nzMask]="!edit" nzWidth="60%" nzSize="default" [nzVisible]="visible" nzPlacement="right"
   [nzTitle]="edit ? ' Chỉnh sửa  ' : ' Tạo mới  '" [nzExtra]="extra" (nzOnClose)="close()">
   <ng-container *nzDrawerContent>
-    <form nz-form nzLayout="vertical" [formGroup]="validateForm" (ngSubmit)="submitForm()">
       <div nz-row [nzGutter]="12">
-        <app-input-clear nz-col [nzXs]="24" [nzMd]="12" placeholder="Nhập mã" [required]="true" label="Mã "
-          [control]="$any(validateForm).controls['id']" [required]="true"
-          [disabled]="edit ? true : false"></app-input-clear>
+        <div nz-col [nzXs]="24" [nzMd]="12" >
+          <div class="inner-box">
+            <label>Mã</label>
+            <input nz-input placeholder="Nhập mã" [(ngModel)]="dataInput.surveyMgmt.ma" type="text" />
 
-        <app-input-clear nz-col [nzXs]="24" [nzMd]="12" placeholder="Nhập tên chức vụ" [required]="true" label="Tên"
-          [control]="$any(validateForm).controls['name']"></app-input-clear>
+          </div>
+        </div>
+        <div nz-col [nzXs]="24" [nzMd]="12" >
+          <div class="inner-box">
+            <label>Tên</label>
+            <input nz-input placeholder="Nhập tên" [(ngModel)]="dataInput.surveyMgmt.name" type="text" />
 
-        <app-input-clear nz-col [nzXs]="24" [nzMd]="12" placeholder="Nhập tên chức vụ" [required]="true" label="Mô tả"
-          [control]="$any(validateForm).controls['name']"></app-input-clear>
+          </div>
+        </div>
+        <div nz-col [nzXs]="24" [nzMd]="12" >
+          <div class="inner-box">
+            <label>Mô tả</label>
+            <input nz-input placeholder="Nhập mô tả" [(ngModel)]="dataInput.surveyMgmt.moTa" type="text" />
+
+          </div>
+        </div>
 
         <div nz-col [nzXs]="24" [nzMd]="12">
-          <nz-form-item >
-          <nz-form-label [nzRequired]="true">Đối tượng áp dung</nz-form-label>
-          <nz-form-control nzErrorTip="Không được để trống">
-            <nz-select nzShowSearch nzAllowClear placeholder="Chọn Đối tượng" formControlName="doiTuongCode" (ngModelChange)="getTblCreate($event)">
-              <nz-option cdkScrollable
-                *ngFor="let item of lstDoiTuong"
-                [nzLabel]="item.name"
-                [nzValue]="item.id">
-              </nz-option>
-            </nz-select>
-          </nz-form-control>
-        </nz-form-item>
+          <label>Đối tượng áp dụng</label>
+          <nz-form-item>
+            <nz-form-control nzErrorTip="Không được để trống">
+              <nz-select nzShowSearch nzAllowClear placeholder="Chọn Đối tượng"
+                [(ngModel)]="dataInput.surveyMgmt.doiTuongId" (ngModelChange)="buildInput($event)">
+                <nz-option cdkScrollable *ngFor="let item of lstDoiTuong" [nzLabel]="item.name" [nzValue]="item.id">
+                </nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
         </div>
 
 
-          <nz-upload nzAction="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+        <nz-upload nzAction="https://www.mocky.io/v2/5cc8019d300000980a055e76"
           [nzHeaders]="{ authorization: 'authorization-text' }" (nzChange)="handleChange($event)">
           <button nz-button>
             <nz-icon nzType="upload" />
@@ -124,33 +131,31 @@
         </nz-upload>
       </div>
 
-      <nz-table *ngIf="isStore" #rowSelectionTable nzShowSizeChanger [nzData]="lstStore" nzFooter=" " [nzFrontPagination]="'false'">
+      <nz-table *ngIf="dataInput.surveyMgmt.doiTuongId === 'DT1'" #rowSelectionTable nzShowSizeChanger
+        [nzData]="dataInput.inputStores" nzFooter=" " [nzFrontPagination]="'false'">
         <thead>
           <tr>
             <th [(nzChecked)]="checked" [nzIndeterminate]="indeterminate" (nzCheckedChange)="onAllChecked($event)"></th>
             <th>Mã</th>
             <th>Tên cửa hàng</th>
-            <th>Cửa hàng trường</th>
+            <th>Cửa hàng trưởng</th>
             <th>Người phụ trách</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let data of rowSelectionTable.data">
-            <td [nzChecked]="isCheckedId(data.id)" (nzCheckedChange)="onItemChecked(data.id, $event)">
+            <td [nzChecked]="data.inputStore.isActive" (nzCheckedChange)="onItemChecked(data.inputStore.id, $event)">
             </td>
-            <td>{{ data.id }}</td>
-            <td>{{ data.name }}</td>
-            <ng-container  *ngFor="let item of lstAccount">
-              <td *ngIf="item.userName === data.cuaHangTruong">{{ item.fullName }}</td>
-            </ng-container >
-            <ng-container  *ngFor="let item of lstAccount">
-              <td *ngIf="item.userName === data.nguoiPhuTrach">{{ item.fullName }}</td>
-            </ng-container >
+            <td>{{ data.inputStore.ma }}</td>
+            <td>{{ data.inputStore.name }}</td>
+            <td>{{ data.inputStore.cuaHangTruong }}</td>
+            <td>{{ data.inputStore.nguoiPhuTrach }}</td>
           </tr>
         </tbody>
       </nz-table>
 
-      <nz-table *ngIf="isKho" #rowSelectionTable nzShowSizeChanger [nzData]="lstKho" nzFooter=" " [nzFrontPagination]="'false'">
+      <nz-table *ngIf="dataInput.doiTuongId === '2b1d51ee-9c22-4b2a-81fb-b22b26c1deae'" #rowSelectionTable
+        nzShowSizeChanger [nzData]="lstKho" nzFooter=" " [nzFrontPagination]="'false'">
         <thead>
           <tr>
             <th [(nzChecked)]="checked" [nzIndeterminate]="indeterminate" (nzCheckedChange)="onAllChecked($event)"></th>
@@ -161,7 +166,7 @@
         </thead>
         <tbody>
           <tr *ngFor="let data of rowSelectionTable.data; track trackById">
-            <td [nzChecked]="isCheckedId(data.id)" (nzCheckedChange)="onItemChecked(data.id, $event)">
+            <td >
             </td>
             <td>{{ data.name }}</td>
             <td>{{ data.age }}</td>
@@ -179,21 +184,20 @@
           </nz-radio-group>
         </nz-form-control>
       </nz-form-item> -->
-    </form>
   </ng-container>
 </nz-drawer>
 <ng-template #extra>
   <nz-space>
     <ng-container *ngIf="edit">
       <button [nzLoading]="loading" *nzSpaceItem nz-button nzType="primary" class="!flex !items-center"
-        (click)="submitForm()">
+        (click)="updateInput()">
         <span nz-icon nzType="save" nzTheme="outline"></span>Lưu
       </button>
     </ng-container>
     <ng-container *ngIf="!edit">
       <button [nzLoading]="loading" *nzSpaceItem nz-button nzType="primary" class="!flex !items-center"
         (click)="submitForm()">
-        <span nz-icon nzType="save" nzTheme="outline"></span>Lưu
+        <span nz-icon nzType="save" nzTheme="outline"></span>Thêm
       </button>
     </ng-container>
     <button *nzSpaceItem nz-button nzType="default" nzType="primary" class="!flex !items-center" nzDanger

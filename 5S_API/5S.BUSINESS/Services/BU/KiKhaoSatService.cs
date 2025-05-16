@@ -30,7 +30,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 var query = _dbContext.TblBuKiKhaoSat.AsQueryable();
                 if (!string.IsNullOrWhiteSpace(filter.KeyWord))
                 {
-                    query = query.Where(x => x.Code.ToString().Contains(filter.KeyWord) || x.Name.Contains(filter.KeyWord));
+                    query = query.Where(x => x.SurveyMgmtId.ToString().Contains(filter.KeyWord) || x.Name.Contains(filter.KeyWord));
                 }
                 if (filter.IsActive.HasValue)
                 {
@@ -53,7 +53,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 var datakks = new TblBuKiKhaoSat()
                 {
                     Code = data.Code,
-                    Survey_Mgmt_Id = data.Survey_Mgmt_Id,
+                    SurveyMgmtId = data.SurveyMgmtId,
                     Des = data.Des,
                     StartDate = data.StartDate,
                     EndDate = data.EndDate,

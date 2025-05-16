@@ -11,6 +11,7 @@ import { StoreService } from '../service/master-data/store.service'
 import { DoiTuongService } from '../service/master-data/doi-tuong.service'
 import { KhoXangDauService } from '../service/master-data/kho-xang-dau.service'
 import { AccountService } from '../service/system-manager/account.service'
+import { Router } from '@angular/router'
 
 @Component({
   selector: 'app-survey-mgmt',
@@ -20,6 +21,7 @@ import { AccountService } from '../service/system-manager/account.service'
   styleUrl: './survey-mgmt.component.scss',
 })
 export class SurveyMgmtComponent {
+  [x: string]: any
   validateForm: FormGroup
   isSubmit: boolean = false
   visible: boolean = false
@@ -37,7 +39,10 @@ export class SurveyMgmtComponent {
   isKho: boolean = false
   isStore: boolean = false
 
-  dataInput: any = []
+  dataInput: any = {
+    inputStores: [],
+    surveyMgmt: {}
+  }
 
   constructor(
     private _service: SurveyMgmtService,
@@ -45,12 +50,13 @@ export class SurveyMgmtComponent {
     private _accountService: AccountService,
     private _doiTuongService: DoiTuongService,
     private _khoService: KhoXangDauService,
+    private router: Router,
     private fb: NonNullableFormBuilder,
     private messageService: NzMessageService,
     private globalService: GlobalService,
     private message: NzMessageService,
   ) {
-    this.validateForm= this.fb.group({
+    this.validateForm = this.fb.group({
       id: [''],
       name: ['', [Validators.required]],
       doiTuongCode: ["DT1", [Validators.required]],
@@ -150,56 +156,43 @@ export class SurveyMgmtComponent {
     })
   }
 
+  getInput(id: any){
+    this._service.getInput(id).subscribe({
+      next: (data) => {
+        this.dataInput = data
+      },
+    })
+    setTimeout(() => {
+      this.edit = true
+      this.visible = true
+    }, 200)
+  }
+
   isCodeExist(code: string): boolean {
     return this.paginationResult.data?.some(
       (accType: any) => accType.id === code,
     )
   }
+
   submitForm(): void {
     this.isSubmit = true
-    console.log(this.lstInputStore);
-
-    // if (this.validateForm.valid) {
-    //   if (this.edit) {
-    //     this._service
-    //       .update(this.validateForm.getRawValue())
-    //       .subscribe({
-    //         next: (data) => {
-    //           this.search()
-    //         },
-    //         error: (response) => {
-    //           console.log(response)
-    //         },
-    //       })
-    //   } else {
-    //     const formData = this.validateForm.getRawValue()
-    //     if (this.isCodeExist(formData.id)) {
-    //       this.message.error(
-    //         `Mã kiểu người dùng ${formData.id} đã tồn tại, vui lòng nhập lại`,
-    //       )
-    //       return
-    //     }
-    //     this._service
-    //       .create(this.validateForm.getRawValue())
-    //       .subscribe({
-    //         next: (data) => {
-    //           this.search()
-    //         },
-    //         error: (response) => {
-    //           console.log(response)
-    //         },
-    //       })
-    //   }
-    // } else {
-    //   Object.values(this.validateForm.controls).forEach((control) => {
-    //     if (control.invalid) {
-    //       control.markAsDirty()
-    //       control.updateValueAndValidity({ onlySelf: true })
-    //     }
-    //   })
-    // }
+    console.log(this.dataInput);
+    this._service.create(this.dataInput).subscribe({
+      next:(data) =>{
+        this.search()
+      }
+    })
   }
 
+  updateInput(): void {
+    this.isSubmit = true
+    console.log(this.dataInput);
+    this._service.update(this.dataInput).subscribe({
+      next:(data) =>{
+        this.search()
+      }
+    })
+  }
   close() {
     this.visible = false
     this.resetForm()
@@ -211,6 +204,7 @@ export class SurveyMgmtComponent {
   }
 
   openCreate() {
+    this.buildInput("DT1")
     this.edit = false
     this.visible = true
   }
@@ -231,16 +225,8 @@ export class SurveyMgmtComponent {
     })
   }
 
-  openEdit(data: { id: string; name: number; isActive: boolean }) {
-    this.validateForm.setValue({
-      id: data.id,
-      name: data.name,
-      isActive: data.isActive,
-    })
-    setTimeout(() => {
-      this.edit = true
-      this.visible = true
-    }, 200)
+  openKiKhaoSat(data: any) {
+    this.router.navigate([`/ki-khao-sat/${data}`]);
   }
 
   pageSizeChange(size: number): void {
@@ -266,62 +252,44 @@ export class SurveyMgmtComponent {
     }
   }
 
-  buildInput(){
-    this._service.buildInput().subscribe({
+  buildInput(doiTuongId: any) {
+    this._service.buildInput(doiTuongId).subscribe({
       next: (data) => {
+        console.log(data.doiTuongId);
+
         this.dataInput = data
       }
     })
   }
 
-  getTblCreate(id : any){
-    console.log(id);
-    if(id == "DT1"){
-      this.lstStore()
-    }else if(id == "2b1d51ee-9c22-4b2a-81fb-b22b26c1deae"){
-      this.lstKho()
-    }
-  }
-
-  setOfCheckedId = new Set<number>();
-  lstCheckedId : any = []
-
   onAllChecked(value: boolean): void {
-    this.lstCheckedId = []
     if (value) {
-      this.lstStore.forEach((i: any) => {
-          this.lstInputStore.push(i)
-          this.lstCheckedId.push(i.id)
+      this.dataInput.inputStores.forEach((item: any) => {
+        item.inputStore.isActive = true;
       })
     } else {
-      this.lstInputStore = []
-      this.lstCheckedId = []
+      this.dataInput.inputStores.forEach((item: any) => {
+        item.inputStore.isActive = false;
+      })
     }
   }
   updateCheckedSet(code: any, checked: boolean,): void {
     if (checked) {
-      this.lstCheckedId.push(code)
-      this.lstStore.forEach((i: any) => {
-        if(i.id == code){
-          this.lstInputStore.push(i)
+      this.dataInput.inputStores.forEach((item: any) => {
+        if (item.inputStore.id === code) {
+          item.inputStore.isActive = true;
         }
-      })
+      });
     } else {
-      this.lstCheckedId = this.lstCheckedId.filter(
-        (x: any) => x !== code
-      )
-      this.lstStore.forEach((i: any) => {
-        this.lstInputStore = this.lstInputStore.filter(
-          (x: any) => x.id !== code
-        )
-      })
+      this.dataInput.inputStores.forEach((item: any) => {
+        if (item.inputStore.id === code) {
+          item.inputStore.isActive = false;
+        }
+      });
     }
   }
   onItemChecked(code: String, checked: boolean,): void {
     this.updateCheckedSet(code, checked)
-  }
-  isCheckedId(code: string): boolean {
-    return this.lstCheckedId.some((item : any) => item == code)
   }
 
 }

@@ -25,7 +25,7 @@ namespace PLX5S.BUSINESS.Dtos.BU
         public DateTime? EndDate { get; set; }
 
         [Description("header id")]
-        public string Survey_Mgmt_Id { get; set; }
+        public string SurveyMgmtId { get; set; }
         public void Mapping(Profile profile)
         {
             profile.CreateMap<TblBuKiKhaoSat, KiKhaoSatDto>().ReverseMap();

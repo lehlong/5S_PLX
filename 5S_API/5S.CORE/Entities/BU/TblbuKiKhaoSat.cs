@@ -19,13 +19,11 @@ namespace PLX5S.CORE.Entities.BU
         public string Des { get; set; }
 
         [Column("START_DATE")]
-     
-
         
         public DateTime? StartDate { get; set; }
-        //INPUT_STORE_ID
+
         [Column("SURVEY_MGMT_ID")]
-        public string Survey_Mgmt_Id { get; set; }
+        public string SurveyMgmtId { get; set; }
 
         [Column("END_DATE")]
         public DateTime? EndDate { get; set; }

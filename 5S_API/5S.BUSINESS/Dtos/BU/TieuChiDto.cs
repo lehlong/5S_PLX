@@ -19,7 +19,7 @@ namespace PLX5S.BUSINESS.Dtos.BU
 
         public string Name { get; set; }
 
-        public string? ParentId { get; set; }
+        public string? PId { get; set; }
 
         public string? KiKhaoSatId { get; set; }
 
