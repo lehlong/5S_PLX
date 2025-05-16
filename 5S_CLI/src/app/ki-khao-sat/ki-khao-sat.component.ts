@@ -28,6 +28,8 @@ export class KiKhaoSatComponent {
   loading: boolean = false
   Account:any=[]
   DataChamdiem:any=[]
+  headerId : any = ""
+
   constructor(
     private _service: KiKhaoSatService,
     private route: ActivatedRoute,
@@ -64,8 +66,8 @@ export class KiKhaoSatComponent {
   ngOnInit(): void {
     this.route.paramMap.subscribe({
       next: (params) => {
-        const id = params.get('id')
-
+        this.headerId = params.get('id')
+        this.filter.keyWord = this.headerId
       },
     })
     this.search()
@@ -86,6 +88,8 @@ export class KiKhaoSatComponent {
 
   search() {
     this.isSubmit = false
+    console.log(this.filter);
+
     this._service.search(this.filter).subscribe({
       next: (data) => {
         this.paginationResult = data
