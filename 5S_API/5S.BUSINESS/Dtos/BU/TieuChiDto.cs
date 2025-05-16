@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Common;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PLX5S.BUSINESS.Dtos.AD;
 using PLX5S.CORE.Entities.AD;
 using PLX5S.CORE.Entities.BU;
@@ -18,6 +19,9 @@ namespace PLX5S.BUSINESS.Dtos.BU
         public string Id { get; set; }
 
         public string Name { get; set; }
+        public string Title { get; set; }
+
+        public bool IsExpanded { set; get; }
 
         public string? PId { get; set; }
 

@@ -57,12 +57,14 @@ namespace PLX5S.BUSINESS.Services.BU
             {
                 Id = node.Id,
                 Name = node.Name,
+                Title = node.Name,
                 PId = node.PId,
                 IsGroup = node.IsGroup,
                 KiKhaoSatId = node.KiKhaoSatId,
                 OrderNumber = 1,
                 IsImg = node.IsImg,
                 Report = node.Report,
+                IsExpanded= false
             };
             lstNode.Add(rootNode);
 
@@ -73,12 +75,14 @@ namespace PLX5S.BUSINESS.Services.BU
                 {
                     Id = menu.Id,
                     Name = menu.Name,
+                    Title = menu.Name,
                     PId = menu.PId,
                     IsGroup = menu.IsGroup,
                     KiKhaoSatId = menu.KiKhaoSatId,
                     OrderNumber = menu.OrderNumber,
                     IsImg = menu.IsImg,
                     Report = menu.Report,
+                    IsExpanded = false
                 };
                 lstNode.Add(node1);
             }
