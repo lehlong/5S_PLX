@@ -7,10 +7,10 @@ import { KiKhaoSatService } from '../service/master-data/ki-khao-sat.service'
 import { AccountService } from '../service/system-manager/account.service'
 import { GlobalService } from '../service/global.service'
 import { NzMessageService } from 'ng-zorro-antd/message'
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute ,Router,RouterModule} from '@angular/router'
 @Component({
   selector: 'app-ki-khao-sat',
-  imports: [ShareModule],
+  imports: [ShareModule,RouterModule],
   standalone: true,
   templateUrl: './ki-khao-sat.component.html',
   styleUrl: './ki-khao-sat.component.scss'
@@ -36,6 +36,7 @@ export class KiKhaoSatComponent {
     private route: ActivatedRoute,
     private fb: NonNullableFormBuilder,
     private globalService: GlobalService,
+      private router: Router,
     private message: NzMessageService,
     private accountService: AccountService,
   ) {
@@ -170,6 +171,11 @@ export class KiKhaoSatComponent {
   close() {
     this.visible = false
     this.resetForm()
+  }
+  openTieuchi(id :string) {
+    console.log(id)
+     this.router.navigate([`danh-gia-tieu-chi/${id}`])
+
   }
 
   reset() {

@@ -52,7 +52,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let data of headerTable.data; let i = index" (dblclick)="openEdit(data)">
+        <tr *ngFor="let data of headerTable.data; let i = index">
           <td>
             {{
             (paginationResult.currentPage - 1) * paginationResult.pageSize +
@@ -72,7 +72,7 @@
           <td></td>
           
           <td nzAlign="center">
-            <button class="!flex !items-center" nzType="default" nz-button>
+            <button class="!flex !items-center" nzType="default" nz-button (click)="openTieuchi(data.code)">
               <span nz-icon nzType="edit"></span>  Cập nhập tiêu chí
             </button>
           </td>

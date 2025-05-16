@@ -10,6 +10,7 @@ import { systemManagerRoutes } from './@system-manager/system-manager.routes';
 import { masterDataRoutes } from './@master-data/master-data.routes';
 import { KiKhaoSatComponent } from './ki-khao-sat/ki-khao-sat.component';
 import { SurveyMgmtComponent } from './survey-mgmt/survey-mgmt.component';
+import { DanhGiaTieuChiComponent } from './@master-data/danh-gia-tieu-chi/danh-gia-tieu-chi.component';
 
 export const routes: Routes = [
   {
@@ -21,6 +22,7 @@ export const routes: Routes = [
       {path: 'system-manager', children: systemManagerRoutes, canActivate: [AuthGuard]},
       {path: 'master-data', children: masterDataRoutes, canActivate: [AuthGuard]},
       {path: `ki-khao-sat/:id`, component: KiKhaoSatComponent, canActivate: [AuthGuard]},
+      {path: `danh-gia-tieu-chi/:id`, component: DanhGiaTieuChiComponent, canActivate: [AuthGuard]},
       { path: 'survey-mgmt', component: SurveyMgmtComponent },
 
     ],
