@@ -35,9 +35,7 @@
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('Thời gian kết thúc', $event)">
             Thời gian kết thúc
           </th>
-          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('ghi chú', $event)">
-            ghi chú
-          </th>
+         
          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('trạng thái', $event)" nzAlign="center">
             Trạng thái
           </th>
@@ -63,15 +61,16 @@
             }}
           </td>
           <td>
-            <a (click)="openEdit(data)">{{ data.id }}</a>
+            <a (click)="openEdit(data)">{{ data.code }}</a>
           </td>
           <td>{{ data.name }}</td>
-          <td>{{ data.name }}</td>
-          <td>{{ data.name }}</td>
-          <td>{{ data.name }}</td>
-          <td>{{ data.name }}</td>
-          <td>{{ data.name }}</td>
-          <td>{{ data.name }}</td>
+          <td>{{data.startDate}}</td>
+          <td>{{data.endDate}}</td>
+          <td></td>
+         
+          <td></td>
+          <td></td>
+          
           <td nzAlign="center">
             <button class="!flex !items-center" nzType="default" nz-button>
               <span nz-icon nzType="edit"></span>  Cập nhập tiêu chí
@@ -113,10 +112,10 @@
          <div nz-col [nzXs]="24" >
           <app-input-clear placeholder="Nhập tên kì " [required]="true" label="Tên kì "
         [control]="$any(validateForm).controls['Name']" [required]="true"
-        [disabled]="edit ? true : false"></app-input-clear>
+       ></app-input-clear>
          <app-input-clear placeholder="Nhập mô tả " [required]="true" label="Mô tả "
         [control]="$any(validateForm).controls['Des']" [required]="true"
-        [disabled]="edit ? true : false"></app-input-clear>
+       ></app-input-clear>
         </div>
           <div>
         <div class="inner-box">
@@ -181,7 +180,7 @@
             }}
           </td>
           <td>
-            <a (click)="openEdit(data)">{{ data.ma }}</a>
+            <a >{{ data.ma }}</a>
           </td>
           <td nzAlign="center">{{ data.name }}</td>
 
@@ -191,7 +190,8 @@
           <td nzAlign="center">
 
              <nz-select  style="width: 100%;" [nzMaxTagCount]="3" [nzMaxTagPlaceholder]="tagPlaceHolder" nzMode="multiple"
-                                nzPlaceHolder="Please select" formControlName="NguoichamDiem">
+                                nzPlaceHolder="Please select"  [(ngModel)]="data.nguoiChamDiem"
+    [ngModelOptions]="{standalone: true}">
                                 <nz-option cdkScrollable *ngFor="let item of Account" [nzLabel]="item.fullName"
                                     [nzValue]="item.userName">
                                 </nz-option>

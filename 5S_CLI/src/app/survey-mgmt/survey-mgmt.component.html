@@ -45,7 +45,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let data of headerTable.data; let i = index" (dblclick)="openKiKhaoSat(data)">
+        <tr *ngFor="let data of headerTable.data; let i = index" (dblclick)="openKiKhaoSat(data.id)">
           <td>
             {{
             (paginationResult.currentPage - 1) * paginationResult.pageSize +
@@ -54,7 +54,7 @@
             }}
           </td>
           <td>
-            <a (click)="openKiKhaoSat(data.ma)">{{ data.ma }}</a>
+            <a (click)="openKiKhaoSat(data.id)">{{ data.ma }}</a>
           </td>
           <td>{{ data.name }}</td>
           <td>{{ data.moTa }}</td>

@@ -12,11 +12,11 @@ export class KiKhaoSatService {
     return this.commonService.get('KiKhaoSat/Search', params)
   }
 
-  getAll(): Observable<any> {
-    return this.commonService.get('KiKhaoSat/GetAll')
+  getAll(param:any): Observable<any> {
+    return this.commonService.get(`KiKhaoSat/GetAll?kiKhaoSatId=${param}`)
   }
-  getAlldata(): Observable<any> {
-    return this.commonService.get('KiKhaoSat/GetAllData')
+  getAlldata(param:any): Observable<any> {
+    return this.commonService.get(`KiKhaoSat/GetAllData?headerId=${param}`)
   }
 
   create(params: any): Observable<any> {

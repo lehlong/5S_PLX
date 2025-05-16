@@ -29,6 +29,7 @@ export class KiKhaoSatComponent {
   Account:any=[]
   DataChamdiem:any=[]
   headerId : any = ""
+  DataKS:any=[]
 
   constructor(
     private _service: KiKhaoSatService,
@@ -45,8 +46,8 @@ export class KiKhaoSatComponent {
       StartDate: ['', [Validators.required]],
       EndDate: ['', [Validators.required]],
       isActive: [true, [Validators.required]],
-      Survey_Mgmt_Id: ['Survey_Mgmt_Id',],
-      NguoichamDiem: [[], [Validators.required]],
+      SurveyMgmtId: [this.headerId,],
+      // NguoichamDiem: [[], [Validators.required]],
 
     })
     this.globalService.setBreadcrumb([
@@ -71,7 +72,7 @@ export class KiKhaoSatComponent {
       },
     })
     this.search()
-    this.getAlldata()
+    this.getAlldata(this.headerId)
     this.getAllAccount()
 
 
@@ -88,7 +89,7 @@ export class KiKhaoSatComponent {
 
   search() {
     this.isSubmit = false
-    console.log(this.filter);
+
 
     this._service.search(this.filter).subscribe({
       next: (data) => {
@@ -99,10 +100,11 @@ export class KiKhaoSatComponent {
       },
     })
   }
-  getAlldata() {
-    this._service.getAlldata().subscribe({
+  getAlldata(headerId: string) {
+    this._service.getAlldata(headerId).subscribe({
       next: (data) => {
       this.DataChamdiem=data
+     
 
       },
       error: (response) => {
@@ -117,14 +119,18 @@ export class KiKhaoSatComponent {
     )
   }
   submitForm(): void {
-    console.log(this.validateForm.valid)
-    console.log(this.validateForm.getRawValue())
+   this.validateForm.get('SurveyMgmtId')?.setValue(this.headerId);
+   const formData = this.validateForm.getRawValue()
+      const payload = {
+          ...formData,
+       Chamdiemlst: this.DataChamdiem 
+      };
     this.isSubmit = true
     if (this.validateForm.valid) {
 
       if (this.edit) {
         this._service
-          .update(this.validateForm.getRawValue())
+          .update(payload)
           .subscribe({
             next: (data) => {
               this.search()
@@ -135,13 +141,15 @@ export class KiKhaoSatComponent {
           })
       } else {
 
-        const formData = this.validateForm.getRawValue()
-       console.log('create')
+        
+      
+       console.log(this.DataChamdiem)
         this._service
-          .create(this.validateForm.getRawValue())
+          .create(payload)
           .subscribe({
             next: (data) => {
               this.search()
+              this.visible = false
             },
             error: (response) => {
               console.log(response)
@@ -156,6 +164,7 @@ export class KiKhaoSatComponent {
         }
       })
     }
+    this.reset()
   }
 
   close() {
@@ -164,7 +173,7 @@ export class KiKhaoSatComponent {
   }
 
   reset() {
-    this.filter = new AccountTypeFilter()
+  
     this.search()
   }
     getAllAccount() {
@@ -202,11 +211,17 @@ export class KiKhaoSatComponent {
     })
   }
 
-  openEdit(data: { id: string; name: number; isActive: boolean }) {
+  openEdit(data: { code: string; name: number; isActive: boolean , des: string, startDate: Date, endDate: Date}) {
+   this.Getdataki(data.code)
+   
     this.validateForm.setValue({
-      id: data.id,
-      name: data.name,
+      Code: data.code,
+      Name: data.name,
       isActive: data.isActive,
+      Des: data.des,
+      StartDate: data.startDate,
+      EndDate: data.endDate,
+      SurveyMgmtId: this.headerId,
     })
     setTimeout(() => {
       this.edit = true
@@ -214,6 +229,28 @@ export class KiKhaoSatComponent {
     }, 200)
   }
 
+  Getdataki(code: string) {
+    this._service.getAll(code).subscribe({
+      next: (data) => {
+        this.DataKS = data
+       this.DataChamdiem = this.DataChamdiem.map((store: any) => {
+
+  const nguoiChamDiemArr = this.DataKS
+    .filter((x:any) => x.storeId === store.ma)
+    .map((x:any) => x.userName);
+
+  return {
+   ...store,
+    nguoiChamDiem: nguoiChamDiemArr // gán vào thuộc tính này
+  };
+});
+
+      },
+      error: (response) => {
+        console.log(response)
+      },
+    })
+  }
   pageSizeChange(size: number): void {
     this.filter.currentPage = 1
     this.filter.pageSize = size

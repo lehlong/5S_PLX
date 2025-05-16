@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static PLX5S.BUSINESS.Services.BU.KikhaosatService;
 
 namespace PLX5S.BUSINESS.Services.BU
 {
@@ -18,8 +19,11 @@ namespace PLX5S.BUSINESS.Services.BU
     {
         //Task<IList<SurveyMgmtDto>> GetAll(BaseMdFilter filter);
         //Task<byte[]> Export(BaseMdFilter filter);
-        Task Insert(TblBuKiKhaoSat data);
-        //Task<List<InputStoreDto>> GetallData();
+        Task Insert(KiKhaoSatDto data);
+        Task<List<InputStoreDto>> GetallData(string headerId);
+        Task<List<InputChamDiemDto>> Getchamdiem(string kiKhaoSatId);
+        Task UpdateData(KiKhaoSatDto data);
+
     }
     public class KikhaosatService(AppDbContext dbContext, IMapper mapper) : GenericService<TblBuKiKhaoSat, KiKhaoSatDto>(dbContext, mapper), IKikhaosatService
     {
@@ -31,6 +35,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 if (!string.IsNullOrWhiteSpace(filter.KeyWord))
                 {
                     query = query.Where(x => x.SurveyMgmtId.ToString().Contains(filter.KeyWord) || x.Name.Contains(filter.KeyWord));
+                  
                 }
                 if (filter.IsActive.HasValue)
                 {
@@ -46,7 +51,34 @@ namespace PLX5S.BUSINESS.Services.BU
                 return null;
             }
         }
-        public async Task Insert(TblBuKiKhaoSat data)
+        public class Dataks
+        {
+            public KiKhaoSatDto KhaoSat { get; set; }
+            public List<TblBuInputChamDiem> ChamDiemList { get; set; }
+        }
+        public async Task<List<InputChamDiemDto>> Getchamdiem(string kiKhaoSatId)
+        {
+            try
+            {
+                var chamDiemList = await _dbContext.TblBuInputChamDiem
+                    .Where(x => x.KiKhaoSatId == kiKhaoSatId && x.IsDeleted==false)
+                    .ToListAsync();
+
+                // Map the list of TblBuInputChamDiem to InputChamDiemDto
+                var chamDiemDtoList = _mapper.Map<List<InputChamDiemDto>>(chamDiemList);
+
+                return chamDiemDtoList;
+            }
+            catch (Exception ex)
+            {
+                Status = false;
+                Exception = ex;
+                return null;
+            }
+        }
+
+
+        public async Task Insert(KiKhaoSatDto data)
         {
             try
             {
@@ -59,10 +91,97 @@ namespace PLX5S.BUSINESS.Services.BU
                     KiKhaoSatId = data.Code,
                     IsImg = false,
                     OrderNumber = 0,
-                    Report = "-"
+                    Report = "-",
+                    IsDeleted=false
                 };
+                var khaosatdata = new TblBuKiKhaoSat()
+                {
+                    Code=data.Code,
+                    SurveyMgmtId = data.SurveyMgmtId,
+                    Name = data.Name,
+                    IsActive = true,
+                    StartDate = data.StartDate,
+                    EndDate = data.EndDate,
+                    Des = data.Des,
+                    IsDeleted=false
+
+                };
+                var lstChamDiem = new List<TblBuInputChamDiem>();
+                foreach (var item in data.Chamdiemlst)
+                {
+                    foreach (var i in item.NguoiChamDiem)
+                    {
+                        var chamdiem = new TblBuInputChamDiem()
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            StoreId = item.Ma,
+                            KiKhaoSatId = data.Code,
+                            UserName = i,
+                            IsActive = true,
+                            IsDeleted=false,
+                        };
+                        lstChamDiem.Add(chamdiem);
+                    }
+                   
+                }
+                _dbContext.TblBuInputChamDiem.AddRange(lstChamDiem);
                 _dbContext.TblBuTieuChi.Add(tree);
-                _dbContext.TblBuKiKhaoSat.Add(data);
+                _dbContext.TblBuKiKhaoSat.Add(khaosatdata);
+
+                _dbContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Status = false;
+                Exception = ex;
+            }
+        }
+        public async Task UpdateData(KiKhaoSatDto data)
+        {
+            try
+            {
+               
+                var khaosatdata = new TblBuKiKhaoSat()
+                {
+                    Code = data.Code,
+                    SurveyMgmtId = data.SurveyMgmtId,
+                    Name = data.Name,
+                    IsActive = true,
+                    StartDate = data.StartDate,
+                    EndDate = data.EndDate,
+                    Des = data.Des,
+
+                };
+                var lstdel = _dbContext.TblBuInputChamDiem.Where(x => x.KiKhaoSatId == data.Code).ToList();
+                foreach (var item in lstdel)
+                {
+                    item.IsDeleted = true;
+                }
+                _dbContext.TblBuInputChamDiem.UpdateRange(lstdel);
+                var lstChamDiem = new List<TblBuInputChamDiem>();
+                
+                foreach (var item in data.Chamdiemlst)
+                {
+                    foreach (var i in item.NguoiChamDiem)
+                    {
+                        var chamdiem = new TblBuInputChamDiem()
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            StoreId = item.Ma,
+                            KiKhaoSatId = data.Code,
+                            UserName = i,
+                            IsActive = true,
+                            IsDeleted=false
+                        };
+                        lstChamDiem.Add(chamdiem);
+
+                    }
+
+                }
+                
+               
+                _dbContext.TblBuKiKhaoSat.Update(khaosatdata);
+                _dbContext.TblBuInputChamDiem.AddRange(lstChamDiem);
 
                 _dbContext.SaveChanges();
             }
@@ -85,28 +204,27 @@ namespace PLX5S.BUSINESS.Services.BU
             public string Fullname { get; set; }
          }
 
-        //public async Task<List<ListdataKikhaosat> GetallData()
-        //{
+        public async Task<List<InputStoreDto>> GetallData( string headerId)
+        {
 
-        //    try
-        //    {
-        //        var headerId = "12345";
-        //        var data = _dbContext.TblBuInputStore.AsQueryable().ToList();
-        //        var dataDto = _mapper.Map<List<InputStoreDto>>(data);
-        //        var NguoiChamDiem = _dbContext.TblBuInputChamDiem.Where(x => x.KiKhaoSatId == headerId).ToList();
-        //        var NguoiChamDiemDto = _mapper.Map<List<NameUser>>(NguoiChamDiem);
+            try
+            {
+                
+                var data = _dbContext.TblBuInputStore.Where(x=>x.SurveyMgmtId==headerId).ToList();
+                var dataDto = _mapper.Map<List<InputStoreDto>>(data);
+                
 
-        //        return dataDto;
+                return dataDto;
 
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Status = false;
-        //        Exception = ex;
-        //        return null;
-        //    }
-        //}
-
+            }
+            catch (Exception ex)
+            {
+                Status = false;
+                Exception = ex;
+                return null;
+            }
+        }
+        
 
     }
 }

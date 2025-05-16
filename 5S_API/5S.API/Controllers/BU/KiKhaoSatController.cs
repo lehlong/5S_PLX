@@ -33,10 +33,10 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
- 
-      
+        
+        
         [HttpPost("Insert")]
-        public async Task<IActionResult> Insert([FromBody] TblBuKiKhaoSat time)
+        public async Task<IActionResult> Insert([FromBody] KiKhaoSatDto time)
         {
             var transferObject = new TransferObject();
 
@@ -44,7 +44,6 @@ namespace PLX5S.API.Controllers.BU
 
             if (_service.Status)
             {
-                //transferObject.Data = result;
                 transferObject.Status = true;
                 transferObject.MessageObject.MessageType = MessageType.Success;
                 transferObject.GetMessage("0100", _service);
@@ -61,7 +60,7 @@ namespace PLX5S.API.Controllers.BU
         public async Task<IActionResult> Update([FromBody] KiKhaoSatDto time)
         {
             var transferObject = new TransferObject();
-            await _service.Update(time);
+            await _service.UpdateData(time);
             if (_service.Status)
             {
                 transferObject.Status = true;
@@ -96,13 +95,13 @@ namespace PLX5S.API.Controllers.BU
             return Ok(transferObject);
         }
         [HttpGet("GetAllData")]
-        public async Task<IActionResult> GetAllData()
+        public async Task<IActionResult> GetAllData([FromQuery] string headerId)
         {
-            var transferObject = new TransferObject();
-           //var result=  await  _service.GetallData();
+            var transferObject = new TransferObject(); 
+            var result = await _service.GetallData(headerId);
             if (_service.Status)
             {
-                //transferObject.Data = result;
+                transferObject.Data = result;
                 transferObject.Status = true;
                 transferObject.MessageObject.MessageType = MessageType.Success;
                 transferObject.GetMessage("0105", _service);
@@ -115,6 +114,27 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
+        [HttpGet("GetAll")]
+        public async Task<IActionResult> GetAll([FromQuery] string kiKhaoSatId)
+        {
+            var transferObject = new TransferObject();
+            var result = await _service.Getchamdiem(kiKhaoSatId);
+            if (result != null)
+            {
+                transferObject.Data = result;
+                transferObject.Status = true;
+                transferObject.MessageObject.MessageType = MessageType.Success;
+                transferObject.GetMessage("0100", _service);
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0101", _service);
+            }
+            return Ok(transferObject);
+        }
+
 
     }
 }

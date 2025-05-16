@@ -26,9 +26,26 @@ namespace PLX5S.BUSINESS.Dtos.BU
 
         [Description("header id")]
         public string SurveyMgmtId { get; set; }
+        public List<NguoiChamDiemlst> Chamdiemlst { get; set; }
+        public bool? IsActive { get; set; }
         public void Mapping(Profile profile)
         {
             profile.CreateMap<TblBuKiKhaoSat, KiKhaoSatDto>().ReverseMap();
         }
     }
+   public class NguoiChamDiemlst
+{
+    public string Id { get; set; }
+    public string Ma { get; set; }
+    public string SurveyMgmtId { get; set; }
+    public string Name { get; set; }
+    public string PhoneNumber { get; set; }
+    public string CuaHangTruong { get; set; }
+    public string NguoiPhuTrach { get; set; }
+    public string KinhDo { get; set; }
+    public string ViDo { get; set; }
+    public bool? TrangThaiCuaHang { get; set; }
+
+    public List<string> NguoiChamDiem { get; set; }= new List<string>();
+}
 }
