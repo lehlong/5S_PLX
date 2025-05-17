@@ -80,15 +80,8 @@ namespace PLX5S.BUSINESS.Services.BU
                     var st = new TblBuInputStore()
                     {
                         Id = idSt,
-                        Ma = s.Id,
+                        StoreId = s.Id,
                         SurveyMgmtId = id,
-                        Name = s.Name,
-                        PhoneNumber = s.PhoneNumber,
-                        CuaHangTruong = s.CuaHangTruong,
-                        NguoiPhuTrach = s.NguoiPhuTrach,
-                        KinhDo = s.KinhDo,
-                        ViDo = s.ViDo,  
-                        TrangThaiCuaHang = s.TrangThaiCuaHang,
                         IsActive = false
                     };
                     var inStore = new InputStoreModel()

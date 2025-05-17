@@ -96,7 +96,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 };
                 var khaosatdata = new TblBuKiKhaoSat()
                 {
-                    Code=data.Code,
+                    Code = data.Code,
                     SurveyMgmtId = data.SurveyMgmtId,
                     Name = data.Name,
                     IsActive = true,

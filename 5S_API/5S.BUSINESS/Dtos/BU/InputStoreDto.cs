@@ -12,31 +12,11 @@ namespace PLX5S.BUSINESS.Dtos.BU
         public string Id { get; set; }
 
         [Description("Mã cửa hàng")]
-        public string Ma { get; set; }
+        public string StoreId { get; set; }
 
         [Description("Mã kỳ khảo sát")]
         public string SurveyMgmtId { get; set; }
 
-        [Description("Tên cửa hàng")]
-        public string Name { get; set; }
-
-        [Description("Số điện thoại")]
-        public string PhoneNumber { get; set; }
-
-        [Description("Cửa hàng trưởng")]
-        public string CuaHangTruong { get; set; }
-
-        [Description("Người phụ trách")]
-        public string NguoiPhuTrach { get; set; }
-
-        [Description("Kinh độ")]
-        public string KinhDo { get; set; }
-
-        [Description("Vĩ độ")]
-        public string ViDo { get; set; }
-
-        [Description("Trạng thái cửa hàng")]
-        public bool? TrangThaiCuaHang { get; set; }
 
         public void Mapping(Profile profile)
         {

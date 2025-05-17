@@ -16,7 +16,7 @@ namespace PLX5S.BUSINESS.Dtos.BU
         public string Name { get; set; }
 
         [Description("Mô tả")]
-        public string Des { get; set; }
+        public string? Des { get; set; }
 
         [Description("Ngày bắt đầu")]
         public DateTime? StartDate { get; set; }
@@ -34,18 +34,18 @@ namespace PLX5S.BUSINESS.Dtos.BU
         }
     }
    public class NguoiChamDiemlst
-{
-    public string Id { get; set; }
-    public string Ma { get; set; }
-    public string SurveyMgmtId { get; set; }
-    public string Name { get; set; }
-    public string PhoneNumber { get; set; }
-    public string CuaHangTruong { get; set; }
-    public string NguoiPhuTrach { get; set; }
-    public string KinhDo { get; set; }
-    public string ViDo { get; set; }
-    public bool? TrangThaiCuaHang { get; set; }
+    {
+        public string Id { get; set; }
+        public string Ma { get; set; }
+        public string SurveyMgmtId { get; set; }
+        public string Name { get; set; }
+        public string PhoneNumber { get; set; }
+        public string CuaHangTruong { get; set; }
+        public string NguoiPhuTrach { get; set; }
+        public string KinhDo { get; set; }
+        public string ViDo { get; set; }
+        public bool? TrangThaiCuaHang { get; set; }
 
-    public List<string> NguoiChamDiem { get; set; }= new List<string>();
-}
+        public List<string> NguoiChamDiem { get; set; }= new List<string>();
+    }
 }

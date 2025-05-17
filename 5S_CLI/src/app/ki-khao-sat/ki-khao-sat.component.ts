@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, ViewChild } from '@angular/core'
 import { ShareModule } from '../shared/share-module'
 import { FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms'
 import { AccountTypeFilter } from '../models/master-data/account-type.model'
@@ -7,40 +7,53 @@ import { KiKhaoSatService } from '../service/master-data/ki-khao-sat.service'
 import { AccountService } from '../service/system-manager/account.service'
 import { GlobalService } from '../service/global.service'
 import { NzMessageService } from 'ng-zorro-antd/message'
-import { ActivatedRoute ,Router,RouterModule} from '@angular/router'
+import { ActivatedRoute, Router, RouterModule } from '@angular/router'
+import { NzTreeComponent, NzFormatEmitEvent } from 'ng-zorro-antd/tree'
+import { NzUploadChangeParam } from 'ng-zorro-antd/upload'
+import { TreeTieuChiService } from '../service/business/tree-tieu-chi.service'
 @Component({
   selector: 'app-ki-khao-sat',
-  imports: [ShareModule,RouterModule],
+  imports: [ShareModule, RouterModule],
   standalone: true,
   templateUrl: './ki-khao-sat.component.html',
   styleUrl: './ki-khao-sat.component.scss'
 })
 export class KiKhaoSatComponent {
+  @ViewChild('treeCom', { static: false }) treeCom!: NzTreeComponent;
 
-   validateForm: FormGroup
+  validateForm: FormGroup
   isSubmit: boolean = false
   visible: boolean = false
   edit: boolean = false
   EndDate: Date | null = null;
-
+  drawerVisible = false;
+  selectedNode: any = null;
+  selectedNodeDetails: any[] = [];
+  searchValue = '';
+  treeData: any = [];
   filter = new AccountTypeFilter()
   paginationResult = new PaginationResult()
   loading: boolean = false
-  Account:any=[]
-  DataChamdiem:any=[]
-  headerId : any = ""
-  DataKS:any=[]
+  Account: any = []
+  dataChamdiem: any = []
+  headerId: any = ""
+  calculationRows: any[] = [];
+  DataKS: any = []
+  kiKhaoSat: any = {}
+  visibleKiKhaoSat: boolean = false
 
   constructor(
     private _service: KiKhaoSatService,
     private route: ActivatedRoute,
     private fb: NonNullableFormBuilder,
     private globalService: GlobalService,
-      private router: Router,
+    private messageService: NzMessageService,
+    private router: Router,
+    private _treeTieuChiService: TreeTieuChiService,
     private message: NzMessageService,
     private accountService: AccountService,
   ) {
-    this.validateForm= this.fb.group({
+    this.validateForm = this.fb.group({
       Code: [''],
       Name: ['', [Validators.required]],
       Des: ['', [Validators.required]],
@@ -53,7 +66,7 @@ export class KiKhaoSatComponent {
     })
     this.globalService.setBreadcrumb([
       {
-        name: 'Danh sách kiểu người dùng',
+        name: 'Danh sách kì khảo sát',
         path: 'master-data/account-type',
       },
     ])
@@ -104,8 +117,8 @@ export class KiKhaoSatComponent {
   getAlldata(headerId: string) {
     this._service.getAlldata(headerId).subscribe({
       next: (data) => {
-      this.DataChamdiem=data
-     
+        this.dataChamdiem = data
+
 
       },
       error: (response) => {
@@ -120,14 +133,16 @@ export class KiKhaoSatComponent {
     )
   }
   submitForm(): void {
-   this.validateForm.get('SurveyMgmtId')?.setValue(this.headerId);
-   const formData = this.validateForm.getRawValue()
-      const payload = {
-          ...formData,
-       Chamdiemlst: this.DataChamdiem 
-      };
+    this.kiKhaoSat.surveyMgmtId = this.headerId
+    this.kiKhaoSat.isActive = true
+
+    const payload = {
+      ...this.kiKhaoSat,
+      Chamdiemlst: this.dataChamdiem
+    };
+
     this.isSubmit = true
-    if (this.validateForm.valid) {
+    // if (this.validateForm.valid) {
 
       if (this.edit) {
         this._service
@@ -141,10 +156,7 @@ export class KiKhaoSatComponent {
             },
           })
       } else {
-
-        
-      
-       console.log(this.DataChamdiem)
+       console.log(this.dataChamdiem)
         this._service
           .create(payload)
           .subscribe({
@@ -157,32 +169,64 @@ export class KiKhaoSatComponent {
             },
           })
       }
-    } else {
-      Object.values(this.validateForm.controls).forEach((control) => {
-        if (control.invalid) {
-          control.markAsDirty()
-          control.updateValueAndValidity({ onlySelf: true })
-        }
-      })
-    }
+    // } else {
+    //   Object.values(this.validateForm.controls).forEach((control) => {
+    //     if (control.invalid) {
+    //       control.markAsDirty()
+    //       control.updateValueAndValidity({ onlySelf: true })
+    //     }
+    //   })
+    // }
     this.reset()
+  }
+
+  openCreateChild(node: any) {
+    this.close()
+    this.edit = false
+    this.visible = true
+    this.validateForm.get('pId')?.setValue(node?.origin.id)
+    this.validateForm.get('orderNumber')?.setValue(null)
+    this.validateForm.get('children')?.setValue([])
+  }
+  addCalculationRow(): void {
+    this.calculationRows.push({ description: '', score: 0 });
+  }
+
+  removeCalculationRow(index: number): void {
+    this.calculationRows.splice(index, 1);
   }
 
   close() {
     this.visible = false
+    this.visibleKiKhaoSat = false
     this.resetForm()
+    this.kiKhaoSat = []
   }
-  openTieuchi(id :string) {
+
+  closeDrawer(): void {
+    this.drawerVisible = false;
+  }
+
+  closeModal(): void {
+    this.visible = false;
+  }
+
+
+  onClick(node: any) {
+    console.log('Node clicked:', node);
+  }
+
+  openTieuchi(id: string) {
     console.log(id)
-     this.router.navigate([`danh-gia-tieu-chi/${id}`])
+    this.router.navigate([`danh-gia-tieu-chi/${id}`])
 
   }
 
   reset() {
-  
+
     this.search()
   }
-    getAllAccount() {
+  getAllAccount() {
     this.accountService.getall().subscribe({
       next: (data) => {
         this.Account = data
@@ -196,9 +240,14 @@ export class KiKhaoSatComponent {
     })
   }
 
+  openCreateModal(): void {
+    this.edit = false;
+    this.visible = true;
+  }
+
   openCreate() {
     this.edit = false
-    this.visible = true
+    this.visibleKiKhaoSat = true
   }
 
   resetForm() {
@@ -217,39 +266,45 @@ export class KiKhaoSatComponent {
     })
   }
 
-  openEdit(data: { code: string; name: number; isActive: boolean , des: string, startDate: Date, endDate: Date}) {
-   this.Getdataki(data.code)
-   
-    this.validateForm.setValue({
-      Code: data.code,
-      Name: data.name,
-      isActive: data.isActive,
-      Des: data.des,
-      StartDate: data.startDate,
-      EndDate: data.endDate,
-      SurveyMgmtId: this.headerId,
-    })
+  nzEvent(event: NzFormatEmitEvent): void { }
+
+  onDrop(event: any) { }
+
+  onDragStart(event: any) { }
+
+  openEditKyKhaoSat(data: any) {
+    this.Getdataki(data.code)
+    this.kiKhaoSat = data
     setTimeout(() => {
       this.edit = true
-      this.visible = true
+      this.visibleKiKhaoSat = true
     }, 200)
+  }
+
+  openDrawer(param : any): void {
+    this.drawerVisible = true;
+    this._treeTieuChiService.GetTreeTieuChi(param).subscribe((res) => {
+      console.log(res);
+
+      this.treeData = [res];
+    })
   }
 
   Getdataki(code: string) {
     this._service.getAll(code).subscribe({
       next: (data) => {
         this.DataKS = data
-       this.DataChamdiem = this.DataChamdiem.map((store: any) => {
+        this.dataChamdiem = this.dataChamdiem.map((store: any) => {
 
-  const nguoiChamDiemArr = this.DataKS
-    .filter((x:any) => x.storeId === store.ma)
-    .map((x:any) => x.userName);
+          const nguoiChamDiemArr = this.DataKS
+            .filter((x: any) => x.storeId === store.ma)
+            .map((x: any) => x.userName);
 
-  return {
-   ...store,
-    nguoiChamDiem: nguoiChamDiemArr // gán vào thuộc tính này
-  };
-});
+          return {
+            ...store,
+            nguoiChamDiem: nguoiChamDiemArr // gán vào thuộc tính này
+          };
+        });
 
       },
       error: (response) => {
@@ -263,6 +318,18 @@ export class KiKhaoSatComponent {
     this.search()
   }
 
+  handleChange(info: NzUploadChangeParam): void {
+    if (info.file.status !== 'uploading') {
+      console.log(info.file, info.fileList);
+    }
+    if (info.file.status === 'done') {
+      this.messageService.success(
+        `${info.file.name} file uploaded successfully`
+      );
+    } else if (info.file.status === 'error') {
+      this.messageService.error(`${info.file.name} file upload failed.`);
+    }
+  }
   pageIndexChange(index: number): void {
     this.filter.currentPage = index
     this.search()

@@ -55,7 +55,7 @@ export class DanhGiaTieuChiComponent {
     this.drawerVisible = true;
     this._service.GetTreeTieuChi(param).subscribe((res) => {
       console.log(res);
-      
+
       this.treeData = [res];
     })
   }
@@ -64,41 +64,12 @@ export class DanhGiaTieuChiComponent {
   closeDrawer(): void {
     this.drawerVisible = false;
   }
-  nzEvent(event: NzFormatEmitEvent): void {}
 
-  onDragStart(event: any) {}
+  nzEvent(event: NzFormatEmitEvent): void {  }
 
-  onDrop(event: NzFormatEmitEvent): void {
-    const treeData = this.treeCom
-      .getTreeNodes()
-      .map((node) => this.mapNode(node));
-    console.log('Updated Tree Data:', treeData);
-  }
+  onDrop(event: any) { }
 
-  loadNodeDetails(nodeKey: string): void {
-    if (nodeKey === '0-0') {
-      this.selectedNodeDetails = [
-        { id: '1', code: 'TC001', name: 'Sàn bãi', requiredImage: true },
-        {
-          id: '2',
-          code: 'TC002',
-          name: 'Tiêu đào trụ bơm',
-          requiredImage: false,
-        },
-      ];
-    } else if (nodeKey === '0-1') {
-      this.selectedNodeDetails = [
-        {
-          id: '3',
-          code: 'TC003',
-          name: 'Đồng phục khi bán hàng',
-          requiredImage: true,
-        },
-      ];
-    } else {
-      this.selectedNodeDetails = [];
-    }
-  }
+  onDragStart(event: any) { }
 
   handleChange(info: NzUploadChangeParam): void {
     if (info.file.status !== 'uploading') {
@@ -118,6 +89,11 @@ export class DanhGiaTieuChiComponent {
     this.validateForm.reset();
   }
 
+  updateOrderTree() {
+    const treeData = this.treeCom
+      .getTreeNodes()
+      .map((node) => this.mapNode(node))
+  }
   openEdit(node: any) {
     if (!node) return;
     this.edit = true;

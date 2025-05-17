@@ -28,7 +28,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 var query = _dbContext.TblBuInputStore.AsQueryable();
                 if (!string.IsNullOrWhiteSpace(filter.KeyWord))
                 {
-                    query = query.Where(x => x.Id.Contains(filter.KeyWord) || x.Name.Contains(filter.KeyWord));
+                    query = query.Where(x => x.Id.Contains(filter.KeyWord) || x.StoreId.Contains(filter.KeyWord));
                 }
                 if (filter.IsActive.HasValue)
                 {
