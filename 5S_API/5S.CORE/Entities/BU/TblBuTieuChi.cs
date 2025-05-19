@@ -33,10 +33,17 @@ public class TblBuTieuChi : SoftDeleteEntity
         [Column("IS_IMG")]
         public bool? IsImg { get; set; }
 
+        [Column("NUMBER_IMG")]
+        public decimal? NumberImg { get; set; }
+
         [Column("ORDER_NUMBER")]
         public int OrderNumber { get; set; }
 
         [Column("REPORT", TypeName = "NVARCHAR(255)")]
         public string? Report { get; set; }
+        
+        [Column("CHI_CHT_ATVSV", TypeName = "BIT")]
+        public bool ChiChtAtvsv { get; set; }
+
     }
 }

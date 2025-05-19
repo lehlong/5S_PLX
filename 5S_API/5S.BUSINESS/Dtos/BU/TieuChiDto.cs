@@ -19,23 +19,29 @@ namespace PLX5S.BUSINESS.Dtos.BU
         public string Id { get; set; }
 
         public string Name { get; set; }
+        
         public string Title { get; set; }
 
         public bool IsExpanded { set; get; }
-        //public bool? IsLeaf { set; get; }
+        
         public string? PId { get; set; }
 
         public string? KiKhaoSatId { get; set; }
-
+        
         public int? OrderNumber { get; set; }
-
+        
         public bool? IsGroup { get; set; }
-
+        
         public bool? IsImg { get; set; }
+        
+        public decimal? NumberImg { get; set; }
 
-        public string Report { get; set; }
+        public string? Report { get; set; }
+        public bool ChiChtAtvsv { get; set; }
 
         public List<TieuChiDto>? Children { set; get; }
+        
+        public List<TblBuTinhDiemTieuChi>? DiemTieuChi { set; get; }
 
         public void Mapping(Profile profile)
         {

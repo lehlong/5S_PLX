@@ -52,7 +52,7 @@ namespace PLX5S.API.Controllers.BU
         }
 
         [HttpPost("InsertTreeLeaves")]
-        public async Task<IActionResult> InsertTreeLeaves([FromQuery] TblBuTieuChi data)
+        public async Task<IActionResult> InsertTreeLeaves([FromBody] TieuChiDto data)
         {
             var transferObject = new TransferObject();
             await _service.InsertTreeLeaves(data);
@@ -68,5 +68,24 @@ namespace PLX5S.API.Controllers.BU
             return Ok(transferObject);
         }
 
+        [HttpGet("GetLeaves")]
+        public async Task<IActionResult> GetLeaves([FromQuery] string id)
+        {
+
+            var transferObject = new TransferObject();
+            var result = _service.getLeaves(id);
+            if (_service.Status)
+            {
+                transferObject.Data = result;
+
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
     }
 }

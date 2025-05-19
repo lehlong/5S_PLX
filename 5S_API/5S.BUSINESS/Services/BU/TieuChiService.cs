@@ -18,8 +18,9 @@ namespace PLX5S.BUSINESS.Services.BU
     public interface ITieuChiService : IGenericService<TblBuTieuChi, TieuChiDto>
     {
         Task<TieuChiDto> BuildDataForTree(string kiKhaoSatId);
-        Task InsertTreeGroup(TblBuTieuChi data);
-        Task InsertTreeLeaves(TblBuTieuChi data);
+        Task InsertTreeGroup(TblBuTieuChi data); 
+        Task<List<TieuChiDto>> getLeaves(string id);
+        Task InsertTreeLeaves(TieuChiDto data);
     }
 
     public class TieuChiService(AppDbContext dbContext, IMapper mapper) : GenericService<TblBuTieuChi, TieuChiDto>(dbContext, mapper), ITieuChiService
@@ -37,11 +38,26 @@ namespace PLX5S.BUSINESS.Services.BU
 
             }
         }
-        public async Task InsertTreeLeaves(TblBuTieuChi data)
+
+        public async Task InsertTreeLeaves(TieuChiDto data)
         {
             try
             {
-                _dbContext.TblBuTieuChi.Add(data);
+                var tieuChi = new TblBuTieuChi()
+                {
+                    Id = data.Id,
+                    Name = data.Name,
+                    IsActive = true,
+                    IsGroup = false,
+                    KiKhaoSatId = data.KiKhaoSatId,
+                    PId = data.PId,
+                    Report = data.Report,
+                    IsImg = data.IsImg,
+                    NumberImg = data.NumberImg
+                };
+                _dbContext.TblBuTieuChi.Add(tieuChi);
+                _dbContext.TblBuTinhDiemTieuChi.AddRange(data.DiemTieuChi);
+
                 await _dbContext.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -102,11 +118,32 @@ namespace PLX5S.BUSINESS.Services.BU
 
         }
 
-        public async Task<List<TblBuTieuChi>> getLeaves(string id)
+        public async Task<List<TieuChiDto>> getLeaves(string id)
         {
             try
             {
-                return null;
+                var tieuChi = _dbContext.TblBuTieuChi.Where(x => x.IsDeleted == false && x.PId == id).ToList();
+                var lstTieuChiLeaves = new List<TieuChiDto>();
+                foreach (var item in tieuChi)
+                {
+                    var leaves = new TieuChiDto()
+                    {
+                        Id = item.Id,
+                        PId = item.PId,
+                        Name = item.Name,
+                        Title = item.Name,
+                        IsImg = item.IsImg,
+                        Report = item.Report,
+                        IsGroup = item.IsGroup,
+                        NumberImg = item.NumberImg,
+                        KiKhaoSatId = item.KiKhaoSatId,
+                        OrderNumber = item.OrderNumber,
+                        DiemTieuChi = _dbContext.TblBuTinhDiemTieuChi.Where(x => x.TieuChiId == item.Id && x.IsDeleted == false).ToList()
+                    };
+                    lstTieuChiLeaves.Add(leaves);
+                }
+
+                return lstTieuChiLeaves;
             }
             catch (Exception ex)
             {
