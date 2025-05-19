@@ -35,7 +35,7 @@ namespace PLX5S.API.Controllers.BU
         }
 
         [HttpPost("InsertTreeGroup")]
-        public async Task<IActionResult> InsertTreeGroup([FromQuery] TblBuTieuChi data)
+        public async Task<IActionResult> InsertTreeGroup([FromBody] TblBuTieuChi data)
         {
             var transferObject = new TransferObject();
             await _service.InsertTreeGroup(data);

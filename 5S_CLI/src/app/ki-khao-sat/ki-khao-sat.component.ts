@@ -44,7 +44,7 @@ export class KiKhaoSatComponent {
   visibleKiKhaoSat: boolean = false
   treeNode: any = [];
   tree: any = []
-  dataInsertTree: any = []
+  dataInsertTree: any = {}
 
   constructor(
     private _service: KiKhaoSatService,
@@ -344,7 +344,6 @@ export class KiKhaoSatComponent {
   openModalTree(data: any): void {
     this.treeVisible = true;
     this.tree= data.origin;
-    console.log("11111",this.tree);
     this.dataInsertTree.pId = this.tree.id
     this.dataInsertTree.kiKhaoSatId = this.tree.kiKhaoSatId
     this.dataInsertTree.isGroup = true
@@ -352,8 +351,9 @@ export class KiKhaoSatComponent {
 
   submitFormTree(): void {
     this.loading = true;
-    console.log("222222",this.dataInsertTree);
-    this._treeTieuChiService.Insert(this.dataInsertTree).subscribe({
+    console.log(this.dataInsertTree);
+
+    this._treeTieuChiService.addTree(this.dataInsertTree).subscribe({
       next: (res) => {
         this.messageService.success('Thêm tiêu chí thành công!');
         this.treeVisible = false;

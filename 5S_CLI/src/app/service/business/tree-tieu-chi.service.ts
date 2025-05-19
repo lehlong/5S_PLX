@@ -15,6 +15,9 @@ Insert(params: any): Observable<any> {
     console.log("33333",params);
     return this.commonService.post('TieuChi/InsertTreeGroup', params)
   }
+  addTree(params: any): Observable<any>{
+    return this.commonService.post('TieuChi/InsertTreeGroup', params)
+  }
 //   GetMenuTree() {
 //     return this.commonService.get('TreeTieuChi/GetMenu');
 //   }
