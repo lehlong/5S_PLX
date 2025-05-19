@@ -34,7 +34,7 @@ namespace PLX5S.API.Controllers.BU
             return Ok(transferObject);
         }
 
-        [HttpGet("InsertTreeGroup")]
+        [HttpPost("InsertTreeGroup")]
         public async Task<IActionResult> InsertTreeGroup([FromQuery] TblBuTieuChi data)
         {
             var transferObject = new TransferObject();
@@ -51,7 +51,7 @@ namespace PLX5S.API.Controllers.BU
             return Ok(transferObject);
         }
 
-        [HttpGet("InsertTreeLeaves")]
+        [HttpPost("InsertTreeLeaves")]
         public async Task<IActionResult> InsertTreeLeaves([FromQuery] TblBuTieuChi data)
         {
             var transferObject = new TransferObject();

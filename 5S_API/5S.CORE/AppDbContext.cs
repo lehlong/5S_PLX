@@ -137,13 +137,12 @@ namespace PLX5S.CORE
         #endregion
 
         #region Business 
+        public DbSet<TblBuTinhDiemTieuChi> TblBuTinhDiemTieuChi { get; set; }
         public DbSet<TblBuKiKhaoSat> TblBuKiKhaoSat { get; set; }
         public DbSet<TblBuSurveyMgmt> TblBuSurveyMgmt { get; set; }
-
         public DbSet<TblBuInputChamDiem> TblBuInputChamDiem { get; set; }
         public DbSet<TblBuInputAtvsv> TblBuInputAtvsv { get; set; }
         public DbSet<TblBuTieuChi> TblBuTieuChi { get; set; }
-
         public DbSet<TblBuInputStore> TblBuInputStore { get; set; }
 
 
