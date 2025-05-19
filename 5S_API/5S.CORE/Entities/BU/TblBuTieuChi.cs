@@ -42,8 +42,8 @@ public class TblBuTieuChi : SoftDeleteEntity
         [Column("REPORT", TypeName = "NVARCHAR(255)")]
         public string? Report { get; set; }
         
-        [Column("CHI_CHT_ATVSV", TypeName = "BIT")]
-        public bool ChiChtAtvsv { get; set; }
+        [Column("CHI_CHT_ATVSV")]
+        public bool? ChiChtAtvsv { get; set; }
 
     }
 }

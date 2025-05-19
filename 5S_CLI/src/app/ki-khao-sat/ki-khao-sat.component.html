@@ -235,8 +235,8 @@
             [nzTreeTemplate]="nzTreeTemplate" [nzExpandedIcon]="multiExpandedIconTpl">
             <ng-template #nzTreeTemplate let-node class="flex-1">
 
-              <div class="flex justify-between pr-8 note_title">
-                <div class="flex-1" (click)="onClick(node)">{{ node.title }}</div>
+              <div class="flex justify-between pr-8 note_title" (click)="onClick(node)">
+                <div class="flex-1">{{ node.title }}</div>
                 <div>
                   <span nz-icon (click)="openModalTree(node)" nzType="plus-circle" nzTheme="twotone"></span>
                   <span nz-icon (click)="openCreateChild(node)" nzType="edit" nzTheme="outline"
@@ -258,7 +258,7 @@
         <nz-page-header nzBackIcon>
           <nz-page-header-title>Chi tiết tiêu chí</nz-page-header-title>
           <nz-page-header-extra>
-            <button nz-button nzType="primary" class="mt-2" (click)="openCreateModal(selectedNode)">
+            <button nz-button nzType="primary" *ngIf="treeId != ''" class="mt-2" (click)="openCreLeaves(selectedNode)">
               <i nz-icon nzType="plus-circle"></i> Thêm mới
             </button>
           </nz-page-header-extra>
@@ -292,35 +292,32 @@
 </nz-drawer>
 
 <!-- Create/Edit Form tiêu chí -->
-<nz-modal [(nzVisible)]="visible" [nzTitle]="edit ? 'Chỉnh sửa tiêu chí' : 'Thêm mới tiêu chí'"
-  (nzOnCancel)="closeModal()" [nzFooter]=" " [nzWidth]="1400" [nzBodyStyle]="{height: '70vh', overflow: 'auto'}">
-  <!-- <form nz-form [formGroup]="validateForm" *nzModalContent> -->
+<nz-modal [(nzVisible)]="leavesVisible" [nzTitle]="edit ? 'Chỉnh sửa tiêu chí' : 'Thêm mới tiêu chí'"
+  (nzOnCancel)="closeModal()" [nzFooter]="modalFooter" [nzWidth]="1400" [nzBodyStyle]="{height: '70vh', overflow: 'auto'}">
   <div nz-row [nzGutter]="16" *nzModalContent>
-    <!-- First Row: Code and Checkboxes -->
     <div nz-col [nzSpan]="12">
-      <div class="inner-box" style="padding:5px 0px;">
+      <div class="inner-box" style="padding:5px 0px !important;">
         <label nzRequired class="block-label">Mã tiêu chí</label>
 
-        <input nz-input [(ngModel)]="treeNode.code" />
+        <input nz-input [(ngModel)]="leavesNode.id" />
 
       </div>
     </div>
     <div nz-col [nzSpan]="12">
       <nz-form-item>
-
         <nz-form-control>
-          <label nz-checkbox [(ngModel)]="treeNode.isRequiredImage" class="mr-4">Bắt buộc phải chọn ảnh</label>
-          <label nz-checkbox [(ngModel)]="treeNode.isCHTATVOnly">Chỉ yêu cầu CHT, ATV chụp ảnh</label>
+          <label nz-checkbox [(ngModel)]="leavesNode.isImg" class="mr-4">Bắt buộc phải chọn ảnh</label>
+          <label nz-checkbox [(ngModel)]="leavesNode.chiChtAtvsv">Chỉ yêu cầu CHT, ATV chụp ảnh</label>
         </nz-form-control>
       </nz-form-item>
     </div>
 
     <!-- Second Row: Order and Minimum Images -->
     <div nz-col [nzSpan]="12">
-      <div class="inner-box" style="padding:5px 0px;">
+      <div class="inner-box" style="padding:5px 0px !important;">
         <label class="block-label">Số thứ tự</label>
 
-        <input nz-input [(ngModel)]="treeNode.order" type="number" />
+        <input nz-input [(ngModel)]="leavesNode.orderNumber" type="number" />
 
       </div>
     </div>
@@ -328,7 +325,7 @@
       <div class="inner-box" style="padding:5px 0px;">
         <label class="block-label">Số ảnh tối thiểu</label>
 
-        <input nz-input [(ngModel)]="treeNode.minImages" type="number" />
+        <input nz-input [(ngModel)]="leavesNode.numberImg" type="number" />
 
       </div>
     </div>
@@ -338,7 +335,7 @@
       <div class="inner-box" style="padding:5px 0px;">
         <label nzRequired class="block-label">Tên tiêu chí</label>
 
-        <input nz-input [(ngModel)]="treeNode.name" />
+        <input nz-input [(ngModel)]="leavesNode.name" />
 
       </div>
     </div>
@@ -348,7 +345,7 @@
       <div class="inner-box" style="padding:5px 0px;">
         <label class="block-label">Cảnh báo</label>
 
-        <input nz-input [(ngModel)]="treeNode.report" />
+        <input nz-input [(ngModel)]="leavesNode.report" />
 
       </div>
     </div>
@@ -375,8 +372,8 @@
             <tbody>
               <tr *ngFor="let row of calculationRows; let i = index">
                 <td>{{ i + 1 }}</td>
-                <td><input nz-input [(ngModel)]="row.description" placeholder="Nhập mô tả" /></td>
-                <td><input nz-input [(ngModel)]="row.score" type="number" placeholder="Nhập điểm" />
+                <td><input nz-input [(ngModel)]="row.moTa" placeholder="Nhập mô tả" /></td>
+                <td><input nz-input [(ngModel)]="row.diem" type="number" placeholder="Nhập điểm" />
                 </td>
                 <td>
                   <button nz-button nzType="default" nzDanger (click)="removeCalculationRow(i)">
@@ -391,7 +388,7 @@
     </div>
 
     <!-- Sixth Row: Upload -->
-    <div nz-col [nzSpan]="24">
+    <!-- <div nz-col [nzSpan]="24">
       <nz-form-item>
         <nz-form-label class="block-label">Upload ảnh</nz-form-label>
         <nz-form-control>
@@ -404,19 +401,19 @@
           </nz-upload>
         </nz-form-control>
       </nz-form-item>
-    </div>
+    </div> -->
   </div>
   <!-- </form> -->
   <ng-template #modalFooter>
     <button nz-button nzType="default" (click)="closeModal()">Hủy</button>
-    <button nz-button nzType="primary" [disabled]="validateForm.invalid" (click)="submitForm()">Lưu</button>
+    <button nz-button  nzType="primary"  (click)="insertTree()">Lưu</button>
   </ng-template>
 </nz-modal>
 
 
 <!-- /* Modal tree */ -->
 <nz-modal [(nzVisible)]="treeVisible" [nzTitle]="edit ? 'Chỉnh sửa cây tiêu chí' : 'Thêm mới cây tiêu chí'"
-  (nzOnCancel)="closeModal()" [nzFooter]="treeModalFooter" [nzWidth]="700" [nzBodyStyle]="{height: '70vh', overflow: 'auto'}">
+  (nzOnCancel)="closeModal()" [nzFooter]="treeModalFooter" [nzWidth]="400" [nzBodyStyle]="{height: '20vh', overflow: 'auto'}">
   <!-- <form nz-form [formGroup]="validateForm" *nzModalContent> -->
   <ng-container *nzModalContent>
     <div class="modal-content">

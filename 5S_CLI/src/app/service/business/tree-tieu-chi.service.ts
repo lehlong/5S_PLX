@@ -11,16 +11,16 @@ export class TreeTieuChiService {
   GetTreeTieuChi(param: any): Observable<any> {
     return this.commonService.get(`TieuChi/BuildDataForTree?kiKhaoSatId=${param}`);
   }
-Insert(params: any): Observable<any> {
-    console.log("33333",params);
-    return this.commonService.post('TieuChi/InsertTreeGroup', params)
-  }
+
   addTree(params: any): Observable<any>{
     return this.commonService.post('TieuChi/InsertTreeGroup', params)
   }
-//   GetMenuTree() {
-//     return this.commonService.get('TreeTieuChi/GetMenu');
-//   }
+  addLeaves(params: any): Observable<any>{
+    return this.commonService.post('TieuChi/InsertTreeLeaves', params)
+  }
+  GetTreeLeaves(param: any): Observable<any> {
+    return this.commonService.get(`TieuChi/GetLeaves?id=${param}`);
+  }
 
 //   GetMenuWithTreeRight(param: any) {
 //     return this.commonService.get('TieuChi/GetMenuWithTreeRight', param);
