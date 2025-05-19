@@ -24,6 +24,7 @@ export class KiKhaoSatComponent {
   validateForm: FormGroup
   isSubmit: boolean = false
   visible: boolean = false
+  treeVisible: boolean = false
   edit: boolean = false
   EndDate: Date | null = null;
   drawerVisible = false;
@@ -41,6 +42,9 @@ export class KiKhaoSatComponent {
   DataKS: any = []
   kiKhaoSat: any = {}
   visibleKiKhaoSat: boolean = false
+  treeNode: any = [];
+  tree: any = []
+  dataInsertTree: any = []
 
   constructor(
     private _service: KiKhaoSatService,
@@ -208,7 +212,8 @@ export class KiKhaoSatComponent {
   }
 
   closeModal(): void {
-    this.visible = false;
+    this.treeVisible = false;
+    this.resetForm()
   }
 
 
@@ -240,9 +245,10 @@ export class KiKhaoSatComponent {
     })
   }
 
-  openCreateModal(): void {
+  openCreateModal(data:any): void {
     this.edit = false;
     this.visible = true;
+    this.treeNode = data;
   }
 
   openCreate() {
@@ -333,5 +339,31 @@ export class KiKhaoSatComponent {
   pageIndexChange(index: number): void {
     this.filter.currentPage = index
     this.search()
+  }
+
+  openModalTree(data: any): void {
+    this.treeVisible = true;
+    this.tree= data.origin;
+    console.log("11111",this.tree);
+    this.dataInsertTree.pId = this.tree.id
+    this.dataInsertTree.kiKhaoSatId = this.tree.kiKhaoSatId
+    this.dataInsertTree.isGroup = true
+  }
+
+  submitFormTree(): void {
+    this.loading = true;
+    console.log("222222",this.dataInsertTree);
+    this._treeTieuChiService.Insert(this.dataInsertTree).subscribe({
+      next: (res) => {
+        this.messageService.success('Thêm tiêu chí thành công!');
+        this.treeVisible = false;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.log('Lỗi backend:', err);
+        this.messageService.error('Thêm tiêu chí thất bại!');
+        this.loading = false;
+      }
+    });
   }
 }
