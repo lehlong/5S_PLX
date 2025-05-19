@@ -28,6 +28,7 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
+                data.Id = Guid.NewGuid().ToString();
                 _dbContext.TblBuTieuChi.Add(data);
                 await _dbContext.SaveChangesAsync();
             }

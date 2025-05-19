@@ -16,13 +16,13 @@ public class TblBuTieuChi : SoftDeleteEntity
 {
         [Key]
         [Column("ID", TypeName = "VARCHAR(50)")]
-        public string Id { get; set; }
+        public string? Id { get; set; }
 
         [Column("NAME", TypeName = "NVARCHAR(255)")]
         public string Name { get; set; }
 
         [Column("PARENT_ID", TypeName = "VARCHAR(50)")]
-        public string? PId { get; set; }
+        public string PId { get; set; }
 
         [Column("KI_KHAO_SAT_ID", TypeName = "VARCHAR(50)")]
         public string? KiKhaoSatId { get; set; }
@@ -37,6 +37,6 @@ public class TblBuTieuChi : SoftDeleteEntity
         public int OrderNumber { get; set; }
 
         [Column("REPORT", TypeName = "NVARCHAR(255)")]
-        public string Report { get; set; }
+        public string? Report { get; set; }
     }
 }

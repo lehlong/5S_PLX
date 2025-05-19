@@ -90,7 +90,7 @@ namespace PLX5S.BUSINESS.Services.BU
                     PId = "-1",
                     KiKhaoSatId = data.Code,
                     IsImg = false,
-                    OrderNumber = 0,
+                    OrderNumber = 1,
                     Report = "-",
                     IsDeleted=false
                 };
