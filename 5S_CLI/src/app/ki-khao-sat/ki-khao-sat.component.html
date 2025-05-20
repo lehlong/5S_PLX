@@ -264,28 +264,32 @@
           </nz-page-header-extra>
         </nz-page-header>
         <nz-table class="auto-scroll-table" #headerTable [nzData]="selectedNodeDetails" [nzBordered]="true"
-          [nzFrontPagination]="false">
-          <thead>
-            <tr>
-              <th nzWidth="60px">STT</th>
-              <th>Mã tiêu chí</th>
-              <th>Tên tiêu chí</th>
-              <th>Bắt buộc chọn hình ảnh</th>
-              <th nzAlign="center">Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let data of headerTable.data; let i = index">
-              <td>{{ i + 1 }}</td>
-              <td>{{ data.id }}</td>
-              <td>{{ data.name }}</td>
-              <td>{{ data.requiredImage ? 'Có' : 'Không' }}</td>
-              <td nzAlign="center">
-                <!-- <button nz-button nzType="link" (click)="openEdit(data)">Sửa</button> -->
-              </td>
-            </tr>
-          </tbody>
-        </nz-table>
+  [nzFrontPagination]="false">
+  <thead>
+    <tr>
+      <th nzWidth="60px">STT</th>
+      <th>Mã tiêu chí</th>
+      <th>Tên tiêu chí</th>
+      <th>Bắt buộc chọn hình ảnh</th>
+      <th nzAlign="center">Thao tác</th>
+    </tr>
+  </thead>
+  <tbody cdkDropList (cdkDropListDropped)="drop($event)">
+    <tr *ngFor="let data of headerTable.data; let i = index" cdkDrag>
+      <td>{{ i + 1 }}</td>
+      <td>{{ data.id }}</td>
+      <td>{{ data.name }}</td>
+      <td>{{ data.requiredImage ? 'Có' : 'Không' }}</td>
+      <td nzAlign="center">
+        <div>
+          <span nz-icon (click)="openUpdateLeaves(data)" nzType="edit" nzTheme="outline"
+            style="margin: 0 5px;"></span>
+          <span nz-icon nzType="delete" nzTheme="outline"></span>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</nz-table>
       </div>
     </div>
   </div>
@@ -293,7 +297,8 @@
 
 <!-- Create/Edit Form tiêu chí -->
 <nz-modal [(nzVisible)]="leavesVisible" [nzTitle]="edit ? 'Chỉnh sửa tiêu chí' : 'Thêm mới tiêu chí'"
-  (nzOnCancel)="closeModal()" [nzFooter]="modalFooter" [nzWidth]="1400" [nzBodyStyle]="{height: '70vh', overflow: 'auto'}">
+  (nzOnCancel)="closeModal()"  [nzWidth]="1400" [nzMask]="!edit"  [nzFooter]="extra" 
+  [nzBodyStyle]="{height: '70vh', overflow: 'auto'}">
   <div nz-row [nzGutter]="16" *nzModalContent>
     <div nz-col [nzSpan]="12">
       <div class="inner-box" style="padding:5px 0px !important;">
@@ -404,16 +409,26 @@
     </div> -->
   </div>
   <!-- </form> -->
-  <ng-template #modalFooter>
-    <button nz-button nzType="default" (click)="closeModal()">Hủy</button>
-    <button nz-button  nzType="primary"  (click)="insertTree()">Lưu</button>
+  <ng-template #extra>
+    <ng-container *ngIf="edit">
+      <button [nzLoading]="loading" *nzSpaceItem nz-button nzType="primary" class="!flex !items-center">
+        <span nz-icon nzType="save" (click)="updateLeaves()" nzTheme="outline"></span>Lưu
+      </button>
+    </ng-container>
+    <ng-container>
+      <button nz-button nzType="default" (click)="closeModal()">Hủy</button>
+    </ng-container>
+    <ng-container *ngIf="!edit">
+      <button   nz-button nzType="primary" (click)="insertTree()">Thêm</button>
+    </ng-container>
   </ng-template>
 </nz-modal>
 
 
 <!-- /* Modal tree */ -->
 <nz-modal [(nzVisible)]="treeVisible" [nzTitle]="edit ? 'Chỉnh sửa cây tiêu chí' : 'Thêm mới cây tiêu chí'"
-  (nzOnCancel)="closeModal()" [nzFooter]="treeModalFooter" [nzWidth]="400" [nzBodyStyle]="{height: '20vh', overflow: 'auto'}">
+  (nzOnCancel)="closeModal()" [nzFooter]="treeModalFooter" [nzWidth]="400"
+  [nzBodyStyle]="{height: '20vh', overflow: 'auto'}">
   <!-- <form nz-form [formGroup]="validateForm" *nzModalContent> -->
   <ng-container *nzModalContent>
     <div class="modal-content">
@@ -422,7 +437,7 @@
           <nz-form-item>
             <nz-form-label>Tên tiêu chí cha</nz-form-label>
             <nz-form-control>
-              <input nz-input [(ngModel)]="tree.title" [readonly]="true" disabled/>
+              <input nz-input [(ngModel)]="tree.title" [readonly]="true" disabled />
             </nz-form-control>
           </nz-form-item>
         </div>
@@ -444,6 +459,14 @@
           (click)="submitFormTree()">
           <span nz-icon nzType="save" nzTheme="outline"></span>Thêm
         </button>
+      </ng-container>
+          <ng-container *ngIf="edit">
+      <button [nzLoading]="loading" *nzSpaceItem nz-button nzType="primary" class="!flex !items-center">
+        <span nz-icon nzType="save" nzTheme="outline"></span>Lưu
+      </button>
+    </ng-container>
+      <ng-container>
+
         <button *nzSpaceItem nz-button nzType="default" nzType="primary" class="!flex !items-center" nzDanger
           (click)="closeModal()">
           <span nz-icon nzType="close-circle" nzTheme="outline"></span>Huỷ

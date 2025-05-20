@@ -77,6 +77,7 @@ namespace PLX5S.BUSINESS.Services.BU
             var rootNode = new TieuChiDto()
             {
                 Id = node.Id,
+                Key= node.Id,
                 Name = node.Name,
                 Title = node.Name,
                 PId = node.PId,
@@ -85,7 +86,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 OrderNumber = 1,
                 IsImg = node.IsImg,
                 Report = node.Report,
-                IsExpanded = true,
+                Expanded = true,
                 IsLeaf = false
             };
             lstNode.Add(rootNode);
@@ -96,6 +97,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 var node1 = new TieuChiDto()
                 {
                     Id = menu.Id,
+                    Key = menu.Id,
                     Name = menu.Name,
                     Title = menu.Name,
                     PId = menu.PId,
@@ -104,7 +106,7 @@ namespace PLX5S.BUSINESS.Services.BU
                     OrderNumber = menu.OrderNumber,
                     IsImg = menu.IsImg,
                     Report = menu.Report,
-                    IsExpanded = true,
+                    Expanded = true,
                     IsLeaf = false
 
                 };

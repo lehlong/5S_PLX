@@ -11,9 +11,10 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { NzTreeComponent, NzFormatEmitEvent } from 'ng-zorro-antd/tree';
 import { NzUploadChangeParam } from 'ng-zorro-antd/upload';
 import { TreeTieuChiService } from '../service/business/tree-tieu-chi.service';
+import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 @Component({
   selector: 'app-ki-khao-sat',
-  imports: [ShareModule, RouterModule],
+  imports: [ShareModule, RouterModule,DragDropModule],
   standalone: true,
   templateUrl: './ki-khao-sat.component.html',
   styleUrl: './ki-khao-sat.component.scss',
@@ -38,6 +39,7 @@ export class KiKhaoSatComponent {
   Account: any = [];
   dataChamdiem: any = [];
   headerId: any = '';
+  kiKhaoSatId: any = '';
   calculationRows: { moTa: string; diem: number }[] = [];
   DataKS: any = [];
   kiKhaoSat: any = {};
@@ -244,6 +246,8 @@ export class KiKhaoSatComponent {
           console.log(response);
         },
       });
+    } else{
+      this.treeId = '';
     }
   }
 
@@ -277,9 +281,15 @@ export class KiKhaoSatComponent {
     this.edit = false;
     this.leavesVisible = true;
     this.leavesNode.pId = this.treeId;
-    console.log('object', this.leavesNode.pId);
   }
-
+  openUpdateLeaves(data: any): void {
+    this.leavesNode = data;
+    this.edit = true;
+    this.leavesVisible = true;
+    this.leavesNode.pId = this.treeId;
+    this.calculationRows = data.diemTieuChi
+  }
+  
   openCreate() {
     this.edit = false;
     this.visibleKiKhaoSat = true;
@@ -322,13 +332,18 @@ export class KiKhaoSatComponent {
 
   openDrawer(param: any): void {
     this.drawerVisible = true;
-    this._treeTieuChiService.GetTreeTieuChi(param).subscribe((res) => {
+    this.kiKhaoSatId = param;
+    this.GetTreeTieuChi();
+    
+  }
+
+  GetTreeTieuChi(){
+    this._treeTieuChiService.GetTreeTieuChi(this.kiKhaoSatId).subscribe((res) => {
       console.log(res);
 
       this.treeData = [res];
     });
   }
-
   Getdataki(code: string) {
 
     this._service.getAll(code).subscribe({
@@ -385,23 +400,27 @@ export class KiKhaoSatComponent {
 
   submitFormTree(): void {
     this.loading = true;
-    console.log(this.dataInsertTree);
 
     this._treeTieuChiService.addTree(this.dataInsertTree).subscribe({
       next: (res) => {
-        this.messageService.success('Thêm tiêu chí thành công!');
         this.treeVisible = false;
         this.loading = false;
+            this.GetTreeTieuChi();
+
       },
       error: (err) => {
         console.log('Lỗi backend:', err);
-        this.messageService.error('Thêm tiêu chí thất bại!');
         this.loading = false;
       },
     });
   }
+
   isValid(): boolean {
     return !!this.leavesNode.id && !!this.leavesNode.name;
+  }
+
+  updateLeaves(): void {
+    this.edit = true;
   }
   insertTree(): void {
     if (!this.isValid()) {
@@ -430,21 +449,23 @@ export class KiKhaoSatComponent {
       })),
     };
 
-    console.log('Form data to submit:', formData);
-
     this._treeTieuChiService.addLeaves(formData).subscribe({
       next: (res) => {
-        this.messageService.success('Thêm tiêu chí thành công!');
         this.leavesVisible = false;
         this.loading = false;
+        this.GetTreeTieuChi();
       },
       error: (err) => {
-        console.log('Lỗi backend:', err);
-        this.messageService.error('Thêm tiêu chí thất bại!');
         this.loading = false;
       },
     });
 
     this.closeModal();
+  }
+
+  drop(event: CdkDragDrop<any[]>): void {
+    moveItemInArray(this.selectedNodeDetails, event.previousIndex, event.currentIndex);
+    // Có thể thêm logic lưu thứ tự vào backend nếu cần
+    console.log('New order:', this.selectedNodeDetails);
   }
 }

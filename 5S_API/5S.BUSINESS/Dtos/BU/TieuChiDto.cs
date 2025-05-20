@@ -17,12 +17,12 @@ namespace PLX5S.BUSINESS.Dtos.BU
     {
         [Key]
         public string Id { get; set; }
-
+        public string Key { get; set; }
         public string Name { get; set; }
         
         public string Title { get; set; }
 
-        public bool IsExpanded { set; get; }
+        public bool Expanded { set; get; }
         public bool IsLeaf { set; get; }
 
         public string? PId { get; set; }
