@@ -40,7 +40,7 @@ export class KhoXangDauComponent {
       name: ['', [Validators.required]],
       isActive: [true, [Validators.required]],
       truongKho: ['', [Validators.required]],
-      ATVSV: [[], [Validators.required]], 
+      atvsv: [[],[Validators.required]], 
       nguoiPhuTrach: ['', [Validators.required]],
     });
     this.globalService.setBreadcrumb([
@@ -183,18 +183,27 @@ export class KhoXangDauComponent {
       },
     });
   }
+  getATVSV(data:any) {
+      this._service.getATVSV(data).subscribe({
+        next: (data) => {
+          this.ATVSVList = data;
+        },
+        error: (response) => {
+          console.log(response);
+        
+      }});
+    }
+  
 
   openEdit(data: any) {
-    const filteredATVSV = this.ATVSVList.filter((item) => item.storeId === data.id);
-
-    const atvsvNames = filteredATVSV.map((item) => item.name);
+   this.getATVSV(data.id);
 
     this.validateForm.patchValue({
         id: data.id,
         name: data.name,
         isActive: data.isActive,
         truongKho: data.truongKho,
-        ATVSV: atvsvNames, 
+        atvsv:   this.ATVSVList, 
         nguoiPhuTrach: data.nguoiPhuTrach || '',
     });
 

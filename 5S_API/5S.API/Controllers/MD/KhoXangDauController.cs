@@ -109,22 +109,22 @@ public class KhoXangDauController(IKhoXangDauService service) : ControllerBase
         }
         return Ok(transferObject);
     }
-    //[HttpGet("Export")]
-    //public async Task<IActionResult> Export([FromQuery] BaseMdFilter filter)
-    //{
-    //    var transferObject = new TransferObject();
-    //    var result = await _service.Export(filter);
-    //    if (_service.Status)
-    //    {
-    //        return File(result, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "DSKND" + DateTime.Now.ToString() + ".xlsx");
-    //    }
-    //    else
-    //    {
-    //        transferObject.Status = false;
-    //        transferObject.MessageObject.MessageType = MessageType.Error;
-    //        transferObject.GetMessage("2000", _service);
-    //        return Ok(transferObject);
-    //    }
-    //}
-}
+        [HttpGet("GetATVSV")]
+        public async Task<IActionResult> GetATVSV([FromQuery] string headerId)
+        {
+            var transferObject = new TransferObject();
+            var result = await _service.GetATVSV(headerId);
+            if (_service.Status)
+            {
+                transferObject.Data = result;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
+    }
 }

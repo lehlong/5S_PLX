@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PLX5S.BUSINESS.Common;
 using PLX5S.BUSINESS.Dtos.MD;
 using PLX5S.CORE;
+using PLX5S.CORE.Entities.BU;
 using PLX5S.CORE.Entities.MD;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,9 @@ namespace PLX5S.BUSINESS.Services.MD
     {
         Task<IList<StoreDto>> GetAll(BaseMdFilter filter);
         Task Insert(StoreDto data);
+        Task UpdateStore(StoreDto data);
+        Task<List<string>> GetATVSV(string headerId);
+
 
 
     }
@@ -55,25 +59,26 @@ namespace PLX5S.BUSINESS.Services.MD
                 {
                     Id = data.Id,
                     Name = data.Name,
-                    PhoneNumber = data.Phone,
+                    PhoneNumber = data.PhoneNumber,
                     CuaHangTruong = data.CuaHangTruong,
                     NguoiPhuTrach = data.NguoiPhuTrach,
                     KinhDo = data.KinhDo,
                     ViDo = data.ViDo,
                     TrangThaiCuaHang = data.TrangThaiCuaHang,
                     IsActive = data.IsActive
+                   
                 };
                 _dbContext.tblMdStore.Add(store);
 
                 foreach (var item in data.ATVSV)
                 {
-                    var atvsv = new TblMdAtvsv();
+                    var atvsv = new TblBuInputAtvsv();
                     atvsv.Id = Guid.NewGuid().ToString();
                     atvsv.Name = item;
-                    atvsv.StoreId = data.Id;
+                    atvsv.InputStoreId = data.Id;
                     atvsv.IsActive = true;
-
-                    _dbContext.tblMdAtvsv.AddRange(atvsv);
+                    atvsv.Type = "DT1";
+                    _dbContext.TblBuInputAtvsv.AddRange(atvsv);
                 }
 
                 await _dbContext.SaveChangesAsync();
@@ -96,7 +101,7 @@ namespace PLX5S.BUSINESS.Services.MD
                 {
                     Id = data.Id,
                     Name = data.Name,
-                    PhoneNumber = data.Phone,
+                    PhoneNumber = data.PhoneNumber,
                     CuaHangTruong = data.CuaHangTruong,
                     NguoiPhuTrach = data.NguoiPhuTrach,
                     KinhDo = data.KinhDo,
@@ -107,18 +112,18 @@ namespace PLX5S.BUSINESS.Services.MD
                 _dbContext.tblMdStore.Update(store);
                 var lstdel= _dbContext.tblMdAtvsv.Where(x => x.StoreId == data.Id);
                 _dbContext.tblMdAtvsv.RemoveRange(lstdel);
-                var lst = new List<TblMdAtvsv>();
+                var lst = new List<TblBuInputAtvsv>();
                 foreach (var item in data.ATVSV)
                 {
-                    var atvsv = new TblMdAtvsv();
+                    var atvsv = new TblBuInputAtvsv();
                     atvsv.Id = Guid.NewGuid().ToString();
                     atvsv.Name = item;
-                    atvsv.StoreId = data.Id;
+                    atvsv.InputStoreId = data.Id;
                     atvsv.IsActive = true;
-
+                    atvsv.Type = "DT1";
                     lst.Add(atvsv);
                 }
-                _dbContext.tblMdAtvsv.AddRange(lst);
+                _dbContext.TblBuInputAtvsv.AddRange(lst);
                 
 
                 await _dbContext.SaveChangesAsync();
@@ -142,6 +147,21 @@ namespace PLX5S.BUSINESS.Services.MD
                     query = query.Where(x => x.IsActive == filter.IsActive);
                 }
                 return await base.GetAllMd(query, filter);
+            }
+            catch (Exception ex)
+            {
+                Status = false;
+                Exception = ex;
+                return null;
+            }
+        }
+        public async  Task<List<string>> GetATVSV( string headerId)
+        {
+            try
+            {
+                var lst = _dbContext.TblBuInputAtvsv.Where(x => x.InputStoreId == headerId).Select(x=>x.Name).ToList();
+                
+                return  lst;
             }
             catch (Exception ex)
             {

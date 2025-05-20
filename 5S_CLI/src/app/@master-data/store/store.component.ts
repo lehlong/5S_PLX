@@ -24,6 +24,7 @@ export class StoreComponent {
   filter = new AccountTypeFilter()
   paginationResult = new PaginationResult()
   loading: boolean = false
+  lstATVSV=[]
   Account:any=[] 
   constructor(
     private _service: StoreService,
@@ -37,7 +38,7 @@ export class StoreComponent {
       name: ['', [Validators.required]],
       KinhDo: ['', [Validators.required]],
       ViDo: ['', [Validators.required]],
-      Phone: ['', [Validators.required]],
+      PhoneNumber: ['', [Validators.required]],
       isActive: [true, [Validators.required]],
       TrangThaiCuaHang: [true],
       CuaHangTruong: ['', [Validators.required]],
@@ -78,6 +79,7 @@ export class StoreComponent {
     this._service.search(this.filter).subscribe({
       next: (data) => {
         this.paginationResult = data
+        
       },
       error: (response) => {
         console.log(response)
@@ -95,6 +97,7 @@ export class StoreComponent {
       },
     })
   }
+ 
  
   isCodeExist(code: string): boolean {
     return this.paginationResult.data?.some(
@@ -173,23 +176,33 @@ export class StoreComponent {
       },
     })
   }
+ GetATVSV(params: any) {
+    this._service.getATVSV(params).subscribe({
+      next: (data) => {
+        this.lstATVSV = data
+      },
+      error: (response) => {
+        console.log(response)
+      },
+    })
+  }
+  openEdit(data: any) {
+    var storeid = data.id
+    this.GetATVSV(storeid)
+    this.validateForm.setValue({
+      id: data.id,
+      name: data.name,
+      KinhDo: data.kinhDo,
+      ViDo: data.viDo,
+      PhoneNumber: data.phoneNumber,
+      TrangThaiCuaHang: data.trangThaiCuaHang,
+      CuaHangTruong: data.cuaHangTruong,
+      ATVSV: this.lstATVSV,
+      NguoiPhuTrach: data.nguoiPhuTrach,
 
-  openEdit(data: { id: string; name: number; isActive: boolean }) {
-    console.log(data)
-    // this.validateForm.setValue({
-    //   id: data.id,
-    //   name: data.name,
-    //   KinhDo: data.kinhDo,
-    //   ViDo: data.viDo,
-    //   Phone: data.phone,
-    //   TrangThaiCuaHang: data.trangThaiCuaHang,
-    //   CuaHangTruong: data.cuaHangTruong,
-    //   ATVSV: [],
-     
+      isActive: data.isActive,
 
-    //   isActive: data.isActive,
-
-    // })
+    })
     setTimeout(() => {
       this.edit = true
       this.visible = true

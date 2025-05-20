@@ -24,6 +24,7 @@ public class TblMdKhoXangDau : SoftDeleteEntity
 
     [Column("NGUOI_PHU_TRACH")]
     public string NguoiPhuTrach { get; set; }
+    
 
 }
 }

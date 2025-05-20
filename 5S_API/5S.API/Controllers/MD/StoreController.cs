@@ -48,6 +48,23 @@ namespace PLX5S.API.Controllers
             }
             return Ok(transferObject);
         }
+        [HttpGet("GetATVSV")]
+        public async Task<IActionResult> GetATVSV([FromQuery] string headerId)
+        {
+            var transferObject = new TransferObject();
+            var result = await _service.GetATVSV(headerId);
+            if (_service.Status)
+            {
+                transferObject.Data = result;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
         [HttpPost("Insert")]
         public async Task<IActionResult> Insert([FromBody] StoreDto time)
         {
@@ -74,7 +91,7 @@ namespace PLX5S.API.Controllers
         public async Task<IActionResult> Update([FromBody] StoreDto time)
         {
             var transferObject = new TransferObject();
-            await _service.Update(time);
+            await _service.UpdateStore(time);
             if (_service.Status)
             {
                 transferObject.Status = true;

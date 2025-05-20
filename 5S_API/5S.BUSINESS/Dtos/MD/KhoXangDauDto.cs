@@ -27,6 +27,7 @@ namespace PLX5S.BUSINESS.Dtos.MD
 
     [Description("Người phụ trách")]
     public string NguoiPhuTrach { get; set; }
+ 
     public List<string> ATVSV { get; set; }
 
 

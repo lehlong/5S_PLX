@@ -21,5 +21,7 @@ namespace PLX5S.CORE.Entities.BU
 
         [Column("INPUT_STORE_ID")]
         public string InputStoreId { get; set; }
+        [Column("TYPE")]
+        public string Type { get; set; }
     }
 }

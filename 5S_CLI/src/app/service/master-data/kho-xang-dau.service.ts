@@ -16,6 +16,9 @@ export class KhoXangDauService {
     return this.commonService.get('KhoXangDau/GetAll')
   }
 
+   getATVSV(param:any): Observable<any> {
+    return this.commonService.get(`KhoXangDau/GetATVSV?headerId=${param}`)
+  }
   create(params: any): Observable<any> {
     return this.commonService.post('KhoXangDau/Insert', params)
   }

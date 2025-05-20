@@ -15,6 +15,10 @@ export class StoreService {
   getAll(): Observable<any> {
     return this.commonService.get('Store/GetAll')
   }
+  getATVSV(param:any): Observable<any> {
+    return this.commonService.get(`Store/GetATVSV?headerId=${param}`)
+  }
+
 
   create(params: any): Observable<any> {
     return this.commonService.post('Store/Insert', params)

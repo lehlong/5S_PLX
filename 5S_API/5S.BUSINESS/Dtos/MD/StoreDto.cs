@@ -22,7 +22,7 @@ namespace PLX5S.BUSINESS.Dtos.MD
         public string Name { get; set; }
 
         [Description("Số điện thoại")]
-        public string Phone { get; set; }
+        public string PhoneNumber { get; set; }
 
         [Description("Cửa hàng trưởng")]
         public string CuaHangTruong { get; set; }
@@ -39,8 +39,7 @@ namespace PLX5S.BUSINESS.Dtos.MD
         [Description("Trạng Thái cửa hàng")]
         public bool TrangThaiCuaHang { get; set; }
         public List<string> ATVSV { get; set; }
-
-
+       
         [Description("Trạng thái")]
         public string State { get => this.IsActive == true ? "Đang hoạt động" : "Khóa"; }
         public void Mapping(Profile profile)

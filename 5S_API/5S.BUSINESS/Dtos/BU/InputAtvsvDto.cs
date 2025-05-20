@@ -17,7 +17,7 @@ namespace PLX5S.BUSINESS.Dtos.BU
         public string Id { get; set; }
         public string Name { get; set; }
         public string StoreId { get; set; }
-
+        public string Type { get; set; }
         public void Mapping(Profile profile)
         {
             profile.CreateMap<TblBuInputAtvsv, InputAtvsvDto>().ReverseMap();
