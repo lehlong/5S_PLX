@@ -56,7 +56,11 @@ namespace PLX5S.BUSINESS.Services.BU
                     NumberImg = data.NumberImg
                 };
                 _dbContext.TblBuTieuChi.Add(tieuChi);
-                _dbContext.TblBuTinhDiemTieuChi.AddRange(data.DiemTieuChi);
+                foreach (var item in data.DiemTieuChi)
+                {
+                    item.Id = Guid.NewGuid().ToString();
+                    _dbContext.TblBuTinhDiemTieuChi.Add(item);
+                }
 
                 await _dbContext.SaveChangesAsync();
             }
@@ -81,7 +85,8 @@ namespace PLX5S.BUSINESS.Services.BU
                 OrderNumber = 1,
                 IsImg = node.IsImg,
                 Report = node.Report,
-                IsExpanded = false,
+                IsExpanded = true,
+                IsLeaf = false
             };
             lstNode.Add(rootNode);
 
@@ -99,7 +104,9 @@ namespace PLX5S.BUSINESS.Services.BU
                     OrderNumber = menu.OrderNumber,
                     IsImg = menu.IsImg,
                     Report = menu.Report,
-                    IsExpanded = false,
+                    IsExpanded = true,
+                    IsLeaf = false
+
                 };
                 lstNode.Add(node1);
             }
@@ -122,7 +129,7 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
-                var tieuChi = _dbContext.TblBuTieuChi.Where(x => x.IsDeleted == false && x.PId == id).ToList();
+                var tieuChi = _dbContext.TblBuTieuChi.Where(x => x.IsDeleted != true && x.PId == id).ToList();
                 var lstTieuChiLeaves = new List<TieuChiDto>();
                 foreach (var item in tieuChi)
                 {

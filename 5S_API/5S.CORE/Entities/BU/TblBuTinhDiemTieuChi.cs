@@ -14,7 +14,7 @@ namespace PLX5S.CORE.Entities.BU
     {
         [Key]
         [Column("ID", TypeName = "NVARCHAR(50)")]
-        public string Id { get; set; }
+        public string? Id { get; set; }
 
         [Column("MO_TA", TypeName = "NVARCHAR(50)")]
         public string MoTa { get; set; }

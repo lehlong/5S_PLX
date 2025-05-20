@@ -237,9 +237,9 @@ export class KiKhaoSatComponent {
       this.treeId = node.origin.id;
       this._treeTieuChiService.GetTreeLeaves(this.treeId).subscribe({
         next: (data) => {
-          this.selectedNodeDetails = data;
+          this.selectedNodeDetails = data.result;
         },
-        
+
         error: (response) => {
           console.log(response);
         },
