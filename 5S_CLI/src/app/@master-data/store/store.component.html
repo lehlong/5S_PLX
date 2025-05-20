@@ -101,43 +101,30 @@
     <form nz-form nzLayout="vertical" [formGroup]="validateForm" (ngSubmit)="submitForm()">
       <div nz-row [nzGutter]="12">
          <div nz-col [nzXs]="24" [nzMd]="12">
-         <app-input-clear placeholder="Nhập mã kiểu người dùng " [required]="true" label="Mã "
+         <app-input-clear placeholder="Nhập mã cửa hàng " [required]="true" label="Mã "
         [control]="$any(validateForm).controls['id']" [required]="true"
         [disabled]="edit ? true : false"></app-input-clear>
         </div>
         <div nz-col [nzXs]="24" [nzMd]="12">
           <app-input-clear placeholder="Nhập tên cửa hàng " [required]="true" label="Tên cửa hàng"
             [control]="$any(validateForm).controls['name']" [required]="true"
-            [disabled]="edit ? true : false"></app-input-clear>
+           ></app-input-clear>
         </div>
         <div nz-col [nzXs]="24" [nzMd]="12">
           <app-input-clear placeholder="Nhập tên kinh độ " [required]="true" label="Kinh độ"
             [control]="$any(validateForm).controls['KinhDo']" [required]="true"
-            [disabled]="edit ? true : false"></app-input-clear>
+           ></app-input-clear>
         </div>
         <div nz-col [nzXs]="24" [nzMd]="12">
           <app-input-clear placeholder="Nhập tên vĩ độ " [required]="true" label="Vĩ độ"
             [control]="$any(validateForm).controls['ViDo']" [required]="true"
-            [disabled]="edit ? true : false"></app-input-clear>
+           ></app-input-clear>
         </div>
         <div nz-col [nzXs]="24" [nzMd]="12">
           <app-input-clear placeholder="Nhập số điện thoại " [required]="true" label="Số điện thoại"
             [control]="$any(validateForm).controls['Phone']" [required]="true"></app-input-clear>
         </div>
-        <!-- <nz-select
-                nzShowSearch
-                nzAllowClear
-                placeholder="Chọn cửa hàng trưởng"
-                formControlName="accountType"
-              >
-                <nz-option
-                  cdkScrollable
-                  *ngFor="let item of "
-                  [nzLabel]="item."
-                  [nzValue]="item.id"
-                >
-                </nz-option>
-              </nz-select> -->
+   
         <div nz-col [nzXs]="24" [nzMd]="12">
           <nz-form-item>
             <nz-form-label>Trạng thái cửa hàng</nz-form-label>

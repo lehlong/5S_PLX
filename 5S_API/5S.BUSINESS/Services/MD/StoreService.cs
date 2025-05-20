@@ -86,34 +86,51 @@ namespace PLX5S.BUSINESS.Services.MD
                 throw;
             }
         }
-        //public async Task<byte[]> Export(BaseMdFilter filter)
-        //{
-        //    try
-        //    {
-        //        var query = _dbContext.tblMdStore.AsQueryable();
-        //        if (!string.IsNullOrWhiteSpace(filter.KeyWord))
-        //        {
-        //            query = query.Where(x => x.Name.Contains(filter.KeyWord));
-        //        }
-        //        if (filter.IsActive.HasValue)
-        //        {
-        //            query = query.Where(x => x.IsActive == filter.IsActive);
-        //        }
-        //        var data = await base.GetAllMd(query, filter);
-        //        int i = 1;
-        //        data.ForEach(x =>
-        //        {
-        //            x.OrdinalNumber = i++;
-        //        });
-        //        return await ExportExtension.ExportToExcel(data);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Status = false;
-        //        Exception = ex;
-        //        return null;
-        //    }
-        //}
+
+        public async Task UpdateStore(StoreDto data)
+        {
+            try
+            {
+
+                var store = new TblMdStore()
+                {
+                    Id = data.Id,
+                    Name = data.Name,
+                    PhoneNumber = data.Phone,
+                    CuaHangTruong = data.CuaHangTruong,
+                    NguoiPhuTrach = data.NguoiPhuTrach,
+                    KinhDo = data.KinhDo,
+                    ViDo = data.ViDo,
+                    TrangThaiCuaHang = data.TrangThaiCuaHang,
+                    IsActive = data.IsActive
+                };
+                _dbContext.tblMdStore.Update(store);
+                var lstdel= _dbContext.tblMdAtvsv.Where(x => x.StoreId == data.Id);
+                _dbContext.tblMdAtvsv.RemoveRange(lstdel);
+                var lst = new List<TblMdAtvsv>();
+                foreach (var item in data.ATVSV)
+                {
+                    var atvsv = new TblMdAtvsv();
+                    atvsv.Id = Guid.NewGuid().ToString();
+                    atvsv.Name = item;
+                    atvsv.StoreId = data.Id;
+                    atvsv.IsActive = true;
+
+                    lst.Add(atvsv);
+                }
+                _dbContext.tblMdAtvsv.AddRange(lst);
+                
+
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                Status = false;
+                Exception = ex;
+                Console.WriteLine($"Lỗi khi lưu thay đổi: {ex.InnerException?.Message}");
+                throw;
+            }
+        }
 
         public async Task<IList<StoreDto>> GetAll(BaseMdFilter filter)
         {

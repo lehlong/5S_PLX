@@ -50,7 +50,7 @@ public class KhoXangDauService(AppDbContext dbContext, IMapper mapper) : Generic
     {
         try
         {
-            data.Id = Guid.NewGuid().ToString();
+          
             var store = new TblMdKhoXangDau()
             {
                 Id = data.Id,

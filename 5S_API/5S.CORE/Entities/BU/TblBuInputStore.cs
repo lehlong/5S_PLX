@@ -1,4 +1,6 @@
 ﻿using PLX5S.CORE.Common;
+using PLX5S.CORE.Entities.MD;
+using PLX5S.CORE.Migrations;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -16,6 +18,10 @@ namespace PLX5S.CORE.Entities.BU
 
         [Column("SURVEY_MGMT_ID", TypeName = "NVARCHAR(50)")]
         public string SurveyMgmtId { get; set; }
+        [ForeignKey("StoreId")]
+        public virtual TblMdStore Store { get; set; }
+
+
 
     }
 }

@@ -146,13 +146,17 @@ export class KiKhaoSatComponent {
     );
   }
   submitForm(): void {
-    this.kiKhaoSat.surveyMgmtId = this.headerId;
-    this.kiKhaoSat.isActive = true;
+
+    this.kiKhaoSat.surveyMgmtId = this.headerId
+    this.kiKhaoSat.isActive = true
+    const { chamdiemlst, ...eventData } = this.kiKhaoSat;
 
     const payload = {
-      ...this.kiKhaoSat,
-      Chamdiemlst: this.dataChamdiem,
+      ...eventData,
+      Chamdiemlst: this.dataChamdiem
+
     };
+    console.log(payload)
 
     this.isSubmit = true;
     // if (this.validateForm.valid) {
@@ -206,10 +210,16 @@ export class KiKhaoSatComponent {
   }
 
   close() {
+     if (this.dataChamdiem ) {
+    this.dataChamdiem.forEach((item: any) => {
+      item.nguoiChamDiem = [];
+    });
+  }
     this.visible = false;
     this.visibleKiKhaoSat = false;
     this.resetForm();
     this.kiKhaoSat = [];
+   
   }
 
   closeDrawer(): void {
@@ -298,8 +308,12 @@ export class KiKhaoSatComponent {
   onDragStart(event: any) {}
 
   openEditKyKhaoSat(data: any) {
-    this.Getdataki(data.code);
-    this.kiKhaoSat = data;
+
+    this.Getdataki(data.code)
+    this.kiKhaoSat = data
+
+    console.log(this.kiKhaoSat)
+
     setTimeout(() => {
       this.edit = true;
       this.visibleKiKhaoSat = true;
@@ -316,19 +330,22 @@ export class KiKhaoSatComponent {
   }
 
   Getdataki(code: string) {
+
     this._service.getAll(code).subscribe({
       next: (data) => {
+        console.log('dataki', data);
         this.DataKS = data;
-        this.dataChamdiem = this.dataChamdiem.map((store: any) => {
-          const nguoiChamDiemArr = this.DataKS.filter(
-            (x: any) => x.storeId === store.ma
-          ).map((x: any) => x.userName);
-
+        this.dataChamdiem = this.dataChamdiem.map((item: any) => {
+          const nguoiChamDiemArr = this.DataKS
+            .filter((x: any) => x.storeId === item.store.id)
+            .map((x: any) => x.userName);
           return {
-            ...store,
-            nguoiChamDiem: nguoiChamDiemArr, // gán vào thuộc tính này
+            ...item,
+            nguoiChamDiem: nguoiChamDiemArr
           };
         });
+          console.log('listcd', this.dataChamdiem)
+
       },
       error: (response) => {
         console.log(response);

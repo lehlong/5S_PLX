@@ -36,16 +36,37 @@ namespace PLX5S.BUSINESS.Dtos.BU
    public class NguoiChamDiemlst
     {
         public string Id { get; set; }
-        public string Ma { get; set; }
+        public string storeId { get; set; }
         public string SurveyMgmtId { get; set; }
-        public string Name { get; set; }
-        public string PhoneNumber { get; set; }
-        public string CuaHangTruong { get; set; }
-        public string NguoiPhuTrach { get; set; }
-        public string KinhDo { get; set; }
-        public string ViDo { get; set; }
-        public bool? TrangThaiCuaHang { get; set; }
-
+        public Storejs Store { get; set; }
+        public bool? IsDeleted { get; set; }
+        public DateTime? DeleteDate { get; set; }
+        public string? DeleteBy { get; set; }
+        public bool? IsActive { get; set; }
+        public string CreateBy { get; set; }
+        public string UpdateBy { get; set; }
+        public DateTime? CreateDate { get; set; }
+        public DateTime? UpdateDate { get; set; }
         public List<string> NguoiChamDiem { get; set; }= new List<string>();
     }
+}
+
+public class Storejs
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public string PhoneNumber { get; set; }
+    public string CuaHangTruong { get; set; }
+    public string NguoiPhuTrach { get; set; }
+    public string KinhDo { get; set; }
+    public string ViDo { get; set; }
+    public bool? TrangThaiCuaHang { get; set; }
+    public bool? IsDeleted { get; set; }
+    public DateTime? DeleteDate { get; set; }
+    public string? DeleteBy { get; set; }
+    public bool? IsActive { get; set; }
+    public string CreateBy { get; set; }
+    public string? UpdateBy { get; set; }
+    public DateTime? CreateDate { get; set; }
+    public DateTime? UpdateDate { get; set; }
 }

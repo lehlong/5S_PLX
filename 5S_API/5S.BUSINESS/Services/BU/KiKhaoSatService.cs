@@ -20,8 +20,8 @@ namespace PLX5S.BUSINESS.Services.BU
         //Task<IList<SurveyMgmtDto>> GetAll(BaseMdFilter filter);
         //Task<byte[]> Export(BaseMdFilter filter);
         Task Insert(KiKhaoSatDto data);
-        Task<List<InputStoreDto>> GetallData(string headerId);
-        Task<List<InputChamDiemDto>> Getchamdiem(string kiKhaoSatId);
+        Task<List<TblBuInputStore>> GetallData(string headerId);
+        Task<List<TblBuInputChamDiem>> Getchamdiem(string kiKhaoSatId);
         Task UpdateData(KiKhaoSatDto data);
 
     }
@@ -56,16 +56,18 @@ namespace PLX5S.BUSINESS.Services.BU
             public KiKhaoSatDto KhaoSat { get; set; }
             public List<TblBuInputChamDiem> ChamDiemList { get; set; }
         }
-        public async Task<List<InputChamDiemDto>> Getchamdiem(string kiKhaoSatId)
+        public async Task<List<TblBuInputChamDiem>> Getchamdiem(string kiKhaoSatId)
         {
             try
             {
                 var chamDiemList = await _dbContext.TblBuInputChamDiem
-                    .Where(x => x.KiKhaoSatId == kiKhaoSatId && x.IsDeleted==false)
-                    .ToListAsync();
+                     .Include(x => x.Store)
+                    .Where(x => x.KiKhaoSatId == kiKhaoSatId)
+                     .ToListAsync();
 
-                // Map the list of TblBuInputChamDiem to InputChamDiemDto
-                var chamDiemDtoList = _mapper.Map<List<InputChamDiemDto>>(chamDiemList);
+
+
+                var chamDiemDtoList = _mapper.Map<List<TblBuInputChamDiem>>(chamDiemList);
 
                 return chamDiemDtoList;
             }
@@ -114,7 +116,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         var chamdiem = new TblBuInputChamDiem()
                         {
                             Id = Guid.NewGuid().ToString(),
-                            StoreId = item.Ma,
+                            StoreId = item.storeId,
                             KiKhaoSatId = data.Code,
                             UserName = i,
                             IsActive = true,
@@ -167,7 +169,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         var chamdiem = new TblBuInputChamDiem()
                         {
                             Id = Guid.NewGuid().ToString(),
-                            StoreId = item.Ma,
+                            StoreId = item.storeId,
                             KiKhaoSatId = data.Code,
                             UserName = i,
                             IsActive = true,
@@ -204,17 +206,14 @@ namespace PLX5S.BUSINESS.Services.BU
             public string Fullname { get; set; }
          }
 
-        public async Task<List<InputStoreDto>> GetallData( string headerId)
+        public async Task<List<TblBuInputStore>> GetallData( string headerId)
         {
 
             try
             {
-                
-                var data = _dbContext.TblBuInputStore.Where(x=>x.SurveyMgmtId==headerId).ToList();
-                var dataDto = _mapper.Map<List<InputStoreDto>>(data);
-                
 
-                return dataDto;
+                var data = await _dbContext.TblBuInputStore.Include(x => x.Store).Where(x => x.SurveyMgmtId == headerId).ToListAsync();
+                 return  data;
 
             }
             catch (Exception ex)

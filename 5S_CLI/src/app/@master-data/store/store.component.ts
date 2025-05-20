@@ -175,11 +175,21 @@ export class StoreComponent {
   }
 
   openEdit(data: { id: string; name: number; isActive: boolean }) {
-    this.validateForm.setValue({
-      id: data.id,
-      name: data.name,
-      isActive: data.isActive,
-    })
+    console.log(data)
+    // this.validateForm.setValue({
+    //   id: data.id,
+    //   name: data.name,
+    //   KinhDo: data.kinhDo,
+    //   ViDo: data.viDo,
+    //   Phone: data.phone,
+    //   TrangThaiCuaHang: data.trangThaiCuaHang,
+    //   CuaHangTruong: data.cuaHangTruong,
+    //   ATVSV: [],
+     
+
+    //   isActive: data.isActive,
+
+    // })
     setTimeout(() => {
       this.edit = true
       this.visible = true
