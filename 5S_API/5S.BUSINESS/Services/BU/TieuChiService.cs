@@ -35,7 +35,7 @@ namespace PLX5S.BUSINESS.Services.BU
             }
             catch (Exception ex)
             {
-
+                Status = false;
             }
         }
 
@@ -49,6 +49,7 @@ namespace PLX5S.BUSINESS.Services.BU
                     Name = data.Name,
                     IsActive = true,
                     IsGroup = false,
+                    IsDeleted = false,
                     KiKhaoSatId = data.KiKhaoSatId,
                     PId = data.PId,
                     Report = data.Report,
@@ -66,7 +67,7 @@ namespace PLX5S.BUSINESS.Services.BU
             }
             catch (Exception ex)
             {
-
+                Status = false;
             }
         }
 
@@ -156,7 +157,35 @@ namespace PLX5S.BUSINESS.Services.BU
             }
             catch (Exception ex)
             {
+                Status = false;
                 return null;
+            }
+        }
+
+        public async Task updateLeaves(TieuChiDto item)
+        {
+            try
+            {
+                _dbContext.TblBuTieuChi.Add(new TblBuTieuChi()
+                {
+                    Id = item.Id,
+                    PId = item.PId,
+                    Name = item.Name,
+                    IsImg = item.IsImg,
+                    Report = item.Report,
+                    IsGroup = item.IsGroup,
+                    NumberImg = item.NumberImg,
+                    KiKhaoSatId = item.KiKhaoSatId,
+                    OrderNumber = item.OrderNumber,
+                    IsDeleted = item.IsDeleted
+                });
+                _dbContext.TblBuTinhDiemTieuChi.AddRange(item.DiemTieuChi);
+
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Status = false;
             }
         }
 

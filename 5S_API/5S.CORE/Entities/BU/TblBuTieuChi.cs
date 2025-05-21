@@ -37,7 +37,7 @@ public class TblBuTieuChi : SoftDeleteEntity
         public decimal? NumberImg { get; set; }
 
         [Column("ORDER_NUMBER")]
-        public int OrderNumber { get; set; }
+        public decimal? OrderNumber { get; set; }
 
         [Column("REPORT", TypeName = "NVARCHAR(255)")]
         public string? Report { get; set; }
