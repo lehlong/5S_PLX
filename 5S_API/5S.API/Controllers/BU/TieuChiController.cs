@@ -24,6 +24,7 @@ namespace PLX5S.API.Controllers.BU
             if (_service.Status)
             {
                 transferObject.Data = result;
+                transferObject.Status = true;
             }
             else
             {
@@ -41,6 +42,7 @@ namespace PLX5S.API.Controllers.BU
             await _service.InsertTreeGroup(data);
             if (_service.Status)
             {
+                transferObject.Status = true;
             }
             else
             {
@@ -58,6 +60,7 @@ namespace PLX5S.API.Controllers.BU
             await _service.InsertTreeLeaves(data);
             if (_service.Status)
             {
+                transferObject.Status = true;
             }
             else
             {
@@ -77,7 +80,7 @@ namespace PLX5S.API.Controllers.BU
             if (_service.Status)
             {
                 transferObject.Data = result;
-
+                transferObject.Status = true;
             }
             else
             {
@@ -87,5 +90,24 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
+
+        [HttpPost("UpdateLeaves")]
+        public async Task<IActionResult> UpdateLeaves([FromBody] TieuChiDto data)
+        {
+            var transferObject = new TransferObject();
+            await _service.updateLeaves(data);
+            if (_service.Status)
+            {
+                transferObject.Status = true;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
+
     }
 }

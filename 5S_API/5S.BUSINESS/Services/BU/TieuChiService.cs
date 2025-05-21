@@ -21,6 +21,7 @@ namespace PLX5S.BUSINESS.Services.BU
         Task InsertTreeGroup(TblBuTieuChi data); 
         Task<List<TieuChiDto>> getLeaves(string id);
         Task InsertTreeLeaves(TieuChiDto data);
+        Task updateLeaves(TieuChiDto item);
     }
 
     public class TieuChiService(AppDbContext dbContext, IMapper mapper) : GenericService<TblBuTieuChi, TieuChiDto>(dbContext, mapper), ITieuChiService
@@ -188,6 +189,8 @@ namespace PLX5S.BUSINESS.Services.BU
                 Status = false;
             }
         }
+
+        //public async TaskTieuChiDto> updata
 
         //public async Task UpdateOrderTree(TieuChiDto moduleDto)
         //{
