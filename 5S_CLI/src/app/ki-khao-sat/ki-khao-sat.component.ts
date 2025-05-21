@@ -299,6 +299,12 @@ DeleteKKS(data: any) {
     this.leavesNode.pId = this.treeId;
     this.calculationRows = data.diemTieuChi
   }
+  openUpdateTree(data: any): void {
+    this.treeVisible = true;
+    this.edit = true;
+     this.treeData = data;
+    this.treeData.name = data.name;
+  }
   
   openCreate() {
     this.edit = false;
@@ -419,7 +425,6 @@ DeleteKKS(data: any) {
 
       },
       error: (err) => {
-        console.log('Lỗi backend:', err);
         this.loading = false;
       },
     });
@@ -429,6 +434,20 @@ DeleteKKS(data: any) {
     return !!this.leavesNode.id && !!this.leavesNode.name;
   }
 
+
+  updateOrderTree(): void {
+    console.log("object", this.treeData)
+    this._treeTieuChiService.UpdateOrderTree(this.treeData).subscribe({
+      next: (res) => {
+        this.treeData = res;
+        this.loading = false;
+        this.GetTreeTieuChi();
+      },
+      error: (err) => {
+        this.loading = false;
+      },
+    });
+  }
   updateLeaves(): void {
     this.edit = true;
     const formData = {

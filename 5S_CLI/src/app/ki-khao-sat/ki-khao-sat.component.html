@@ -243,7 +243,8 @@
       <!-- Left Panel: Tree View -->
       <div class="left-panel w-1/3 pr-4">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="m-0">Cây tiêu chí chấm điểm</h3>
+          <h3 class="m-0" >Cây tiêu chí chấm điểm</h3>
+          <button (click)="updateOrderTree()">Cập nhật vị trí</button>
         </div>
         <nz-page-header-content class="main-content">
           <nz-tree #treeCom class="!pl-[10px] overflow-auto" [nzData]="treeData" nzDraggable nzBlockNode
@@ -252,11 +253,11 @@
             [nzTreeTemplate]="nzTreeTemplate" [nzExpandedIcon]="multiExpandedIconTpl">
             <ng-template #nzTreeTemplate let-node class="flex-1">
 
-              <div class="flex justify-between pr-8 note_title" (click)="onClick(node)">
-                <div class="flex-1">{{ node.title }}</div>
+              <div class="flex justify-between pr-8 note_title" >
+                <div class="flex-1" (click)="onClick(node)">{{ node.title }}</div>
                 <div>
                   <span nz-icon (click)="openModalTree(node)" nzType="plus-circle" nzTheme="twotone"></span>
-                  <span nz-icon (click)="openCreateChild(node)" nzType="edit" nzTheme="outline"
+                  <span nz-icon (click)="openUpdateTree(node)" nzType="edit" nzTheme="outline"
                     style="margin: 0 5px;"></span>
                   <span nz-icon (click)="openCreateChild(node)" nzType="delete" nzTheme="outline"></span>
                 </div>
@@ -444,7 +445,7 @@
 
 <!-- /* Modal tree */ -->
 <nz-modal [(nzVisible)]="treeVisible" [nzTitle]="edit ? 'Chỉnh sửa cây tiêu chí' : 'Thêm mới cây tiêu chí'"
-  (nzOnCancel)="closeModal()" [nzFooter]="treeModalFooter" [nzWidth]="400"
+  (nzOnCancel)="closeModal()" [nzFooter]="treeModalFooter" [nzWidth]="400"  [nzMask]="edit"
   [nzBodyStyle]="{height: '20vh', overflow: 'auto'}">
   <!-- <form nz-form [formGroup]="validateForm" *nzModalContent> -->
   <ng-container *nzModalContent>

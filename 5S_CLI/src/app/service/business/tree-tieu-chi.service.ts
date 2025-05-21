@@ -35,9 +35,9 @@ export class TreeTieuChiService {
   //   return this.commonService.post('TieuChi/InsertTreeGroup', data);
   // }
 
-//   UpdateOrderTree(dataTree: any) {
-//     return this.commonService.put('TreeTieuChi/Update-Order', dataTree);
-//   }
+  UpdateOrderTree(data: any) {
+    return this.commonService.put('TieuChi/UpdateOrderTree', data);
+  }
 
 //   Delete(id: string | number): Observable<any> {
 //     return this.commonService.delete(`TreeTieuChi/Delete/${id}`);
