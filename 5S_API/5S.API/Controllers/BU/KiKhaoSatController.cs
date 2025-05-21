@@ -79,7 +79,7 @@ namespace PLX5S.API.Controllers.BU
         public async Task<IActionResult> Delete([FromRoute] string id)
         {
             var transferObject = new TransferObject();
-            await _service.Delete(id);
+            await _service.DeleteData(id);
             if (_service.Status)
             {
                 transferObject.Status = true;

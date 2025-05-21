@@ -24,6 +24,7 @@ namespace PLX5S.CORE.Entities.BU
 
         [Column("TIEU_CHI_ID", TypeName = "NVARCHAR(50)")]
         public string TieuChiId { get; set; }
-
+        [ForeignKey("TieuChiId")]
+        public virtual TblBuTieuChi? TieuChi { get; set; }
     }
 }

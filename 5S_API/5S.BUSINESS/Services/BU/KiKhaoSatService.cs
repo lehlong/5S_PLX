@@ -11,6 +11,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static PLX5S.BUSINESS.Services.BU.KikhaosatService;
+using Microsoft.IdentityModel.Tokens;
+using DocumentFormat.OpenXml.Office.CustomUI;
+using DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace PLX5S.BUSINESS.Services.BU
 {
@@ -23,6 +26,7 @@ namespace PLX5S.BUSINESS.Services.BU
         Task<List<TblBuInputStore>> GetallData(string headerId);
         Task<List<TblBuInputChamDiem>> Getchamdiem(string kiKhaoSatId);
         Task UpdateData(KiKhaoSatDto data);
+        Task DeleteData(string id);
 
     }
     public class KikhaosatService(AppDbContext dbContext, IMapper mapper) : GenericService<TblBuKiKhaoSat, KiKhaoSatDto>(dbContext, mapper), IKikhaosatService
@@ -84,30 +88,80 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
-                var tree = new TblBuTieuChi()
+                var lsttc = new List<TblBuTieuChi>();
+                var lstDtc = new List<TblBuTinhDiemTieuChi>();
+                if (data.kicopy.IsNullOrEmpty()) {
+                    var tree = new TblBuTieuChi()
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = data.Name,
+                        IsGroup = true,
+                        PId = "-1",
+                        KiKhaoSatId = data.Code,
+                        IsImg = false,
+                        OrderNumber = 1,
+                        Report = "-",
+                        IsDeleted = false
+                    };
+                    _dbContext.TblBuTieuChi.Add(tree);
+                }
+                else
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    Name = data.Name,
-                    IsGroup = true,
-                    PId = "-1",
-                    KiKhaoSatId = data.Code,
-                    IsImg = false,
-                    OrderNumber = 1,
-                    Report = "-",
-                    IsDeleted=false
-                };
-                var khaosatdata = new TblBuKiKhaoSat()
-                {
-                    Code = data.Code,
-                    SurveyMgmtId = data.SurveyMgmtId,
-                    Name = data.Name,
-                    IsActive = true,
-                    StartDate = data.StartDate,
-                    EndDate = data.EndDate,
-                    Des = data.Des,
-                    IsDeleted=false
+                   
+                    var tcks = _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == data.kicopy).ToList();
+                    foreach (var item in tcks)
+                    {
+                        var code = Guid.NewGuid().ToString();
+                        var itemtc = new TblBuTieuChi()
+                        {
+                            Id=code,
+                            Name = item.Name,
+                            IsGroup = item.IsGroup,
+                            PId = item.PId,
+                            KiKhaoSatId = data.Code,
+                            IsImg = item.IsImg,
+                            OrderNumber = item.OrderNumber,
+                            Report = item.Report,
+                            IsDeleted = false,
+                            ChiChtAtvsv = item.ChiChtAtvsv,
+                            NumberImg = item.NumberImg,
+                        };
+                        lsttc.Add(itemtc);
+                        if (!item.DiemTieuChi.IsNullOrEmpty())
+                        {
+                            foreach(var dtc in item.DiemTieuChi)
+                            {
+                                var diemtc = new TblBuTinhDiemTieuChi()
+                                {
+                                    Id = Guid.NewGuid().ToString(),
+                                    MoTa = dtc.MoTa,
+                                    TieuChiId=code,
+                                    IsActive=true,
+                                    Diem=dtc.Diem
+                                };
+                                lstDtc.Add(diemtc);
+                            }
+                            
+                        }
 
-                };
+                        _dbContext.TblBuTinhDiemTieuChi.AddRange(lstDtc);
+
+                    }
+                    _dbContext.TblBuTieuChi.AddRange(lsttc);
+                   
+                }
+                    var khaosatdata = new TblBuKiKhaoSat()
+                    {
+                        Code = data.Code,
+                        SurveyMgmtId = data.SurveyMgmtId,
+                        Name = data.Name,
+                        IsActive = true,
+                        StartDate = data.StartDate,
+                        EndDate = data.EndDate,
+                        Des = data.Des,
+                        IsDeleted = false
+
+                    };
                 var lstChamDiem = new List<TblBuInputChamDiem>();
                 foreach (var item in data.Chamdiemlst)
                 {
@@ -127,7 +181,7 @@ namespace PLX5S.BUSINESS.Services.BU
                    
                 }
                 _dbContext.TblBuInputChamDiem.AddRange(lstChamDiem);
-                _dbContext.TblBuTieuChi.Add(tree);
+
                 _dbContext.TblBuKiKhaoSat.Add(khaosatdata);
 
                 _dbContext.SaveChanges();
@@ -158,6 +212,54 @@ namespace PLX5S.BUSINESS.Services.BU
                 foreach (var item in lstdel)
                 {
                     item.IsDeleted = true;
+                }
+                var lsttc = new List<TblBuTieuChi>();
+                var lstDtc = new List<TblBuTinhDiemTieuChi>();
+                if (!data.kicopy.IsNullOrEmpty())
+                {
+                    //var lstchamdiem
+
+                    var tcks = _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == data.kicopy).ToList();
+                    foreach (var item in tcks)
+                    {
+                        var code = Guid.NewGuid().ToString();
+                        var itemtc = new TblBuTieuChi()
+                        {
+                            Id = code,
+                            Name = item.Name,
+                            IsGroup = item.IsGroup,
+                            PId = item.PId,
+                            KiKhaoSatId = data.Code,
+                            IsImg = item.IsImg,
+                            OrderNumber = item.OrderNumber,
+                            Report = item.Report,
+                            IsDeleted = false,
+                            ChiChtAtvsv = item.ChiChtAtvsv,
+                            NumberImg = item.NumberImg,
+                        };
+                        lsttc.Add(itemtc);
+                        if (!item.DiemTieuChi.IsNullOrEmpty())
+                        {
+                            foreach (var dtc in item.DiemTieuChi)
+                            {
+                                var diemtc = new TblBuTinhDiemTieuChi()
+                                {
+                                    Id = Guid.NewGuid().ToString(),
+                                    MoTa = dtc.MoTa,
+                                    TieuChiId = code,
+                                    IsActive = true,
+                                    Diem = dtc.Diem
+                                };
+                                lstDtc.Add(diemtc);
+                            }
+
+                        }
+
+                        _dbContext.TblBuTinhDiemTieuChi.AddRange(lstDtc);
+
+                    }
+                    _dbContext.TblBuTieuChi.AddRange(lsttc);
+
                 }
                 _dbContext.TblBuInputChamDiem.UpdateRange(lstdel);
                 var lstChamDiem = new List<TblBuInputChamDiem>();
@@ -193,7 +295,29 @@ namespace PLX5S.BUSINESS.Services.BU
                 Exception = ex;
             }
         }
+        public async Task DeleteData(string id)
+        {
+            try
+            {
+                var data = await _dbContext.TblBuKiKhaoSat.FindAsync(id);
+                var Ncd = await _dbContext.TblBuInputChamDiem.Where(x => x.KiKhaoSatId == id).ToListAsync();
+                var TC = await _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == id).ToListAsync();
 
+                if (data != null)
+                {
+                    _dbContext.TblBuInputChamDiem.RemoveRange(Ncd);
+                    _dbContext.TblBuKiKhaoSat.Remove(data);
+                    _dbContext.TblBuTieuChi.RemoveRange(TC);
+
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Status = false;
+                Exception = ex;
+            }
+        }
         public class ListdataKikhaosat
         {
           public List<InputStoreDto> InputStore { get; set; }
@@ -223,6 +347,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 return null;
             }
         }
+        
         
 
     }

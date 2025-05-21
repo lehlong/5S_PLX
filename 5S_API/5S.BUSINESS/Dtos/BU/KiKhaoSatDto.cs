@@ -28,6 +28,7 @@ namespace PLX5S.BUSINESS.Dtos.BU
         public string SurveyMgmtId { get; set; }
         public List<NguoiChamDiemlst> Chamdiemlst { get; set; }
         public bool? IsActive { get; set; }
+        public string? kicopy { get; set; }
         public void Mapping(Profile profile)
         {
             profile.CreateMap<TblBuKiKhaoSat, KiKhaoSatDto>().ReverseMap();

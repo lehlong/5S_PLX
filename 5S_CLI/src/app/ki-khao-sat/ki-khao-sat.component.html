@@ -72,9 +72,14 @@
           <td></td>
 
           <td nzAlign="center">
+            <div nz-row [nzGutter]="1">
             <button class="!flex !items-center" nzType="default" nz-button (click)="openDrawer(data.code)">
-              <span nz-icon nzType="edit"></span> Cập nhập tiêu chí
+              <span nz-icon nzType="edit"></span> 
             </button>
+             <button class="!flex !items-center" nzType="default" nz-button (click)="DeleteKKS(data.code)">
+              <span nz-icon nzType="delete"></span> 
+            </button>
+            </div>
           </td>
         </tr>
       </tbody>
@@ -124,6 +129,17 @@
                 [nzPlaceHolder]="'Chọn ngày'" style="width: 100%;"></nz-date-picker>
             </div>
           </div>
+                <div nz-col [nzXs]="12">
+                       <label>Kì copy</label>
+                            <nz-select style="width: 100%;" nzShowSearch nzAllowClear placeholder="Chọn kì copy"
+                                 [(ngModel)]="kiKhaoSat.kicopy" (ngModelChange)="CopyKKS($event)">
+                                <nz-option cdkScrollable *ngFor="let item of lstKKS.data" [nzLabel]="item.name"
+                                    [nzValue]="item.code" >
+                                </nz-option>
+                            </nz-select>
+                       
+                  
+                </div>
           <div nz-col [nzXs]="24">
             <div class="inner-box">
               <label>Nhập mô tả </label>
@@ -194,6 +210,7 @@
 <ng-template #extra>
   <nz-space>
     <ng-container *ngIf="edit">
+       
       <button [nzLoading]="loading" *nzSpaceItem nz-button nzType="primary" class="!flex !items-center"
         (click)="submitForm()">
         <span nz-icon nzType="save" nzTheme="outline"></span>Lưu

@@ -62,6 +62,7 @@ export class KiKhaoSatComponent {
   leavesVisible: boolean = false;
   dataInsertTree: any = {};
   treeId: any = '';
+  lstKKS: any = [];
 
   constructor(
     private _service: KiKhaoSatService,
@@ -125,6 +126,7 @@ export class KiKhaoSatComponent {
     this._service.search(this.filter).subscribe({
       next: (data) => {
         this.paginationResult = data;
+        this.lstKKS = data;
       },
       error: (response) => {
         console.log(response);
@@ -184,17 +186,24 @@ export class KiKhaoSatComponent {
         },
       });
     }
-    // } else {
-    //   Object.values(this.validateForm.controls).forEach((control) => {
-    //     if (control.invalid) {
-    //       control.markAsDirty()
-    //       control.updateValueAndValidity({ onlySelf: true })
-    //     }
-    //   })
-    // }
+  
     this.reset();
   }
+CopyKKS(param:any){
+  this.kiKhaoSat.kicopy = param;
 
+}
+DeleteKKS(data: any) {
+  console.log(data);
+  this._service.delete(data).subscribe({
+    next: (data) => {
+      this.search();
+    },
+    error: (response) => {
+      console.log(response);
+    },
+  });
+}
   openCreateChild(node: any) {
     this.close();
     this.edit = false;
@@ -249,6 +258,7 @@ export class KiKhaoSatComponent {
     } else{
       this.treeId = '';
     }
+    console.log("11111",node);
   }
 
   openTieuchi(id: string) {

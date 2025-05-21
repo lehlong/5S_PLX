@@ -26,6 +26,7 @@ export class KhoXangDauComponent {
   loading: boolean = false;
   Account: any[] = [];
   ATVSVList: any[] = []; 
+  lstKKS: any[] = [];
 
   constructor(
     private _service: KhoXangDauService,
@@ -78,6 +79,7 @@ export class KhoXangDauComponent {
     this._service.search(this.filter).subscribe({
       next: (data) => {
         this.paginationResult = data;
+        this.lstKKS=data
       },
       error: (response) => {
         console.log(response);
