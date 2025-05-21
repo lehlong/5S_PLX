@@ -277,14 +277,14 @@
           <tbody cdkDropList (cdkDropListDropped)="drop($event)">
             <tr *ngFor="let data of selectedNodeDetails; let i = index" cdkDrag>
               <td>{{ i + 1 }}</td>
-              <td>{{ data.id }}</td>
+              <td><a (click)="openUpdateLeaves(data)" style="cursor:pointer;">{{ data.id }}</a></td>
               <td>{{ data.name }}</td>
               <td>{{ data.requiredImage ? 'Có' : 'Không' }}</td>
               <td nzAlign="center">
                 <div>
-                  <span nz-icon (click)="openUpdateLeaves(data)" nzType="edit" nzTheme="outline"
-                    style="margin: 0 5px;"></span>
-                  <span nz-icon nzType="delete" nzTheme="outline"></span>
+                  <span nz-icon (click)="openUpdateLeaves(data)" nzType="edit" nzTheme="outline" 
+                    style="margin: 0 5px; cursor: pointer;"></span>
+                  <span nz-icon nzType="delete" nzTheme="outline" style="cursor:pointer;"></span>
                 </div>
               </td>
             </tr>
@@ -297,7 +297,7 @@
 
 <!-- Create/Edit Form tiêu chí -->
 <nz-modal [(nzVisible)]="leavesVisible" [nzTitle]="edit ? 'Chỉnh sửa tiêu chí' : 'Thêm mới tiêu chí'"
-  (nzOnCancel)="closeModal()" [nzWidth]="1400" [nzMask]="!edit" [nzFooter]="extra"
+  (nzOnCancel)="closeModal()" [nzWidth]="1400" [nzMask]="!edit" [nzFooter]="extra1"
   [nzBodyStyle]="{height: '70vh', overflow: 'auto'}">
   <div nz-row [nzGutter]="16" *nzModalContent>
     <div nz-col [nzSpan]="12">
@@ -409,10 +409,10 @@
     </div> -->
   </div>
   <!-- </form> -->
-  <ng-template #extra>
+  <ng-template #extra1>
     <ng-container *ngIf="edit">
-      <button [nzLoading]="loading" *nzSpaceItem nz-button nzType="primary" class="!flex !items-center">
-        <span nz-icon nzType="save" (click)="updateLeaves()" nzTheme="outline"></span>Lưu
+      <button [nzLoading]="loading" nz-button nzType="primary" (click)="updateLeaves()">
+        Lưu
       </button>
     </ng-container>
     <ng-container>

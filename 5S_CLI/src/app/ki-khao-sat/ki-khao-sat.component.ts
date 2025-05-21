@@ -421,7 +421,42 @@ export class KiKhaoSatComponent {
 
   updateLeaves(): void {
     this.edit = true;
+    const formData = {
+      id: this.leavesNode.id,
+      key: this.leavesNode.id,
+      name: this.leavesNode.name,
+      title: this.leavesNode.name,
+      isExpanded: this.leavesNode.isExpanded,
+      pId: this.leavesNode.pId,
+      kiKhaoSatId: this.leavesNode.kiKhaoSatId,
+      orderNumber: this.leavesNode.orderNumber,
+      isGroup: this.leavesNode.isGroup,
+      isImg: this.leavesNode.isImg,
+      numberImg: this.leavesNode.numberImg,
+      report: this.leavesNode.report,
+      chiChtAtvsv: this.leavesNode.chiChtAtvsv,
+      diemTieuChi: this.calculationRows.map((row) => ({
+        isActive: true,
+        isDeleted: false,
+        moTa: row.moTa,
+        diem: row.diem,
+        tieuChiId: this.leavesNode.id,
+      })),
+    };
+    this._treeTieuChiService.UpdateLeaves(formData).subscribe({
+      next: (res) => {
+        this.leavesVisible = false;
+        this.loading = false;
+        this.GetTreeTieuChi();
+      },
+      error: (err) => {
+        console.log("object", err)
+        this.loading = false;
+      }
+    });
   }
+
+
   insertTree(): void {
     if (!this.isValid()) {
       return;

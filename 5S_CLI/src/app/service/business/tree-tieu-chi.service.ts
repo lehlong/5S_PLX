@@ -26,9 +26,9 @@ export class TreeTieuChiService {
 //     return this.commonService.get('TieuChi/GetMenuWithTreeRight', param);
 //   }
 
-//   Update(data: any) {
-//     return this.commonService.put('TreeTieuChi/Update', data);
-//   }
+  UpdateLeaves(data: any) {
+    return this.commonService.put('TieuChi/UpdateLeaves', data);
+  }
 
   // Insert(data: any): Observable<any> {
   //   // return this.commonService.post('TieuChi/InsertTreeGroup', data);
