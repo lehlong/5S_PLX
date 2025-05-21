@@ -91,7 +91,7 @@ namespace PLX5S.API.Controllers.BU
             return Ok(transferObject);
         }
 
-        [HttpPost("UpdateLeaves")]
+        [HttpPut("UpdateLeaves")]
         public async Task<IActionResult> UpdateLeaves([FromBody] TieuChiDto data)
         {
             var transferObject = new TransferObject();
@@ -109,5 +109,22 @@ namespace PLX5S.API.Controllers.BU
             return Ok(transferObject);
         }
 
+        [HttpPut("UpdateOrderTree")]
+        public async Task<IActionResult> UpdateOrderTree([FromBody] TieuChiDto data)
+        {
+            var transferObject = new TransferObject();
+            await _service.UpdateOrderTree(data);
+            if (_service.Status)
+            {
+                transferObject.Status = true;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
     }
 }
