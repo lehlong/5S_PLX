@@ -103,6 +103,7 @@ namespace PLX5S.BUSINESS.Services.BU
             {
                 var node1 = new TieuChiDto()
                 {
+                    Code = menu.Code,
                     Id = menu.Id,
                     Key = menu.Id,
                     Name = menu.Name,
@@ -175,6 +176,7 @@ namespace PLX5S.BUSINESS.Services.BU
             {
                 _dbContext.TblBuTieuChi.Update(new TblBuTieuChi()
                 {
+                    Code= item.Code,
                     Id = item.Id,
                     PId = item.PId,
                     Name = item.Name,
@@ -245,7 +247,7 @@ namespace PLX5S.BUSINESS.Services.BU
                     module.OrderNumber = numberOrder++;
                     lstModuleUpdate.Add(module);
                 }
-                _dbContext.UpdateRange(lstModuleUpdate);
+                _dbContext.TblBuTieuChi.UpdateRange(lstModuleUpdate);
                 await _dbContext.SaveChangesAsync();
             }
             catch (Exception ex)

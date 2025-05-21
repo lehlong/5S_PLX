@@ -8,10 +8,10 @@ namespace PLX5S.CORE.Configuration.BU
     {
         public void Configure(EntityTypeBuilder<TblBuTinhDiemTieuChi> builder)
         {
-            builder.HasOne(x => x.TieuChi)
-                .WithMany(g => g.DiemTieuChi)
-                .HasForeignKey(x => x.TieuChiId)
-                .OnDelete(DeleteBehavior.Cascade);
+            //builder.HasOne(x => x.TieuChi)
+            //    .WithMany(g => g.DiemTieuChi)
+            //    .HasForeignKey(x => x.TieuChiId)
+            //    .OnDelete(DeleteBehavior.Cascade);
 
            
         }

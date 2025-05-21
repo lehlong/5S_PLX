@@ -72,7 +72,7 @@
           <td></td>
 
           <td nzAlign="center">
-            <div nz-row [nzGutter]="1">
+            <div nz-row [nzGutter]="1" >
               <button class="!flex !items-center" nzType="default" nz-button (click)="openDrawer(data.code)">
                 <span nz-icon nzType="edit"></span>
               </button>
@@ -441,11 +441,11 @@
 <!-- /* Modal tree */ -->
 <nz-modal [(nzVisible)]="treeVisible" [nzTitle]="edit ? 'Chỉnh sửa cây tiêu chí' : 'Thêm mới cây tiêu chí'"
   (nzOnCancel)="closeModal()" [nzFooter]="treeModalFooter" [nzWidth]="400" [nzMask]="edit"
-  [nzBodyStyle]="{height: '20vh', overflow: 'auto'}">
+  [nzBodyStyle]="{height: '20vh'}">
   <!-- <form nz-form [formGroup]="validateForm" *nzModalContent> -->
   <ng-container *nzModalContent>
     <div class="modal-content">
-      <div nz-row [nzGutter]="16">
+      <div nz-row [nzGutter]="16" >
         <div nz-col [nzSpan]="24">
           <nz-form-label>Tên tiêu chí cha</nz-form-label>
           <nz-form-item>
@@ -465,8 +465,8 @@
       </div>
     </div>
   </ng-container>
-  <ng-template #treeModalFooter>
-    <nz-space>
+  <ng-template #treeModalFooter >
+    <nz-space >
       <ng-container *ngIf="!edit">
         <button [nzLoading]="loading" *nzSpaceItem nz-button nzType="primary" class="!flex !items-center"
           (click)="submitFormTree()">

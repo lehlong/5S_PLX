@@ -246,11 +246,8 @@ export class KiKhaoSatComponent {
     this.resetForm();
     this.leavesVisible = false;
   }
-
-  onClick(node: any) {
-    if (node.origin.children == null) {
-      this.treeId = node.origin.id;
-      this._treeTieuChiService.GetTreeLeaves(this.treeId).subscribe({
+GetTreeLeaves() {
+    this._treeTieuChiService.GetTreeLeaves(this.treeId).subscribe({
         next: (data) => {
           this.selectedNodeDetails = data.result;
         },
@@ -259,10 +256,15 @@ export class KiKhaoSatComponent {
           console.log(response);
         },
       });
+    }
+
+  onClick(node: any) {
+    if (node.origin.children == null) {
+      this.treeId = node.origin.id;
+      this.GetTreeLeaves();
     } else {
       this.treeId = '';
     }
-    console.log("11111", node);
   }
 
   openTieuchi(id: string) {
@@ -363,8 +365,6 @@ export class KiKhaoSatComponent {
 
   GetTreeTieuChi() {
     this._treeTieuChiService.GetTreeTieuChi(this.kiKhaoSatId).subscribe((res) => {
-      console.log(res);
-
       this.treeData = [res];
     });
   }
@@ -430,12 +430,13 @@ export class KiKhaoSatComponent {
         this.treeVisible = false;
         this.loading = false;
         this.GetTreeTieuChi();
-
+        
       },
       error: (err) => {
         this.loading = false;
       },
     });
+    this.dataInsertTree.name= '';
   }
 
   isValid(): boolean {
@@ -443,19 +444,54 @@ export class KiKhaoSatComponent {
   }
 
 
-  updateOrderTree(): void {
-    console.log("object", this.treeData)
-    this._treeTieuChiService.UpdateOrderTree(this.treeData).subscribe({
-      next: (res) => {
-        this.treeData = res;
-        this.loading = false;
-        this.GetTreeTieuChi();
-      },
-      error: (err) => {
-        this.loading = false;
-      },
-    });
+  // updateOrderTree(): void {
+  //   this._treeTieuChiService.UpdateOrderTree(this.treeData).subscribe({
+  //     next: (res) => {
+  //       this.treeData = res;
+  //       this.loading = false;
+  //       this.GetTreeTieuChi();
+  //     },
+  //     error: (err) => {
+  //       this.loading = false;
+  //     },
+  //   });
+  //   console.log("object", this.treeData)
+  // }
+
+
+  updateOrderTree() {
+    const treeData = this.treeCom
+      .getTreeNodes()
+      .map((node) => this.mapNode(node))
+      console.log("11111",treeData[0])
+
+      this._treeTieuChiService.UpdateOrderTree(treeData[0]).subscribe({
+        next: (data) => {
+          this.GetTreeTieuChi()
+        },
+        error: (response) => {
+          console.log(response)
+        },
+      })
   }
+
+  private mapNode(node: any): any {
+    const children = node.children
+      ? node.children.map((child: any) => this.mapNode(child))
+      : []
+    return {
+      code: node.origin.code,
+      id: node.origin.id,
+      pId: node.parentNode?.key || '-1',
+      name: node.origin.name,
+      children: children,
+      kiKhaoSatId: node.origin.kiKhaoSatId,
+      isGroup: node.origin.isGroup,
+      isActive: true,
+      isDeleted: false,
+    }
+  }
+
   updateLeaves(): void {
     this.edit = true;
     this.leavesNode.diemTieuChi = this.calculationRows
@@ -463,7 +499,7 @@ export class KiKhaoSatComponent {
       next: (res) => {
         this.leavesVisible = false;
         this.loading = false;
-        this.GetTreeTieuChi();
+        this.GetTreeLeaves();
       },
       error: (err) => {
         console.log("object", err)
@@ -478,12 +514,11 @@ export class KiKhaoSatComponent {
       return;
     }
     this.leavesNode.diemTieuChi = this.calculationRows
-
     this._treeTieuChiService.addLeaves(this.leavesNode).subscribe({
       next: (res) => {
         this.leavesVisible = false;
         this.loading = false;
-        this.GetTreeTieuChi();
+        this.GetTreeLeaves();
       },
       error: (err) => {
         this.loading = false;
