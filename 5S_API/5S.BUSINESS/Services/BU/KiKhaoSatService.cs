@@ -88,6 +88,29 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
+                //var tree = new TblBuTieuChi()
+                //{
+                //    Id = Guid.NewGuid().ToString(),
+                //    Code = Guid.NewGuid().ToString(),
+                //    Name = data.Name,
+                //    IsGroup = true,
+                //    PId = "-1",
+                //    KiKhaoSatId = data.Code,
+                //    IsImg = false,
+                //    OrderNumber = 1,
+                //    Report = "-",
+                //    IsDeleted=false
+                //};
+                //var khaosatdata = new TblBuKiKhaoSat()
+                //{
+                //    Code = data.Code,
+                //    SurveyMgmtId = data.SurveyMgmtId,
+                //    Name = data.Name,
+                //    IsActive = true,
+                //    StartDate = data.StartDate,
+                //    EndDate = data.EndDate,
+                //    Des = data.Des,
+                //    IsDeleted=false
                 var lsttc = new List<TblBuTieuChi>();
                 var lstDtc = new List<TblBuTinhDiemTieuChi>();
                 if (data.kicopy.IsNullOrEmpty()) {
@@ -127,22 +150,22 @@ namespace PLX5S.BUSINESS.Services.BU
                             NumberImg = item.NumberImg,
                         };
                         lsttc.Add(itemtc);
-                        if (!item.DiemTieuChi.IsNullOrEmpty())
-                        {
-                            foreach(var dtc in item.DiemTieuChi)
-                            {
-                                var diemtc = new TblBuTinhDiemTieuChi()
-                                {
-                                    Id = Guid.NewGuid().ToString(),
-                                    MoTa = dtc.MoTa,
-                                    TieuChiId=code,
-                                    IsActive=true,
-                                    Diem=dtc.Diem
-                                };
-                                lstDtc.Add(diemtc);
-                            }
+                        //if (!item.DiemTieuChi.IsNullOrEmpty())
+                        //{
+                        //    foreach(var dtc in item.DiemTieuChi)
+                        //    {
+                        //        var diemtc = new TblBuTinhDiemTieuChi()
+                        //        {
+                        //            Id = Guid.NewGuid().ToString(),
+                        //            MoTa = dtc.MoTa,
+                        //            TieuChiId=code,
+                        //            IsActive=true,
+                        //            Diem=dtc.Diem
+                        //        };
+                        //        lstDtc.Add(diemtc);
+                        //    }
                             
-                        }
+                        //}
 
                         _dbContext.TblBuTinhDiemTieuChi.AddRange(lstDtc);
 
@@ -238,22 +261,22 @@ namespace PLX5S.BUSINESS.Services.BU
                             NumberImg = item.NumberImg,
                         };
                         lsttc.Add(itemtc);
-                        if (!item.DiemTieuChi.IsNullOrEmpty())
-                        {
-                            foreach (var dtc in item.DiemTieuChi)
-                            {
-                                var diemtc = new TblBuTinhDiemTieuChi()
-                                {
-                                    Id = Guid.NewGuid().ToString(),
-                                    MoTa = dtc.MoTa,
-                                    TieuChiId = code,
-                                    IsActive = true,
-                                    Diem = dtc.Diem
-                                };
-                                lstDtc.Add(diemtc);
-                            }
+                        //if (!item.DiemTieuChi.IsNullOrEmpty())
+                        //{
+                        //    foreach (var dtc in item.DiemTieuChi)
+                        //    {
+                        //        var diemtc = new TblBuTinhDiemTieuChi()
+                        //        {
+                        //            Id = Guid.NewGuid().ToString(),
+                        //            MoTa = dtc.MoTa,
+                        //            TieuChiId = code,
+                        //            IsActive = true,
+                        //            Diem = dtc.Diem
+                        //        };
+                        //        lstDtc.Add(diemtc);
+                        //    }
 
-                        }
+                        //}
 
                         _dbContext.TblBuTinhDiemTieuChi.AddRange(lstDtc);
 

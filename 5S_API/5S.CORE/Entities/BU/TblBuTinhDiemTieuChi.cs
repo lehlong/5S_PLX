@@ -22,9 +22,11 @@ namespace PLX5S.CORE.Entities.BU
         [Column("DIEM", TypeName = "DECIMAL(18.0)")]
         public decimal Diem { get; set; }
 
-        [Column("TIEU_CHI_ID", TypeName = "NVARCHAR(50)")]
-        public string TieuChiId { get; set; }
-        [ForeignKey("TieuChiId")]
-        public virtual TblBuTieuChi? TieuChi { get; set; }
+
+//        [ForeignKey("TieuChiId")]
+//        public virtual TblBuTieuChi? TieuChi { get; set; }
+
+        [Column("TIEU_CHI_CODE", TypeName = "NVARCHAR(50)")]
+        public string TieuChiCode { get; set; }
     }
 }

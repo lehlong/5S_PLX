@@ -14,7 +14,7 @@ import { TreeTieuChiService } from '../service/business/tree-tieu-chi.service';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 @Component({
   selector: 'app-ki-khao-sat',
-  imports: [ShareModule, RouterModule,DragDropModule],
+  imports: [ShareModule, RouterModule, DragDropModule],
   standalone: true,
   templateUrl: './ki-khao-sat.component.html',
   styleUrl: './ki-khao-sat.component.scss',
@@ -40,23 +40,13 @@ export class KiKhaoSatComponent {
   dataChamdiem: any = [];
   headerId: any = '';
   kiKhaoSatId: any = '';
-  calculationRows: { moTa: string; diem: number }[] = [];
+  calculationRows: any = [];
   DataKS: any = [];
   kiKhaoSat: any = {};
   visibleKiKhaoSat: boolean = false;
-  leavesNode = {
-    id: '',
-    name: '',
-    title: '',
-    isExpanded: true,
-    pId: '',
-    kiKhaoSatId: '-',
-    orderNumber: 0,
-    isGroup: false,
-    isImg: false,
-    numberImg: 0,
-    report: '',
-    chiChtAtvsv: false,
+  leavesNode: any = {
+    Code: "-1",
+    diemTieuChi: []
   };
   tree: any = [];
   leavesVisible: boolean = false;
@@ -186,51 +176,61 @@ export class KiKhaoSatComponent {
         },
       });
     }
-  
+
     this.reset();
   }
-CopyKKS(param:any){
-  this.kiKhaoSat.kicopy = param;
+  CopyKKS(param: any) {
+    this.kiKhaoSat.kicopy = param;
 
-}
-DeleteKKS(data: any) {
-  console.log(data);
-  this._service.delete(data).subscribe({
-    next: (data) => {
-      this.search();
-    },
-    error: (response) => {
-      console.log(response);
-    },
-  });
-}
-  openCreateChild(node: any) {
+  }
+  DeleteKKS(data: any) {
+    console.log(data);
+    this._service.delete(data).subscribe({
+      next: (data) => {
+        this.search();
+      },
+      error: (response) => {
+        console.log(response);
+      },
+    });
+  }
+  openEditTree(node: any) {
     this.close();
-    this.edit = false;
-    this.visible = true;
-    this.validateForm.get('pId')?.setValue(node?.origin.id);
-    this.validateForm.get('orderNumber')?.setValue(null);
-    this.validateForm.get('children')?.setValue([]);
+    this.edit = true;
+    this.treeVisible = true;
+    this.dataInsertTree = node
   }
   addCalculationRow(): void {
-    this.calculationRows.push({ moTa: '', diem: 0 });
+    this.calculationRows.push({ id: "-1", tieuChiCode: this.leavesNode.id, moTa: '', diem: 0, isActive: true, isDeleted: false });
   }
 
   removeCalculationRow(index: number): void {
     this.calculationRows.splice(index, 1);
   }
+  deleteCalculationRow(index: any, i: number): void {
+    console.log("xóa mềm", index);
 
-  close() {
-     if (this.dataChamdiem ) {
-    this.dataChamdiem.forEach((item: any) => {
-      item.nguoiChamDiem = [];
-    });
+    const target = this.calculationRows.find((item: any) => item.id === index.id);
+    if (index.id != "-1") {
+      target.isDeleted = true;
+    } else {
+      this.calculationRows.splice(i, 1);
+    }
+    console.log(this.calculationRows);
+
+
   }
+  close() {
+    if (this.dataChamdiem) {
+      this.dataChamdiem.forEach((item: any) => {
+        item.nguoiChamDiem = [];
+      });
+    }
     this.visible = false;
     this.visibleKiKhaoSat = false;
     this.resetForm();
     this.kiKhaoSat = [];
-   
+
   }
 
   closeDrawer(): void {
@@ -239,6 +239,10 @@ DeleteKKS(data: any) {
 
   closeModal(): void {
     this.treeVisible = false;
+      this.leavesNode = {
+      Code: "-1",
+    };
+    this.calculationRows = []
     this.resetForm();
     this.leavesVisible = false;
   }
@@ -255,10 +259,10 @@ DeleteKKS(data: any) {
           console.log(response);
         },
       });
-    } else{
+    } else {
       this.treeId = '';
     }
-    console.log("11111",node);
+    console.log("11111", node);
   }
 
   openTieuchi(id: string) {
@@ -298,14 +302,18 @@ DeleteKKS(data: any) {
     this.leavesVisible = true;
     this.leavesNode.pId = this.treeId;
     this.calculationRows = data.diemTieuChi
+    console.log(this.calculationRows);
+
+    console.log(this.leavesNode);
   }
   openUpdateTree(data: any): void {
     this.treeVisible = true;
     this.edit = true;
-     this.treeData = data;
+    this.treeData = data;
     this.treeData.name = data.name;
   }
-  
+
+
   openCreate() {
     this.edit = false;
     this.visibleKiKhaoSat = true;
@@ -327,11 +335,11 @@ DeleteKKS(data: any) {
     });
   }
 
-  nzEvent(event: NzFormatEmitEvent): void {}
+  nzEvent(event: NzFormatEmitEvent): void { }
 
-  onDrop(event: any) {}
+  onDrop(event: any) { }
 
-  onDragStart(event: any) {}
+  onDragStart(event: any) { }
 
   openEditKyKhaoSat(data: any) {
 
@@ -350,10 +358,10 @@ DeleteKKS(data: any) {
     this.drawerVisible = true;
     this.kiKhaoSatId = param;
     this.GetTreeTieuChi();
-    
+
   }
 
-  GetTreeTieuChi(){
+  GetTreeTieuChi() {
     this._treeTieuChiService.GetTreeTieuChi(this.kiKhaoSatId).subscribe((res) => {
       console.log(res);
 
@@ -361,7 +369,6 @@ DeleteKKS(data: any) {
     });
   }
   Getdataki(code: string) {
-
     this._service.getAll(code).subscribe({
       next: (data) => {
         console.log('dataki', data);
@@ -375,7 +382,7 @@ DeleteKKS(data: any) {
             nguoiChamDiem: nguoiChamDiemArr
           };
         });
-          console.log('listcd', this.dataChamdiem)
+        console.log('listcd', this.dataChamdiem)
 
       },
       error: (response) => {
@@ -406,7 +413,8 @@ DeleteKKS(data: any) {
     this.search();
   }
 
-  openModalTree(data: any): void {
+  openCreateTree(data: any): void {
+    this.edit = false
     this.treeVisible = true;
     this.tree = data.origin;
     this.dataInsertTree.pId = this.tree.id;
@@ -421,7 +429,7 @@ DeleteKKS(data: any) {
       next: (res) => {
         this.treeVisible = false;
         this.loading = false;
-            this.GetTreeTieuChi();
+        this.GetTreeTieuChi();
 
       },
       error: (err) => {
@@ -450,29 +458,8 @@ DeleteKKS(data: any) {
   }
   updateLeaves(): void {
     this.edit = true;
-    const formData = {
-      id: this.leavesNode.id,
-      key: this.leavesNode.id,
-      name: this.leavesNode.name,
-      title: this.leavesNode.name,
-      isExpanded: this.leavesNode.isExpanded,
-      pId: this.leavesNode.pId,
-      kiKhaoSatId: this.leavesNode.kiKhaoSatId,
-      orderNumber: this.leavesNode.orderNumber,
-      isGroup: this.leavesNode.isGroup,
-      isImg: this.leavesNode.isImg,
-      numberImg: this.leavesNode.numberImg,
-      report: this.leavesNode.report,
-      chiChtAtvsv: this.leavesNode.chiChtAtvsv,
-      diemTieuChi: this.calculationRows.map((row) => ({
-        isActive: true,
-        isDeleted: false,
-        moTa: row.moTa,
-        diem: row.diem,
-        tieuChiId: this.leavesNode.id,
-      })),
-    };
-    this._treeTieuChiService.UpdateLeaves(formData).subscribe({
+    this.leavesNode.diemTieuChi = this.calculationRows
+    this._treeTieuChiService.UpdateLeaves(this.leavesNode).subscribe({
       next: (res) => {
         this.leavesVisible = false;
         this.loading = false;
@@ -490,30 +477,9 @@ DeleteKKS(data: any) {
     if (!this.isValid()) {
       return;
     }
+    this.leavesNode.diemTieuChi = this.calculationRows
 
-    const formData = {
-      id: this.leavesNode.id,
-      name: this.leavesNode.name,
-      title: this.leavesNode.name,
-      isExpanded: this.leavesNode.isExpanded,
-      pId: this.leavesNode.pId,
-      kiKhaoSatId: this.leavesNode.kiKhaoSatId,
-      orderNumber: this.leavesNode.orderNumber,
-      isGroup: this.leavesNode.isGroup,
-      isImg: this.leavesNode.isImg,
-      numberImg: this.leavesNode.numberImg,
-      report: this.leavesNode.report,
-      chiChtAtvsv: this.leavesNode.chiChtAtvsv,
-      diemTieuChi: this.calculationRows.map((row) => ({
-        isActive: true,
-        isDeleted: false,
-        moTa: row.moTa,
-        diem: row.diem,
-        tieuChiId: this.leavesNode.id,
-      })),
-    };
-
-    this._treeTieuChiService.addLeaves(formData).subscribe({
+    this._treeTieuChiService.addLeaves(this.leavesNode).subscribe({
       next: (res) => {
         this.leavesVisible = false;
         this.loading = false;
@@ -523,7 +489,6 @@ DeleteKKS(data: any) {
         this.loading = false;
       },
     });
-
     this.closeModal();
   }
 

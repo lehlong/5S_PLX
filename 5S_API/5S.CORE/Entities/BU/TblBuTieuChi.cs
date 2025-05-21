@@ -15,6 +15,9 @@ namespace PLX5S.CORE.Entities.BU
 public class TblBuTieuChi : SoftDeleteEntity
 {
         [Key]
+        [Column("CODE", TypeName = "VARCHAR(50)")]
+        public string? Code { get; set; }
+
         [Column("ID", TypeName = "VARCHAR(50)")]
         public string? Id { get; set; }
 

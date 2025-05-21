@@ -127,7 +127,6 @@ namespace PLX5S.CORE
 
         #region Master Data
         public DbSet<TblMdAccountType> tblMdAccountType { get; set; }
-
         public DbSet<TblMdChucVu> tblMdChucVu { get; set; }
         public DbSet<TblMdDoiTuong> tblMdDoituong { get; set; }
         public DbSet<TblMdStore> tblMdStore { get; set; }

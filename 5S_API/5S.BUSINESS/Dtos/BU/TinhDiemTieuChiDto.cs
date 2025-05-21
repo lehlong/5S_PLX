@@ -17,7 +17,7 @@ namespace PLX5S.BUSINESS.Dtos.BU
         public string Id { get; set; }
         public string MoTa { get; set; }
         public decimal Diem { get; set; }
-        public string TieuChiId { get; set; }
+        public string TieuChiCode { get; set; }
 
         [Description("Trạng thái")]
         public string State { get => this.IsActive == true ? "Đang hoạt động" : "Khóa"; }

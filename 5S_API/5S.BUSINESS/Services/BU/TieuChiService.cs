@@ -32,6 +32,7 @@ namespace PLX5S.BUSINESS.Services.BU
             try
             {
                 data.Id = Guid.NewGuid().ToString();
+                data.Code = Guid.NewGuid().ToString();
                 _dbContext.TblBuTieuChi.Add(data);
                 await _dbContext.SaveChangesAsync();
             }
@@ -47,6 +48,7 @@ namespace PLX5S.BUSINESS.Services.BU
             {
                 var tieuChi = new TblBuTieuChi()
                 {
+                    Code = Guid.NewGuid().ToString(),
                     Id = data.Id,
                     Name = data.Name,
                     IsActive = true,
@@ -55,8 +57,9 @@ namespace PLX5S.BUSINESS.Services.BU
                     KiKhaoSatId = data.KiKhaoSatId,
                     PId = data.PId,
                     Report = data.Report,
-                    IsImg = data.IsImg,
-                    NumberImg = data.NumberImg
+                    IsImg = data.IsImg ?? false,
+                    ChiChtAtvsv = data.ChiChtAtvsv ?? false,
+                    NumberImg = data.NumberImg ?? 0
                 };
                 _dbContext.TblBuTieuChi.Add(tieuChi);
                 foreach (var item in data.DiemTieuChi)
@@ -79,6 +82,7 @@ namespace PLX5S.BUSINESS.Services.BU
             var node = _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == kiKhaoSatId && x.PId == "-1" && x.IsDeleted != true).FirstOrDefault();
             var rootNode = new TieuChiDto()
             {
+                Code = node.Code,
                 Id = node.Id,
                 Key= node.Id,
                 Name = node.Name,
@@ -134,12 +138,13 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
-                var tieuChi = _dbContext.TblBuTieuChi.Where(x => x.IsDeleted != true && x.PId == id).ToList();
+                var tieuChi = _dbContext.TblBuTieuChi.Where(x => x.IsDeleted != true && x.PId == id).OrderBy(x => x.OrderNumber).ToList();
                 var lstTieuChiLeaves = new List<TieuChiDto>();
                 foreach (var item in tieuChi)
                 {
                     var leaves = new TieuChiDto()
                     {
+                        Code = item.Code,
                         Id = item.Id,
                         PId = item.PId,
                         Name = item.Name,
@@ -150,7 +155,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         NumberImg = item.NumberImg,
                         KiKhaoSatId = item.KiKhaoSatId,
                         OrderNumber = item.OrderNumber,
-                        DiemTieuChi = _dbContext.TblBuTinhDiemTieuChi.Where(x => x.TieuChiId == item.Id && x.IsDeleted == false).ToList()
+                        DiemTieuChi = _dbContext.TblBuTinhDiemTieuChi.Where(x => x.TieuChiCode == item.Id && x.IsDeleted != true).ToList()
                     };
                     lstTieuChiLeaves.Add(leaves);
                 }
@@ -168,7 +173,7 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
-                _dbContext.TblBuTieuChi.Add(new TblBuTieuChi()
+                _dbContext.TblBuTieuChi.Update(new TblBuTieuChi()
                 {
                     Id = item.Id,
                     PId = item.PId,
@@ -179,16 +184,13 @@ namespace PLX5S.BUSINESS.Services.BU
                     NumberImg = item.NumberImg,
                     KiKhaoSatId = item.KiKhaoSatId,
                     OrderNumber = item.OrderNumber,
-                    IsDeleted = item.IsDeleted
+                    IsDeleted = item.IsDeleted ?? false
                 }); 
                 foreach (var diem in item.DiemTieuChi)
                 {
-                    var existing = await _dbContext.TblBuTinhDiemTieuChi
-                        .FirstOrDefaultAsync(x => x.Id == diem.Id);
-
-                    if (existing != null)
+                    if (diem.Id != "-1")
                     {
-                        _dbContext.TblBuTinhDiemTieuChi.UpdateRange(diem);
+                        _dbContext.TblBuTinhDiemTieuChi.Update(diem);
                     }
                     else
                     {

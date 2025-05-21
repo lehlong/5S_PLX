@@ -73,12 +73,12 @@
 
           <td nzAlign="center">
             <div nz-row [nzGutter]="1">
-            <button class="!flex !items-center" nzType="default" nz-button (click)="openDrawer(data.code)">
-              <span nz-icon nzType="edit"></span> 
-            </button>
-             <button class="!flex !items-center" nzType="default" nz-button (click)="DeleteKKS(data.code)">
-              <span nz-icon nzType="delete"></span> 
-            </button>
+              <button class="!flex !items-center" nzType="default" nz-button (click)="openDrawer(data.code)">
+                <span nz-icon nzType="edit"></span>
+              </button>
+              <button class="!flex !items-center" nzType="default" nz-button (click)="DeleteKKS(data.code)">
+                <span nz-icon nzType="delete"></span>
+              </button>
             </div>
           </td>
         </tr>
@@ -129,17 +129,16 @@
                 [nzPlaceHolder]="'Chọn ngày'" style="width: 100%;"></nz-date-picker>
             </div>
           </div>
-                <div nz-col [nzXs]="12">
-                       <label>Kì copy</label>
-                            <nz-select style="width: 100%;" nzShowSearch nzAllowClear placeholder="Chọn kì copy"
-                                 [(ngModel)]="kiKhaoSat.kicopy" (ngModelChange)="CopyKKS($event)">
-                                <nz-option cdkScrollable *ngFor="let item of lstKKS.data" [nzLabel]="item.name"
-                                    [nzValue]="item.code" >
-                                </nz-option>
-                            </nz-select>
-                       
-                  
-                </div>
+          <div nz-col [nzXs]="12">
+            <label>Kì copy</label>
+            <nz-select style="width: 100%;" nzShowSearch nzAllowClear placeholder="Chọn kì copy"
+              [(ngModel)]="kiKhaoSat.kicopy" (ngModelChange)="CopyKKS($event)">
+              <nz-option cdkScrollable *ngFor="let item of lstKKS.data" [nzLabel]="item.name" [nzValue]="item.code">
+              </nz-option>
+            </nz-select>
+
+
+          </div>
           <div nz-col [nzXs]="24">
             <div class="inner-box">
               <label>Nhập mô tả </label>
@@ -210,7 +209,7 @@
 <ng-template #extra>
   <nz-space>
     <ng-container *ngIf="edit">
-       
+
       <button [nzLoading]="loading" *nzSpaceItem nz-button nzType="primary" class="!flex !items-center"
         (click)="submitForm()">
         <span nz-icon nzType="save" nzTheme="outline"></span>Lưu
@@ -243,9 +242,11 @@
       <!-- Left Panel: Tree View -->
       <div class="left-panel w-1/3 pr-4">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="m-0" >Cây tiêu chí chấm điểm</h3>
+          <nz-page-header-title>Cây tiêu chí chấm điểm</nz-page-header-title>
           <button (click)="updateOrderTree()">Cập nhật vị trí</button>
+
         </div>
+        <nz-divider style="margin: 15px 0px;"></nz-divider>
         <nz-page-header-content class="main-content">
           <nz-tree #treeCom class="!pl-[10px] overflow-auto" [nzData]="treeData" nzDraggable nzBlockNode
             (nzOnDrop)="nzEvent($event)" [nzSearchValue]="searchValue" (nzExpandChange)="nzEvent($event)"
@@ -253,13 +254,13 @@
             [nzTreeTemplate]="nzTreeTemplate" [nzExpandedIcon]="multiExpandedIconTpl">
             <ng-template #nzTreeTemplate let-node class="flex-1">
 
-              <div class="flex justify-between pr-8 note_title" >
-                <div class="flex-1" (click)="onClick(node)">{{ node.title }}</div>
+              <div class="flex justify-between pr-8 note_title" (click)="onClick(node)">
+                <div class="flex-1">{{ node.title }}</div>
                 <div>
-                  <span nz-icon (click)="openModalTree(node)" nzType="plus-circle" nzTheme="twotone"></span>
-                  <span nz-icon (click)="openUpdateTree(node)" nzType="edit" nzTheme="outline"
+                  <span nz-icon (click)="openCreateTree(node)" nzType="plus-circle" nzTheme="twotone"></span>
+                  <span nz-icon (click)="openEditTree(node)" nzType="edit" nzTheme="outline"
                     style="margin: 0 5px;"></span>
-                  <span nz-icon (click)="openCreateChild(node)" nzType="delete" nzTheme="outline"></span>
+                  <span nz-icon (click)="openEditTree(node)" nzType="delete" nzTheme="outline"></span>
                 </div>
               </div>
             </ng-template>
@@ -300,9 +301,12 @@
               <td>{{ data.requiredImage ? 'Có' : 'Không' }}</td>
               <td nzAlign="center">
                 <div>
-                  <span nz-icon (click)="openUpdateLeaves(data)" nzType="edit" nzTheme="outline" 
+                  <span nz-icon (click)="openUpdateLeaves(data)" nzType="edit" nzTheme="outline"
                     style="margin: 0 5px; cursor: pointer;"></span>
-                  <span nz-icon nzType="delete" nzTheme="outline" style="cursor:pointer;"></span>
+                  <button nz-popconfirm nzPopconfirmTitle="Are you sure delete this task?"
+                    (nzOnConfirm)="updateLeaves()" nzPopconfirmPlacement="topRight" nz-button>
+                    <span nz-icon nzType="delete" nzTheme="outline" style="cursor:pointer;"></span>
+                  </button>
                 </div>
               </td>
             </tr>
@@ -316,14 +320,12 @@
 <!-- Create/Edit Form tiêu chí -->
 <nz-modal [(nzVisible)]="leavesVisible" [nzTitle]="edit ? 'Chỉnh sửa tiêu chí' : 'Thêm mới tiêu chí'"
   (nzOnCancel)="closeModal()" [nzWidth]="1400" [nzMask]="!edit" [nzFooter]="extra1"
-  [nzBodyStyle]="{height: '70vh', overflow: 'auto'}">
+  [nzBodyStyle]="{height: '70%', overflow: 'auto'}">
   <div nz-row [nzGutter]="16" *nzModalContent>
     <div nz-col [nzSpan]="12">
       <div class="inner-box" style="padding:5px 0px !important;">
         <label nzRequired class="block-label">Mã tiêu chí</label>
-
         <input nz-input [(ngModel)]="leavesNode.id" />
-
       </div>
     </div>
     <div nz-col [nzSpan]="12">
@@ -335,45 +337,33 @@
       </nz-form-item>
     </div>
 
-    <!-- Second Row: Order and Minimum Images -->
     <div nz-col [nzSpan]="12">
       <div class="inner-box" style="padding:5px 0px !important;">
         <label class="block-label">Số thứ tự</label>
-
         <input nz-input [(ngModel)]="leavesNode.orderNumber" type="number" />
-
       </div>
     </div>
     <div nz-col [nzSpan]="12">
       <div class="inner-box" style="padding:5px 0px;">
         <label class="block-label">Số ảnh tối thiểu</label>
-
         <input nz-input [(ngModel)]="leavesNode.numberImg" type="number" />
-
       </div>
     </div>
 
-    <!-- Third Row: Name -->
     <div nz-col [nzSpan]="24">
       <div class="inner-box" style="padding:5px 0px;">
         <label nzRequired class="block-label">Tên tiêu chí</label>
-
         <input nz-input [(ngModel)]="leavesNode.name" />
-
       </div>
     </div>
 
-    <!-- Fourth Row: Warning -->
     <div nz-col [nzSpan]="24">
       <div class="inner-box" style="padding:5px 0px;">
         <label class="block-label">Cảnh báo</label>
-
         <input nz-input [(ngModel)]="leavesNode.report" />
-
       </div>
     </div>
 
-    <!-- Fifth Row: Calculation Method -->
     <div nz-col [nzSpan]="24">
       <div class="inner-box flex ant-flex-justify-space-between" style="padding:10px 0px;">
         <label class="block-label" style="font-size: large; font-weight: 700;">Cách tính điểm</label>
@@ -394,15 +384,21 @@
             </thead>
             <tbody>
               <tr *ngFor="let row of calculationRows; let i = index">
-                <td>{{ i + 1 }}</td>
-                <td><input nz-input [(ngModel)]="row.moTa" placeholder="Nhập mô tả" /></td>
-                <td><input nz-input [(ngModel)]="row.diem" type="number" placeholder="Nhập điểm" />
-                </td>
-                <td>
-                  <button nz-button nzType="default" nzDanger (click)="removeCalculationRow(i)">
-                    <i nz-icon nzType="delete"></i>
-                  </button>
-                </td>
+                <ng-container *ngIf="row.isDeleted != true">
+
+                  <td>{{ i + 1 }}</td>
+                  <td><input nz-input [(ngModel)]="row.moTa" placeholder="Nhập mô tả" /></td>
+                  <td><input nz-input [(ngModel)]="row.diem" type="number" placeholder="Nhập điểm" />
+                  </td>
+                  <td>
+                    <button *ngIf="edit" nz-button nzType="default" nzDanger (click)="deleteCalculationRow(row, i)">
+                      <i nz-icon nzType="delete"></i>
+                    </button>
+                    <button nz-button *ngIf="!edit" nzType="default" nzDanger (click)="removeCalculationRow(i)">
+                      <i nz-icon nzType="delete"></i>
+                    </button>
+                  </td>
+                </ng-container>
               </tr>
             </tbody>
           </nz-table>
@@ -426,7 +422,6 @@
       </nz-form-item>
     </div> -->
   </div>
-  <!-- </form> -->
   <ng-template #extra1>
     <ng-container *ngIf="edit">
       <button [nzLoading]="loading" nz-button nzType="primary" (click)="updateLeaves()">
@@ -445,23 +440,23 @@
 
 <!-- /* Modal tree */ -->
 <nz-modal [(nzVisible)]="treeVisible" [nzTitle]="edit ? 'Chỉnh sửa cây tiêu chí' : 'Thêm mới cây tiêu chí'"
-  (nzOnCancel)="closeModal()" [nzFooter]="treeModalFooter" [nzWidth]="400"  [nzMask]="edit"
+  (nzOnCancel)="closeModal()" [nzFooter]="treeModalFooter" [nzWidth]="400" [nzMask]="edit"
   [nzBodyStyle]="{height: '20vh', overflow: 'auto'}">
   <!-- <form nz-form [formGroup]="validateForm" *nzModalContent> -->
   <ng-container *nzModalContent>
     <div class="modal-content">
       <div nz-row [nzGutter]="16">
         <div nz-col [nzSpan]="24">
+          <nz-form-label>Tên tiêu chí cha</nz-form-label>
           <nz-form-item>
-            <nz-form-label>Tên tiêu chí cha</nz-form-label>
             <nz-form-control>
               <input nz-input [(ngModel)]="tree.title" [readonly]="true" disabled />
             </nz-form-control>
           </nz-form-item>
         </div>
         <div nz-col [nzSpan]="24">
+          <nz-form-label>Tên tiêu chí con</nz-form-label>
           <nz-form-item>
-            <nz-form-label>Tên tiêu chí con</nz-form-label>
             <nz-form-control>
               <input nz-input [(ngModel)]="dataInsertTree.name" placeholder="Nhập tên tiêu chí con" />
             </nz-form-control>

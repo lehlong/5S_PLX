@@ -16,13 +16,18 @@ namespace PLX5S.BUSINESS.Dtos.BU
     public class TieuChiDto : IMapFrom, IDto
     {
         [Key]
+        public string? Code { get; set; }
+
         public string Id { get; set; }
+
         public string? Key { get; set; }
+
         public string Name { get; set; }
         
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         public bool Expanded { set; get; }
+
         public bool IsLeaf { set; get; }
 
         public string? PId { get; set; }
@@ -34,12 +39,14 @@ namespace PLX5S.BUSINESS.Dtos.BU
         public bool? IsGroup { get; set; }
         
         public bool? IsImg { get; set; }
+
         public bool? IsDeleted { get; set; }
 
         public decimal? NumberImg { get; set; }
 
         public string? Report { get; set; }
-        public bool ChiChtAtvsv { get; set; }
+
+        public bool? ChiChtAtvsv { get; set; }
 
         public List<TieuChiDto>? Children { set; get; }
         
