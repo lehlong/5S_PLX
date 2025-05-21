@@ -29,12 +29,13 @@ namespace PLX5S.BUSINESS.Dtos.BU
 
         public string? KiKhaoSatId { get; set; }
         
-        public int? OrderNumber { get; set; }
+        public decimal? OrderNumber { get; set; }
         
         public bool? IsGroup { get; set; }
         
         public bool? IsImg { get; set; }
-        
+        public bool? IsDeleted { get; set; }
+
         public decimal? NumberImg { get; set; }
 
         public string? Report { get; set; }
