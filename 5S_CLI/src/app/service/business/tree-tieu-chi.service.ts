@@ -22,21 +22,20 @@ export class TreeTieuChiService {
     return this.commonService.get(`TieuChi/GetLeaves?id=${param}`);
   }
 
-//   GetMenuWithTreeRight(param: any) {
-//     return this.commonService.get('TieuChi/GetMenuWithTreeRight', param);
-//   }
 
   UpdateLeaves(data: any) {
     return this.commonService.put('TieuChi/UpdateLeaves', data);
   }
-
-  // Insert(data: any): Observable<any> {
-  //   // return this.commonService.post('TieuChi/InsertTreeGroup', data);
-  //   return this.commonService.post('TieuChi/InsertTreeGroup', data);
-  // }
+  
+  UpdateTreeGroup(data: any) {
+    return this.commonService.put('TieuChi/UpdateTreeGroup', data);
+  }
 
   UpdateOrderTree(data: any) {
     return this.commonService.put('TieuChi/UpdateOrderTree', data);
+  }
+  UpdateOrderLeaves(data: any) {
+    return this.commonService.put('TieuChi/UpdateOrderLeaves', data);
   }
 
 //   Delete(id: string | number): Observable<any> {

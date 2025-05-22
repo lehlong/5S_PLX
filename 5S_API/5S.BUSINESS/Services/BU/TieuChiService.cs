@@ -21,8 +21,11 @@ namespace PLX5S.BUSINESS.Services.BU
         Task InsertTreeGroup(TblBuTieuChi data); 
         Task<List<TieuChiDto>> getLeaves(string id);
         Task InsertTreeLeaves(TieuChiDto data);
-        Task updateLeaves(TieuChiDto item); 
+        Task updateLeaves(TieuChiDto item);
+        Task updateTreeGroup(TieuChiDto item);
         Task UpdateOrderTree(TieuChiDto moduleDto);
+        Task UpdateOrderLeaves(List<TieuChiDto> lsrModule);
+
     }
 
     public class TieuChiService(AppDbContext dbContext, IMapper mapper) : GenericService<TblBuTieuChi, TieuChiDto>(dbContext, mapper), ITieuChiService
@@ -207,7 +210,32 @@ namespace PLX5S.BUSINESS.Services.BU
                 Status = false;
             }
         }
-
+        public async Task updateTreeGroup(TieuChiDto item)
+        {
+            try
+            {
+                _dbContext.TblBuTieuChi.Update(new TblBuTieuChi()
+                {
+                    Code = item.Code,
+                    Id = item.Id,
+                    PId = item.PId,
+                    Name = item.Name,
+                    IsImg = item.IsImg,
+                    Report = item.Report,
+                    IsGroup = item.IsGroup,
+                    NumberImg = item.NumberImg,
+                    KiKhaoSatId = item.KiKhaoSatId,
+                    OrderNumber = item.OrderNumber,
+                    IsDeleted = item.IsDeleted ?? false
+                });
+                
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Status = false;
+            }
+        }
         //public async Task<TieuChiDto> updateOrderTree()
         //{
         //    try
@@ -257,7 +285,27 @@ namespace PLX5S.BUSINESS.Services.BU
             }
         }
 
-
+        public async Task UpdateOrderLeaves(List<TieuChiDto> lsrModule)
+        {
+            try
+            {
+                var numberOrder = 1;
+                var lstModuleUpdate = new List<TblBuTieuChi>();
+                foreach (var item in lsrModule)
+                {
+                    var module = _mapper.Map<TblBuTieuChi>(item);
+                    module.OrderNumber = numberOrder++;
+                    lstModuleUpdate.Add(module);
+                }
+                _dbContext.TblBuTieuChi.UpdateRange(lstModuleUpdate);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Status = false;
+                Exception = ex;
+            }
+        }
 
         private static void ConvertNestedToList(TieuChiDto node, ref List<TieuChiDto> lstNodeFlat)
         {

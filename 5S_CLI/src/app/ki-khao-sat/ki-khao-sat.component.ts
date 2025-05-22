@@ -8,7 +8,7 @@ import { AccountService } from '../service/system-manager/account.service';
 import { GlobalService } from '../service/global.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { NzTreeComponent, NzFormatEmitEvent } from 'ng-zorro-antd/tree';
+import { NzTreeComponent, NzFormatEmitEvent, NzTreeNode } from 'ng-zorro-antd/tree';
 import { NzUploadChangeParam } from 'ng-zorro-antd/upload';
 import { TreeTieuChiService } from '../service/business/tree-tieu-chi.service';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
@@ -26,7 +26,8 @@ export class KiKhaoSatComponent {
   validateForm: FormGroup;
   isSubmit: boolean = false;
   visible: boolean = false;
-  treeVisible: boolean = false;
+  treeInsertVisible: boolean = false;
+  treeEditVisible: boolean = false;
   edit: boolean = false;
   EndDate: Date | null = null;
   drawerVisible = false;
@@ -58,6 +59,8 @@ export class KiKhaoSatComponent {
     kiKhaoSat : {},
     lstInputStore : []
   }
+  currentNode: NzTreeNode | undefined;
+  parentTitle: string | undefined;
 
   constructor(
     private _service: KiKhaoSatService,
@@ -206,12 +209,33 @@ export class KiKhaoSatComponent {
       },
     });
   }
-  openEditTree(node: any) {
-    this.close();
-    this.edit = true;
-    this.treeVisible = true;
-    this.dataInsertTree = node
-  }
+openEditTree(node: NzTreeNode): void {
+  this.treeEditVisible = true;
+  this.currentNode = node;
+  const parentNode = node.getParentNode();
+  this.parentTitle = parentNode ? parentNode.title : '(Không có tiêu chí cha)';
+  this.dataInsertTree = node.origin
+  console.log(node.origin);
+  
+}
+
+deleteTree(data:any): void {
+ data.origin.isDeleted = true;
+ console.log("object,", data.origin);
+  this._treeTieuChiService.UpdateTreeGroup(data.origin).subscribe({
+      next: (res) => {
+        this.treeEditVisible = false;
+        this.loading = false;
+        this.GetTreeTieuChi();
+      },
+      error: (err) => {
+        console.log("object", err)
+        this.loading = false;
+      }
+    });
+    console.log(data.origin);
+}
+
   addCalculationRow(): void {
     this.calculationRows.push({ id: "-1", tieuChiCode: this.leavesNode.id, moTa: '', diem: 0, isActive: true, isDeleted: false });
   }
@@ -250,13 +274,14 @@ export class KiKhaoSatComponent {
   }
 
   closeModal(): void {
-    this.treeVisible = false;
+    this.treeEditVisible = false;
+    this.treeInsertVisible = false;
       this.leavesNode = {
       Code: "-1",
     };
     this.calculationRows = []
-    this.resetForm();
     this.leavesVisible = false;
+    this.dataInsertTree.name = '';
   }
 GetTreeLeaves() {
     this._treeTieuChiService.GetTreeLeaves(this.treeId).subscribe({
@@ -272,6 +297,7 @@ GetTreeLeaves() {
 
   onClick(node: any) {
     if (node.origin.children == null) {
+      console.log(node.origin);
       this.treeId = node.origin.id;
       this.GetTreeLeaves();
     } else {
@@ -320,12 +346,12 @@ GetTreeLeaves() {
 
     console.log(this.leavesNode);
   }
-  openUpdateTree(data: any): void {
-    this.treeVisible = true;
-    this.edit = true;
-    this.treeData = data;
-    this.treeData.name = data.name;
-  }
+  // openUpdateTree(data: any): void {
+  //   this.treeVisible = true;
+  //   this.edit = true;
+  //   this.treeData = data;
+  //   this.treeData.name = data.name;
+  // }
 
 
   openCreateKi() {
@@ -436,7 +462,7 @@ GetTreeLeaves() {
 
   openCreateTree(data: any): void {
     this.edit = false
-    this.treeVisible = true;
+    this.treeInsertVisible = true;
     this.tree = data.origin;
     this.dataInsertTree.pId = this.tree.id;
     this.dataInsertTree.kiKhaoSatId = this.tree.kiKhaoSatId;
@@ -448,7 +474,7 @@ GetTreeLeaves() {
 
     this._treeTieuChiService.addTree(this.dataInsertTree).subscribe({
       next: (res) => {
-        this.treeVisible = false;
+        this.treeInsertVisible = false;
         this.loading = false;
         this.GetTreeTieuChi();
 
@@ -484,7 +510,6 @@ GetTreeLeaves() {
     const treeData = this.treeCom
       .getTreeNodes()
       .map((node) => this.mapNode(node))
-      console.log("11111",treeData[0])
 
       this._treeTieuChiService.UpdateOrderTree(treeData[0]).subscribe({
         next: (data) => {
@@ -528,6 +553,22 @@ GetTreeLeaves() {
       }
     });
   }
+  deleteLeaves(node:any): void {
+    this.edit = true;
+    this.leavesNode = node;
+    this.leavesNode.isDeleted = true
+    this._treeTieuChiService.UpdateLeaves(this.leavesNode).subscribe({
+      next: (res) => {
+        this.leavesVisible = false;
+        this.loading = false;
+        this.GetTreeLeaves();
+      },
+      error: (err) => {
+        console.log("object", err)
+        this.loading = false;
+      }
+    });
+  }
 
 
   insertTree(): void {
@@ -548,9 +589,35 @@ GetTreeLeaves() {
     this.closeModal();
   }
 
+  updateTreeGroup(data:any): void {
+    this.dataInsertTree = data;
+    console.log("object", data)
+    this._treeTieuChiService.UpdateTreeGroup(this.dataInsertTree).subscribe({
+      next: (res) => {
+        this.treeEditVisible = false;
+        this.loading = false;
+        this.GetTreeTieuChi();
+      },
+      error: (err) => {
+        this.loading = false;
+      },
+    }); 
+  }
+
+    updateOrderLeaves(data: any): void {
+      this.selectedNodeDetails = data
+      this._treeTieuChiService.UpdateOrderLeaves(data).subscribe({
+        next: (data) => {
+          this.GetTreeTieuChi()
+        },
+        error: (response) => {
+          console.log(response)
+        },
+      })
+  }
   drop(event: CdkDragDrop<any[]>): void {
     moveItemInArray(this.selectedNodeDetails, event.previousIndex, event.currentIndex);
-    // Có thể thêm logic lưu thứ tự vào backend nếu cần
-    console.log('New order:', this.selectedNodeDetails);
+    this.updateOrderLeaves(this.selectedNodeDetails);
+    
   }
 }
