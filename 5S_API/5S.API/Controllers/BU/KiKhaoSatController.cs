@@ -33,8 +33,26 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
-        
-        
+
+        [HttpGet("BuildObjCreate")]
+        public async Task<IActionResult> BuildObjCreate([FromQuery] string id)
+        {
+            var transferObject = new TransferObject();
+            var result = await _service.BuilObjCreate(id);
+            if (_service.Status)
+            {
+                transferObject.Data = result;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
+
+
         [HttpPost("Insert")]
         public async Task<IActionResult> Insert([FromBody] KiKhaoSatDto time)
         {
@@ -118,7 +136,8 @@ namespace PLX5S.API.Controllers.BU
         public async Task<IActionResult> GetAll([FromQuery] string kiKhaoSatId)
         {
             var transferObject = new TransferObject();
-            var result = await _service.Getchamdiem(kiKhaoSatId);
+            var result = '-';
+                //await _service.Getchamdiem(kiKhaoSatId);
             if (result != null)
             {
                 transferObject.Data = result;

@@ -14,15 +14,16 @@ namespace PLX5S.CORE.Entities.BU
         public string Id { get; set; }
 
         [Column("STORE_ID", TypeName = "NVARCHAR(50)")]
-        public string StoreId { get; set; }
+        public string InStoreId { get; set; }
 
         [Column("KI_KHAO_SAT_ID", TypeName = "NVARCHAR(50)")]
         public string KiKhaoSatId { get; set; }
 
         [Column("USER_NAME", TypeName = "NVARCHAR(50)")]
         public string UserName { get; set; }
-        [ForeignKey("StoreId")]
-        public virtual TblMdStore Store { get; set; }
+
+        //[ForeignKey("StoreId")]
+        //public virtual TblMdStore Store { get; set; }
 
 
     }

@@ -26,7 +26,7 @@ namespace PLX5S.BUSINESS.Dtos.BU
 
         [Description("header id")]
         public string SurveyMgmtId { get; set; }
-        public List<NguoiChamDiemlst> Chamdiemlst { get; set; }
+        public List<TblBuInputChamDiem> Chamdiemlst { get; set; }
         public bool? IsActive { get; set; }
         public string? kicopy { get; set; }
         public void Mapping(Profile profile)
@@ -34,22 +34,22 @@ namespace PLX5S.BUSINESS.Dtos.BU
             profile.CreateMap<TblBuKiKhaoSat, KiKhaoSatDto>().ReverseMap();
         }
     }
-   public class NguoiChamDiemlst
-    {
-        public string Id { get; set; }
-        public string storeId { get; set; }
-        public string SurveyMgmtId { get; set; }
-        public Storejs Store { get; set; }
-        public bool? IsDeleted { get; set; }
-        public DateTime? DeleteDate { get; set; }
-        public string? DeleteBy { get; set; }
-        public bool? IsActive { get; set; }
-        public string CreateBy { get; set; }
-        public string UpdateBy { get; set; }
-        public DateTime? CreateDate { get; set; }
-        public DateTime? UpdateDate { get; set; }
-        public List<string> NguoiChamDiem { get; set; }= new List<string>();
-    }
+   //public class NguoiChamDiemlst
+   // {
+   //     public string Id { get; set; }
+   //     public string storeId { get; set; }
+   //     public string SurveyMgmtId { get; set; }
+   //     public Storejs Store { get; set; }
+   //     public bool? IsDeleted { get; set; }
+   //     public DateTime? DeleteDate { get; set; }
+   //     public string? DeleteBy { get; set; }
+   //     public bool? IsActive { get; set; }
+   //     public string CreateBy { get; set; }
+   //     public string UpdateBy { get; set; }
+   //     public DateTime? CreateDate { get; set; }
+   //     public DateTime? UpdateDate { get; set; }
+   //     public List<string> NguoiChamDiem { get; set; }= new List<string>();
+   // }
 }
 
 public class Storejs

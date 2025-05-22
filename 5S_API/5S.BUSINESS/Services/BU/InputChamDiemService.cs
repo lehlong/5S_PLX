@@ -24,7 +24,7 @@ namespace Services.BU
                 var query = _dbContext.Set<TblBuInputChamDiem>().AsQueryable();
                 if (!string.IsNullOrWhiteSpace(filter.KeyWord))
                 {
-                    query = query.Where(x => x.StoreId.Contains(filter.KeyWord) || x.KiKhaoSatId.Contains(filter.KeyWord) || x.UserName.Contains(filter.KeyWord));
+                    query = query.Where(x => x.InStoreId.Contains(filter.KeyWord) || x.KiKhaoSatId.Contains(filter.KeyWord) || x.UserName.Contains(filter.KeyWord));
                 }
                 if (filter.IsActive.HasValue)
                 {

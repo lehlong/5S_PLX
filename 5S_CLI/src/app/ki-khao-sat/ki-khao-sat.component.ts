@@ -12,6 +12,7 @@ import { NzTreeComponent, NzFormatEmitEvent } from 'ng-zorro-antd/tree';
 import { NzUploadChangeParam } from 'ng-zorro-antd/upload';
 import { TreeTieuChiService } from '../service/business/tree-tieu-chi.service';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { log } from 'ng-zorro-antd/core/logger';
 @Component({
   selector: 'app-ki-khao-sat',
   imports: [ShareModule, RouterModule, DragDropModule],
@@ -53,6 +54,10 @@ export class KiKhaoSatComponent {
   dataInsertTree: any = {};
   treeId: any = '';
   lstKKS: any = [];
+  inputKi: any = {
+    kiKhaoSat : {},
+    lstInputStore : []
+  }
 
   constructor(
     private _service: KiKhaoSatService,
@@ -139,45 +144,52 @@ export class KiKhaoSatComponent {
       (accType: any) => accType.id === code
     );
   }
+
+  putNguoiChamDiem(){
+    console.log("hello");
+
+  }
+
   submitForm(): void {
+    console.log(this.inputKi);
 
-    this.kiKhaoSat.surveyMgmtId = this.headerId
-    this.kiKhaoSat.isActive = true
-    const { chamdiemlst, ...eventData } = this.kiKhaoSat;
+    // this.kiKhaoSat.surveyMgmtId = this.headerId
+    // this.kiKhaoSat.isActive = true
+    // const { chamdiemlst, ...eventData } = this.kiKhaoSat;
 
-    const payload = {
-      ...eventData,
-      Chamdiemlst: this.dataChamdiem
+    // const payload = {
+    //   ...eventData,
+    //   Chamdiemlst: this.dataChamdiem
 
-    };
-    console.log(payload)
+    // };
+    // console.log(payload)
 
-    this.isSubmit = true;
-    // if (this.validateForm.valid) {
+    // this.isSubmit = true;
+    // // if (this.validateForm.valid) {
 
-    if (this.edit) {
-      this._service.update(payload).subscribe({
-        next: (data) => {
-          this.search();
-        },
-        error: (response) => {
-          console.log(response);
-        },
-      });
-    } else {
-      console.log(this.dataChamdiem);
-      this._service.create(payload).subscribe({
-        next: (data) => {
-          this.search();
-          this.visible = false;
-        },
-        error: (response) => {
-          console.log(response);
-        },
-      });
-    }
+    // if (this.edit) {
+    //   this._service.update(payload).subscribe({
+    //     next: (data) => {
+    //       this.search();
+    //     },
+    //     error: (response) => {
+    //       console.log(response);
+    //     },
+    //   });
+    // } else {
+    //   console.log(this.dataChamdiem);
+    //   this._service.create(payload).subscribe({
+    //     next: (data) => {
+    //       this.search();
+    //       this.visible = false;
+    //     },
+    //     error: (response) => {
+    //       console.log(response);
+    //     },
+    //   });
+    // }
 
-    this.reset();
+    // this.reset();
   }
   CopyKKS(param: any) {
     this.kiKhaoSat.kicopy = param;
@@ -316,7 +328,16 @@ GetTreeLeaves() {
   }
 
 
-  openCreate() {
+  openCreateKi() {
+    this._service.buildObjCreate(this.headerId).subscribe({
+      next: (data) => {
+        this.inputKi = data
+        // this.search();
+      },
+      error: (response) => {
+        console.log(response);
+      },
+    });
     this.edit = false;
     this.visibleKiKhaoSat = true;
   }
@@ -430,7 +451,7 @@ GetTreeLeaves() {
         this.treeVisible = false;
         this.loading = false;
         this.GetTreeTieuChi();
-        
+
       },
       error: (err) => {
         this.loading = false;

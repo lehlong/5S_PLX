@@ -12,7 +12,7 @@
           <span nz-icon nzType="redo"></span>
         </button>
       </nz-space>
-      <button (click)="openCreate()" class="!flex !items-center space-btn" nzType="primary" nz-button>
+      <button (click)="openCreateKi()" class="!flex !items-center space-btn" nzType="primary" nz-button>
         <span nz-icon nzType="plus-circle"></span> Thêm mới
       </button>
     </div>
@@ -72,7 +72,7 @@
           <td></td>
 
           <td nzAlign="center">
-            <div nz-row [nzGutter]="1" >
+            <div nz-row [nzGutter]="1">
               <button class="!flex !items-center" nzType="default" nz-button (click)="openDrawer(data.code)">
                 <span nz-icon nzType="edit"></span>
               </button>
@@ -106,50 +106,50 @@
           <div nz-col [nzXs]="12">
             <div class="inner-box">
               <label>Mã</label>
-              <input nz-input placeholder="Nhập mã" [(ngModel)]="kiKhaoSat.code" type="text" />
+              <input nz-input placeholder="Nhập mã" [(ngModel)]="inputKi.kiKhaoSat.code" type="text" />
             </div>
           </div>
           <div nz-col [nzXs]="12">
             <div class="inner-box">
               <label>Nhập tên kì</label>
-              <input nz-input placeholder="Nhập tên" [(ngModel)]="kiKhaoSat.name" type="text" />
+              <input nz-input placeholder="Nhập tên" [(ngModel)]="inputKi.kiKhaoSat.name" type="text" />
             </div>
           </div>
           <div nz-col [nzXs]="12">
             <div class="inner-box">
               <label>Ngày bắt đầu</label>
-              <nz-date-picker nzShowTime nzFormat="yyyy-MM-dd HH:mm" [(ngModel)]="kiKhaoSat.startDate"
+              <nz-date-picker nzShowTime nzFormat="yyyy-MM-dd HH:mm" [(ngModel)]="inputKi.kiKhaoSat.startDate"
                 [nzPlaceHolder]="'Chọn ngày'" style="width: 100%;"></nz-date-picker>
             </div>
           </div>
           <div nz-col [nzXs]="12">
             <div class="inner-box">
               <label>Ngày kết thúc</label>
-              <nz-date-picker nzShowTime nzFormat="yyyy-MM-dd HH:mm" [(ngModel)]="kiKhaoSat.endDate"
+              <nz-date-picker nzShowTime nzFormat="yyyy-MM-dd HH:mm" [(ngModel)]="inputKi.kiKhaoSat.endDate"
                 [nzPlaceHolder]="'Chọn ngày'" style="width: 100%;"></nz-date-picker>
             </div>
           </div>
-          <div nz-col [nzXs]="12">
+          <!-- <div nz-col [nzXs]="12">
             <label>Kì copy</label>
             <nz-select style="width: 100%;" nzShowSearch nzAllowClear placeholder="Chọn kì copy"
               [(ngModel)]="kiKhaoSat.kicopy" (ngModelChange)="CopyKKS($event)">
-              <nz-option cdkScrollable *ngFor="let item of lstKKS.data" [nzLabel]="item.name" [nzValue]="item.code">
+              <nz-option cdkScrollable *ngFor="let item of lstKKS.data" [nzLabel]="inputKi.item.name"
+                [nzValue]="item.code">
               </nz-option>
             </nz-select>
+          </div> -->
 
-
-          </div>
           <div nz-col [nzXs]="24">
             <div class="inner-box">
               <label>Nhập mô tả </label>
-              <input nz-input placeholder="Nhập mô tả" [(ngModel)]="kiKhaoSat.des" type="text" />
+              <input nz-input placeholder="Nhập mô tả" [(ngModel)]="inputKi.kiKhaoSat.des" type="text" />
             </div>
           </div>
         </div>
       </nz-tab>
 
       <nz-tab nzTitle="Người chấm điểm">
-        <nz-table class="auto-scroll-table" #headerTable [nzData]="dataChamdiem" [nzFrontPagination]="false"
+        <nz-table class="auto-scroll-table" #headerTable [nzData]="inputKi.lstInputStore" [nzFrontPagination]="false"
           [nzScroll]="{ y: 'calc(100vh - 244px)' }">
           <thead>
             <tr>
@@ -173,27 +173,21 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let data of dataChamdiem; let i = index">
+            <tr *ngFor="let data of inputKi.lstInputStore; let i = index">
+              <td>{{(paginationResult.currentPage - 1) * paginationResult.pageSize + i + 1}}</td>
               <td>
-                {{
-                (paginationResult.currentPage - 1) * paginationResult.pageSize +
-                i +
-                1
-                }}
+                <a>{{ data.storeId }}</a>
               </td>
-              <td>
-                <a>{{ data.store.id }}</a>
-              </td>
-              <td nzAlign="center">{{ data.store.name }}</td>
-              <td nzAlign="center">{{ data.store.cuaHangTruong }}</td>
-              <td nzAlign="center">{{ data.store.nguoiPhuTrach }}</td>
+              <td nzAlign="center">{{ data.name }}</td>
+              <td nzAlign="center">{{ data.cuaHangTruong }}</td>
+              <td nzAlign="center">{{ data.nguoiPhuTrach }}</td>
               <td nzAlign="center">
-
                 <nz-select style="width: 100%;" [nzMaxTagCount]="3" [nzMaxTagPlaceholder]="tagPlaceHolder"
-                  nzMode="multiple" nzPlaceHolder="Please select" [(ngModel)]="data.nguoiChamDiem"
+                  nzMode="multiple" nzPlaceHolder="Please select" [(ngModel)]="data.lstChamDiem"
                   [ngModelOptions]="{standalone: true}">
                   <nz-option cdkScrollable *ngFor="let item of Account" [nzLabel]="item.fullName"
-                    [nzValue]="item.userName">
+                  [nzValue]="{id: ' ', userName : item.userName, inStoreId: data.StoreId, kiKhaoSatId: kiKhaoSatId}">
+                  <!-- [nzValue]="item.userName"> -->
                   </nz-option>
                 </nz-select>
               </td>
@@ -445,7 +439,7 @@
   <!-- <form nz-form [formGroup]="validateForm" *nzModalContent> -->
   <ng-container *nzModalContent>
     <div class="modal-content">
-      <div nz-row [nzGutter]="16" >
+      <div nz-row [nzGutter]="16">
         <div nz-col [nzSpan]="24">
           <nz-form-label>Tên tiêu chí cha</nz-form-label>
           <nz-form-item>
@@ -465,8 +459,8 @@
       </div>
     </div>
   </ng-container>
-  <ng-template #treeModalFooter >
-    <nz-space >
+  <ng-template #treeModalFooter>
+    <nz-space>
       <ng-container *ngIf="!edit">
         <button [nzLoading]="loading" *nzSpaceItem nz-button nzType="primary" class="!flex !items-center"
           (click)="submitFormTree()">

@@ -12,6 +12,9 @@ export class KiKhaoSatService {
     return this.commonService.get('KiKhaoSat/Search', params)
   }
 
+  buildObjCreate(params: any): Observable<any> {
+    return this.commonService.get(`KiKhaoSat/BuildObjCreate?id=${params}`)
+  }
   getAll(param:any): Observable<any> {
     return this.commonService.get(`KiKhaoSat/GetAll?kiKhaoSatId=${param}`)
   }

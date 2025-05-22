@@ -14,6 +14,7 @@ using static PLX5S.BUSINESS.Services.BU.KikhaosatService;
 using Microsoft.IdentityModel.Tokens;
 using DocumentFormat.OpenXml.Office.CustomUI;
 using DocumentFormat.OpenXml.Office2010.Excel;
+using PLX5S.BUSINESS.Models;
 
 namespace PLX5S.BUSINESS.Services.BU
 {
@@ -24,7 +25,8 @@ namespace PLX5S.BUSINESS.Services.BU
         //Task<byte[]> Export(BaseMdFilter filter);
         Task Insert(KiKhaoSatDto data);
         Task<List<TblBuInputStore>> GetallData(string headerId);
-        Task<List<TblBuInputChamDiem>> Getchamdiem(string kiKhaoSatId);
+        //Task<List<TblBuInputChamDiem>> Getchamdiem(string kiKhaoSatId);
+        Task<KiKhaoSatModel> BuilObjCreate(string surveyMgmtId);
         Task UpdateData(KiKhaoSatDto data);
         Task DeleteData(string id);
 
@@ -60,28 +62,76 @@ namespace PLX5S.BUSINESS.Services.BU
             public KiKhaoSatDto KhaoSat { get; set; }
             public List<TblBuInputChamDiem> ChamDiemList { get; set; }
         }
-        public async Task<List<TblBuInputChamDiem>> Getchamdiem(string kiKhaoSatId)
+
+        public async Task<KiKhaoSatModel> BuilObjCreate(string surveyMgmtId)
         {
-            try
+            var lstInStore = _dbContext.TblBuInputStore.Where(x => x.IsActive == true && x.SurveyMgmtId == surveyMgmtId).ToList();
+            
+            var kiKhaoSatModel = new KiKhaoSatModel();
+
+            var lstInputStore = new List<InputStore>();
+
+            foreach (var item in lstInStore)
             {
-                var chamDiemList = await _dbContext.TblBuInputChamDiem
-                     .Include(x => x.Store)
-                    .Where(x => x.KiKhaoSatId == kiKhaoSatId)
-                     .ToListAsync();
+                var store = _dbContext.tblMdStore.Where(x => x.Id == item.StoreId).FirstOrDefault();
+                var inStore = new InputStore()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    PhoneNumber = store.PhoneNumber,
+                    Name = store.Name,
+                    CuaHangTruong = store.CuaHangTruong,
+                    NguoiPhuTrach = store.NguoiPhuTrach,
+                    ViDo = store.ViDo,
+                    KinhDo = store.KinhDo,
+                    TrangThaiCuaHang = store.TrangThaiCuaHang,
+                    StoreId = store.Id,
+                    SurveyMgmtId = surveyMgmtId,
+                };
 
 
 
-                var chamDiemDtoList = _mapper.Map<List<TblBuInputChamDiem>>(chamDiemList);
+                lstInputStore.Add(inStore);
 
-                return chamDiemDtoList;
             }
-            catch (Exception ex)
+            return new KiKhaoSatModel()
             {
-                Status = false;
-                Exception = ex;
-                return null;
-            }
+                KiKhaoSat = new TblBuKiKhaoSat()
+                {
+                    Code = "",
+                    Name = "",
+                    Des = "",
+                    StartDate = new DateTime(),
+                    EndDate = new DateTime(),
+                    SurveyMgmtId = surveyMgmtId,
+                    IsActive = true
+                },
+                lstInputStore = lstInputStore,
+            };
+
         }
+
+        //public async Task<List<TblBuInputChamDiem>> Getchamdiem(string kiKhaoSatId)
+        //{
+        //    try
+        //    {
+        //        var chamDiemList = await _dbContext.TblBuInputChamDiem
+        //             .Include(x => x.Store)
+        //            .Where(x => x.KiKhaoSatId == kiKhaoSatId)
+        //             .ToListAsync();
+
+
+
+        //        var chamDiemDtoList = _mapper.Map<List<TblBuInputChamDiem>>(chamDiemList);
+
+        //        return chamDiemDtoList;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Status = false;
+        //        Exception = ex;
+        //        return null;
+        //    }
+        //}
 
 
         public async Task Insert(KiKhaoSatDto data)
@@ -186,23 +236,23 @@ namespace PLX5S.BUSINESS.Services.BU
 
                     };
                 var lstChamDiem = new List<TblBuInputChamDiem>();
-                foreach (var item in data.Chamdiemlst)
-                {
-                    foreach (var i in item.NguoiChamDiem)
-                    {
-                        var chamdiem = new TblBuInputChamDiem()
-                        {
-                            Id = Guid.NewGuid().ToString(),
-                            StoreId = item.storeId,
-                            KiKhaoSatId = data.Code,
-                            UserName = i,
-                            IsActive = true,
-                            IsDeleted=false,
-                        };
-                        lstChamDiem.Add(chamdiem);
-                    }
+                //foreach (var item in data.Chamdiemlst)
+                //{
+                //    foreach (var i in item.NguoiChamDiem)
+                //    {
+                //        var chamdiem = new TblBuInputChamDiem()
+                //        {
+                //            Id = Guid.NewGuid().ToString(),
+                //            StoreId = item.storeId,
+                //            KiKhaoSatId = data.Code,
+                //            UserName = i,
+                //            IsActive = true,
+                //            IsDeleted=false,
+                //        };
+                //        lstChamDiem.Add(chamdiem);
+                //    }
                    
-                }
+                //}
                 _dbContext.TblBuInputChamDiem.AddRange(lstChamDiem);
 
                 _dbContext.TblBuKiKhaoSat.Add(khaosatdata);
@@ -289,20 +339,20 @@ namespace PLX5S.BUSINESS.Services.BU
                 
                 foreach (var item in data.Chamdiemlst)
                 {
-                    foreach (var i in item.NguoiChamDiem)
-                    {
-                        var chamdiem = new TblBuInputChamDiem()
-                        {
-                            Id = Guid.NewGuid().ToString(),
-                            StoreId = item.storeId,
-                            KiKhaoSatId = data.Code,
-                            UserName = i,
-                            IsActive = true,
-                            IsDeleted=false
-                        };
-                        lstChamDiem.Add(chamdiem);
+                    //foreach (var i in item.NguoiChamDiem)
+                    //{
+                    //    var chamdiem = new TblBuInputChamDiem()
+                    //    {
+                    //        Id = Guid.NewGuid().ToString(),
+                    //        StoreId = item.storeId,
+                    //        KiKhaoSatId = data.Code,
+                    //        UserName = i,
+                    //        IsActive = true,
+                    //        IsDeleted=false
+                    //    };
+                    //    lstChamDiem.Add(chamdiem);
 
-                    }
+                    //}
 
                 }
                 
