@@ -9,6 +9,9 @@ namespace PLX5S.BUSINESS.Dtos.BU
 {
     public class KiKhaoSatDto : IMapFrom, IDto
     {
+        [Description("Khóa chính")]
+        public string Id { get; set; }
+
         [Description("Mã kỳ khảo sát")]
         public string Code { get; set; }
 

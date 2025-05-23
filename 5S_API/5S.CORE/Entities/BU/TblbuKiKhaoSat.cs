@@ -8,8 +8,10 @@ namespace PLX5S.CORE.Entities.BU
     [Table("T_BU_KI_KHAO_SAT")]
     public class TblBuKiKhaoSat:SoftDeleteEntity
     {
-        [Key]   
-        
+        [Key]
+        [Column("ID", TypeName = "NVARCHAR(50)")]
+        public string Id { get; set; }
+
         [Column("CODE", TypeName = "NVARCHAR(50)")]
         public string Code { get; set; }
 

@@ -21,8 +21,6 @@ import { Router } from '@angular/router'
   styleUrl: './survey-mgmt.component.scss',
 })
 export class SurveyMgmtComponent {
-  [x: string]: any
-  validateForm: FormGroup
   isSubmit: boolean = false
   visible: boolean = false
   edit: boolean = false
@@ -56,13 +54,6 @@ export class SurveyMgmtComponent {
     private globalService: GlobalService,
     private message: NzMessageService,
   ) {
-    this.validateForm = this.fb.group({
-      id: [''],
-      name: ['', [Validators.required]],
-      doiTuongCode: ["DT1", [Validators.required]],
-      moTa: ['', [Validators.required]],
-      isActive: [true, [Validators.required]],
-    })
     this.globalService.setBreadcrumb([
       {
         name: 'Danh sách khảo sát',
@@ -210,7 +201,6 @@ export class SurveyMgmtComponent {
   }
 
   resetForm() {
-    this.validateForm.reset()
     this.isSubmit = false
   }
 

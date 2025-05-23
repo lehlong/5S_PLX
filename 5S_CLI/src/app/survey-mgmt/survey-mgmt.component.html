@@ -1,5 +1,5 @@
 <nz-page-header nzBackIcon>
-  <nz-page-header-title>QUẢN LÝ KHẢO SÁT</nz-page-header-title>
+  <nz-page-header-title>Quản Lý Cuộc Khảo Sát</nz-page-header-title>
   <nz-page-header-extra>
     <div class="flex-grow-2 flex">
       <nz-space>
@@ -25,22 +25,22 @@
         <tr>
           <th nzWidth="60px">STT</th>
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('id', $event)">
-            Mã
+            MÃ
           </th>
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('name', $event)">
-            Tên
+            TÊN
           </th>
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('name', $event)">
-            Mô tả
+            MÔ TẢ
           </th>
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('name', $event)">
-            Đối tượng chấm diểm
+            ĐỐI TƯỢNG CHẤM ĐIỂM
           </th>
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('name', $event)">
-            Thời gian gần nhất
+            THỜI GIAN GẦN NHẤT
           </th>
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('isActive', $event)" nzAlign="center">
-            Thao Tác
+            THAO TÁC
           </th>
         </tr>
       </thead>
@@ -83,7 +83,7 @@
 
 <!--Create Update-->
 <nz-drawer [nzMask]="!edit" nzWidth="60%" nzSize="default" [nzVisible]="visible" nzPlacement="right"
-  [nzTitle]="edit ? ' Chỉnh sửa  ' : ' Tạo mới  '" [nzExtra]="extra" (nzOnClose)="close()">
+  [nzTitle]="edit ? ' CHỈNH SỬA CUỘC KHẢO SÁT  ' : ' THÊM MỚI CUỘC KHẢO SÁT '" [nzExtra]="extra" (nzOnClose)="close()">
   <ng-container *nzDrawerContent>
     <div nz-row [nzGutter]="12">
       <div nz-col [nzXs]="24" [nzMd]="12">
@@ -98,14 +98,14 @@
           <input nz-input placeholder="Nhập tên" [(ngModel)]="dataInput.surveyMgmt.name" type="text" />
         </div>
       </div>
-      <div nz-col [nzXs]="24" [nzMd]="12">
+      <div nz-col [nzXs]="24" [nzMd]="12" style="margin-top: 10px;">
         <div class="inner-box">
-          <label>Mô tả</label>
+          <label>Mô Tả</label>
           <input nz-input placeholder="Nhập mô tả" [(ngModel)]="dataInput.surveyMgmt.moTa" type="text" />
         </div>
       </div>
-      <div nz-col [nzXs]="24" [nzMd]="12">
-        <label>Đối tượng áp dụng</label>
+      <div nz-col [nzXs]="24" [nzMd]="12" style="margin-top: 10px;">
+        <label>Đối Tượng Áp Dụng</label>
         <nz-form-item>
           <nz-form-control nzErrorTip="Không được để trống">
             <nz-select nzShowSearch nzAllowClear placeholder="Chọn Đối tượng"

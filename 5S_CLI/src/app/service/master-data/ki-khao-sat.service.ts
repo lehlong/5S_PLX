@@ -15,6 +15,16 @@ export class KiKhaoSatService {
   buildObjCreate(params: any): Observable<any> {
     return this.commonService.get(`KiKhaoSat/BuildObjCreate?id=${params}`)
   }
+
+  create(params: any): Observable<any> {
+    return this.commonService.post('KiKhaoSat/Insert', params)
+  }
+
+
+  getInputKiKhaoSat(params: any): Observable<any> {
+    return this.commonService.get(`KiKhaoSat/GetInputKiKhaoSat?idKi=${params}`)
+  }
+
   getAll(param:any): Observable<any> {
     return this.commonService.get(`KiKhaoSat/GetAll?kiKhaoSatId=${param}`)
   }
@@ -22,11 +32,7 @@ export class KiKhaoSatService {
     return this.commonService.get(`KiKhaoSat/GetAllData?headerId=${param}`)
   }
 
-  create(params: any): Observable<any> {
-    return this.commonService.post('KiKhaoSat/Insert', params)
-  }
-
-  update(params: any): Observable<any> {
+  updateKiKhaoSat(params: any): Observable<any> {
     return this.commonService.put('KiKhaoSat/Update', params)
   }
 

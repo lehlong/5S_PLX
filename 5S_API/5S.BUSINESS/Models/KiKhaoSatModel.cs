@@ -11,6 +11,7 @@ namespace PLX5S.BUSINESS.Models
     {
         public TblBuKiKhaoSat KiKhaoSat { set; get; } = new TblBuKiKhaoSat();
         public List<InputStore> lstInputStore { set; get; } = new List<InputStore>();
+
     }
 
     public class InputStore
@@ -25,6 +26,7 @@ namespace PLX5S.BUSINESS.Models
         public bool TrangThaiCuaHang { get; set; }
         public string StoreId { get; set; }
         public string SurveyMgmtId { get; set; }
-        public List<TblBuInputChamDiem>? LstChamDiem { set; get; } = new List<TblBuInputChamDiem>();
+        public List<string>? LstChamDiem { set; get; } = new List<string>();
+        public List<TblBuInputChamDiem>? LstInChamDiem { set; get; } = new List<TblBuInputChamDiem>();
     }
 }

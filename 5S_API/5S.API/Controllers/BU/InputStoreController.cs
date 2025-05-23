@@ -53,6 +53,7 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
+
         [HttpPut("Update")]
         public async Task<IActionResult> Update([FromBody] InputStoreDto time)
         {
@@ -72,6 +73,7 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
+
         [HttpDelete("Delete/{id}")]
         public async Task<IActionResult> Delete([FromRoute] string id)
         {

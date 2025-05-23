@@ -23,7 +23,6 @@ import { log } from 'ng-zorro-antd/core/logger';
 export class KiKhaoSatComponent {
   @ViewChild('treeCom', { static: false }) treeCom!: NzTreeComponent;
 
-  validateForm: FormGroup;
   isSubmit: boolean = false;
   visible: boolean = false;
   treeInsertVisible: boolean = false;
@@ -55,9 +54,10 @@ export class KiKhaoSatComponent {
   dataInsertTree: any = {};
   treeId: any = '';
   lstKKS: any = [];
+  lstChamDiem: any = [];
   inputKi: any = {
-    kiKhaoSat : {},
-    lstInputStore : []
+    kiKhaoSat: {},
+    lstInputStore: [],
   }
   currentNode: NzTreeNode | undefined;
   parentTitle: string | undefined;
@@ -73,19 +73,9 @@ export class KiKhaoSatComponent {
     private message: NzMessageService,
     private accountService: AccountService
   ) {
-    this.validateForm = this.fb.group({
-      Code: [''],
-      Name: ['', [Validators.required]],
-      Des: ['', [Validators.required]],
-      StartDate: ['', [Validators.required]],
-      EndDate: ['', [Validators.required]],
-      isActive: [true, [Validators.required]],
-      SurveyMgmtId: [this.headerId],
-      // NguoichamDiem: [[], [Validators.required]],
-    });
     this.globalService.setBreadcrumb([
       {
-        name: 'Danh sách kì khảo sát',
+        name: 'KỲ CHẤM ĐIỂM',
         path: 'master-data/account-type',
       },
     ]);
@@ -148,51 +138,44 @@ export class KiKhaoSatComponent {
     );
   }
 
-  putNguoiChamDiem(){
-    console.log("hello");
+  onChangeChamDiem(userNames: string[], store: any) {
+    this.inputKi.lstInputStore.forEach((i: any) => {
+      if (i.storeId == store.storeId) {
+        this.inputKi.lstInputStore.lstChamDiem.push({
+          id: '',
+          userName: i,
+          inStoreId: store.storeId,
+          kiKhaoSatId: this.kiKhaoSatId,
+        })
+      }
+    });
 
+  }
+
+  onUpdateKiKhaoSat() {
+    this._service.updateKiKhaoSat(this.inputKi).subscribe({
+      next: (data) => {
+        this.search();
+        this.visible = false;
+      },
+      error: (response) => {
+        console.log(response);
+      },
+    });
   }
 
   submitForm(): void {
     console.log(this.inputKi);
 
-    // this.kiKhaoSat.surveyMgmtId = this.headerId
-    // this.kiKhaoSat.isActive = true
-    // const { chamdiemlst, ...eventData } = this.kiKhaoSat;
-
-    // const payload = {
-    //   ...eventData,
-    //   Chamdiemlst: this.dataChamdiem
-
-    // };
-    // console.log(payload)
-
-    // this.isSubmit = true;
-    // // if (this.validateForm.valid) {
-
-    // if (this.edit) {
-    //   this._service.update(payload).subscribe({
-    //     next: (data) => {
-    //       this.search();
-    //     },
-    //     error: (response) => {
-    //       console.log(response);
-    //     },
-    //   });
-    // } else {
-    //   console.log(this.dataChamdiem);
-    //   this._service.create(payload).subscribe({
-    //     next: (data) => {
-    //       this.search();
-    //       this.visible = false;
-    //     },
-    //     error: (response) => {
-    //       console.log(response);
-    //     },
-    //   });
-    // }
-
-    // this.reset();
+    this._service.create(this.inputKi).subscribe({
+      next: (data) => {
+        this.search();
+        this.visible = false;
+      },
+      error: (response) => {
+        console.log(response);
+      },
+    });
   }
   CopyKKS(param: any) {
     this.kiKhaoSat.kicopy = param;
@@ -209,20 +192,20 @@ export class KiKhaoSatComponent {
       },
     });
   }
-openEditTree(node: NzTreeNode): void {
-  this.treeEditVisible = true;
-  this.currentNode = node;
-  const parentNode = node.getParentNode();
-  this.parentTitle = parentNode ? parentNode.title : '(Không có tiêu chí cha)';
-  this.dataInsertTree = node.origin
-  console.log(node.origin);
-  
-}
+  openEditTree(node: NzTreeNode): void {
+    this.treeEditVisible = true;
+    this.currentNode = node;
+    const parentNode = node.getParentNode();
+    this.parentTitle = parentNode ? parentNode.title : '(Không có tiêu chí cha)';
+    this.dataInsertTree = node.origin
+    console.log(node.origin);
 
-deleteTree(data:any): void {
- data.origin.isDeleted = true;
- console.log("object,", data.origin);
-  this._treeTieuChiService.UpdateTreeGroup(data.origin).subscribe({
+  }
+
+  deleteTree(data: any): void {
+    data.origin.isDeleted = true;
+    console.log("object,", data.origin);
+    this._treeTieuChiService.UpdateTreeGroup(data.origin).subscribe({
       next: (res) => {
         this.treeEditVisible = false;
         this.loading = false;
@@ -234,7 +217,7 @@ deleteTree(data:any): void {
       }
     });
     console.log(data.origin);
-}
+  }
 
   addCalculationRow(): void {
     this.calculationRows.push({ id: "-1", tieuChiCode: this.leavesNode.id, moTa: '', diem: 0, isActive: true, isDeleted: false });
@@ -276,24 +259,24 @@ deleteTree(data:any): void {
   closeModal(): void {
     this.treeEditVisible = false;
     this.treeInsertVisible = false;
-      this.leavesNode = {
+    this.leavesNode = {
       Code: "-1",
     };
     this.calculationRows = []
     this.leavesVisible = false;
     this.dataInsertTree.name = '';
   }
-GetTreeLeaves() {
+  GetTreeLeaves() {
     this._treeTieuChiService.GetTreeLeaves(this.treeId).subscribe({
-        next: (data) => {
-          this.selectedNodeDetails = data.result;
-        },
+      next: (data) => {
+        this.selectedNodeDetails = data.result;
+      },
 
-        error: (response) => {
-          console.log(response);
-        },
-      });
-    }
+      error: (response) => {
+        console.log(response);
+      },
+    });
+  }
 
   onClick(node: any) {
     if (node.origin.children == null) {
@@ -325,17 +308,13 @@ GetTreeLeaves() {
     });
   }
 
-  // openCreateModal(data:any): void {
-  //   this.edit = false;
-  //   this.visible = true;
-  //   this.treeNode = data;
-  // }
 
   openCreLeaves(data: any): void {
     this.edit = false;
     this.leavesVisible = true;
     this.leavesNode.pId = this.treeId;
   }
+
   openUpdateLeaves(data: any): void {
     this.leavesNode = data;
     this.edit = true;
@@ -346,13 +325,6 @@ GetTreeLeaves() {
 
     console.log(this.leavesNode);
   }
-  // openUpdateTree(data: any): void {
-  //   this.treeVisible = true;
-  //   this.edit = true;
-  //   this.treeData = data;
-  //   this.treeData.name = data.name;
-  // }
-
 
   openCreateKi() {
     this._service.buildObjCreate(this.headerId).subscribe({
@@ -369,7 +341,6 @@ GetTreeLeaves() {
   }
 
   resetForm() {
-    this.validateForm.reset();
     this.isSubmit = false;
   }
 
@@ -391,12 +362,15 @@ GetTreeLeaves() {
   onDragStart(event: any) { }
 
   openEditKyKhaoSat(data: any) {
+    console.log(data);
 
-    this.Getdataki(data.code)
-    this.kiKhaoSat = data
+    this._service.getInputKiKhaoSat(data.id).subscribe({
+      next: (data) => {
+        this.inputKi = data
 
+      }
+    })
     console.log(this.kiKhaoSat)
-
     setTimeout(() => {
       this.edit = true;
       this.visibleKiKhaoSat = true;
@@ -415,28 +389,7 @@ GetTreeLeaves() {
       this.treeData = [res];
     });
   }
-  Getdataki(code: string) {
-    this._service.getAll(code).subscribe({
-      next: (data) => {
-        console.log('dataki', data);
-        this.DataKS = data;
-        this.dataChamdiem = this.dataChamdiem.map((item: any) => {
-          const nguoiChamDiemArr = this.DataKS
-            .filter((x: any) => x.storeId === item.store.id)
-            .map((x: any) => x.userName);
-          return {
-            ...item,
-            nguoiChamDiem: nguoiChamDiemArr
-          };
-        });
-        console.log('listcd', this.dataChamdiem)
 
-      },
-      error: (response) => {
-        console.log(response);
-      },
-    });
-  }
   pageSizeChange(size: number): void {
     this.filter.currentPage = 1;
     this.filter.pageSize = size;
@@ -483,7 +436,7 @@ GetTreeLeaves() {
         this.loading = false;
       },
     });
-    this.dataInsertTree.name= '';
+    this.dataInsertTree.name = '';
   }
 
   isValid(): boolean {
@@ -491,34 +444,20 @@ GetTreeLeaves() {
   }
 
 
-  // updateOrderTree(): void {
-  //   this._treeTieuChiService.UpdateOrderTree(this.treeData).subscribe({
-  //     next: (res) => {
-  //       this.treeData = res;
-  //       this.loading = false;
-  //       this.GetTreeTieuChi();
-  //     },
-  //     error: (err) => {
-  //       this.loading = false;
-  //     },
-  //   });
-  //   console.log("object", this.treeData)
-  // }
-
 
   updateOrderTree() {
     const treeData = this.treeCom
       .getTreeNodes()
       .map((node) => this.mapNode(node))
 
-      this._treeTieuChiService.UpdateOrderTree(treeData[0]).subscribe({
-        next: (data) => {
-          this.GetTreeTieuChi()
-        },
-        error: (response) => {
-          console.log(response)
-        },
-      })
+    this._treeTieuChiService.UpdateOrderTree(treeData[0]).subscribe({
+      next: (data) => {
+        this.GetTreeTieuChi()
+      },
+      error: (response) => {
+        console.log(response)
+      },
+    })
   }
 
   private mapNode(node: any): any {
@@ -553,7 +492,7 @@ GetTreeLeaves() {
       }
     });
   }
-  deleteLeaves(node:any): void {
+  deleteLeaves(node: any): void {
     this.edit = true;
     this.leavesNode = node;
     this.leavesNode.isDeleted = true
@@ -589,7 +528,7 @@ GetTreeLeaves() {
     this.closeModal();
   }
 
-  updateTreeGroup(data:any): void {
+  updateTreeGroup(data: any): void {
     this.dataInsertTree = data;
     console.log("object", data)
     this._treeTieuChiService.UpdateTreeGroup(this.dataInsertTree).subscribe({
@@ -601,23 +540,23 @@ GetTreeLeaves() {
       error: (err) => {
         this.loading = false;
       },
-    }); 
+    });
   }
 
-    updateOrderLeaves(data: any): void {
-      this.selectedNodeDetails = data
-      this._treeTieuChiService.UpdateOrderLeaves(data).subscribe({
-        next: (data) => {
-          this.GetTreeTieuChi()
-        },
-        error: (response) => {
-          console.log(response)
-        },
-      })
+  updateOrderLeaves(data: any): void {
+    this.selectedNodeDetails = data
+    this._treeTieuChiService.UpdateOrderLeaves(data).subscribe({
+      next: (data) => {
+        this.GetTreeTieuChi()
+      },
+      error: (response) => {
+        console.log(response)
+      },
+    })
   }
   drop(event: CdkDragDrop<any[]>): void {
     moveItemInArray(this.selectedNodeDetails, event.previousIndex, event.currentIndex);
     this.updateOrderLeaves(this.selectedNodeDetails);
-    
+
   }
 }

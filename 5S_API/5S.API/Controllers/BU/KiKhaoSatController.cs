@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PLX5S.CORE.Entities.BU;
 using NPOI.SS.Formula.Functions;
+using PLX5S.BUSINESS.Models;
 
 namespace PLX5S.API.Controllers.BU
 {
@@ -53,8 +54,28 @@ namespace PLX5S.API.Controllers.BU
         }
 
 
+        [HttpGet("GetInputKiKhaoSat")]
+        public async Task<IActionResult> GetInputKiKhaoSat([FromQuery] string idKi)
+        {
+            var transferObject = new TransferObject();
+            var result = await _service.GetInput(idKi);
+            if (_service.Status)
+            {
+                transferObject.Data = result;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
+
+
+
         [HttpPost("Insert")]
-        public async Task<IActionResult> Insert([FromBody] KiKhaoSatDto time)
+        public async Task<IActionResult> Insert([FromBody] KiKhaoSatModel time)
         {
             var transferObject = new TransferObject();
 
@@ -75,10 +96,10 @@ namespace PLX5S.API.Controllers.BU
             return Ok(transferObject);
         }
         [HttpPut("Update")]
-        public async Task<IActionResult> Update([FromBody] KiKhaoSatDto time)
+        public async Task<IActionResult> Update([FromBody] KiKhaoSatModel time)
         {
             var transferObject = new TransferObject();
-            await _service.UpdateData(time);
+            await _service.UpdateDataInput(time);
             if (_service.Status)
             {
                 transferObject.Status = true;
@@ -112,6 +133,7 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
+
         [HttpGet("GetAllData")]
         public async Task<IActionResult> GetAllData([FromQuery] string headerId)
         {
@@ -132,6 +154,7 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
+
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll([FromQuery] string kiKhaoSatId)
         {
