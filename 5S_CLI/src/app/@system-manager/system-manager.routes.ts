@@ -13,5 +13,5 @@ export const systemManagerRoutes: Routes = [
   { path: 'menu', component: MenuComponent },
   { path: 'profile', component: ProfileIndexComponent },
   { path: 'action-log', component: ActionLogComponent },
-  { path: 'organization', component: OrganizeComponent },
+  { path: 'organize', component: OrganizeComponent },
 ]

@@ -1,4 +1,4 @@
-<nz-layout>
+<!-- <nz-layout>
     <nz-sider nzCollapsible [(nzCollapsed)]="isCollapsed" [nzTrigger]="null" [nzWidth]="'240px'">
         <div class="logo"></div>
         <ul nz-menu nzTheme="light" nzMode="inline">
@@ -62,4 +62,78 @@
             </div>
         </nz-content>
     </nz-layout>
+</nz-layout> -->
+
+<nz-layout>
+  <nz-header>
+    <div class="logo">
+      <img src="img/logo.png" alt="Logo" />
+    </div>
+    <div [routerLink]="'/'"><nz-icon nzType="home" nzTheme="outline" /> Trang chủ </div>
+
+    <div nz-dropdown [nzDropdownMenu]="setting">
+      <nz-icon nzType="setting" />
+      Quản trị hệ thống
+      <nz-icon nzType="down" />
+    </div>
+    <nz-dropdown-menu #setting="nzDropdownMenu">
+      <ul nz-menu nzSelectable>
+        <li nz-menu-item [routerLink]="'system-manager/organize'">Cấu trúc tổ chức</li>
+        <li nz-menu-item>Danh sách quyền</li>
+        <li nz-menu-item>Nhóm người dùng</li>
+        <li nz-menu-item>Danh sách người dùng</li>
+      </ul>
+    </nz-dropdown-menu>
+
+    <div nz-dropdown [nzDropdownMenu]="masterdata">
+      <nz-icon nzType="unordered-list" nzTheme="outline" />
+      Danh mục
+      <nz-icon nzType="down" />
+    </div>
+    <nz-dropdown-menu #masterdata="nzDropdownMenu">
+      <ul nz-menu nzSelectable>
+        <li nz-menu-item>1st menu item</li>
+        <li nz-menu-item>2nd menu item</li>
+      </ul>
+    </nz-dropdown-menu>
+
+    <div><nz-icon nzType="container" nzTheme="outline" /> Quản lý khảo sát </div>
+
+    <div><nz-icon nzType="form" nzTheme="outline" /> Quản lý tin tức </div>
+
+    <div nz-dropdown [nzDropdownMenu]="report">
+      <nz-icon nzType="pie-chart" nzTheme="outline" />
+      Báo cáo
+      <nz-icon nzType="down" />
+    </div>
+    <nz-dropdown-menu #report="nzDropdownMenu">
+      <ul nz-menu nzSelectable>
+        <li nz-menu-item>1st menu item</li>
+        <li nz-menu-item>2nd menu item</li>
+      </ul>
+    </nz-dropdown-menu>
+
+    <div nz-dropdown [nzDropdownMenu]="dropdownUser" class="user">
+      <div class="circle">
+        <img [src]="userAvatar" alt="Avatar User">
+      </div>
+      <div class="full-name">{{user.fullName}}</div>
+    </div>
+    <nz-dropdown-menu #dropdownUser="nzDropdownMenu">
+      <ul nz-menu nzSelectable>
+        <li nz-menu-item (click)="changePass()"><nz-icon nzType="lock" nzTheme="outline" /> Đổi mật khẩu</li>
+        <li nz-menu-item (click)="logOut()"><nz-icon nzType="login" nzTheme="outline" /> Đăng xuất</li>
+      </ul>
+    </nz-dropdown-menu>
+
+  </nz-header>
+  <nz-content>
+    <nz-content>
+      <div class="inner-content">
+        <nz-spin [nzSpinning]="loading">
+          <router-outlet></router-outlet>
+        </nz-spin>
+      </div>
+    </nz-content>
+  </nz-content>
 </nz-layout>
