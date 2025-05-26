@@ -1,4 +1,5 @@
-﻿using PLX5S.CORE.Entities.BU;
+﻿using PLX5S.BUSINESS.Dtos.BU;
+using PLX5S.CORE.Entities.BU;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,12 @@ using System.Threading.Tasks;
 
 namespace PLX5S.BUSINESS.Models
 {
+    public class KiVaTieuTri
+    {
+        public KiKhaoSatModel kiKhaoSatModel { set; get; } = new KiKhaoSatModel();
+        public List<TieuChiDto> lstTieuChi { set; get; } = new List<TieuChiDto>();
+    }
+
     public class KiKhaoSatModel
     {
         public TblBuKiKhaoSat KiKhaoSat { set; get; } = new TblBuKiKhaoSat();
@@ -29,4 +36,7 @@ namespace PLX5S.BUSINESS.Models
         public List<string>? LstChamDiem { set; get; } = new List<string>();
         public List<TblBuInputChamDiem>? LstInChamDiem { set; get; } = new List<TblBuInputChamDiem>();
     }
+
+
+
 }

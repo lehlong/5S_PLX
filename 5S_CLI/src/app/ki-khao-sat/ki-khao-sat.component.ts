@@ -134,7 +134,7 @@ export class KiKhaoSatComponent {
 
   isCodeExist(code: string): boolean {
     return this.paginationResult.data?.some(
-      (accType: any) => accType.id === code
+      (accType: any) => accType.code === code
     );
   }
 
@@ -165,8 +165,12 @@ export class KiKhaoSatComponent {
   }
 
   submitForm(): void {
-    console.log(this.inputKi);
-
+    if (this.isCodeExist(this.inputKi.kiKhaoSat.code)) {
+      this.message.error(
+        `Mã ${this.inputKi.kiKhaoSat.code} đã tồn tại, vui lòng nhập lại`,
+      )
+      return
+    }
     this._service.create(this.inputKi).subscribe({
       next: (data) => {
         this.search();
@@ -177,10 +181,7 @@ export class KiKhaoSatComponent {
       },
     });
   }
-  CopyKKS(param: any) {
-    this.kiKhaoSat.kicopy = param;
 
-  }
   DeleteKKS(data: any) {
     console.log(data);
     this._service.delete(data).subscribe({
@@ -340,6 +341,23 @@ export class KiKhaoSatComponent {
     this.visibleKiKhaoSat = true;
   }
 
+  getInputCopyKy() {
+    console.log(this.kiKhaoSatId);
+    if (this.kiKhaoSatId == null || this.kiKhaoSatId == '') {
+      return
+    }
+
+    this._service.getInputCopyKy(this.kiKhaoSatId).subscribe({
+      next: (data) => {
+        this.inputKi = data
+        // this.search();
+      },
+      error: (response) => {
+        console.log(response);
+      },
+    });
+  }
+
   resetForm() {
     this.isSubmit = false;
   }
@@ -355,15 +373,8 @@ export class KiKhaoSatComponent {
     });
   }
 
-  nzEvent(event: NzFormatEmitEvent): void { }
-
-  onDrop(event: any) { }
-
-  onDragStart(event: any) { }
-
   openEditKyKhaoSat(data: any) {
     console.log(data);
-
     this._service.getInputKiKhaoSat(data.id).subscribe({
       next: (data) => {
         this.inputKi = data
@@ -376,6 +387,12 @@ export class KiKhaoSatComponent {
       this.visibleKiKhaoSat = true;
     }, 200);
   }
+
+  nzEvent(event: NzFormatEmitEvent): void { }
+
+  onDrop(event: any) { }
+
+  onDragStart(event: any) { }
 
   openDrawerTieuChi(param: any): void {
     this.drawerVisible = true;

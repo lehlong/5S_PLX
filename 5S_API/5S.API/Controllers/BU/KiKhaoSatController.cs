@@ -134,26 +134,27 @@ namespace PLX5S.API.Controllers.BU
             return Ok(transferObject);
         }
 
-        //[HttpGet("GetAllData")]
-        //public async Task<IActionResult> GetAllData([FromQuery] string headerId)
-        //{
-        //    var transferObject = new TransferObject(); 
-        //    var result = await _service.GetallData(headerId);
-        //    if (_service.Status)
-        //    {
-        //        transferObject.Data = result;
-        //        transferObject.Status = true;
-        //        transferObject.MessageObject.MessageType = MessageType.Success;
-        //        transferObject.GetMessage("0105", _service);
-        //    }
-        //    else
-        //    {
-        //        transferObject.Status = false;
-        //        transferObject.MessageObject.MessageType = MessageType.Error;
-        //        transferObject.GetMessage("0106", _service);
-        //    }
-        //    return Ok(transferObject);
-        //}
+
+        [HttpGet("GetInputCopyKy")]
+        public async Task<IActionResult> GetInputCopyKy([FromQuery] string kyKhaoSatId)
+        {
+            var transferObject = new TransferObject();
+            var result = await _service.getKyCopy(kyKhaoSatId);
+            if (result != null)
+            {
+                transferObject.Data = result;
+                transferObject.Status = true;
+                transferObject.MessageObject.MessageType = MessageType.Success;
+                transferObject.GetMessage("0100", _service);
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0101", _service);
+            }
+            return Ok(transferObject);
+        }
 
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll([FromQuery] string kiKhaoSatId)
