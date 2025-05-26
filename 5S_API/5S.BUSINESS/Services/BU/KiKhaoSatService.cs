@@ -21,12 +21,9 @@ namespace PLX5S.BUSINESS.Services.BU
 
     public interface IKikhaosatService : IGenericService<TblBuKiKhaoSat, KiKhaoSatDto>
     {
-        //Task<IList<SurveyMgmtDto>> GetAll(BaseMdFilter filter);
-        //Task<byte[]> Export(BaseMdFilter filter);
         Task Insert(KiKhaoSatModel data);
-        //Task<List<TblBuInputStore>> GetallData(string headerId);
-        //Task<List<TblBuInputChamDiem>> Getchamdiem(string kiKhaoSatId);
         Task<KiKhaoSatModel> BuilObjCreate(string surveyMgmtId);
+        Task<KiKhaoSatModel> getKyCopy(string kiKhaoSatId);
         Task UpdateDataInput(KiKhaoSatModel data);
         Task DeleteData(string id);
         Task<KiKhaoSatModel> GetInput(string idKi);
@@ -266,9 +263,30 @@ namespace PLX5S.BUSINESS.Services.BU
             }
         }
 
-        public async Task getKyCopy()
+        public async Task<KiKhaoSatModel> getKyCopy(string kiKhaoSatId)
         {
+            try
+            {
+                var idKi = Guid.NewGuid().ToString();
 
+                var kiKhaoSat = await this.GetInput(kiKhaoSatId);
+                kiKhaoSat.KiKhaoSat.Id = idKi;
+
+                foreach (var s in kiKhaoSat.lstInputStore) 
+                {
+                    foreach (var d in s.LstInChamDiem)
+                    {
+                        d.Id = Guid.NewGuid().ToString();
+                        d.KiKhaoSatId = idKi;
+                    }
+                }
+                return kiKhaoSat;
+            }
+            catch (Exception ex)
+            {
+                this.Status = false;
+                return null;
+            }
         }
 
         public async Task DeleteData(string id)

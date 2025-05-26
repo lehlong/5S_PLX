@@ -20,10 +20,19 @@ export class KiKhaoSatService {
     return this.commonService.post('KiKhaoSat/Insert', params)
   }
 
-
   getInputKiKhaoSat(params: any): Observable<any> {
     return this.commonService.get(`KiKhaoSat/GetInputKiKhaoSat?idKi=${params}`)
   }
+
+  getInputCopyKy(params: any): Observable<any> {
+    return this.commonService.get(`KiKhaoSat/GetInputCopyKy?kyKhaoSatId=${params}`)
+  }
+
+  updateKiKhaoSat(params: any): Observable<any> {
+    return this.commonService.put('KiKhaoSat/Update', params)
+  }
+
+
 
   getAll(param:any): Observable<any> {
     return this.commonService.get(`KiKhaoSat/GetAll?kiKhaoSatId=${param}`)
@@ -32,9 +41,6 @@ export class KiKhaoSatService {
     return this.commonService.get(`KiKhaoSat/GetAllData?headerId=${param}`)
   }
 
-  updateKiKhaoSat(params: any): Observable<any> {
-    return this.commonService.put('KiKhaoSat/Update', params)
-  }
 
   delete(id: string): Observable<any> {
     return this.commonService.delete(`KiKhaoSat/Delete/${id}`)

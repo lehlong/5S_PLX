@@ -142,10 +142,9 @@
 
           <div nz-col [nzXs]="12" style="margin: 20px 0;">
             <H4>Copy Kỳ Khảo Sát</H4>
-            <nz-select style="width: 100%;" nzShowSearch nzAllowClear placeholder="Chọn kì copy"
-              [(ngModel)]="kiKhaoSat.kicopy" (ngModelChange)="CopyKKS($event)">
+            <nz-select style="width: 100%;" nzShowSearch nzAllowClear placeholder="Chọn kì copy" [(ngModel)]="kiKhaoSatId" (ngModelChange)="getInputCopyKy()">
               <nz-option cdkScrollable *ngFor="let item of paginationResult.data" [nzLabel]="item.name"
-                [nzValue]="item.code">
+                [nzValue]="item.id">
               </nz-option>
             </nz-select>
           </div>
