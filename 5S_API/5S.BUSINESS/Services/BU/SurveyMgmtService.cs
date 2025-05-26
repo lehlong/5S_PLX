@@ -123,7 +123,10 @@ namespace PLX5S.BUSINESS.Services.BU
                 foreach (var item in dataInput.InputStores)
                 {
                     _dbContext.TblBuInputStore.Add(item.InputStore);
-                    _dbContext.TblBuInputAtvsv.AddRange(item.Atvsvs);
+                    if (item.Atvsvs.Count() != 0)
+                    {
+                        _dbContext.TblBuInputAtvsv.AddRange(item.Atvsvs);
+                    }
                 }
                 _dbContext.TblBuSurveyMgmt.Add(dataInput.SurveyMgmt);
 

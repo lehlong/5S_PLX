@@ -14,14 +14,14 @@ namespace PLX5S.CORE.Entities.BU
     {
         [Key]
         [Column("ID")]
-        public string Id { get; set; }
+        public string? Id { get; set; }
 
         [Column("NAME", TypeName = "NVARCHAR(255)")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Column("INPUT_STORE_ID")]
-        public string InputStoreId { get; set; }
+        public string? InputStoreId { get; set; }
         [Column("TYPE")]
-        public string Type { get; set; }
+        public string? Type { get; set; }
     }
 }

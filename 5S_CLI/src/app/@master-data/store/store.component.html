@@ -65,18 +65,18 @@
             <a (click)="openEdit(data)">{{ data.id }}</a>
           </td>
           <td>{{ data.name }}</td>
-          <td>{{ data.cuaHangTruong }}</td>
+
+                     <td>{{ data.cuaHangTruong }}</td>
           <td>{{ data.nguoiPhuTrach }}</td>
           <td>{{ data.phoneNumber }}</td>
           <td>{{ data.kinhDo }}</td>
           <td>{{ data.viDo }}</td>
-          <td>{{data.trangThaiCuaHang}}</td>
           <td nzAlign="center">
-            <nz-tag nzColor="success" *ngIf="data.isActive">
+            <nz-tag nzColor="success" *ngIf="data.trangThaiCuaHang">
               <nz-icon nzType="check-circle" />
               <span>Kích hoạt</span>
             </nz-tag>
-            <nz-tag nzColor="error" *ngIf="!data.isActive">
+            <nz-tag nzColor="error" *ngIf="!data.trangThaiCuaHang">
               <nz-icon nzType="close-circle" />
               <span>Khoá</span>
             </nz-tag>
@@ -124,7 +124,7 @@
           <app-input-clear placeholder="Nhập số điện thoại" [required]="true" label="Số điện thoại"
             [control]="$any(validateForm).controls['PhoneNumber']" [required]="true"></app-input-clear>
         </div>
-   
+
         <div nz-col [nzXs]="24" [nzMd]="12">
           <nz-form-item>
             <nz-form-label>Trạng thái cửa hàng</nz-form-label>
@@ -167,7 +167,7 @@
             <nz-form-label>ATVSV</nz-form-label>
             <nz-form-control nzErrorTip="Không được để trống">
               <nz-select [nzMaxTagCount]="3" [nzMaxTagPlaceholder]="tagPlaceHolder" nzMode="multiple"
-                nzPlaceHolder="Please select" formControlName="ATVSV"  [(ngModel)]="lstATVSV"> 
+                nzPlaceHolder="Please select" formControlName="ATVSV"  [(ngModel)]="lstATVSV">
                 <nz-option cdkScrollable *ngFor="let item of Account" [nzLabel]="item.fullName"
                   [nzValue]="item.userName">
                 </nz-option>

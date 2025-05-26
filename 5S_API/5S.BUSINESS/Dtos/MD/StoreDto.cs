@@ -22,7 +22,7 @@ namespace PLX5S.BUSINESS.Dtos.MD
         public string Name { get; set; }
 
         [Description("Số điện thoại")]
-        public string PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; }
 
         [Description("Cửa hàng trưởng")]
         public string CuaHangTruong { get; set; }
@@ -31,10 +31,10 @@ namespace PLX5S.BUSINESS.Dtos.MD
         public string NguoiPhuTrach { get; set; }
 
         [Description("Kinh độ")]
-        public string KinhDo { get; set; }
+        public string? KinhDo { get; set; }
 
         [Description("Vĩ độ")]
-        public string ViDo { get; set; }
+        public string? ViDo { get; set; }
 
         [Description("Trạng Thái cửa hàng")]
         public bool TrangThaiCuaHang { get; set; }

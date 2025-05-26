@@ -15,7 +15,7 @@ namespace PLX5S.BUSINESS.Models
     public class InputStoreModel()
     {
         public TblBuInputStore InputStore { set; get; } = new TblBuInputStore();
-        public List<TblBuInputAtvsv> Atvsvs { set; get; } = new List<TblBuInputAtvsv>();
+        public List<TblBuInputAtvsv>? Atvsvs { set; get; } = new List<TblBuInputAtvsv>();
 
     }
 }

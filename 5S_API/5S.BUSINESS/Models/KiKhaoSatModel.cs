@@ -21,8 +21,8 @@ namespace PLX5S.BUSINESS.Models
         public string Name { get; set; }
         public string CuaHangTruong { get; set; }
         public string NguoiPhuTrach { get; set; }
-        public string ViDo { get; set; }
-        public string KinhDo { get; set; }
+        public string? ViDo { get; set; }
+        public string? KinhDo { get; set; }
         public bool TrangThaiCuaHang { get; set; }
         public string StoreId { get; set; }
         public string SurveyMgmtId { get; set; }

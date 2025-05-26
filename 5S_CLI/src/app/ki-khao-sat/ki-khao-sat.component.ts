@@ -377,7 +377,7 @@ export class KiKhaoSatComponent {
     }, 200);
   }
 
-  openDrawer(param: any): void {
+  openDrawerTieuChi(param: any): void {
     this.drawerVisible = true;
     this.kiKhaoSatId = param;
     this.GetTreeTieuChi();
@@ -515,6 +515,7 @@ export class KiKhaoSatComponent {
       return;
     }
     this.leavesNode.diemTieuChi = this.calculationRows
+    this.leavesNode.kiKhaoSatId = this.kiKhaoSatId
     this._treeTieuChiService.addLeaves(this.leavesNode).subscribe({
       next: (res) => {
         this.leavesVisible = false;

@@ -19,8 +19,8 @@ namespace PLX5S.CORE.Entities.BU
         [Column("SURVEY_MGMT_ID", TypeName = "NVARCHAR(50)")]
         public string SurveyMgmtId { get; set; }
       
-        [ForeignKey("StoreId")]
-        public virtual TblMdStore Store { get; set; }
+        //[ForeignKey("StoreId")]
+        //public virtual TblMdStore Store { get; set; }
 
 
 
