@@ -18,15 +18,15 @@ export class TreeTieuChiService {
   addLeaves(params: any): Observable<any>{
     return this.commonService.post('TieuChi/InsertTreeLeaves', params)
   }
-  GetTreeLeaves(param: any): Observable<any> {
-    return this.commonService.get(`TieuChi/GetLeaves?id=${param}`);
+  GetTreeLeaves(param: any, kiKhaoSatId: any): Observable<any> {
+    return this.commonService.get(`TieuChi/GetLeaves?pId=${param}&kiKhaoSatId=${kiKhaoSatId}`);
   }
 
 
   UpdateLeaves(data: any) {
     return this.commonService.put('TieuChi/UpdateLeaves', data);
   }
-  
+
   UpdateTreeGroup(data: any) {
     return this.commonService.put('TieuChi/UpdateTreeGroup', data);
   }

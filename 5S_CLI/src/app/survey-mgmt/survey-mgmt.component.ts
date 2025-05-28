@@ -9,9 +9,9 @@ import { SurveyMgmtService } from '../service/business/survey-mgmt.service'
 import { NzUploadChangeParam } from 'ng-zorro-antd/upload'
 import { StoreService } from '../service/master-data/store.service'
 import { DoiTuongService } from '../service/master-data/doi-tuong.service'
-import { KhoXangDauService } from '../service/master-data/kho-xang-dau.service'
 import { AccountService } from '../service/system-manager/account.service'
 import { Router } from '@angular/router'
+import { WareHouseService } from '../service/master-data/ware-house.service'
 
 @Component({
   selector: 'app-survey-mgmt',
@@ -47,7 +47,7 @@ export class SurveyMgmtComponent {
     private _storeService: StoreService,
     private _accountService: AccountService,
     private _doiTuongService: DoiTuongService,
-    private _khoService: KhoXangDauService,
+    private _khoService: WareHouseService,
     private router: Router,
     private fb: NonNullableFormBuilder,
     private messageService: NzMessageService,
@@ -73,6 +73,7 @@ export class SurveyMgmtComponent {
     this.getAllStore()
     this.getAllDoiTuong()
     this.getAllAccount()
+    this.getAllKho()
   }
 
   onSortChange(name: string, value: any) {
@@ -257,9 +258,15 @@ export class SurveyMgmtComponent {
       this.dataInput.inputStores.forEach((item: any) => {
         item.inputStore.isActive = true;
       })
+      this.dataInput.inputWareHouse.forEach((item: any) => {
+        item.inputWareHouse.isActive = true;
+      })
     } else {
       this.dataInput.inputStores.forEach((item: any) => {
         item.inputStore.isActive = false;
+      })
+      this.dataInput.inputWareHouse.forEach((item: any) => {
+        item.inputWareHouse.isActive = false;
       })
     }
   }
@@ -270,16 +277,32 @@ export class SurveyMgmtComponent {
           item.inputStore.isActive = true;
         }
       });
+      this.dataInput.inputWareHouse.forEach((item: any) => {
+        if (item.inputWareHouse.id === code) {
+          item.inputWareHouse.isActive = true;
+        }
+      });
     } else {
       this.dataInput.inputStores.forEach((item: any) => {
         if (item.inputStore.id === code) {
           item.inputStore.isActive = false;
         }
       });
+
+      this.dataInput.inputWareHouse.forEach((item: any) => {
+        if (item.inputWareHouse.id === code) {
+          item.inputWareHouse.isActive = false;
+        }
+      });
     }
   }
   onItemChecked(code: String, checked: boolean,): void {
     this.updateCheckedSet(code, checked)
+  }
+
+  getNameByCodeAccount(code: any) {
+    const item = this.lstAccount.find((x: any) => x.userName === code);
+    return item ? item.fullName : code;
   }
 
 }

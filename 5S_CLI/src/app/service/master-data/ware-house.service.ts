@@ -5,29 +5,29 @@ import { Observable } from 'rxjs'
 @Injectable({
   providedIn: 'root',
 })
-export class KhoXangDauService {
+export class WareHouseService {
   constructor(private commonService: CommonService) { }
 
   search(params: any): Observable<any> {
-    return this.commonService.get('KhoXangDau/Search', params)
+    return this.commonService.get('WareHouse/Search', params)
   }
 
   getAll(): Observable<any> {
-    return this.commonService.get('KhoXangDau/GetAll')
+    return this.commonService.get('WareHouse/GetAll')
   }
 
    getATVSV(param:any): Observable<any> {
-    return this.commonService.get(`KhoXangDau/GetATVSV?headerId=${param}`)
+    return this.commonService.get(`WareHouse/GetATVSV?headerId=${param}`)
   }
   create(params: any): Observable<any> {
-    return this.commonService.post('KhoXangDau/Insert', params)
+    return this.commonService.post('WareHouse/Insert', params)
   }
 
   update(params: any): Observable<any> {
-    return this.commonService.put('KhoXangDau/Update', params)
+    return this.commonService.put('WareHouse/Update', params)
   }
 
   delete(id: string): Observable<any> {
-    return this.commonService.delete(`KhoXangDau/Delete/${id}`)
+    return this.commonService.delete(`WareHouse/Delete/${id}`)
   }
 }

@@ -52,60 +52,82 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
-                var lstStore = _dbContext.tblMdStore.Where(x => x.IsActive == true).ToList();
-
-                var id = Guid.NewGuid().ToString();
-
+                List<InputWareHouseModel> lstInWareHouse = new List<InputWareHouseModel>();
                 List<InputStoreModel> lstInStore = new List<InputStoreModel>();
 
-                foreach (var s in lstStore)
+                var id = Guid.NewGuid().ToString();
+                var atvst = await _dbContext.tblMdAtvsv.Where(x => x.IsActive == true).ToListAsync();
+
+                if (doiTuongId == "DT1") 
                 {
-                    var idSt = Guid.NewGuid().ToString();
+                    var lstStore = _dbContext.tblMdStore.Where(x => x.IsActive == true).ToList();
 
-                    var atvst = await _dbContext.tblMdAtvsv.Where(x => x.StoreId == s.Id).ToListAsync();
-
-
-                    List<TblBuInputAtvsv> inAtvsvs = new List<TblBuInputAtvsv>();
-
-                    foreach (var item in atvst)
+                    foreach (var s in lstStore)
                     {
-                        var inAtvsv = new TblBuInputAtvsv
+                        var idSt = Guid.NewGuid().ToString();
+
+                        var inStore = new InputStoreModel()
                         {
-                            Id = Guid.NewGuid().ToString(),
-                            Name = item.Name,
-                            InputStoreId = idSt
+                            InputStore = new TblBuInputStore()
+                            {
+                                Id = idSt,
+                                StoreId = s.Id,
+                                SurveyMgmtId = id,
+                                IsActive = false
+                            },
+                            Atvsvs = atvst.Where(x => x.StoreId == s.Id).Select(x => new TblBuInputAtvsv()
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Name = x.Name,
+                                InputStoreId = idSt
+                            }).ToList()
                         };
-                        inAtvsvs.Add(inAtvsv);
+
+                        lstInStore.Add(inStore);
                     }
-                    var st = new TblBuInputStore()
-                    {
-                        Id = idSt,
-                        StoreId = s.Id,
-                        SurveyMgmtId = id,
-                        IsActive = false
-                    };
-                    var inStore = new InputStoreModel()
-                    {
-                        InputStore = st,
-                        Atvsvs = inAtvsvs
-                    };
-
-                    lstInStore.Add(inStore);
-                }
-                var surveymgmt = new TblBuSurveyMgmt
+                }else if (doiTuongId == "DT2")
                 {
+                    var lstWareHouse = _dbContext.TblMdWareHouse.Where(x => x.IsActive == true).ToList();
 
-                    Id = id,
-                    Name = "",
-                    MoTa = "",
-                    DoiTuongId = doiTuongId,
-                    Image = "",
-                    IsActive = true
-                };
+
+                    foreach (var s in lstWareHouse)
+                    {
+                        var idSt = Guid.NewGuid().ToString();
+
+                        var inWareHouse = new InputWareHouseModel()
+                        {
+                            InputWareHouse = new TblBuInputWareHouse()
+                            {
+                                Id = idSt,
+                                WareHouseId = s.Id,
+                                SurveyMgmtId = id,
+                                IsActive = false
+                            },
+                            Atvsvs = atvst.Where(x => x.StoreId == s.Id).Select(x => new TblBuInputAtvsv()
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Name = x.Name,
+                                InputStoreId = idSt
+                            }).ToList()
+                        };
+
+                        lstInWareHouse.Add(inWareHouse);
+                    }
+                }
+
                 return new SurveyMgmtModel
                 {
-                    SurveyMgmt = surveymgmt,
-                    InputStores = lstInStore
+                    SurveyMgmt =  new TblBuSurveyMgmt
+                    {
+                        Id = id,
+                        Name = "",
+                        MoTa = "",
+                        DoiTuongId = doiTuongId,
+                        Image = "",
+                        IsActive = true
+                    },
+                    InputStores = lstInStore,
+                    InputWareHouse = lstInWareHouse
                 };
             }
             catch (Exception ex)
@@ -120,12 +142,26 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
-                foreach (var item in dataInput.InputStores)
+                if (dataInput.SurveyMgmt.DoiTuongId == "DT1")
                 {
-                    _dbContext.TblBuInputStore.Add(item.InputStore);
-                    if (item.Atvsvs.Count() != 0)
+                    foreach (var item in dataInput.InputStores)
                     {
-                        _dbContext.TblBuInputAtvsv.AddRange(item.Atvsvs);
+                        _dbContext.TblBuInputStore.Add(item.InputStore);
+                        if (item.Atvsvs.Count() != 0)
+                        {
+                            _dbContext.TblBuInputAtvsv.AddRange(item.Atvsvs);
+                        }
+                    }
+
+                }else if (dataInput.SurveyMgmt.DoiTuongId == "DT2")
+                {
+                    foreach (var item in dataInput.InputWareHouse)
+                    {
+                        _dbContext.TblBuInputWareHouse.Add(item.InputWareHouse);
+                        if (item.Atvsvs.Count() != 0)
+                        {
+                            _dbContext.TblBuInputAtvsv.AddRange(item.Atvsvs);
+                        }
                     }
                 }
                 _dbContext.TblBuSurveyMgmt.Add(dataInput.SurveyMgmt);
@@ -143,22 +179,34 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
-                var lstInStore = _dbContext.TblBuInputStore.Where(x => x.SurveyMgmtId == id).ToList();
+                var lstInStore = _dbContext.TblBuInputStore.Where(x => x.SurveyMgmtId == id).ToList() ?? [];
+                var lstInWareHouse = _dbContext.TblBuInputWareHouse.Where(x => x.SurveyMgmtId == id).ToList() ?? [];
+                var lstInAtvsv = _dbContext.TblBuInputAtvsv.Where(x => x.IsDeleted != true).ToList();
                 var InputStores = new List<InputStoreModel>();
+                var lstWareHouse = new List<InputWareHouseModel>();
+
                 foreach (var item in lstInStore)
                 {
-                    var inputStoreModel = new InputStoreModel
+
+                    InputStores.Add(new InputStoreModel
                     {
                         InputStore = item,
-                        Atvsvs = _dbContext.TblBuInputAtvsv.Where(x => x.InputStoreId == item.Id).ToList()
-                    };
-
-                    InputStores.Add(inputStoreModel);
+                        Atvsvs = lstInAtvsv.Where(x => x.InputStoreId == item.Id).ToList()
+                    });
+                }
+                foreach (var item in lstInWareHouse)
+                {
+                    lstWareHouse.Add(new InputWareHouseModel
+                    {
+                        InputWareHouse = item,
+                        Atvsvs = lstInAtvsv.Where(x => x.InputStoreId == item.Id).ToList()
+                    });
                 }
                 return new SurveyMgmtModel
                 {
                     SurveyMgmt = await _dbContext.TblBuSurveyMgmt.Where(x => x.Id == id).FirstOrDefaultAsync(),
-                    InputStores = InputStores
+                    InputStores = InputStores,
+                    InputWareHouse = lstWareHouse
                 };
             }
             catch (Exception ex)

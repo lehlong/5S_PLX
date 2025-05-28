@@ -130,8 +130,8 @@ namespace PLX5S.CORE
         public DbSet<TblMdChucVu> tblMdChucVu { get; set; }
         public DbSet<TblMdDoiTuong> tblMdDoituong { get; set; }
         public DbSet<TblMdStore> tblMdStore { get; set; }
+        public DbSet<TblMdWareHouse> TblMdWareHouse { get; set; }
         public DbSet<TblMdAtvsv> tblMdAtvsv { get; set; }
-        public DbSet<TblMdKhoXangDau> tblMdKhoXangDau { get; set; }
 
         #endregion
 
@@ -143,6 +143,7 @@ namespace PLX5S.CORE
         public DbSet<TblBuInputAtvsv> TblBuInputAtvsv { get; set; }
         public DbSet<TblBuTieuChi> TblBuTieuChi { get; set; }
         public DbSet<TblBuInputStore> TblBuInputStore { get; set; }
+        public DbSet<TblBuInputWareHouse> TblBuInputWareHouse { get; set; }
 
 
         #endregion

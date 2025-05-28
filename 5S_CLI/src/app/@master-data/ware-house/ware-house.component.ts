@@ -6,17 +6,17 @@ import { PaginationResult } from '../../models/base.model';
 import { AccountService } from '../../service/system-manager/account.service';
 import { GlobalService } from '../../service/global.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { KhoXangDauService } from '../../service/master-data/kho-xang-dau.service';
 import { ATVSVService } from '../../service/master-data/atvsv.service'; // Import ATVSVService
+import { WareHouseService } from '../../service/master-data/ware-house.service';
 
 @Component({
   selector: 'app-store',
   standalone: true,
   imports: [ShareModule],
-  templateUrl: './kho-xang-dau.component.html',
-  styleUrl: './kho-xang-dau.component.scss',
+  templateUrl: './ware-house.component.html',
+  styleUrl: './ware-house.component.scss',
 })
-export class KhoXangDauComponent {
+export class WareHouseComponent {
   validateForm: FormGroup;
   isSubmit: boolean = false;
   visible: boolean = false;
@@ -25,29 +25,29 @@ export class KhoXangDauComponent {
   paginationResult = new PaginationResult();
   loading: boolean = false;
   Account: any[] = [];
-  ATVSVList: any[] = []; 
+  ATVSVList: any[] = [];
   lstKKS: any[] = [];
 
   constructor(
-    private _service: KhoXangDauService,
+    private _service: WareHouseService,
     private fb: NonNullableFormBuilder,
     private globalService: GlobalService,
     private message: NzMessageService,
     private accountService: AccountService,
-    private atvsvService: ATVSVService 
+    private atvsvService: ATVSVService
   ) {
     this.validateForm = this.fb.group({
       id: [''],
       name: ['', [Validators.required]],
       isActive: [true, [Validators.required]],
       truongKho: ['', [Validators.required]],
-      atvsv: [[],[Validators.required]], 
+      atvsv: [[],[Validators.required]],
       nguoiPhuTrach: ['', [Validators.required]],
     });
     this.globalService.setBreadcrumb([
       {
         name: 'Danh sách kho xăng dầu',
-        path: 'master-data/kho-xang-dau',
+        path: 'master-data/ware-house',
       },
     ]);
     this.globalService.getLoading().subscribe((value) => {
@@ -62,7 +62,7 @@ export class KhoXangDauComponent {
   ngOnInit(): void {
     this.search();
     this.getAllAccount();
-    this.getAllATVSV(); 
+    this.getAllATVSV();
   }
 
   onSortChange(name: string, value: any) {
@@ -192,10 +192,10 @@ export class KhoXangDauComponent {
         },
         error: (response) => {
           console.log(response);
-        
+
       }});
     }
-  
+
 
   openEdit(data: any) {
    this.getATVSV(data.id);
@@ -205,7 +205,7 @@ export class KhoXangDauComponent {
         name: data.name,
         isActive: data.isActive,
         truongKho: data.truongKho,
-        atvsv:   this.ATVSVList, 
+        atvsv:   this.ATVSVList,
         nguoiPhuTrach: data.nguoiPhuTrach || '',
     });
 

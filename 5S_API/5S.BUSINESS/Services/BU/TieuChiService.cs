@@ -19,7 +19,7 @@ namespace PLX5S.BUSINESS.Services.BU
     {
         Task<TieuChiDto> BuildDataForTree(string kiKhaoSatId);
         Task InsertTreeGroup(TblBuTieuChi data); 
-        Task<List<TieuChiDto>> getLeaves(string id);
+        Task<List<TieuChiDto>> getLeaves(string pId, string kiKhaoSatId);
         Task InsertTreeLeaves(TieuChiDto data);
         Task updateLeaves(TieuChiDto item);
         Task updateTreeGroup(TieuChiDto item);
@@ -68,6 +68,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 foreach (var item in data.DiemTieuChi)
                 {
                     item.Id = Guid.NewGuid().ToString();
+                    item.TieuChiCode = tieuChi.Code;
                     _dbContext.TblBuTinhDiemTieuChi.Add(item);
                 }
 
@@ -138,11 +139,11 @@ namespace PLX5S.BUSINESS.Services.BU
 
         }
 
-        public async Task<List<TieuChiDto>> getLeaves(string id)
+        public async Task<List<TieuChiDto>> getLeaves(string pId, string kiKhaoSatId)
         {
             try
             {
-                var tieuChi = _dbContext.TblBuTieuChi.Where(x => x.IsDeleted != true && x.PId == id).OrderBy(x => x.OrderNumber).ToList();
+                var tieuChi = _dbContext.TblBuTieuChi.Where(x => x.IsDeleted != true && x.PId == pId && x.KiKhaoSatId == kiKhaoSatId).OrderBy(x => x.OrderNumber).ToList();
                 var lstTieuChiLeaves = new List<TieuChiDto>();
                 foreach (var item in tieuChi)
                 {
@@ -159,7 +160,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         NumberImg = item.NumberImg,
                         KiKhaoSatId = item.KiKhaoSatId,
                         OrderNumber = item.OrderNumber,
-                        DiemTieuChi = _dbContext.TblBuTinhDiemTieuChi.Where(x => x.TieuChiCode == item.Id && x.IsDeleted != true).ToList()
+                        DiemTieuChi = _dbContext.TblBuTinhDiemTieuChi.Where(x => x.TieuChiCode == item.Code && x.IsDeleted != true).ToList()
                     };
                     lstTieuChiLeaves.Add(leaves);
                 }

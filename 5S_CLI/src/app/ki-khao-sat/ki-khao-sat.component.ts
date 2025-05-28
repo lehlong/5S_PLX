@@ -13,6 +13,7 @@ import { NzUploadChangeParam } from 'ng-zorro-antd/upload';
 import { TreeTieuChiService } from '../service/business/tree-tieu-chi.service';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { log } from 'ng-zorro-antd/core/logger';
+import { WareHouseService } from '../service/master-data/ware-house.service';
 @Component({
   selector: 'app-ki-khao-sat',
   imports: [ShareModule, RouterModule, DragDropModule],
@@ -37,12 +38,12 @@ export class KiKhaoSatComponent {
   filter = new AccountTypeFilter();
   paginationResult = new PaginationResult();
   loading: boolean = false;
-  Account: any = [];
-  dataChamdiem: any = [];
+  lstAccount: any = [];
   headerId: any = '';
   kiKhaoSatId: any = '';
   calculationRows: any = [];
   DataKS: any = [];
+  lstKho: any = [];
   kiKhaoSat: any = {};
   visibleKiKhaoSat: boolean = false;
   leavesNode: any = {
@@ -68,6 +69,7 @@ export class KiKhaoSatComponent {
     private fb: NonNullableFormBuilder,
     private globalService: GlobalService,
     private messageService: NzMessageService,
+    private _khoService: WareHouseService,
     private router: Router,
     private _treeTieuChiService: TreeTieuChiService,
     private message: NzMessageService,
@@ -95,8 +97,8 @@ export class KiKhaoSatComponent {
       },
     });
     this.search();
-    this.getAlldata(this.headerId);
     this.getAllAccount();
+    this.getAllKho()
   }
 
   onSortChange(name: string, value: any) {
@@ -115,16 +117,6 @@ export class KiKhaoSatComponent {
       next: (data) => {
         this.paginationResult = data;
         this.lstKKS = data;
-      },
-      error: (response) => {
-        console.log(response);
-      },
-    });
-  }
-  getAlldata(headerId: string) {
-    this._service.getAlldata(headerId).subscribe({
-      next: (data) => {
-        this.dataChamdiem = data;
       },
       error: (response) => {
         console.log(response);
@@ -221,7 +213,13 @@ export class KiKhaoSatComponent {
   }
 
   addCalculationRow(): void {
-    this.calculationRows.push({ id: "-1", tieuChiCode: this.leavesNode.id, moTa: '', diem: 0, isActive: true, isDeleted: false });
+    this.calculationRows.push({
+      id: "-1",
+      tieuChiCode: this.leavesNode.code,
+      moTa: '', diem: 0,
+      isActive: true,
+      isDeleted: false
+    });
   }
 
   removeCalculationRow(index: number): void {
@@ -240,21 +238,15 @@ export class KiKhaoSatComponent {
 
 
   }
-  close() {
-    if (this.dataChamdiem) {
-      this.dataChamdiem.forEach((item: any) => {
-        item.nguoiChamDiem = [];
-      });
-    }
-    this.visible = false;
-    this.visibleKiKhaoSat = false;
-    this.resetForm();
-    this.kiKhaoSat = [];
-
-  }
 
   closeDrawer(): void {
+    this.visible = false;
+    this.visibleKiKhaoSat = false;
+    this.kiKhaoSat = [];
     this.drawerVisible = false;
+    this.selectedNodeDetails = []
+    this.treeId = '';
+
   }
 
   closeModal(): void {
@@ -264,11 +256,12 @@ export class KiKhaoSatComponent {
       Code: "-1",
     };
     this.calculationRows = []
+    this.visibleKiKhaoSat = false
     this.leavesVisible = false;
     this.dataInsertTree.name = '';
   }
   GetTreeLeaves() {
-    this._treeTieuChiService.GetTreeLeaves(this.treeId).subscribe({
+    this._treeTieuChiService.GetTreeLeaves(this.treeId, this.kiKhaoSatId).subscribe({
       next: (data) => {
         this.selectedNodeDetails = data.result;
       },
@@ -300,7 +293,7 @@ export class KiKhaoSatComponent {
   getAllAccount() {
     this.accountService.getall().subscribe({
       next: (data) => {
-        this.Account = data;
+        this.lstAccount = data;
       },
 
       error: (response) => {
@@ -309,6 +302,17 @@ export class KiKhaoSatComponent {
     });
   }
 
+  getAllKho() {
+    this.isSubmit = false
+    this._khoService.getAll().subscribe({
+      next: (data) => {
+        this.lstKho = data
+      },
+      error: (response) => {
+        console.log(response)
+      },
+    })
+  }
 
   openCreLeaves(data: any): void {
     this.edit = false;
@@ -342,12 +346,12 @@ export class KiKhaoSatComponent {
   }
 
   getInputCopyKy() {
-    console.log(this.kiKhaoSatId);
-    if (this.kiKhaoSatId == null || this.kiKhaoSatId == '') {
+    console.log(this.inputKi.kyCopyId);
+    if (this.inputKi.kyCopyId == null || this.inputKi.kyCopyId == '') {
       return
     }
 
-    this._service.getInputCopyKy(this.kiKhaoSatId).subscribe({
+    this._service.getInputCopyKy(this.inputKi.kyCopyId).subscribe({
       next: (data) => {
         this.inputKi = data
         // this.search();
@@ -358,9 +362,6 @@ export class KiKhaoSatComponent {
     });
   }
 
-  resetForm() {
-    this.isSubmit = false;
-  }
 
   deleteItem(id: string) {
     this._service.delete(id).subscribe({
@@ -576,5 +577,11 @@ export class KiKhaoSatComponent {
     moveItemInArray(this.selectedNodeDetails, event.previousIndex, event.currentIndex);
     this.updateOrderLeaves(this.selectedNodeDetails);
 
+  }
+
+
+  getNameByCodeAccount(code: any) {
+    const item = this.lstAccount.find((x: any) => x.userName === code);
+    return item ? item.fullName : code;
   }
 }

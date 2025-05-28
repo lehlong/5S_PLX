@@ -9,8 +9,8 @@ using PLX5S.CORE.Common;
 
 namespace PLX5S.CORE.Entities.MD
 {
-    [Table("T_MD_KHO_XANG_DAU")]
-public class TblMdKhoXangDau : SoftDeleteEntity
+    [Table("T_MD_WARE_HOUSE")]
+public class TblMdWareHouse : SoftDeleteEntity
 {
     [Key]
     [Column("ID")]
@@ -24,7 +24,6 @@ public class TblMdKhoXangDau : SoftDeleteEntity
 
     [Column("NGUOI_PHU_TRACH")]
     public string NguoiPhuTrach { get; set; }
-    
 
 }
 }

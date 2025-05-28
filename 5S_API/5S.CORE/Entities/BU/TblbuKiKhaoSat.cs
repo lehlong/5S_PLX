@@ -18,16 +18,14 @@ namespace PLX5S.CORE.Entities.BU
         [Column("NAME", TypeName = "NVARCHAR(50)")]
         public string? Name { get; set; }
 
-        [Column("DES", TypeName = "NCHAR(50)")]
+        [Column("DES", TypeName = "NVARCHAR(50)")]
         public string? Des { get; set; }
 
         [Column("START_DATE")]
-        
         public DateTime? StartDate { get; set; }
 
         [Column("SURVEY_MGMT_ID")]
         public string? SurveyMgmtId { get; set; }
-
 
         [Column("END_DATE")]
         public DateTime? EndDate { get; set; }

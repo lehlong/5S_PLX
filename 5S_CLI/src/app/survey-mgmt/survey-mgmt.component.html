@@ -108,7 +108,7 @@
         <label>Đối Tượng Áp Dụng</label>
         <nz-form-item>
           <nz-form-control nzErrorTip="Không được để trống">
-            <nz-select nzShowSearch nzAllowClear placeholder="Chọn Đối tượng"
+            <nz-select [disabled]="edit" nzShowSearch nzAllowClear placeholder="Chọn Đối tượng"
               [(ngModel)]="dataInput.surveyMgmt.doiTuongId" (ngModelChange)="buildInput($event)">
               <nz-option cdkScrollable *ngFor="let item of lstDoiTuong" [nzLabel]="item.name" [nzValue]="item.id">
               </nz-option>
@@ -144,31 +144,39 @@
           <ng-container *ngFor="let item of lstStore">
             <ng-container *ngIf="item.id == data.inputStore.storeId">
               <td>{{ item.name }}</td>
-              <td>{{ item.cuaHangTruong }}</td>
-              <td>{{ item.nguoiPhuTrach }}</td>
+              <td>{{ getNameByCodeAccount(item.cuaHangTruong) }}</td>
+              <td>{{ getNameByCodeAccount(item.nguoiPhuTrach) }}</td>
+
             </ng-container>
           </ng-container>
         </tr>
       </tbody>
     </nz-table>
 
-    <nz-table *ngIf="dataInput.doiTuongId === '2b1d51ee-9c22-4b2a-81fb-b22b26c1deae'" #rowSelectionTable
-      nzShowSizeChanger [nzData]="lstKho" nzFooter=" " [nzFrontPagination]="'false'">
+    <nz-table *ngIf="dataInput.surveyMgmt.doiTuongId === 'DT2'" #rowSelectionTable nzShowSizeChanger
+      [nzData]="dataInput.inputWareHouse" nzFooter=" " [nzFrontPagination]="'false'">
       <thead>
         <tr>
           <th [(nzChecked)]="checked" [nzIndeterminate]="indeterminate" (nzCheckedChange)="onAllChecked($event)"></th>
-          <th>Name</th>
-          <th>Age</th>
-          <th>Address</th>
+          <th>Mã</th>
+          <th>Tên Kho</th>
+          <th>Trưởng Kho</th>
+          <th>Người phụ trách</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let data of rowSelectionTable.data; track trackById">
-          <td>
+        <tr *ngFor="let data of rowSelectionTable.data">
+          <td [nzChecked]="data.inputWareHouse.isActive"
+            (nzCheckedChange)="onItemChecked(data.inputWareHouse.id, $event)">
           </td>
-          <td>{{ data.name }}</td>
-          <td>{{ data.age }}</td>
-          <td>{{ data.address }}</td>
+          <td>{{ data.inputWareHouse.wareHouseId }}</td>
+          <ng-container *ngFor="let item of lstKho">
+            <ng-container *ngIf="item.id == data.inputWareHouse.wareHouseId">
+              <td>{{ item.name }}</td>
+              <td>{{ getNameByCodeAccount(item.truongKho) }}</td>
+              <td>{{ getNameByCodeAccount(item.nguoiPhuTrach) }}</td>
+            </ng-container>
+          </ng-container>
         </tr>
       </tbody>
     </nz-table>

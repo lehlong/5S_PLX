@@ -10,9 +10,9 @@ namespace PLX5S.API.Controllers.MD
     
     [Route("api/[controller]")]
 [ApiController]
-public class KhoXangDauController(IKhoXangDauService service) : ControllerBase
+public class WareHouseController(IWarehouseService service) : ControllerBase
 {
-    public readonly IKhoXangDauService _service = service;
+    public readonly IWarehouseService _service = service;
 
     [HttpGet("Search")]
     public async Task<IActionResult> Search([FromQuery] BaseFilter filter)
@@ -50,7 +50,7 @@ public class KhoXangDauController(IKhoXangDauService service) : ControllerBase
         return Ok(transferObject);
     }
     [HttpPost("Insert")]
-    public async Task<IActionResult> Insert([FromBody] KhoXangDauDto time)
+    public async Task<IActionResult> Insert([FromBody] WarehouseDto time)
     {
         var transferObject = new TransferObject();
 
@@ -72,7 +72,7 @@ public class KhoXangDauController(IKhoXangDauService service) : ControllerBase
         return Ok(transferObject);
     }
     [HttpPut("Update")]
-    public async Task<IActionResult> Update([FromBody] KhoXangDauDto time)
+    public async Task<IActionResult> Update([FromBody] WarehouseDto time)
     {
         var transferObject = new TransferObject();
         await _service.Update(time);

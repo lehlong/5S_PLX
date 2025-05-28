@@ -6,15 +6,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PLX5S.CORE.Entities.BU
 {
-    [Table("T_BU_INPUT_STORE")]
-    public class TblBuInputStore : SoftDeleteEntity
+    [Table("T_BU_INPUT_WARE_HOUSE")]
+    public class TblBuInputWareHouse : SoftDeleteEntity
     {
         [Key]
         [Column("ID", TypeName = "NVARCHAR(50)")]
         public string Id { get; set; }
 
-        [Column("STORE_ID", TypeName = "NVARCHAR(50)")]
-        public string StoreId { get; set; }
+        [Column("WARE_HOUSE_ID", TypeName = "NVARCHAR(50)")]
+        public string WareHouseId { get; set; }
 
         [Column("SURVEY_MGMT_ID", TypeName = "NVARCHAR(50)")]
         public string SurveyMgmtId { get; set; }
