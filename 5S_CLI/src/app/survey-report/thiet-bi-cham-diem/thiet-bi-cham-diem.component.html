@@ -1,0 +1,99 @@
+<nz-page-header nzBackIcon>
+  <nz-page-header-title>BÁO CÁO</nz-page-header-title>
+  <nz-page-header-subtitle>Thiết Bị Chấm Điểm</nz-page-header-subtitle>
+
+
+  <nz-page-header-content class="main-content">
+    <ng-container>
+      <div nz-row [nzGutter]="12">
+
+        <div nz-col [nzXs]="24" [nzMd]="6">
+          <nz-form-item style="display: block;">
+            <h4>Cuộc Khảo Sát</h4>
+            <nz-form-control nzErrorTip="Không được để trống">
+              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Chọn cuộc khảo sát" formControlName="CuaHangTruong">
+                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.fullName"
+                  [nzValue]="item.userName">
+                </nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+
+        <div nz-col [nzXs]="24" [nzMd]="6">
+          <nz-form-item style="display: block;">
+            <h4>Kỳ Chấm Điểm</h4>
+            <nz-form-control nzErrorTip="Không được để trống">
+              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Chọn kỳ chấm điểm" formControlName="CuaHangTruong">
+                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.fullName"
+                  [nzValue]="item.userName">
+                </nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+
+        <div nz-col [nzXs]="24" [nzMd]="6">
+          <nz-form-item style="display: block;">
+            <h4>Cửa Hàng</h4>
+            <nz-form-control nzErrorTip="Không được để trống">
+              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Chọn cửa hàng" formControlName="CuaHangTruong">
+                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.fullName"
+                  [nzValue]="item.userName">
+                </nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+
+        <div nz-col [nzXs]="24" [nzMd]="6">
+          <h4>'</h4>
+          <div class="">
+            <button (click)="openCreate()" class="!flex !items-center space-btn" nzType="primary" nz-button>
+              <span nz-icon nzType="snippets"></span> Xem Báo Cáo
+            </button>
+            <button (click)="openCreate()" class="!flex !items-center space-btn btn-excel"  nz-button>
+              <span nz-icon nzType="file-excel"></span> Xuất Excel
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </ng-container>
+
+    <nz-table class="auto-scroll-table" #headerTable nzBordered  [nzData]="paginationResult.data" [nzFrontPagination]="false"
+      [nzScroll]="{ y: 'calc(100vh - 276px)' }">
+      <thead>
+        <tr>
+          <th nzWidth="60px" rowspan="3" >STT</th>
+          <th nzWidth=""  rowspan="3" >TÊN ĐƠN VỊ</th>
+          <th nzWidth=""colSpan="3">SỐ LẦN CHẤM ĐIỂM TRONG KỲ</th>
+          <th nzWidth="" rowspan="3" >TỔNG LẦN CHẤM</th>
+          <th nzWidth="" rowspan="3" >ĐIỂM BÌNH QUÂN</th>
+          <th nzWidth="" rowspan="3" >XẾP LOẠI</th>
+        </tr>
+        <tr>
+          <th nzWidth="60px" colSpan="1">CHT</th>
+          <th nzWidth="" colSpan="1">ATVSV</th>
+          <th nzWidth="" rowspan="1" >TỔ CHUYÊN GIA, BAN 5S</th>
+        </tr>
+        <tr>
+          <th nzWidth="60px" rowspan="1">LẦN 1</th>
+          <th nzWidth="60px" rowspan="1">LẦN 1</th>
+          <th nzWidth="60px" rowspan="1">LẦN 1</th>
+        </tr>
+
+      </thead>
+      <tbody>
+
+      </tbody>
+    </nz-table>
+  </nz-page-header-content>
+  <nz-page-header-content class="footer-content">
+    <div *ngIf="paginationResult?.data" class="flex justify-end p-[10px] border-t border-custom-gray border-solid">
+      <nz-pagination nzShowSizeChanger [nzPageIndex]="filter.currentPage" [nzTotal]="paginationResult.totalRecord"
+        [nzPageSize]="filter.pageSize" (nzPageIndexChange)="pageIndexChange($event)"
+        (nzPageSizeChange)="pageSizeChange($event)"></nz-pagination>
+    </div>
+  </nz-page-header-content>
+</nz-page-header>

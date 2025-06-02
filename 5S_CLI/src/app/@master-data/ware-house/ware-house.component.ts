@@ -24,7 +24,7 @@ export class WareHouseComponent {
   filter = new AccountTypeFilter();
   paginationResult = new PaginationResult();
   loading: boolean = false;
-  Account: any[] = [];
+  lstAccount: any[] = [];
   ATVSVList: any[] = [];
   lstKKS: any[] = [];
 
@@ -90,7 +90,7 @@ export class WareHouseComponent {
   getAllAccount() {
     this.accountService.getall().subscribe({
       next: (data) => {
-        this.Account = data;
+        this.lstAccount = data;
       },
       error: (response) => {
         console.log(response);
@@ -224,5 +224,10 @@ export class WareHouseComponent {
   pageIndexChange(index: number): void {
     this.filter.currentPage = index;
     this.search();
+  }
+
+  getNameByCodeAccount(code: any) {
+    const item = this.lstAccount.find((x: any) => x.userName === code);
+    return item ? item.fullName : code;
   }
 }

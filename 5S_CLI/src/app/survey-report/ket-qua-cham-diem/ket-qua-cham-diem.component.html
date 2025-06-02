@@ -1,0 +1,106 @@
+<nz-page-header nzBackIcon>
+  <nz-page-header-title>BÁO CÁO</nz-page-header-title>
+  <nz-page-header-subtitle>Kết Quả Chấm Điểm 5S</nz-page-header-subtitle>
+  <nz-page-header-extra>
+    <!-- <div class="flex-grow-2 flex">
+      <nz-space>
+        <app-input-clear placeholder="Tìm kiếm" (enterEvent)="search()" [(value)]="filter.keyWord"></app-input-clear>
+        <button (click)="search()" class="flex !items-center !border-l-0 gray-btn" nzType="default" nz-button
+          nzType="default">
+          <span nz-icon nzType="search"></span>
+        </button>
+        <button (click)="reset()" class="flex !items-center !border-l-0 gray-btn" nzType="default" nz-button
+          nzType="default">
+          <span nz-icon nzType="redo"></span>
+        </button>
+      </nz-space>
+      <button (click)="openCreate()" class="!flex !items-center space-btn" nzType="primary" nz-button>
+        <span nz-icon nzType="plus-circle"></span> Thêm mới
+      </button>
+    </div> -->
+  </nz-page-header-extra>
+
+
+  <nz-page-header-content class="main-content">
+    <ng-container>
+      <div nz-row [nzGutter]="12">
+
+        <div nz-col [nzXs]="24" [nzMd]="6">
+          <nz-form-item style="display: block;">
+            <h4>Cuộc Khảo Sát</h4>
+            <nz-form-control nzErrorTip="Không được để trống">
+              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Chọn cuộc khảo sát" formControlName="CuaHangTruong">
+                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.fullName"
+                  [nzValue]="item.userName">
+                </nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+
+        <div nz-col [nzXs]="24" [nzMd]="6">
+          <nz-form-item style="display: block;">
+            <h4>Kỳ Chấm Điểm</h4>
+            <nz-form-control nzErrorTip="Không được để trống">
+              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Chọn kỳ chấm điểm" formControlName="CuaHangTruong">
+                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.fullName"
+                  [nzValue]="item.userName">
+                </nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+
+        <div nz-col [nzXs]="24" [nzMd]="6">
+          <nz-form-item style="display: block;">
+            <h4>Cửa Hàng</h4>
+            <nz-form-control nzErrorTip="Không được để trống">
+              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Chọn cửa hàng" formControlName="CuaHangTruong">
+                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.fullName"
+                  [nzValue]="item.userName">
+                </nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+
+        <div nz-col [nzXs]="24" [nzMd]="6">
+          <h4>'</h4>
+          <div class="">
+            <button (click)="openCreate()" class="!flex !items-center space-btn" nzType="primary" nz-button>
+              <span nz-icon nzType="snippets"></span> Xem Báo Cáo
+            </button>
+            <button (click)="openCreate()" class="!flex !items-center space-btn btn-excel"  nz-button>
+              <span nz-icon nzType="file-excel"></span> Xuất Excel
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </ng-container>
+
+    <nz-table class="auto-scroll-table" #headerTable [nzData]="paginationResult.data" [nzFrontPagination]="false"
+      [nzScroll]="{ y: 'calc(100vh - 276px)' }">
+      <thead>
+        <tr>
+          <th nzWidth="60px">STT</th>
+          <th nzWidth="">TÊN ĐƠN VỊ</th>
+          <th nzWidth="">SỐ LẦN CHẤM ĐIỂM</th>
+          <th nzWidth="">ĐIỂM BÌNH QUÂN</th>
+          <th nzWidth="">XẾP LOẠI</th>
+          <th nzWidth="">GHI CHÚ</th>
+        </tr>
+      </thead>
+      <tbody>
+
+      </tbody>
+    </nz-table>
+  </nz-page-header-content>
+  <nz-page-header-content class="footer-content">
+    <div *ngIf="paginationResult?.data" class="flex justify-end p-[10px] border-t border-custom-gray border-solid">
+      <nz-pagination nzShowSizeChanger [nzPageIndex]="filter.currentPage" [nzTotal]="paginationResult.totalRecord"
+        [nzPageSize]="filter.pageSize" (nzPageIndexChange)="pageIndexChange($event)"
+        (nzPageSizeChange)="pageSizeChange($event)"></nz-pagination>
+    </div>
+  </nz-page-header-content>
+</nz-page-header>

@@ -52,8 +52,8 @@
           </td>
 
           <td><a (click)="openEdit(data)">{{ data.name }}</a></td>
-          <td>{{data.truongKho}}</td>
-          <td>{{data.nguoiPhuTrach}}</td>
+          <td>{{ getNameByCodeAccount(data.truongKho) }}</td>
+          <td>{{ getNameByCodeAccount(data.nguoiPhuTrach) }}</td>
           <td nzAlign="center">
             <nz-tag nzColor="success" *ngIf="data.isActive">
               <nz-icon nzType="check-circle" />
@@ -97,7 +97,7 @@
             <nz-form-label>Chọn trưởng kho</nz-form-label>
             <nz-form-control nzErrorTip="Không được để trống">
               <nz-select nzShowSearch nzAllowClear placeholder="Chọn trưởng kho" formControlName="truongKho">
-                <nz-option cdkScrollable *ngFor="let item of Account" [nzLabel]="item.fullName"
+                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.fullName"
                   [nzValue]="item.userName">
                 </nz-option>
               </nz-select>
@@ -109,7 +109,7 @@
             <nz-form-label>Người phụ trách</nz-form-label>
             <nz-form-control nzErrorTip="Không được để trống">
               <nz-select nzShowSearch nzAllowClear placeholder="Chọn người phụ trách" formControlName="nguoiPhuTrach">
-                <nz-option cdkScrollable *ngFor="let item of Account" [nzLabel]="item.fullName"
+                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.fullName"
                   [nzValue]="item.userName">
                 </nz-option>
               </nz-select>
@@ -122,7 +122,7 @@
             <nz-form-control nzErrorTip="Không được để trống">
               <nz-select [nzMaxTagCount]="3" [nzMaxTagPlaceholder]="tagPlaceHolder" nzMode="multiple"
                 nzPlaceHolder="Please select" formControlName="atvsv" [(ngModel)]="ATVSVList">
-                <nz-option cdkScrollable *ngFor="let item of Account" [nzLabel]="item.fullName"
+                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.fullName"
                   [nzValue]="item.userName">
                 </nz-option>
               </nz-select>

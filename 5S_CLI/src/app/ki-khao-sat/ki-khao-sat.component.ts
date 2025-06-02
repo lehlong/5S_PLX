@@ -260,12 +260,12 @@ export class KiKhaoSatComponent {
     this.leavesVisible = false;
     this.dataInsertTree.name = '';
   }
+
   GetTreeLeaves() {
     this._treeTieuChiService.GetTreeLeaves(this.treeId, this.kiKhaoSatId).subscribe({
       next: (data) => {
         this.selectedNodeDetails = data.result;
       },
-
       error: (response) => {
         console.log(response);
       },
@@ -279,6 +279,7 @@ export class KiKhaoSatComponent {
       this.GetTreeLeaves();
     } else {
       this.treeId = '';
+      this.selectedNodeDetails = []
     }
   }
 
@@ -290,6 +291,7 @@ export class KiKhaoSatComponent {
   reset() {
     this.search();
   }
+
   getAllAccount() {
     this.accountService.getall().subscribe({
       next: (data) => {
@@ -573,12 +575,12 @@ export class KiKhaoSatComponent {
       },
     })
   }
+
   drop(event: CdkDragDrop<any[]>): void {
     moveItemInArray(this.selectedNodeDetails, event.previousIndex, event.currentIndex);
     this.updateOrderLeaves(this.selectedNodeDetails);
 
   }
-
 
   getNameByCodeAccount(code: any) {
     const item = this.lstAccount.find((x: any) => x.userName === code);

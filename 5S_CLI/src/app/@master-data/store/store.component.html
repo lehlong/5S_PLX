@@ -65,9 +65,8 @@
             <a (click)="openEdit(data)">{{ data.id }}</a>
           </td>
           <td>{{ data.name }}</td>
-
-                     <td>{{ data.cuaHangTruong }}</td>
-          <td>{{ data.nguoiPhuTrach }}</td>
+          <td>{{ getNameByCodeAccount(data.cuaHangTruong) }}</td>
+          <td>{{ getNameByCodeAccount(data.nguoiPhuTrach) }}</td>
           <td>{{ data.phoneNumber }}</td>
           <td>{{ data.kinhDo }}</td>
           <td>{{ data.viDo }}</td>
@@ -100,25 +99,22 @@
   <ng-container *nzDrawerContent>
     <form nz-form nzLayout="vertical" [formGroup]="validateForm" (ngSubmit)="submitForm()">
       <div nz-row [nzGutter]="12">
-         <div nz-col [nzXs]="24" [nzMd]="12">
-         <app-input-clear placeholder="Nhập mã cửa hàng " [required]="true" label="Mã "
-        [control]="$any(validateForm).controls['id']" [required]="true"
-        [disabled]="edit ? true : false"></app-input-clear>
+        <div nz-col [nzXs]="24" [nzMd]="12">
+          <app-input-clear placeholder="Nhập mã cửa hàng " [required]="true" label="Mã "
+            [control]="$any(validateForm).controls['id']" [required]="true"
+            [disabled]="edit ? true : false"></app-input-clear>
         </div>
         <div nz-col [nzXs]="24" [nzMd]="12">
           <app-input-clear placeholder="Nhập tên cửa hàng " [required]="true" label="Tên cửa hàng"
-            [control]="$any(validateForm).controls['name']" [required]="true"
-           ></app-input-clear>
+            [control]="$any(validateForm).controls['name']" [required]="true"></app-input-clear>
         </div>
         <div nz-col [nzXs]="24" [nzMd]="12">
           <app-input-clear placeholder="Nhập tên kinh độ " [required]="true" label="Kinh độ"
-            [control]="$any(validateForm).controls['KinhDo']" [required]="true"
-           ></app-input-clear>
+            [control]="$any(validateForm).controls['KinhDo']" [required]="true"></app-input-clear>
         </div>
         <div nz-col [nzXs]="24" [nzMd]="12">
           <app-input-clear placeholder="Nhập tên vĩ độ " [required]="true" label="Vĩ độ"
-            [control]="$any(validateForm).controls['ViDo']" [required]="true"
-           ></app-input-clear>
+            [control]="$any(validateForm).controls['ViDo']" [required]="true"></app-input-clear>
         </div>
         <div nz-col [nzXs]="24" [nzMd]="12">
           <app-input-clear placeholder="Nhập số điện thoại" [required]="true" label="Số điện thoại"
@@ -143,7 +139,7 @@
             <nz-form-label>Chon cửa hàng trưởng</nz-form-label>
             <nz-form-control nzErrorTip="Không được để trống">
               <nz-select nzShowSearch nzAllowClear placeholder="Chọn cửa hàng trưởng" formControlName="CuaHangTruong">
-                <nz-option cdkScrollable *ngFor="let item of Account" [nzLabel]="item.fullName"
+                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.fullName"
                   [nzValue]="item.userName">
                 </nz-option>
               </nz-select>
@@ -155,7 +151,7 @@
             <nz-form-label>người phụ trách</nz-form-label>
             <nz-form-control nzErrorTip="Không được để trống">
               <nz-select nzShowSearch nzAllowClear placeholder="Chọn người phụ trách" formControlName="NguoiPhuTrach">
-                <nz-option cdkScrollable *ngFor="let item of Account" [nzLabel]="item.fullName"
+                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.fullName"
                   [nzValue]="item.userName">
                 </nz-option>
               </nz-select>
@@ -167,8 +163,8 @@
             <nz-form-label>ATVSV</nz-form-label>
             <nz-form-control nzErrorTip="Không được để trống">
               <nz-select [nzMaxTagCount]="3" [nzMaxTagPlaceholder]="tagPlaceHolder" nzMode="multiple"
-                nzPlaceHolder="Please select" formControlName="ATVSV"  [(ngModel)]="lstATVSV">
-                <nz-option cdkScrollable *ngFor="let item of Account" [nzLabel]="item.fullName"
+                nzPlaceHolder="Please select" formControlName="ATVSV" [(ngModel)]="lstATVSV">
+                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.fullName"
                   [nzValue]="item.userName">
                 </nz-option>
               </nz-select>

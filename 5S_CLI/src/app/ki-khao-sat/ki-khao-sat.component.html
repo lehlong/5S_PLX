@@ -21,20 +21,19 @@
   </nz-page-header-extra>
   <nz-page-header-content class="main-content">
     <nz-table class="auto-scroll-table" #headerTable [nzData]="paginationResult.data" [nzFrontPagination]="false">
-      <!-- [nzScroll]="{ y: 'calc(100vh - 244px)' }" -->
       <thead>
         <tr>
           <th nzWidth="60px">STT</th>
-          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('Mã', $event)">
+          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('code', $event)">
             MÃ KỲ
           </th>
-          <th nzAlign="left" [nzSortFn]="true" (nzSortOrderChange)="onSortChange('Tên kỳ', $event)">
+          <th nzAlign="left" [nzSortFn]="true" (nzSortOrderChange)="onSortChange('name', $event)">
             TÊN KỲ
           </th>
-          <th nzAlign="left" [nzSortFn]="true" (nzSortOrderChange)="onSortChange('thời gian bat dau', $event)">
+          <th nzAlign="left" [nzSortFn]="true" (nzSortOrderChange)="onSortChange('startDate', $event)">
             THỜI GIAN BẮT ĐẦU
           </th>
-          <th nzAlign="left" [nzSortFn]="true" (nzSortOrderChange)="onSortChange('Thời gian kết thúc', $event)">
+          <th nzAlign="left" [nzSortFn]="true" (nzSortOrderChange)="onSortChange('endDate', $event)">
             THỜI GIAN KẾT THÚC
           </th>
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('trạng thái', $event)" nzAlign="center">
@@ -72,7 +71,6 @@
           <td></td>
 
           <td nzAlign="center" style=" display: flex; justify-content: center;">
-            <!-- <div nz-row [nzGutter]="1" style=" display: flex; align-items: center; justify-content: center;"> -->
             <button class="!flex !items-center" nzType="default" nz-button (click)="openDrawerTieuChi(data.id)">
               <span nz-icon nzType="edit"></span>Cập nhập tiêu chí
             </button>
@@ -80,7 +78,6 @@
               style="margin-left: 10px;" nzType="default" nz-button (nzOnConfirm)="DeleteKKS(data.code)">
               <span nz-icon nzType="delete" nzTheme="outline" style="cursor:pointer;"></span>
             </button>
-            <!-- </div> -->
           </td>
         </tr>
       </tbody>

@@ -1,4 +1,5 @@
-import { Component } from '@angular/core'
+import { Component } from '@angular/core';
+
 import { ShareModule } from '../../shared/share-module'
 import { FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms'
 import { AccountTypeFilter } from '../../models/master-data/account-type.model'
@@ -8,15 +9,15 @@ import { AccountService } from '../../service/system-manager/account.service'
 import { GlobalService } from '../../service/global.service'
 import { NzMessageService } from 'ng-zorro-antd/message'
 
-
 @Component({
-  selector: 'app-store',
+  selector: 'app-thiet-bi-cham-diem',
   standalone: true,
   imports: [ShareModule],
-  templateUrl: './store.component.html',
-  styleUrl: './store.component.scss',
+  templateUrl: './thiet-bi-cham-diem.component.html',
+  styleUrl: './thiet-bi-cham-diem.component.scss'
 })
-export class StoreComponent {
+export class ThietBiChamDiemComponent {
+
   validateForm: FormGroup
   isSubmit: boolean = false
   visible: boolean = false
@@ -26,6 +27,7 @@ export class StoreComponent {
   loading: boolean = false
   lstATVSV = []
   lstAccount: any = []
+  text: any= ''
 
   constructor(
     private _service: StoreService,
@@ -37,20 +39,16 @@ export class StoreComponent {
     this.validateForm = this.fb.group({
       id: ['', [Validators.required]],
       name: ['', [Validators.required]],
-      KinhDo: [''],
-      ViDo: [''],
-      PhoneNumber: [''],
       isActive: [true, [Validators.required]],
       TrangThaiCuaHang: [true],
       CuaHangTruong: ['', [Validators.required]],
-      ATVSV: [[], [Validators.required]],
       NguoiPhuTrach: ['', [Validators.required]],
 
     })
     this.globalService.setBreadcrumb([
       {
-        name: 'Danh sách kiểu người dùng',
-        path: 'master-data/account-type',
+        name: 'Báo Cáo',
+        path: 'survey-report/cham-diem-theo-khung-thoi-gian',
       },
     ])
     this.globalService.getLoading().subscribe((value) => {
