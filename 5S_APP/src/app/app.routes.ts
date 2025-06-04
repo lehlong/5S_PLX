@@ -6,6 +6,7 @@ import { NewsComponent } from './tabs/news/news.component';
 import { NotificationsComponent } from './tabs/notifications/notifications.component';
 import { AccountComponent } from './tabs/account/account.component';
 import { SurveyComponent } from './tabs/survey/survey.component';
+import { homeRouter } from './tabs/home/home.routes';
 
 export const routes: Routes = [
   {
@@ -13,7 +14,7 @@ export const routes: Routes = [
     component: MainLayoutComponent,
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
-      { path: 'home', component: HomeComponent },
+      { path: 'home', children: homeRouter },
       { path: 'report', component: ReportComponent },
       { path: 'news', component: NewsComponent },
       { path: 'notifications', component: NotificationsComponent },
