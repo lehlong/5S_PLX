@@ -7,6 +7,8 @@ import { StoreService } from '../../service/master-data/store.service'
 import { AccountService } from '../../service/system-manager/account.service'
 import { GlobalService } from '../../service/global.service'
 import { NzMessageService } from 'ng-zorro-antd/message'
+import { SurveyMgmtService } from '../../service/business/survey-mgmt.service';
+import { KiKhaoSatService } from '../../service/master-data/ki-khao-sat.service';
 
 
 @Component({
@@ -27,10 +29,20 @@ export class KetQuaChamDiemComponent {
   loading: boolean = false
   lstATVSV = []
   lstAccount: any = []
-  text: any= ''
+  lstSurvey: any = []
+  lstKiKhaoSat: any = []
+  lstAllKiKhaoSat: any = []
+  lstDoiTuong: any = []
+  text: any = ''
+  surveyId: any = null
+  kiKhaosatId: any = null
+  storeId: any = null
+  wareHouseId: any = null
 
   constructor(
     private _service: StoreService,
+    private _surveyService: SurveyMgmtService,
+    private _kiKhaoSatService: KiKhaoSatService,
     private fb: NonNullableFormBuilder,
     private globalService: GlobalService,
     private message: NzMessageService,
@@ -62,6 +74,8 @@ export class KetQuaChamDiemComponent {
   ngOnInit(): void {
     this.search()
     this.getAllAccount()
+    this.getAllSurvey()
+    this.getAllKiKhaoSat()
   }
 
   onSortChange(name: string, value: any) {
@@ -86,9 +100,49 @@ export class KetQuaChamDiemComponent {
     })
   }
 
+  getAllSurvey() {
+    this._surveyService.search(this.filter).subscribe({
+      next: (data) => {
+        this.lstSurvey = data.data
+        console.log(data);
+
+      },
+      error: (response) => {
+        console.log(response)
+      },
+    })
+  }
+
+  getAllKiKhaoSat() {
+    this._kiKhaoSatService.search(this.filter).subscribe({
+      next: (data) => {
+        console.log(data);
+        this.lstAllKiKhaoSat = data.data
+
+      },
+      error: (response) => {
+        console.log(response)
+      },
+    })
+  }
+
+  getAllDoiTuong() {
+    this._surveyService.getInput(this.surveyId).subscribe({
+      next: (data) => {
+        console.log(data);
+        this.lstDoiTuong = data
+
+      },
+      error: (response) => {
+        console.log(response)
+      },
+    })
+  }
+
   getAllAccount() {
     this.accountService.getall().subscribe({
       next: (data) => {
+
         this.lstAccount = data
       },
       error: (response) => {
@@ -97,6 +151,12 @@ export class KetQuaChamDiemComponent {
     })
   }
 
+  searchKiKhaoSat(){
+    console.log(this.surveyId);
+    this.getAllDoiTuong()
+    return this.lstKiKhaoSat = this.lstAllKiKhaoSat.filter((x: any) => x.surveyMgmtId == this.surveyId)
+
+  }
 
   isCodeExist(code: string): boolean {
     return this.paginationResult.data?.some(

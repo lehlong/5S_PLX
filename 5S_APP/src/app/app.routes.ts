@@ -5,6 +5,7 @@ import { ReportComponent } from './tabs/report/report.component';
 import { NewsComponent } from './tabs/news/news.component';
 import { NotificationsComponent } from './tabs/notifications/notifications.component';
 import { AccountComponent } from './tabs/account/account.component';
+import { SurveyComponent } from './tabs/survey/survey.component';
 
 export const routes: Routes = [
   {
@@ -17,6 +18,7 @@ export const routes: Routes = [
       { path: 'news', component: NewsComponent },
       { path: 'notifications', component: NotificationsComponent },
       { path: 'account', component: AccountComponent },
+      { path: 'survey', component: SurveyComponent },
     ],
   },
 ];

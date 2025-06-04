@@ -29,9 +29,9 @@
           <nz-form-item style="display: block;">
             <h4>Cuộc Khảo Sát</h4>
             <nz-form-control nzErrorTip="Không được để trống">
-              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Chọn cuộc khảo sát" formControlName="CuaHangTruong">
-                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.fullName"
-                  [nzValue]="item.userName">
+              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Chọn cuộc khảo sát"  [(ngModel)]="surveyId" (ngModelChange)="searchKiKhaoSat()">
+                <nz-option cdkScrollable *ngFor="let item of lstSurvey" [nzLabel]="item?.name"
+                  [nzValue]="item?.id">
                 </nz-option>
               </nz-select>
             </nz-form-control>
@@ -42,21 +42,21 @@
           <nz-form-item style="display: block;">
             <h4>Kỳ Chấm Điểm</h4>
             <nz-form-control nzErrorTip="Không được để trống">
-              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Chọn kỳ chấm điểm" formControlName="CuaHangTruong">
-                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.fullName"
-                  [nzValue]="item.userName">
+              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Chọn kỳ chấm điểm" [(ngModel)]="kiKhaosatId">
+                <nz-option cdkScrollable *ngFor="let item of lstKiKhaoSat" [nzLabel]="item?.name"
+                  [nzValue]="item?.id">
                 </nz-option>
               </nz-select>
             </nz-form-control>
           </nz-form-item>
         </div>
 
-        <div nz-col [nzXs]="24" [nzMd]="6">
+        <div nz-col [nzXs]="24" [nzMd]="6" *ngIf="lstDoiTuong.inputStores != []">
           <nz-form-item style="display: block;">
             <h4>Cửa Hàng</h4>
             <nz-form-control nzErrorTip="Không được để trống">
-              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Chọn cửa hàng" formControlName="CuaHangTruong">
-                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.fullName"
+              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Chọn cửa hàng"  [(ngModel)]="storeId">
+                <nz-option cdkScrollable *ngFor="let item of lstDoiTuong.inputStores" [nzLabel]="item.fullName"
                   [nzValue]="item.userName">
                 </nz-option>
               </nz-select>
@@ -64,6 +64,18 @@
           </nz-form-item>
         </div>
 
+        <!-- <div nz-col [nzXs]="24" [nzMd]="6" *ngIf="lstDoiTuong.inputWareHouse != []">
+          <nz-form-item style="display: block;">
+            <h4>kho</h4>
+            <nz-form-control nzErrorTip="Không được để trống">
+              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Chọn cửa hàng"  [(ngModel)]="storeId">
+                <nz-option cdkScrollable *ngFor="let item of lstDoiTuong.inputWareHouse" [nzLabel]="item.fullName"
+                  [nzValue]="item.userName">
+                </nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div> -->
         <div nz-col [nzXs]="24" [nzMd]="6">
           <h4>'</h4>
           <div class="">
