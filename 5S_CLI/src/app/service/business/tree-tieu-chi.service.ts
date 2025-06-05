@@ -8,7 +8,7 @@ import {Observable} from 'rxjs';
 export class TreeTieuChiService {
   constructor(private commonService: CommonService) {}
 
-  GetTreeTieuChi(param: any): Observable<any> {
+  BuildDataForTree(param: any): Observable<any> {
     return this.commonService.get(`TieuChi/BuildDataForTree?kiKhaoSatId=${param}`);
   }
 

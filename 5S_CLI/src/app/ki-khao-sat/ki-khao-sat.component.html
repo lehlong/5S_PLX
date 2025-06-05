@@ -180,8 +180,8 @@
                 <a>{{ data.storeId }}</a>
               </td>
               <td nzAlign="left">{{ data.name }}</td>
-              <td nzAlign="left">{{ getNameByCodeAccount(data.cuaHangTruong)  }}</td>
-              <td nzAlign="left">{{ getNameByCodeAccount(data.nguoiPhuTrach)  }}</td>
+              <td nzAlign="left">{{ getNameByCodeAccount(data.cuaHangTruong) }}</td>
+              <td nzAlign="left">{{ getNameByCodeAccount(data.nguoiPhuTrach) }}</td>
               <td nzAlign="center">
                 <nz-select style="width: 100%;" [nzMaxTagCount]="3" [nzMaxTagPlaceholder]="tagPlaceHolder"
                   nzMode="multiple" nzPlaceHolder="Please select" [ngModelOptions]="{ standalone: true }"
@@ -253,6 +253,7 @@
     <ng-template #tagPlaceHolder let-selectedList>and {{ selectedList.length }} more selected</ng-template>
   </ng-container>
 </nz-drawer>
+
 <ng-template #extra>
   <nz-space>
     <ng-container *ngIf="edit">
@@ -281,7 +282,7 @@
 
 
 
-<!-- Drawer Component -->
+<!-- Drawer Component cây tiêu chí tree -->
 <nz-drawer [nzVisible]="drawerVisible" nzWidth="85%" nzPlacement="right" nzTitle="CẬP NHẬT TIÊU CHÍ CHẤM ĐIỂM"
   (nzOnClose)="closeDrawer()">
   <div class="container" *nzDrawerContent>
@@ -298,7 +299,7 @@
             (nzSearchValueChange)="nzEvent($event)" (nzOnDrop)="onDrop($event)" (nzOnDragStart)="onDragStart($event)"
             [nzTreeTemplate]="nzTreeTemplate" [nzExpandedIcon]="multiExpandedIconTpl">
             <ng-template #nzTreeTemplate let-node nzWidth="85%">
-              <div class="flex items-center justify-between pr-4 gap-2 w-full" (click)="onClick(node)" >
+              <div class="flex items-center justify-between pr-4 gap-2 w-full" (click)="onClick(node)">
                 <div class="truncate whitespace-nowrap overflow-hidden text-ellipsis" [title]="node.title"
                   style="  white-space: nowrap;  overflow: hidden;  text-overflow: ellipsis; max-width: calc(100% - 80px); padding: 3px 0;">
                   {{ node.title }}
@@ -306,8 +307,8 @@
                 <div class="" style=" position: absolute;    right: 0px; ">
                   <ng-container *ngIf="node.origin.pId !== '-1'">
                     <button nz-popconfirm nzPopconfirmTitle="Bạn có chắc chắn muốn xóa không?"
-                      style="border: none; background: none; color: red;" class="!flex !items-center" nzType="default" nz-button
-                      (nzOnConfirm)="deleteTree(node)">
+                      style="border: none; background: none; color: red;" class="!flex !items-center" nzType="default"
+                      nz-button (nzOnConfirm)="deleteTree(node)">
                       <span nz-icon nzType="delete" nzTheme="outline" style="cursor:pointer;"></span>
                     </button>
                   </ng-container>
@@ -372,94 +373,101 @@
 
 <!-- Create/Edit Form tiêu chí lá-->
 <nz-modal [(nzVisible)]="leavesVisible" [nzTitle]="edit ? 'Chỉnh Sửa Tiêu Chí' : 'Thêm Mới Tiêu Chí'"
-  style="background-color: rgb(182, 188, 197)" (nzOnCancel)="closeModal()" [nzWidth]="1400" [nzMask]="!edit"
+  style="background-color: rgb(138, 158, 188)" (nzOnCancel)="closeModal()" [nzWidth]="1400" [nzMask]="!edit"
   [nzFooter]="extra1" [nzBodyStyle]="{height: '70%', overflow: 'auto'}">
-  <div nz-row [nzGutter]="16" *nzModalContent>
-    <div nz-col [nzSpan]="12">
-      <div class="inner-box" style="padding:5px 0px !important;">
-        <label nzRequired class="block-label">Mã tiêu chí</label>
-        <input nz-input [(ngModel)]="leavesNode.id" />
-      </div>
-    </div>
-    <div nz-col [nzSpan]="12" style="display: flex; align-items: center;">
-      <div class="inner-box"
-        style="display: flex; align-items: center; gap: 16px; width: 100%; justify-content: center;">
-        <label nz-checkbox [(ngModel)]="leavesNode.isImg" class="mr-4">Bắt buộc phải chọn ảnh</label>
-        <label nz-checkbox [(ngModel)]="leavesNode.chiChtAtvsv">Chỉ yêu cầu CHT, ATV chụp ảnh</label>
-      </div>
-    </div>
 
-    <div nz-col [nzSpan]="12">
-      <div class="inner-box" style="padding:5px 0px !important;">
-        <label class="block-label">Số thứ tự</label>
-        <input nz-input [(ngModel)]="leavesNode.orderNumber" type="number" />
-      </div>
-    </div>
-    <div nz-col [nzSpan]="12">
-      <div class="inner-box" style="padding:5px 0px;">
-        <label class="block-label">Số ảnh tối thiểu</label>
-        <input nz-input [(ngModel)]="leavesNode.numberImg" type="number" />
-      </div>
-    </div>
+  <ng-container *nzModalContent>
+    <nz-tabset>
 
-    <div nz-col [nzSpan]="24">
-      <div class="inner-box" style="padding:5px 0px;">
-        <label nzRequired class="block-label">Tên tiêu chí</label>
-        <input nz-input [(ngModel)]="leavesNode.name" />
-      </div>
-    </div>
+      <nz-tab nzTitle="Thông Tin Tiêu Chí">
 
-    <div nz-col [nzSpan]="24">
-      <div class="inner-box" style="padding:5px 0px;">
-        <label class="block-label">Cảnh báo</label>
-        <input nz-input [(ngModel)]="leavesNode.report" />
-      </div>
-    </div>
+        <div nz-row [nzGutter]="16">
+          <div nz-col [nzSpan]="12">
+            <div class="inner-box" style="padding:5px 0px !important;">
+              <label nzRequired class="block-label">Mã tiêu chí</label>
+              <input nz-input [(ngModel)]="leavesNode.id" />
+            </div>
+          </div>
 
-    <div nz-col [nzSpan]="24">
-      <div class="inner-box flex ant-flex-justify-space-between" style="padding:10px 0px;">
-        <label class="block-label" style="font-size: large; font-weight: 700;">Cách tính điểm</label>
-        <button nz-button nzType="dashed" class="mt-2" (click)="addCalculationRow()">
-          <i nz-icon nzType="plus-circle"></i> Thêm mới
-        </button>
-      </div>
-      <nz-form-item *ngIf="calculationRows?.length > 0">
-        <nz-form-control>
-          <nz-table #calculationTable [nzBordered]="true" [nzData]="calculationRows" [nzSize]="'middle'">
-            <thead>
-              <tr>
-                <th nzWidth="50px">STT</th>
-                <th>Mô tả</th>
-                <th nzWidth="300px">Điểm</th>
-                <th nzWidth="50px">#</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let row of calculationRows; let i = index">
-                <ng-container *ngIf="row.isDeleted != true">
+          <div nz-col [nzSpan]="12">
+            <!-- <div class="inner-box" style="padding:5px 0px !important;">
+              <label class="block-label">Số thứ tự</label>
+              <input nz-input [(ngModel)]="leavesNode.orderNumber" type="number" />
+            </div> -->
+          </div>
+          <div nz-col [nzSpan]="12">
+            <div class="inner-box" style="padding:5px 0px;">
+              <label class="block-label">Số ảnh tối thiểu</label>
+              <input nz-input [(ngModel)]="leavesNode.numberImg" type="number" />
+            </div>
+          </div>
+          <div nz-col [nzSpan]="12" style="display: flex; align-items: center;">
+            <div class="inner-box"
+              style="display: flex; align-items: center; gap: 16px; width: 100%; justify-content: center;">
+              <label nz-checkbox [(ngModel)]="leavesNode.isImg" class="mr-4">Bắt buộc phải chọn ảnh</label>
+              <label nz-checkbox [(ngModel)]="leavesNode.chiChtAtvsv">Chỉ yêu cầu CHT, ATV chụp ảnh</label>
+            </div>
+          </div>
 
-                  <td>{{ i + 1 }}</td>
-                  <td><input nz-input [(ngModel)]="row.moTa" placeholder="Nhập mô tả" /></td>
-                  <td><input nz-input [(ngModel)]="row.diem" type="number" placeholder="Nhập điểm" />
-                  </td>
-                  <td>
-                    <button *ngIf="edit" nz-button nzType="default" nzDanger (click)="deleteCalculationRow(row, i)">
-                      <i nz-icon nzType="delete"></i>
-                    </button>
-                    <button nz-button *ngIf="!edit" nzType="default" nzDanger (click)="removeCalculationRow(i)">
-                      <i nz-icon nzType="delete"></i>
-                    </button>
-                  </td>
-                </ng-container>
-              </tr>
-            </tbody>
-          </nz-table>
-        </nz-form-control>
-      </nz-form-item>
-    </div>
+          <div nz-col [nzSpan]="24">
+            <div class="inner-box" style="padding:5px 0px;">
+              <label nzRequired class="block-label">Tên tiêu chí</label>
+              <input nz-input [(ngModel)]="leavesNode.name" />
+            </div>
+          </div>
 
-    <!-- Sixth Row: Upload -->
-    <!-- <div nz-col [nzSpan]="24">
+          <div nz-col [nzSpan]="24">
+            <div class="inner-box" style="padding:5px 0px;">
+              <label class="block-label">Cảnh báo</label>
+              <input nz-input [(ngModel)]="leavesNode.report" />
+            </div>
+          </div>
+
+          <div nz-col [nzSpan]="24">
+            <div class="inner-box flex ant-flex-justify-space-between" style="padding:10px 0px;">
+              <label class="block-label" style="font-size: large; font-weight: 700;">Cách tính điểm</label>
+              <button nz-button nzType="dashed" class="mt-2" (click)="addCalculationRow()">
+                <i nz-icon nzType="plus-circle"></i> Thêm mới
+              </button>
+            </div>
+            <nz-form-item *ngIf="calculationRows?.length > 0">
+              <nz-form-control>
+                <nz-table #calculationTable [nzBordered]="true" [nzData]="calculationRows" [nzSize]="'middle'">
+                  <thead>
+                    <tr>
+                      <th nzWidth="50px">STT</th>
+                      <th>Mô tả</th>
+                      <th nzWidth="300px">Điểm</th>
+                      <th nzWidth="50px">#</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let row of calculationRows; let i = index">
+                      <ng-container *ngIf="row.isDeleted != true">
+
+                        <td>{{ i + 1 }}</td>
+                        <td><input nz-input [(ngModel)]="row.moTa" placeholder="Nhập mô tả" /></td>
+                        <td><input nz-input [(ngModel)]="row.diem" type="number" placeholder="Nhập điểm" />
+                        </td>
+                        <td>
+                          <button *ngIf="edit" nz-button nzType="default" nzDanger
+                            (click)="deleteCalculationRow(row, i)">
+                            <i nz-icon nzType="delete"></i>
+                          </button>
+                          <button nz-button *ngIf="!edit" nzType="default" nzDanger (click)="removeCalculationRow(i)">
+                            <i nz-icon nzType="delete"></i>
+                          </button>
+                        </td>
+                      </ng-container>
+                    </tr>
+                  </tbody>
+                </nz-table>
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+
+          <!-- Sixth Row: Upload -->
+          <!-- <div nz-col [nzSpan]="24">
       <nz-form-item>
         <nz-form-label class="block-label">Upload ảnh</nz-form-label>
         <nz-form-control>
@@ -473,7 +481,96 @@
         </nz-form-control>
       </nz-form-item>
     </div> -->
-  </div>
+        </div>
+
+      </nz-tab>
+      <nz-tab nzTitle="Không Áp Dụng Cửa Hàng">
+        <nz-table *ngIf="inputKi.lstInputStore?.length  != 0" class="auto-scroll-table" #headerTable
+          [nzData]="inputKi.lstInputStore" [nzFrontPagination]="false" [nzScroll]="{ y: 'calc(100vh - 244px)' }">
+          <thead>
+            <tr>
+              <th nzWidth="60px" [(nzChecked)]="checkedAllStore" (nzCheckedChange)="onAllCheckedStore($event)"></th>
+              <th nzWidth="160px" [nzSortFn]="true" [nzAlign]="'left'">
+                Mã Kì
+              </th>
+              <th [nzSortFn]="true">
+                Tên Cửa Hàng
+              </th>
+              <th [nzSortFn]="true">
+                Cửa Hàng Trưởng
+              </th>
+              <th [nzSortFn]="true">
+                Người Phụ Trách
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr >
+
+              <td><span nz-icon nzType="history"></span></td>
+              <td nzAlign="center"><input nz-input type="text"></td>
+              <td nzAlign="left"></td>
+              <td nzAlign="left"></td>
+              <td nzAlign="left"></td>
+            </tr>
+
+            <tr *ngFor="let data of inputKi.lstInputStore; let i = index">
+
+              <td nzWidth="60px" [nzChecked]="isCheckedStore(data.id)" (nzCheckedChange)="onItemCheckedStore(data, $event)"></td>
+              <td nzAlign="center">
+                <a>{{ data.storeId }}</a>
+              </td>
+              <td nzAlign="left">{{ data.name }}</td>
+              <td nzAlign="left">{{ getNameByCodeAccount(data.cuaHangTruong) }}</td>
+              <td nzAlign="left">{{ getNameByCodeAccount(data.nguoiPhuTrach) }}</td>
+            </tr>
+          </tbody>
+        </nz-table>
+
+        <nz-table *ngIf="inputKi.lstInputWareHouse?.length  != 0" class="auto-scroll-table" #headerTable
+          [nzData]="inputKi.lstInputWareHouse" [nzFrontPagination]="false" [nzScroll]="{ y: 'calc(100vh - 244px)' }">
+          <thead>
+            <tr>
+              <th></th>
+              <th nzWidth="160px" [nzSortFn]="true" [nzAlign]="'left'">
+                Mã Kì
+              </th>
+              <th [nzSortFn]="true">
+                Tên Kho
+              </th>
+              <th [nzSortFn]="true">
+                Trưởng Kho
+              </th>
+              <th [nzSortFn]="true">
+                Người Phụ Trách
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of inputKi.lstInputWareHouse; let i = index">
+
+              <td></td>
+              <td nzAlign="center">
+                <a>{{ data.wareHouseId }}</a>
+              </td>
+              <td nzAlign="left">{{ data.name }}</td>
+              <td nzAlign="left">{{ getNameByCodeAccount(data.truongKho) }}</td>
+              <td nzAlign="left">{{ getNameByCodeAccount(data.nguoiPhuTrach) }}</td>
+
+              <!-- <ng-container *ngFor="let item of lstKho">
+                <ng-container *ngIf="item.id == data.wareHouseId">
+                  <ng-container *ngFor="let i of lstAccount">
+                    <td *ngIf="i.userName == item.truongKho">{{ i.fullName }}</td>
+                    <td *ngIf="i.userName == item.nguoiPhuTrach">{{ i.fullName }}</td>
+                  </ng-container>
+                </ng-container>
+              </ng-container> -->
+            </tr>
+          </tbody>
+        </nz-table>
+      </nz-tab>
+    </nz-tabset>
+  </ng-container>
   <ng-template #extra1>
     <ng-container *ngIf="edit">
       <button [nzLoading]="loading" nz-button nzType="primary" (click)="updateLeaves()">

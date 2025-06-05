@@ -202,7 +202,7 @@ export class KiKhaoSatComponent {
       next: (res) => {
         this.treeEditVisible = false;
         this.loading = false;
-        this.GetTreeTieuChi();
+        this.BuildDataForTree();
       },
       error: (err) => {
         console.log("object", err)
@@ -250,6 +250,7 @@ export class KiKhaoSatComponent {
   }
 
   closeModal(): void {
+    this.lstCheckedStore = []
     this.treeEditVisible = false;
     this.treeInsertVisible = false;
     this.leavesNode = {
@@ -264,6 +265,8 @@ export class KiKhaoSatComponent {
   GetTreeLeaves() {
     this._treeTieuChiService.GetTreeLeaves(this.treeId, this.kiKhaoSatId).subscribe({
       next: (data) => {
+        console.log(data.result);
+
         this.selectedNodeDetails = data.result;
       },
       error: (response) => {
@@ -274,7 +277,6 @@ export class KiKhaoSatComponent {
 
   onClick(node: any) {
     if (node.origin.children == null) {
-      console.log(node.origin);
       this.treeId = node.origin.id;
       this.GetTreeLeaves();
     } else {
@@ -317,6 +319,24 @@ export class KiKhaoSatComponent {
   }
 
   openCreLeaves(data: any): void {
+    this.calculationRows = [
+      {
+        id: '-1',
+        tieuChiCode: this.leavesNode.code,
+        moTa: 'Đạt',
+        diem: '1',
+        isActive: true,
+        isDeleted: false
+      },
+      {
+        id: '-1',
+        tieuChiCode: this.leavesNode.code,
+        moTa: 'Không đạt',
+        diem: '0',
+        isActive: true,
+        isDeleted: false
+      }
+    ]
     this.edit = false;
     this.leavesVisible = true;
     this.leavesNode.pId = this.treeId;
@@ -324,13 +344,11 @@ export class KiKhaoSatComponent {
 
   openUpdateLeaves(data: any): void {
     this.leavesNode = data;
-    this.edit = true;
     this.leavesVisible = true;
+    this.edit = true;
+    this.lstCheckedStore = data.lstCriteriaExcludedStores
     this.leavesNode.pId = this.treeId;
     this.calculationRows = data.diemTieuChi
-    console.log(this.calculationRows);
-
-    console.log(this.leavesNode);
   }
 
   openCreateKi() {
@@ -381,7 +399,6 @@ export class KiKhaoSatComponent {
     this._service.getInputKiKhaoSat(data.id).subscribe({
       next: (data) => {
         this.inputKi = data
-
       }
     })
     console.log(this.kiKhaoSat)
@@ -400,12 +417,17 @@ export class KiKhaoSatComponent {
   openDrawerTieuChi(param: any): void {
     this.drawerVisible = true;
     this.kiKhaoSatId = param;
-    this.GetTreeTieuChi();
+    this.BuildDataForTree();
+    this._service.getInputKiKhaoSat(param).subscribe({
+      next: (data) => {
+        this.inputKi = data
 
+      }
+    })
   }
 
-  GetTreeTieuChi() {
-    this._treeTieuChiService.GetTreeTieuChi(this.kiKhaoSatId).subscribe((res) => {
+  BuildDataForTree() {
+    this._treeTieuChiService.BuildDataForTree(this.kiKhaoSatId).subscribe((res) => {
       this.treeData = [res];
     });
   }
@@ -449,7 +471,7 @@ export class KiKhaoSatComponent {
       next: (res) => {
         this.treeInsertVisible = false;
         this.loading = false;
-        this.GetTreeTieuChi();
+        this.BuildDataForTree();
 
       },
       error: (err) => {
@@ -472,7 +494,7 @@ export class KiKhaoSatComponent {
 
     this._treeTieuChiService.UpdateOrderTree(treeData[0]).subscribe({
       next: (data) => {
-        this.GetTreeTieuChi()
+        this.BuildDataForTree()
       },
       error: (response) => {
         console.log(response)
@@ -505,6 +527,7 @@ export class KiKhaoSatComponent {
         this.leavesVisible = false;
         this.loading = false;
         this.GetTreeLeaves();
+        this.closeModal()
       },
       error: (err) => {
         console.log("object", err)
@@ -546,6 +569,7 @@ export class KiKhaoSatComponent {
         this.loading = false;
       },
     });
+
     this.closeModal();
   }
 
@@ -556,7 +580,7 @@ export class KiKhaoSatComponent {
       next: (res) => {
         this.treeEditVisible = false;
         this.loading = false;
-        this.GetTreeTieuChi();
+        this.BuildDataForTree();
       },
       error: (err) => {
         this.loading = false;
@@ -568,7 +592,7 @@ export class KiKhaoSatComponent {
     this.selectedNodeDetails = data
     this._treeTieuChiService.UpdateOrderLeaves(data).subscribe({
       next: (data) => {
-        this.GetTreeTieuChi()
+        this.BuildDataForTree()
       },
       error: (response) => {
         console.log(response)
@@ -586,4 +610,60 @@ export class KiKhaoSatComponent {
     const item = this.lstAccount.find((x: any) => x.userName === code);
     return item ? item.fullName : code;
   }
+
+
+  checkedAllStore: any = false
+  lstCheckedStore: any = []
+
+  onAllCheckedStore(checked: boolean) {
+    this.checkedAllStore = checked;
+    this.inputKi.lstInputStore.forEach((store: any) => {
+      const idx = this.lstCheckedStore.findIndex(
+        (i: any) => i.storeId === store.id && i.tieuChiCode === this.leavesNode.code
+      );
+
+      if (idx !== -1) {
+        this.lstCheckedStore[idx].isDeleted = !checked && this.lstCheckedStore[idx].code !== '-1';
+        if (!checked && this.lstCheckedStore[idx].code === '-1') this.lstCheckedStore.splice(idx, 1);
+      } else if (checked) {
+        this.lstCheckedStore.push({
+          code: "-1",
+          storeId: store.id,
+          tieuChiCode: this.leavesNode.code,
+          isDeleted: false
+        });
+      }
+    });
+    console.log(this.lstCheckedStore);
+
+  }
+
+  onItemCheckedStore(store: any, checked: boolean) {
+    const idx = this.lstCheckedStore.findIndex(
+      (i: any) => i.storeId === store.id && i.tieuChiCode === this.leavesNode.code
+    );
+
+    if (idx !== -1) {
+      if (checked) this.lstCheckedStore[idx].isDeleted = false;
+      else this.lstCheckedStore[idx].code !== '-1'
+        ? this.lstCheckedStore[idx].isDeleted = true
+        : this.lstCheckedStore.splice(idx, 1);
+    } else if (checked) {
+      this.lstCheckedStore.push({
+        code: "-1",
+        storeId: store.id,
+        tieuChiCode: this.leavesNode.code,
+        isDeleted: false
+      });
+    }
+    console.log(this.lstCheckedStore);
+
+  }
+
+  isCheckedStore = (id: string) =>
+    this.lstCheckedStore.some(
+      (i: any) => i.storeId === id && i.tieuChiCode === this.leavesNode.code && !i.isDeleted
+    );
+
+
 }

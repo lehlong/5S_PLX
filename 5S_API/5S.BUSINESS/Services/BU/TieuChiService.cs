@@ -72,6 +72,11 @@ namespace PLX5S.BUSINESS.Services.BU
                     item.TieuChiCode = tieuChi.Code;
                     _dbContext.TblBuTinhDiemTieuChi.Add(item);
                 }
+                foreach (var item in data.LstCriteriaExcludedStores)
+                {
+                    item.Code = Guid.NewGuid().ToString();
+                    _dbContext.TblBuCriteriaExcludedStores.Add(item);
+                }
 
                 await _dbContext.SaveChangesAsync();
             }
@@ -220,7 +225,9 @@ namespace PLX5S.BUSINESS.Services.BU
                         NumberImg = item.NumberImg,
                         KiKhaoSatId = item.KiKhaoSatId,
                         OrderNumber = item.OrderNumber,
-                        DiemTieuChi = _dbContext.TblBuTinhDiemTieuChi.Where(x => x.TieuChiCode == item.Code && x.IsDeleted != true).ToList()
+                        DiemTieuChi = _dbContext.TblBuTinhDiemTieuChi.Where(x => x.TieuChiCode == item.Code && x.IsDeleted != true).ToList(),
+                        LstCriteriaExcludedStores = _dbContext.TblBuCriteriaExcludedStores.Where(x => x.TieuChiCode == item.Code && x.IsDeleted != true).ToList() ?? null
+
                     };
                     lstTieuChiLeaves.Add(leaves);
                 }
@@ -238,6 +245,8 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
+                var lstDiem = new List<TblBuTinhDiemTieuChi>();
+                var lstTieuChikhongApDungCuaHang = new List<TblBuTinhDiemTieuChi>();
                 _dbContext.TblBuTieuChi.Update(new TblBuTieuChi()
                 {
                     Code= item.Code,
@@ -262,6 +271,18 @@ namespace PLX5S.BUSINESS.Services.BU
                     {
                         diem.Id = Guid.NewGuid().ToString();
                         _dbContext.TblBuTinhDiemTieuChi.Add(diem);
+                    }
+                }
+                foreach (var store in item.LstCriteriaExcludedStores)
+                {
+                    if (store.Code != "-1")
+                    {
+                        _dbContext.TblBuCriteriaExcludedStores.Update(store);
+                    }
+                    else
+                    {
+                        store.Code = Guid.NewGuid().ToString();
+                        _dbContext.TblBuCriteriaExcludedStores.Add(store);
                     }
                 }
                 await _dbContext.SaveChangesAsync();
@@ -371,6 +392,34 @@ namespace PLX5S.BUSINESS.Services.BU
                 }
             }
         }
+
+        public async Task<List<TblBuCriteriaExcludedStores>> getStoresExcluded(string tieuChiCode)
+        {
+            try
+            {
+                return _dbContext.TblBuCriteriaExcludedStores.Where(x => x.TieuChiCode == tieuChiCode).ToList();
+            }
+            catch(Exception ex)
+            {
+                Status = false;
+                Exception = ex;
+                return null;
+            }
+        }
+
+        public async Task addStoresExcluded(List<TblBuCriteriaExcludedStores> data)
+        {
+            try
+            {
+                _dbContext.TblBuCriteriaExcludedStores.AddRange(data);
+            }
+            catch (Exception ex)
+            {
+                Status = false;
+                Exception = ex;
+            }
+        }
+
 
     }
 }

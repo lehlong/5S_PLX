@@ -30,6 +30,8 @@ namespace PLX5S.BUSINESS.Models
         public string SurveyMgmtId { get; set; }
         public List<string>? LstChamDiem { set; get; } = new List<string>();
         public List<TblBuInputChamDiem>? LstInChamDiem { set; get; } = new List<TblBuInputChamDiem>();
+        public List<TblBuCriteriaExcludedStores>? LstCriteriaExcludedStores { set; get; }
+
     }
     public class InputWarehouse
     {
@@ -41,6 +43,7 @@ namespace PLX5S.BUSINESS.Models
         public string WareHouseId { get; set; }
         public string SurveyMgmtId { get; set; }
         public List<string>? LstChamDiem { set; get; } = new List<string>();
+        public List<TblBuCriteriaExcludedStores>? LstCriteriaExcludedStores { set; get; }
         public List<TblBuInputChamDiem>? LstInChamDiem { set; get; } = new List<TblBuInputChamDiem>();
     }
 

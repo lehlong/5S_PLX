@@ -53,7 +53,7 @@ export class DanhGiaTieuChiComponent {
   }
   openDrawer(param : any): void {
     this.drawerVisible = true;
-    this._service.GetTreeTieuChi(param).subscribe((res) => {
+    this._service.BuildDataForTree(param).subscribe((res) => {
       console.log(res);
 
       this.treeData = [res];
@@ -154,7 +154,7 @@ export class DanhGiaTieuChiComponent {
    onClick(node: any) {
     console.log('Node clicked:', node);
     this._service
-      .GetTreeTieuChi({
+      .BuildDataForTree({
         kiKhaoSatId: 'string',
       })
       // .subscribe((res) => {

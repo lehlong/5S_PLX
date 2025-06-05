@@ -52,6 +52,8 @@ namespace PLX5S.BUSINESS.Dtos.BU
         
         public List<TblBuTinhDiemTieuChi>? DiemTieuChi { set; get; }
 
+        public List<TblBuCriteriaExcludedStores>? LstCriteriaExcludedStores { set; get; }
+
         public void Mapping(Profile profile)
         {
             profile.CreateMap<TblBuTieuChi, TieuChiDto>().ReverseMap();
