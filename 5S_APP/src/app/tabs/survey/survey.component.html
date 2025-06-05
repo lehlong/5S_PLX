@@ -1,1 +1,9 @@
- <ion-button style="flex: 0 0 10%"  href="/survey/store/list">Xác nhận</ion-button>
+<ion-content>
+  <ion-accordion-group #accordionGroup>
+    <ion-item *ngFor="let item of data">
+      <ion-button expand="block" (click)="navigateTo(item)">
+        {{ item.name }}
+      </ion-button>
+    </ion-item>
+  </ion-accordion-group>
+</ion-content>

@@ -9,8 +9,10 @@ export const surveyRoutes: Routes = [
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: '', component: SurveyComponent },
-      { path: 'store/list', component: ListComponent },
+      { path: 'store/list/:id', component: ListComponent },
       { path: 'store/evaluate', component: EvaluateComponent },
+      { path: 'ware-house/list', component: ListComponent },
+      { path: 'ware-house/evaluate', component: EvaluateComponent },
     ],
   },
 ];

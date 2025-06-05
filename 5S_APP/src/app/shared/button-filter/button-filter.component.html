@@ -1,7 +1,7 @@
 <ion-button color="dark" fill="clear" id="open-modal">
   <ion-icon name="filter-outline"></ion-icon>
 </ion-button>
-<ion-modal #modal trigger="open-modal" [canDismiss]="canDismiss" >
+<ion-modal #modal trigger="open-modal" [canDismiss]="canDismiss">
   <ng-template>
     <ion-header>
       <ion-toolbar>
@@ -18,41 +18,47 @@
           label="Chọn kỳ thời gian"
           label-placement="floating"
         >
-          <ion-select-option value="1">Tháng 6</ion-select-option>
-          <ion-select-option value="2">Tháng 7</ion-select-option>
-          <ion-select-option value="3">Tháng 8</ion-select-option>
+          <ion-select-option *ngFor="let item of data" [value]="item.code">{{
+            item.name
+          }}</ion-select-option>
         </ion-select>
         <ion-select
           formControlName="selectedStore"
           label="Chọn cửa hàng"
           label-placement="floating"
         >
-          <ion-select-option value="1">PETROLIMEX-1</ion-select-option>
-          <ion-select-option value="2">PETROLIMEX-2</ion-select-option>
-          <ion-select-option value="3">PETROLIMEX-3</ion-select-option>
+          <ion-select-option
+            *ngFor="let store of mockStores"
+            [value]="store.id"
+            >{{ store.name }}</ion-select-option
+          >
         </ion-select>
         <ion-select
           formControlName="selectedPerson"
           label="Chọn người chấm"
           label-placement="floating"
         >
-          <ion-select-option value="1">Nguyễn Văn A </ion-select-option>
-          <ion-select-option value="2">Nguyễn Văn B</ion-select-option>
-          <ion-select-option value="3">Nguyễn Văn C</ion-select-option>
+          <ion-select-option
+            *ngFor="let acc of mockAccounts"
+            [value]="acc.userName"
+            >{{ acc.fullName }}</ion-select-option
+          >
         </ion-select>
-        <ion-checkbox formControlName="storeChecked" labelPlacement="end"
-          >Cửa hàng tôi chấm</ion-checkbox
-        >
-        <ion-checkbox formControlName="storeUnchecked" labelPlacement="end"
-          >Cửa hàng chưa chấm</ion-checkbox
-        >
-        <div style="display: flex">
-          <ion-button style="flex: 0 0 80%" (click)="applyFilter()"
-            >Xác nhận</ion-button
+        <div style="margin-top: 20px;">
+          <ion-checkbox formControlName="storeChecked" labelPlacement="end"
+            >Cửa hàng tôi chấm</ion-checkbox
           >
-          <ion-button style="flex: 1" (click)="resetFilters()"
-            >Reset</ion-button
+          <ion-checkbox formControlName="storeUnchecked" labelPlacement="end"
+            >Cửa hàng chưa chấm</ion-checkbox
           >
+          <div style="display: flex">
+            <ion-button style="flex: 0 0 80%" (click)="applyFilter()"
+              >Xác nhận</ion-button
+            >
+            <ion-button style="flex: 1" (click)="resetFilters()"
+              >Reset</ion-button
+            >
+        </div>
         </div>
       </form>
     </ion-content>
