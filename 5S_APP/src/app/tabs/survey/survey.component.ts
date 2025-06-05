@@ -1,10 +1,15 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { SharedModule } from '../../shared/shared.module';
+// import { IonicModule } from '@ionic/angular';
 import { IonAccordionGroup } from '@ionic/angular';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-survey',
-  imports: [SharedModule],
+  imports: [
+    RouterModule,
+    SharedModule
+  ],
   templateUrl: './survey.component.html',
   styleUrls: ['./survey.component.scss'],
 })
@@ -15,44 +20,4 @@ export class SurveyComponent implements OnInit {
   }
   ngOnInit() { }
 
-  toggleAccordion = () => {
-    const nativeEl = this.accordionGroup;
-    if (nativeEl.value === 'second') {
-      nativeEl.value = undefined;
-    } else {
-      nativeEl.value = 'second';
-    }
-  };
-  treeData = [
-    {
-      label: 'First Accordion',
-      value: 'first',
-      children: [
-        {
-          label: 'First Child',
-          value: 'a',
-          children: [
-            {
-              label: 'First Child',
-              value: 'd',
-
-            },
-            { label: 'Second Child', value: 'e' },
-            { label: 'Third Child', value: 'f' },
-          ],
-
-        },
-        { label: 'Second Child', value: 'b' },
-        { label: 'Third Child', value: 'c' },
-      ],
-    },
-    {
-      label: 'Second Accordion',
-      value: 'second',
-    },
-    {
-      label: 'Third Accordion',
-      value: 'third',
-    },
-  ];
 }

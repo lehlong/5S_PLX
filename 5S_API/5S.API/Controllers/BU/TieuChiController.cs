@@ -35,6 +35,25 @@ namespace PLX5S.API.Controllers.BU
             return Ok(transferObject);
         }
 
+        [HttpGet("BuildDataTreeForApp")]
+        public async Task<IActionResult> BuildDataTreeForApp([FromQuery] string kiKhaoSatId)
+        {
+            var transferObject = new TransferObject();
+            var result = await _service.BuildDataTreeForApp(kiKhaoSatId);
+            if (_service.Status)
+            {
+                transferObject.Data = result;
+                transferObject.Status = true;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
+
         [HttpPost("InsertTreeGroup")]
         public async Task<IActionResult> InsertTreeGroup([FromBody] TblBuTieuChi data)
         {
