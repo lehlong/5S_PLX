@@ -3,6 +3,7 @@ import { ListComponent as StoreListComponent } from './strore/list/list.componen
 import { ListComponent as WareHouseListComponent } from './ware-house/list/list.component';
 import { EvaluateComponent } from './strore/evaluate/evaluate.component';
 import { SurveyComponent } from './survey.component';
+import { CheckListComponent as StoreCheckListComponent } from './strore/check-list/check-list.component';
 
 export const surveyRoutes: Routes = [
   {
@@ -10,8 +11,9 @@ export const surveyRoutes: Routes = [
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: '', component: SurveyComponent },
-      { path: 'store/list/:id', component: StoreListComponent },
+      // { path: 'store/list/:id', component: StoreListComponent },
       { path: 'store/list', component: StoreListComponent },
+      { path: 'store/check-list/:id', component: StoreCheckListComponent },
       { path: 'store/evaluate', component: EvaluateComponent },
       { path: 'ware-house/list', component: WareHouseListComponent },
       { path: 'ware-house/evaluate', component: EvaluateComponent },

@@ -1,3 +1,28 @@
-<p>
-  check-list works!
-</p>
+<ion-header [translucent]="true">
+  <ion-toolbar>
+
+    <ion-button fill="" slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-button>
+
+    <ion-title class="t-center"> Chấm điểm 5S cửa hàng </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content color="light" class="ion-padding">
+  <ion-item-group>
+    <ion-item>
+      <ion-icon slot="start" name="calendar-outline"></ion-icon>
+      <p>aa</p>
+    </ion-item>
+    <ion-item>
+      <ion-icon slot="start" name="warning-outline"></ion-icon>
+      <p>Trạng thái</p>
+      <ion-chip slot="end" color="danger">Đã đóng</ion-chip>
+    </ion-item>
+    <ion-item>
+      <ion-icon slot="start" name="home-outline"></ion-icon>
+      <p>Cửa hàng 01</p>
+
+    </ion-item>
+  </ion-item-group>
+</ion-content>

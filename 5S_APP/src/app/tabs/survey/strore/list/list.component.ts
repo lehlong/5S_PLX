@@ -1,18 +1,29 @@
 import { Component, OnInit } from '@angular/core';
 import { ButtonFilterComponent } from 'src/app/shared/button-filter/button-filter.component';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { IonActionSheet, IonButton } from '@ionic/angular/standalone';
+import { FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-scoring-five-s',
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss'],
   standalone: true,
-  imports: [SharedModule, ButtonFilterComponent],
+  imports: [SharedModule, ButtonFilterComponent, IonActionSheet, IonButton],
 })
 export class ListComponent implements OnInit {
   filterData: any;
+  searchTime: any = ''
+  searchNguoiCham: any = ''
+  searchStore: any = ''
   selectValue = '1';
-  constructor() {}
+  filterForm!: FormGroup;
+
+  constructor(
+    private router: Router
+  ) { }
+
   initData: any[] = [
     {
       status: true,
@@ -1151,6 +1162,7 @@ export class ListComponent implements OnInit {
       },
     },
   ];
+
   data: any[] = [...this.initData];
   ngOnInit() {
     this.filterData = {
@@ -1160,10 +1172,20 @@ export class ListComponent implements OnInit {
     };
     this.data = this.initData[0].data.lstInputStore;
   }
+
   onFilterChanged(filterData: any) {
     console.log('Dữ liệu lọc:', filterData);
     this.filterData = filterData;
     this.applyFilter();
+  }
+  isOpen = false;
+
+  openFilterModal() {
+    this.isOpen = true;
+  }
+
+  closeFilterModal() {
+    this.isOpen = false;
   }
   applyFilter() {
     if (
@@ -1183,4 +1205,144 @@ export class ListComponent implements OnInit {
       });
     }
   }
+
+  navigateTo(item: any) {
+    console.log(item);
+
+    this.router.navigate([`/survey/store/check-list/${item}`]);
+  }
+  resetFilters() {
+    this.filterForm.reset({
+      selectedMonth: 'T042025',
+      selectedStore: '',
+      selectedPerson: '',
+      storeChecked: false,
+      storeUnchecked: false,
+    });
+  }
+
+  mockAccounts: any[] = [
+    {
+      userName: 'kienht',
+      fullName: 'Hoàng Trung Kiên',
+      phoneNumber: '012345678',
+      email: 'Thind@gmail.com',
+      address: 'Thanh hóa',
+      accountType: null,
+      organizeCode: null,
+      urlImage: null,
+      accountGroups: [],
+      accountRights: [],
+      isActive: true,
+    },
+    {
+      userName: 'thind',
+      fullName: 'Nguyễn Đình Thi',
+      phoneNumber: '012345678',
+      email: 'Thind@gmail.om',
+      address: 'Hưng yên',
+      accountType: null,
+      organizeCode: null,
+      urlImage: null,
+      accountGroups: [],
+      accountRights: [],
+      isActive: true,
+    },
+    {
+      userName: 'phuongtt',
+      fullName: 'Trần Thanh Phương',
+      phoneNumber: '012345678',
+      email: 'phuongtt@gmail.om',
+      address: 'Hà Nam',
+      accountType: null,
+      organizeCode: null,
+      urlImage: null,
+      accountGroups: [],
+      accountRights: [],
+      isActive: true,
+    },
+  ]
+  mockStores: any[] = [
+    {
+      id: '281001',
+      phoneNumber: '0383596052',
+      name: 'PETROLIMEX-CỬA HÀNG 01',
+      cuaHangTruong: 'thind',
+      nguoiPhuTrach: 'thind',
+      viDo: '2',
+      kinhDo: '1',
+      trangThaiCuaHang: true,
+      storeId: '281001',
+      surveyMgmtId: '03805572-e6b7-4455-90fe-9b6584eef46f',
+      lstChamDiem: [],
+      lstInChamDiem: [],
+    },
+    {
+      id: '281002',
+      phoneNumber: '0383852398',
+      name: 'PETROLIMEX-CỬA HÀNG 03',
+      cuaHangTruong: 'Doãn Thành Vinh',
+      nguoiPhuTrach: 'Nguyễn Thị Việt Hà',
+      viDo: null,
+      kinhDo: null,
+      trangThaiCuaHang: true,
+      storeId: '281002',
+      surveyMgmtId: '03805572-e6b7-4455-90fe-9b6584eef46f',
+      lstChamDiem: [],
+      lstInChamDiem: [],
+    },
+    {
+      id: '281003',
+      phoneNumber: '0383842076',
+      name: 'PETROLIMEX-CỬA HÀNG 02',
+      cuaHangTruong: 'Nguyễn Thị Vinh',
+      nguoiPhuTrach: 'Nguyễn Thị Việt Hà',
+      viDo: null,
+      kinhDo: null,
+      trangThaiCuaHang: true,
+      storeId: '281003',
+      surveyMgmtId: '03805572-e6b7-4455-90fe-9b6584eef46f',
+      lstChamDiem: [],
+      lstInChamDiem: [],
+    },
+    {
+      id: '281004',
+      phoneNumber: '0383851301',
+      name: 'PETROLIMEX-CỬA HÀNG 05',
+      cuaHangTruong: 'Võ Duy Giảng',
+      nguoiPhuTrach: 'Nguyễn Thị Việt Hà',
+      viDo: null,
+      kinhDo: null,
+      trangThaiCuaHang: true,
+      storeId: '281004',
+      surveyMgmtId: '03805572-e6b7-4455-90fe-9b6584eef46f',
+      lstChamDiem: [],
+      lstInChamDiem: [],
+    },
+  ]
+
+  public actionSheetButtons = [
+    {
+      text: 'Delete',
+      role: 'destructive',
+      data: {
+        action: 'delete',
+      },
+    },
+    {
+      text: 'Share',
+      data: {
+        action: 'share',
+      },
+    },
+    {
+      text: 'Cancel',
+      role: 'cancel',
+      data: {
+        action: 'cancel',
+      },
+    },
+  ];
+
+
 }
