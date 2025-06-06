@@ -18,7 +18,9 @@
     <ion-item>
       <ion-icon slot="start" name="warning-outline"></ion-icon>
       <p>Trạng thái</p>
-      <ion-chip slot="end" color="danger">Đã đóng</ion-chip>
+        <ion-chip *ngIf="filterKiKhaoSat.trangThaiKi === '0'" slot="end" color="danger" >Đã đóng</ion-chip>
+        <ion-chip *ngIf="filterKiKhaoSat.trangThaiKi === '1'" slot="end" color="primary" >Khởi tạo</ion-chip>
+        <ion-chip *ngIf="filterKiKhaoSat.trangThaiKi === '2'" slot="end" color="success" >Đang mở</ion-chip>
     </ion-item>
     <ion-item>
       <ion-select justify="end" interface="popover" label="Sắp xếp theo:" placeholder="" [(ngModel)]="selectValue">
@@ -32,6 +34,7 @@
     <ion-list *ngFor="let item of lstStore">
       <ion-item>
         <ion-label (click)="navigateTo(item.id)">{{item.name}}</ion-label>
+        <ion-label slot="end">0 điểm</ion-label>
       </ion-item>
     </ion-list>
   </ion-item-group>
@@ -101,8 +104,8 @@
           <div slot="content" style="height: 25vh; padding: 5px 5px;">
             <ion-content>
               <div style=" overflow-y: auto;">
-                <ion-item *ngFor="let item of lstAccout">
-                  <ion-label >{{ item.name }}</ion-label>
+                <ion-item *ngFor="let item of lstSearchChamDiem">
+                  <ion-label >{{ item.userName }}</ion-label>
                 </ion-item>
               </div>
             </ion-content>
@@ -113,7 +116,7 @@
       <div style="margin-top: 5px;">
         <ion-item>
           <ion-label>
-            <ion-checkbox labelPlacement="end">Cửa hàng tôi chấm</ion-checkbox>
+            <ion-checkbox  labelPlacement="end">Cửa hàng tôi chấm</ion-checkbox>
           </ion-label>
         </ion-item>
 

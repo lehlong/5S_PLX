@@ -213,7 +213,7 @@ namespace PLX5S.BUSINESS.Services.BU
                     var lstChamDiem2 = lstChamDiem.Where(x => x.InStoreId == store.Id).ToList();
                     var inStore = new InputStore()
                     {
-                        Id = store.Id,
+                        Id = item.Id,
                         PhoneNumber = store.PhoneNumber,
                         Name = store.Name,
                         CuaHangTruong = store.CuaHangTruong,
@@ -235,7 +235,7 @@ namespace PLX5S.BUSINESS.Services.BU
                     var lstChamDiem2 = lstChamDiem.Where(x => x.InStoreId == WareHouse.Id).ToList();
                     var inWareHousee = new InputWarehouse()
                     {
-                        Id = WareHouse.Id,
+                        Id = item.Id,
                         Name = WareHouse.Name,
                         TruongKho = WareHouse.TruongKho,
                         NguoiPhuTrach = WareHouse.NguoiPhuTrach,

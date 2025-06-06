@@ -21,6 +21,9 @@ namespace PLX5S.CORE.Entities.BU
         [Column("DES", TypeName = "NVARCHAR(50)")]
         public string? Des { get; set; }
 
+        [Column("TRANG_THAI_KI", TypeName = "NVARCHAR(1)")]
+        public string? TrangThaiKi { get; set; }
+
         [Column("START_DATE")]
         public DateTime? StartDate { get; set; }
 

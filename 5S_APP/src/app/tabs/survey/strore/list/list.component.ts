@@ -21,6 +21,7 @@ export class ListComponent implements OnInit {
   inSearchStore: any = ''
   selectValue = '1';
   lstAccout: any = []
+  lstSearchChamDiem: any = []
   lstSearchStore: any = []
   lstStore: any = []
   lstKiKhaoSat: any = []
@@ -57,11 +58,13 @@ export class ListComponent implements OnInit {
       next: (data) => {
         this.lstKiKhaoSat = data.data;
 
-        this.filterKiKhaoSat = data.data.reduce((a: any, b:any) =>
+        this.filterKiKhaoSat = data.data.reduce((a: any, b: any) =>
           new Date(a.endDate) > new Date(b.endDate) ? a : b
         );
         this.getAllStore()
         this.inputSearchKiKhaoSat = this.filterKiKhaoSat
+        console.log(this.filterKiKhaoSat);
+
 
       },
       error: (response) => {
@@ -75,6 +78,7 @@ export class ListComponent implements OnInit {
       next: (data) => {
         this.lstStore = data.lstInputStore;
         this.lstSearchStore = data.lstInputStore
+
         console.log('data', data);
       },
       error: (response) => {
@@ -89,6 +93,15 @@ export class ListComponent implements OnInit {
       next: (data) => {
         this.lstSearchStore = data.lstInputStore;
         console.log('data', data);
+        this.lstSearchChamDiem = Array.from(
+          new Map(
+            this.lstSearchStore
+              .flatMap((store: any) => store.lstInChamDiem || [])
+              .map((item: any) => [item.userName, item]) // key là userName
+          ).values()
+        );
+        console.log(this.lstSearchChamDiem);
+
       },
       error: (response) => {
         console.log(response)
@@ -111,7 +124,7 @@ export class ListComponent implements OnInit {
     this.isOpen = false;
   }
 
-  onFilter(){
+  onFilter() {
     this.filterKiKhaoSat = this.inputSearchKiKhaoSat
     this.lstStore = this.lstSearchStore
 

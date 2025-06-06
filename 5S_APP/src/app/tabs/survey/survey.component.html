@@ -10,7 +10,7 @@
   <ion-list>
     <div class="item" *ngFor="let item of data">
       <div class="item-survey" (click)="navigateTo(item)">
-       <span><ion-icon name="list-outline"></ion-icon></span>
+      <ion-icon slot="start" name="create-outline"></ion-icon>
         <p style="margin-left: 10px;">{{ item.name }}</p>
       </div>
     </div>

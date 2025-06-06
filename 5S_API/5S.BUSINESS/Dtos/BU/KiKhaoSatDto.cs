@@ -21,6 +21,9 @@ namespace PLX5S.BUSINESS.Dtos.BU
         [Description("Mô tả")]
         public string? Des { get; set; }
 
+        [Description("Trạng Thái Kì")]
+        public string? TrangThaiKi { get; set; }
+
         [Description("Ngày bắt đầu")]
         public DateTime? StartDate { get; set; }
 
