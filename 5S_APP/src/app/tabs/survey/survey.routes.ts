@@ -12,7 +12,7 @@ export const surveyRoutes: Routes = [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: '', component: SurveyComponent },
       // { path: 'store/list/:id', component: StoreListComponent },
-      { path: 'store/list', component: StoreListComponent },
+      { path: 'store/list/:id', component: StoreListComponent },
       { path: 'store/check-list/:id', component: StoreCheckListComponent },
       { path: 'store/evaluate', component: EvaluateComponent },
       { path: 'ware-house/list', component: WareHouseListComponent },

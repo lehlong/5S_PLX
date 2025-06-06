@@ -1,10 +1,16 @@
-<!-- <ion-content>
-  <ion-accordion-group #accordionGroup>
-    <ion-item *ngFor="let item of data">
-      <ion-button expand="block" (click)="navigateTo(item)">
-        {{ item.name }}
-      </ion-button>
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-button fill="" slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-button>
+    <ion-title class="t-center"> Chấm điểm 5S cửa hàng </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+
+  <ion-list>
+    <ion-item *ngFor="let item of data" >
+          <ion-button style="display: block; width: 100%; height: 50px;" href="/survey/store/list/{{ item.id }}">{{ item.name }}</ion-button>
     </ion-item>
-  </ion-accordion-group>
-</ion-content> -->
- <ion-button style="flex: 0 0 10%"  href="/survey/store/list">Xác nhận</ion-button>
+  </ion-list>
+</ion-content>
