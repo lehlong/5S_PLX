@@ -15,34 +15,35 @@ import { KyKhaoSatService } from 'src/app/service/ky-khao-sat.service';
   imports: [SharedModule, ButtonFilterComponent, IonActionSheet, IonButton],
 })
 export class ListComponent implements OnInit {
+  searchCuaHangToiCham: any = '';
+  cuaHangToiCham: boolean = false;
   filterKiKhaoSat: any = {};
-  inputSearchKiKhaoSat: any = {}
-  searchNguoiCham: any = ''
-  inSearchStore: any = ''
+  inputSearchKiKhaoSat: any = {};
+  searchNguoiCham: any = '';
+  inSearchStore: any = '';
   selectValue = '1';
-  lstAccout: any = []
-  lstSearchChamDiem: any = []
-  lstSearchStore: any = []
-  lstStore: any = []
-  lstKiKhaoSat: any = []
-  surveyId: any
+  lstAccout: any = [];
+  lstSearchChamDiem: any = [];
+  lstSearchStore: any = [];
+  lstStore: any = [];
+  lstKiKhaoSat: any = [];
+  surveyId: any;
   filterForm!: FormGroup;
 
   constructor(
     private _service: KyKhaoSatService,
     private router: Router,
-    private route: ActivatedRoute,
-  ) { }
-
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit() {
     this.route.paramMap.subscribe({
       next: (params) => {
-        const id = params.get('id')
-        this.surveyId = id
-        this.getAllKyKhaoSat()
+        const id = params.get('id');
+        this.surveyId = id;
+        this.getAllKyKhaoSat();
       },
-    })
+    });
     // this.filterData = {
     //   selectedMonth: 'T042025',
     //   selectedStore: '',
@@ -52,43 +53,43 @@ export class ListComponent implements OnInit {
   }
 
   getAllKyKhaoSat() {
-    this._service.search({
-      keyWord: this.surveyId
-    }).subscribe({
-      next: (data) => {
-        this.lstKiKhaoSat = data.data;
+    this._service
+      .search({
+        keyWord: this.surveyId,
+      })
+      .subscribe({
+        next: (data) => {
+          this.lstKiKhaoSat = data.data;
 
-        this.filterKiKhaoSat = data.data.reduce((a: any, b: any) =>
-          new Date(a.endDate) > new Date(b.endDate) ? a : b
-        );
-        this.getAllStore()
-        this.inputSearchKiKhaoSat = this.filterKiKhaoSat
-        console.log(this.filterKiKhaoSat);
-
-
-      },
-      error: (response) => {
-        console.log(response)
-      },
-    })
+          this.filterKiKhaoSat = data.data.reduce((a: any, b: any) =>
+            new Date(a.endDate) > new Date(b.endDate) ? a : b
+          );
+          this.getAllStore();
+          this.inputSearchKiKhaoSat = this.filterKiKhaoSat;
+          console.log(this.filterKiKhaoSat);
+        },
+        error: (response) => {
+          console.log(response);
+        },
+      });
   }
 
   getAllStore() {
     this._service.getInputKiKhaoSat(this.filterKiKhaoSat.id).subscribe({
       next: (data) => {
         this.lstStore = data.lstInputStore;
-        this.lstSearchStore = data.lstInputStore
+        this.lstSearchStore = data.lstInputStore;
 
         console.log('data', data);
       },
       error: (response) => {
-        console.log(response)
+        console.log(response);
       },
-    })
+    });
   }
 
   searchStore(kiKhaoSat: any) {
-    this.inputSearchKiKhaoSat = kiKhaoSat
+    this.inputSearchKiKhaoSat = kiKhaoSat;
     this._service.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
       next: (data) => {
         this.lstSearchStore = data.lstInputStore;
@@ -97,16 +98,31 @@ export class ListComponent implements OnInit {
           new Map(
             this.lstSearchStore
               .flatMap((store: any) => store.lstInChamDiem || [])
-              .map((item: any) => [item.userName, item]) // key là userName
+              .map((item: any) => [item.userName, item])
           ).values()
         );
-        console.log(this.lstSearchChamDiem);
-
+        console.log('listSearchChamDiem', this.lstSearchChamDiem);
       },
       error: (response) => {
-        console.log(response)
+        console.log(response);
       },
-    })
+    });
+  }
+  selectSearchStore(item: any) {
+    this.inSearchStore = item.name;
+    console.log('Selected store:', this.inSearchStore);
+  }
+  selectSearchChamDiem(item: any) {
+    this.searchNguoiCham = item.userName;
+    console.log('Selected người chấm điểm:', this.searchNguoiCham);
+  }
+  onCuaHangToiCham() {
+    if (this.cuaHangToiCham) {
+      this.searchCuaHangToiCham = 'thind';
+    } else {
+      this.searchCuaHangToiCham = '';
+    }
+    console.log('Giá trị cửa hàng tôi chấm', this.searchCuaHangToiCham);
   }
   onFilterChanged(filterData: any) {
     console.log('Dữ liệu lọc:', filterData);
@@ -116,7 +132,7 @@ export class ListComponent implements OnInit {
   isOpen = false;
 
   openFilterModal() {
-    this.searchStore(this.filterKiKhaoSat)
+    this.searchStore(this.filterKiKhaoSat);
     this.isOpen = true;
   }
 
@@ -125,10 +141,31 @@ export class ListComponent implements OnInit {
   }
 
   onFilter() {
-    this.filterKiKhaoSat = this.inputSearchKiKhaoSat
-    this.lstStore = this.lstSearchStore
+    const filteredStores = this.lstSearchStore.filter((store: any) => {
+      const storeMatches = this.inSearchStore
+        ? store.name.includes(this.inSearchStore)
+        : true; 
+      const personMatches = this.searchNguoiCham
+        ? store.lstInChamDiem?.some(
+            (chamDiem: any) => chamDiem.userName === this.searchNguoiCham
+          )
+        : false; 
+      const cuaHangToiChamMatches = this.searchCuaHangToiCham
+        ? store.lstInChamDiem?.some(
+            (chamDiem: any) => chamDiem.userName === this.searchCuaHangToiCham
+          )
+        : false; 
 
-    this.closeFilterModal()
+      return storeMatches && (personMatches || cuaHangToiChamMatches);
+    });
+    this.lstStore = filteredStores;
+
+    console.log('searchNguoiCham:', this.searchNguoiCham);
+    console.log('inSearchStore:', this.inSearchStore);
+    console.log('searchCuaHangToiCham:', this.searchCuaHangToiCham);
+    console.log('Filtered stores:', this.lstStore);
+
+    this.closeFilterModal();
   }
 
   // searchHistoryDowload() {
@@ -163,15 +200,10 @@ export class ListComponent implements OnInit {
     this.router.navigate([`/survey/store/check-list/${item}`]);
   }
   resetFilters() {
-    this.filterForm.reset({
-      selectedMonth: 'T042025',
-      selectedStore: '',
-      selectedPerson: '',
-      storeChecked: false,
-      storeUnchecked: false,
-    });
+    this.inSearchStore = '';
+    this.searchNguoiCham = '';
+    this.cuaHangToiCham = false;
   }
-
 
   public actionSheetButtons = [
     {
@@ -195,6 +227,4 @@ export class ListComponent implements OnInit {
       },
     },
   ];
-
-
 }

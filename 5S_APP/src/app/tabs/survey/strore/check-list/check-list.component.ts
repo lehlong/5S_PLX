@@ -42,7 +42,6 @@ export class CheckListComponent implements OnInit {
 
   ngOnInit() {}
   navigateTo() {
-
     this.router.navigate([`survey/store/evaluate`]);
   }
 }
