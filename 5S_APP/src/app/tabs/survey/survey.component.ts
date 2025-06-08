@@ -39,7 +39,7 @@ export class SurveyComponent implements OnInit {
     this._service.getAllSurveyMgmt({}).subscribe({
       next: (data) => {
         this.data = data.data;
-        console.log('data', data);
+        // console.log('data', data);
       },
       error: (response) => {
         console.log(response)

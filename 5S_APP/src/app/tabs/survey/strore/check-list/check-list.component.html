@@ -11,28 +11,49 @@
   <ion-item-group>
     <ion-item>
       <ion-icon slot="start" name="calendar-outline"></ion-icon>
-      <p>aa</p>
+      <p>{{ kiKhaoSat?.name }}</p>
     </ion-item>
     <ion-item>
       <ion-icon slot="start" name="warning-outline"></ion-icon>
       <p>Trạng thái</p>
-      <ion-chip slot="end" color="danger">Đã đóng</ion-chip>
+      <ion-chip *ngIf="kiKhaoSat?.trangThaiKi === '0'" slot="end" color="danger">Đã đóng</ion-chip>
+      <ion-chip *ngIf="kiKhaoSat?.trangThaiKi === '1'" slot="end" color="primary">Khởi tạo</ion-chip>
+      <ion-chip *ngIf="kiKhaoSat?.trangThaiKi === '2'" slot="end" color="success">Đang mở</ion-chip>
     </ion-item>
     <ion-item>
       <ion-icon slot="start" name="home-outline"></ion-icon>
-      <p>Cửa hàng 01</p>
+      <p>{{ store?.name }}</p>
     </ion-item>
   </ion-item-group>
   <ion-item-group style="margin-top: 20px">
-    <ion-item *ngFor="let item of fakeApi">
+    <ion-item *ngFor="let item of lstHisEvaluate">
       <ion-grid>
         <ion-row (click)="navigateTo()">
-          <ion-col class="text-bold" size="7">{{ item.lanCham }}</ion-col>
+          <ion-col class="text-bold" size="7">{{ item?.name }}</ion-col>
           <ion-col class="text-bold" size="5">{{ item.diem }}</ion-col>
-          <ion-col class="text-italic" size="7">{{ item.nguoiCham }}</ion-col>
-          <ion-col class="text-italic" size="5">{{ item.date }}</ion-col>
+          <ion-col class="text-italic" size="7">{{ item.accountUserName }}</ion-col>
+          <ion-col class="text-italic" size="5">{{ item.createDate }}</ion-col>
         </ion-row>
       </ion-grid>
     </ion-item>
   </ion-item-group>
 </ion-content>
+
+<ion-footer *ngIf="checkRightEvaluate()">
+  <!-- <ion-item> -->
+    <!-- <div style="display: flex; height: 60px; gap: 15px; margin: 15px;"> -->
+    <ion-button (click)="navigateTo()" *ngIf="isAdd == 'edit'" expand="full" (click)="1" style="width: 100%;font-weight: 700;">Chấm điểm</ion-button>
+    <ion-button (click)="navigateTo()" *ngIf="isAdd == 'add'" expand="full" (click)="1" style="width: 100%;font-weight: 700;">Chấm điểm</ion-button>
+    <ion-button id="present-alert" *ngIf="isAdd == 'del'" expand="full" (click)="1" style="width: 100%;font-weight: 700;">Chấm điểm</ion-button>
+    <!-- </div> -->
+  <!-- </ion-item> -->
+</ion-footer>
+
+
+<ion-alert
+  trigger="present-alert"
+  header= "Điểm của {{evaluate.header?.name}} sẽ bị mất"
+  message="Bạn muốn tiếp tục chứ??"
+  [buttons]="alertButtons"
+  (didDismiss)="setResult($event)"
+></ion-alert>

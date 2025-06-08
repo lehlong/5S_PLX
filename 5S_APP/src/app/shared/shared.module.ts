@@ -62,6 +62,7 @@ import {
   IonItemSliding,
   IonItemOptions,
   IonItemOption,
+  IonMenuToggle,
   IonNote,
   IonProgressBar,
   IonSegment,
@@ -70,7 +71,10 @@ import {
   IonSegmentButton,
   IonThumbnail,
   IonFooter,
+  IonImg
 } from '@ionic/angular/standalone';
+
+
 import {
   addCircleOutline,
   addCircle,
@@ -223,6 +227,7 @@ const IONIC_COMPONENTS = [
   IonBackButton,
   IonList,
   IonItem,
+  IonMenuToggle,
   IonInput,
   IonTextarea,
   IonSelect,
@@ -231,6 +236,7 @@ const IONIC_COMPONENTS = [
   IonCheckbox,
   IonRadio,
   IonRadioGroup,
+  IonImg,
   IonRange,
   IonCard,
   IonCardHeader,

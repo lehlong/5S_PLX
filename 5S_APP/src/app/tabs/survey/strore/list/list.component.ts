@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ButtonFilterComponent } from 'src/app/shared/button-filter/button-filter.component';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { IonActionSheet, IonButton } from '@ionic/angular/standalone';
+import { IonButton } from '@ionic/angular/standalone';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ListStoreService } from 'src/app/service/store/list-store.service';
 import { KyKhaoSatService } from 'src/app/service/ky-khao-sat.service';
 
 @Component({
@@ -12,16 +10,22 @@ import { KyKhaoSatService } from 'src/app/service/ky-khao-sat.service';
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss'],
   standalone: true,
-  imports: [SharedModule, ButtonFilterComponent, IonActionSheet, IonButton],
+  imports: [SharedModule, IonButton],
 })
 export class ListComponent implements OnInit {
   searchCuaHangToiCham: any = '';
+
   cuaHangToiCham: boolean = false;
+
   filterKiKhaoSat: any = {};
+  filterStore: any = {};
+  filterNguoiCham: any = {}
   inputSearchKiKhaoSat: any = {};
+
   searchNguoiCham: any = '';
   inSearchStore: any = '';
   selectValue = '1';
+
   lstAccout: any = [];
   lstSearchChamDiem: any = [];
   lstSearchStore: any = [];
@@ -29,12 +33,18 @@ export class ListComponent implements OnInit {
   lstKiKhaoSat: any = [];
   surveyId: any;
   filterForm!: FormGroup;
+  isOpen = false;
+
+  user: any= {
+    userName : 'admin',
+    fullName : 'Nguyễn Đình Thi'
+  }
 
   constructor(
     private _service: KyKhaoSatService,
     private router: Router,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.route.paramMap.subscribe({
@@ -44,12 +54,6 @@ export class ListComponent implements OnInit {
         this.getAllKyKhaoSat();
       },
     });
-    // this.filterData = {
-    //   selectedMonth: 'T042025',
-    //   selectedStore: '',
-    //   selectedPerson: '',
-    // };
-    // this.data = this.initData[0].data.lstInputStore;
   }
 
   getAllKyKhaoSat() {
@@ -66,7 +70,7 @@ export class ListComponent implements OnInit {
           );
           this.getAllStore();
           this.inputSearchKiKhaoSat = this.filterKiKhaoSat;
-          console.log(this.filterKiKhaoSat);
+          // console.log(this.filterKiKhaoSat);
         },
         error: (response) => {
           console.log(response);
@@ -80,7 +84,7 @@ export class ListComponent implements OnInit {
         this.lstStore = data.lstInputStore;
         this.lstSearchStore = data.lstInputStore;
 
-        console.log('data', data);
+        // console.log('data', data);
       },
       error: (response) => {
         console.log(response);
@@ -93,7 +97,8 @@ export class ListComponent implements OnInit {
     this._service.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
       next: (data) => {
         this.lstSearchStore = data.lstInputStore;
-        console.log('data', data);
+        // console.log(this.lstSearchStore);
+
         this.lstSearchChamDiem = Array.from(
           new Map(
             this.lstSearchStore
@@ -101,7 +106,6 @@ export class ListComponent implements OnInit {
               .map((item: any) => [item.userName, item])
           ).values()
         );
-        console.log('listSearchChamDiem', this.lstSearchChamDiem);
       },
       error: (response) => {
         console.log(response);
@@ -109,27 +113,15 @@ export class ListComponent implements OnInit {
     });
   }
   selectSearchStore(item: any) {
-    this.inSearchStore = item.name;
-    console.log('Selected store:', this.inSearchStore);
+    this.filterStore = item;
+    console.log('Selected store:', this.filterStore);
+    this.lstSearchChamDiem = item.lstInChamDiem
   }
+
   selectSearchChamDiem(item: any) {
-    this.searchNguoiCham = item.userName;
-    console.log('Selected người chấm điểm:', this.searchNguoiCham);
+    this.filterNguoiCham = item
   }
-  onCuaHangToiCham() {
-    if (this.cuaHangToiCham) {
-      this.searchCuaHangToiCham = 'thind';
-    } else {
-      this.searchCuaHangToiCham = '';
-    }
-    console.log('Giá trị cửa hàng tôi chấm', this.searchCuaHangToiCham);
-  }
-  onFilterChanged(filterData: any) {
-    console.log('Dữ liệu lọc:', filterData);
-    // this.filterData = filterData;
-    // this.applyFilter();
-  }
-  isOpen = false;
+
 
   openFilterModal() {
     this.searchStore(this.filterKiKhaoSat);
@@ -141,90 +133,35 @@ export class ListComponent implements OnInit {
   }
 
   onFilter() {
-    const filteredStores = this.lstSearchStore.filter((store: any) => {
-      const storeMatches = this.inSearchStore
-        ? store.name.includes(this.inSearchStore)
-        : true; 
-      const personMatches = this.searchNguoiCham
-        ? store.lstInChamDiem?.some(
-            (chamDiem: any) => chamDiem.userName === this.searchNguoiCham
-          )
-        : false; 
-      const cuaHangToiChamMatches = this.searchCuaHangToiCham
-        ? store.lstInChamDiem?.some(
-            (chamDiem: any) => chamDiem.userName === this.searchCuaHangToiCham
-          )
-        : false; 
-
-      return storeMatches && (personMatches || cuaHangToiChamMatches);
-    });
-    this.lstStore = filteredStores;
-
-    console.log('searchNguoiCham:', this.searchNguoiCham);
-    console.log('inSearchStore:', this.inSearchStore);
-    console.log('searchCuaHangToiCham:', this.searchCuaHangToiCham);
-    console.log('Filtered stores:', this.lstStore);
+    this.filterKiKhaoSat = this.inputSearchKiKhaoSat
+    this.lstStore = this.lstSearchStore
+      .filter((s: any) => !this.filterStore?.id || s.id == this.filterStore?.id)
+      .filter((s: any) => !this.filterNguoiCham?.userName ||
+        s.lstChamDiem?.some((x: any) => x == this.filterNguoiCham.userName))
+      .filter((s: any) => this.cuaHangToiCham !== true || s.lstChamDiem?.some((x: any) => x == this.user.userName))
 
     this.closeFilterModal();
   }
 
-  // searchHistoryDowload() {
-  //   const keyword = this.inputFileName != null ?  this.inputFileName.trim().toLowerCase() : ''
-  //   this.lstHistoryFile = this.lstAllHistoryFile
-  //     .filter((c) => !this.inputSearchCustomer || c.customerCode === this.inputSearchCustomer)
-  //     .filter((c) => !keyword || c.name.toLowerCase().includes(keyword))
-  // }
-
-  // applyFilter() {
-  //   if (
-  //     this.filterData.selectedStore === '' &&
-  //     this.filterData.selectedPerson === ''
-  //   ) {
-  //     this.data = this.initData[0].data.lstInputStore;
-  //   } else {
-  //     this.data = this.initData[0].data.lstInputStore.filter((item: any) => {
-  //       const storeMatches =
-  //         this.filterData.selectedStore === '' ||
-  //         item.storeId.includes(this.filterData.selectedStore);
-  //       const personMatches =
-  //         this.filterData.selectedPerson === '' ||
-  //         item.lstChamDiem.includes(this.filterData.selectedPerson);
-  //       return storeMatches && personMatches;
-  //     });
-  //   }
-  // }
 
   navigateTo(item: any) {
     console.log(item);
 
-    this.router.navigate([`/survey/store/check-list/${item}`]);
+    this.router.navigate([`/survey/store/check-list/${item.id}`], {
+      state: {
+        kiKhaoSat: this.filterKiKhaoSat,
+        store: item
+      }
+    });
   }
+
   resetFilters() {
+    this.filterKiKhaoSat = this.inputSearchKiKhaoSat
+    this.filterStore = {}
+    this.filterNguoiCham = {}
     this.inSearchStore = '';
     this.searchNguoiCham = '';
     this.cuaHangToiCham = false;
   }
 
-  public actionSheetButtons = [
-    {
-      text: 'Delete',
-      role: 'destructive',
-      data: {
-        action: 'delete',
-      },
-    },
-    {
-      text: 'Share',
-      data: {
-        action: 'share',
-      },
-    },
-    {
-      text: 'Cancel',
-      role: 'cancel',
-      data: {
-        action: 'cancel',
-      },
-    },
-  ];
 }

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { ButtonFilterComponent } from 'src/app/shared/button-filter/button-filter.component';
 import { SharedModule } from 'src/app/shared/shared.module';
 
 @Component({
@@ -7,7 +6,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss'],
   standalone: true,
-  imports: [SharedModule, ButtonFilterComponent],
+  imports: [SharedModule],
 })
 export class ListComponent implements OnInit {
   constructor() {}

@@ -25,7 +25,6 @@ namespace PLX5S.BUSINESS.Services.BU
         Task updateTreeGroup(TieuChiDto item);
         Task UpdateOrderTree(TieuChiDto moduleDto);
         Task UpdateOrderLeaves(List<TieuChiDto> lsrModule); 
-        Task<TieuChiDto> BuildDataTreeForApp(string kiKhaoSatId);
 
     }
 
@@ -145,64 +144,6 @@ namespace PLX5S.BUSINESS.Services.BU
 
         }
 
-        public async Task<TieuChiDto> BuildDataTreeForApp(string kiKhaoSatId)
-        {
-            var lstNode = new List<TieuChiDto>();
-            var node = _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == kiKhaoSatId && x.PId == "-1" && x.IsDeleted != true).FirstOrDefault();
-            var rootNode = new TieuChiDto()
-            {
-                Code = node.Code,
-                Id = node.Id,
-                Key = node.Id,
-                Name = node.Name,
-                Title = node.Name,
-                PId = node.PId,
-                IsGroup = node.IsGroup,
-                KiKhaoSatId = node.KiKhaoSatId,
-                OrderNumber = 1,
-                IsImg = node.IsImg,
-                Report = node.Report,
-                Expanded = true,
-                IsLeaf = false
-            };
-            lstNode.Add(rootNode);
-
-            var lstAllTieuChi = await _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == kiKhaoSatId && x.PId != "-1" && x.IsDeleted != true).OrderBy(x => x.OrderNumber).ToListAsync();
-            foreach (var menu in lstAllTieuChi)
-            {
-                var node1 = new TieuChiDto()
-                {
-                    Code = menu.Code,
-                    Id = menu.Id,
-                    Key = menu.Id,
-                    Name = menu.Name,
-                    Title = menu.Name,
-                    PId = menu.PId,
-                    IsGroup = menu.IsGroup,
-                    KiKhaoSatId = menu.KiKhaoSatId,
-                    OrderNumber = menu.OrderNumber,
-                    IsImg = menu.IsImg,
-                    Report = menu.Report,
-                    Expanded = true,
-                    IsLeaf = false,
-                    DiemTieuChi = _dbContext.TblBuTinhDiemTieuChi.Where(x => x.TieuChiCode == menu.Code).ToList()
-                };
-                lstNode.Add(node1);
-            }
-            var nodeDict = lstNode.ToDictionary(n => n.Id);
-            foreach (var item in lstNode)
-            {
-                if (item.PId == "-1" || !nodeDict.TryGetValue(item.PId, out TieuChiDto parentNode))
-                {
-                    continue;
-                }
-
-                parentNode.Children ??= [];
-                parentNode.Children.Add(item);
-            }
-            return rootNode;
-
-        }
 
         public async Task<List<TieuChiDto>> getLeaves(string pId, string kiKhaoSatId)
         {
