@@ -13,14 +13,14 @@
   <ion-item-group>
     <ion-item>
       <ion-icon slot="start" name="calendar-outline"></ion-icon>
-      <p>{{ filterKiKhaoSat?.name }}</p>
+      <p>{{ filter.filterKiKhaoSat?.name }}</p>
     </ion-item>
     <ion-item>
       <ion-icon slot="start" name="warning-outline"></ion-icon>
       <p>Trạng thái</p>
-      <ion-chip *ngIf="filterKiKhaoSat.trangThaiKi === '0'" slot="end" color="danger">Đã đóng</ion-chip>
-      <ion-chip *ngIf="filterKiKhaoSat.trangThaiKi === '1'" slot="end" color="primary">Khởi tạo</ion-chip>
-      <ion-chip *ngIf="filterKiKhaoSat.trangThaiKi === '2'" slot="end" color="success">Đang mở</ion-chip>
+      <ion-chip *ngIf="filter.filterKiKhaoSat.trangThaiKi === '0'" slot="end" color="danger">Đã đóng</ion-chip>
+      <ion-chip *ngIf="filter.filterKiKhaoSat.trangThaiKi === '1'" slot="end" color="primary">Khởi tạo</ion-chip>
+      <ion-chip *ngIf="filter.filterKiKhaoSat.trangThaiKi === '2'" slot="end" color="success">Đang mở</ion-chip>
     </ion-item>
     <ion-item>
       <ion-select justify="end" interface="popover" label="Sắp xếp theo:" placeholder="" [(ngModel)]="selectValue">
@@ -72,7 +72,7 @@
           <ion-item slot="header" color="light">
             <ion-label>
               <ion-input label="Cửa hàng" labelPlacement="stacked" labelPlacement="floating" [clearInput]="true"
-                [readonly]="true" placeholder="Chọn cửa hàng" [(ngModel)]="filterStore.name">
+                [readonly]="true" placeholder="Chọn cửa hàng" [(ngModel)]="filter.filterStore.name">
               </ion-input>
             </ion-label>
           </ion-item>
@@ -87,7 +87,7 @@
           <ion-item slot="header" color="light">
             <ion-label>
               <ion-input label="Người chấm" labelPlacement="stacked" labelPlacement="floating" [clearInput]="true"
-                [readonly]="true" placeholder="Chọn người chấm" [(ngModel)]="filterNguoiCham.userName">
+                [readonly]="true" placeholder="Chọn người chấm" [(ngModel)]="filter.filterNguoiCham.userName">
               </ion-input>
             </ion-label>
           </ion-item>
@@ -102,7 +102,7 @@
       <div style="margin-top: 5px">
         <ion-item>
           <ion-label>
-            <ion-checkbox [(ngModel)]="cuaHangToiCham" labelPlacement="end">Cửa hàng
+            <ion-checkbox [(ngModel)]="filter.cuaHangToiCham" labelPlacement="end">Cửa hàng
               tôi chấm</ion-checkbox>
           </ion-label>
         </ion-item>

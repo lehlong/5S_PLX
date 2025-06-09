@@ -13,13 +13,14 @@ import { KyKhaoSatService } from 'src/app/service/ky-khao-sat.service';
   imports: [SharedModule, IonButton],
 })
 export class ListComponent implements OnInit {
-  searchCuaHangToiCham: any = '';
 
-  cuaHangToiCham: boolean = false;
+  filter: any = {
+    filterKiKhaoSat: {},
+    filterStore: {},
+    filterNguoiCham: {},
+    cuaHangToiCham: false
 
-  filterKiKhaoSat: any = {};
-  filterStore: any = {};
-  filterNguoiCham: any = {}
+  }
   inputSearchKiKhaoSat: any = {};
 
   searchNguoiCham: any = '';
@@ -35,9 +36,9 @@ export class ListComponent implements OnInit {
   filterForm!: FormGroup;
   isOpen = false;
 
-  user: any= {
-    userName : 'admin',
-    fullName : 'Nguyễn Đình Thi'
+  user: any = {
+    userName: 'admin',
+    fullName: 'Nguyễn Đình Thi'
   }
 
   constructor(
@@ -47,6 +48,7 @@ export class ListComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+
     this.route.paramMap.subscribe({
       next: (params) => {
         const id = params.get('id');
@@ -58,19 +60,26 @@ export class ListComponent implements OnInit {
 
   getAllKyKhaoSat() {
     this._service
-      .search({
-        keyWord: this.surveyId,
-      })
+      .search({ keyWord: this.surveyId })
       .subscribe({
         next: (data) => {
           this.lstKiKhaoSat = data.data;
 
-          this.filterKiKhaoSat = data.data.reduce((a: any, b: any) =>
+          const filter = localStorage.getItem('filterLS') ?? ""
+          const filter2 = data.data.reduce((a: any, b: any) =>
             new Date(a.endDate) > new Date(b.endDate) ? a : b
           );
+          if (filter != "") {
+            this.filter = JSON.parse(filter)
+            if (this.filter.filterKiKhaoSat.surveyMgmtId != this.surveyId) {
+              this.filter.filterKiKhaoSat = filter2
+            }
+          } else {
+            this.filter.filterKiKhaoSat = filter2
+          }
+
           this.getAllStore();
-          this.inputSearchKiKhaoSat = this.filterKiKhaoSat;
-          // console.log(this.filterKiKhaoSat);
+          this.inputSearchKiKhaoSat = this.filter.filterKiKhaoSat;
         },
         error: (response) => {
           console.log(response);
@@ -79,12 +88,10 @@ export class ListComponent implements OnInit {
   }
 
   getAllStore() {
-    this._service.getInputKiKhaoSat(this.filterKiKhaoSat.id).subscribe({
+    this._service.getInputKiKhaoSat(this.filter.filterKiKhaoSat.id).subscribe({
       next: (data) => {
         this.lstStore = data.lstInputStore;
         this.lstSearchStore = data.lstInputStore;
-
-        // console.log('data', data);
       },
       error: (response) => {
         console.log(response);
@@ -97,8 +104,6 @@ export class ListComponent implements OnInit {
     this._service.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
       next: (data) => {
         this.lstSearchStore = data.lstInputStore;
-        // console.log(this.lstSearchStore);
-
         this.lstSearchChamDiem = Array.from(
           new Map(
             this.lstSearchStore
@@ -113,18 +118,18 @@ export class ListComponent implements OnInit {
     });
   }
   selectSearchStore(item: any) {
-    this.filterStore = item;
-    console.log('Selected store:', this.filterStore);
+    this.filter.filterStore = item;
+    console.log('Selected store:', this.filter.filterStore);
     this.lstSearchChamDiem = item.lstInChamDiem
   }
 
   selectSearchChamDiem(item: any) {
-    this.filterNguoiCham = item
+    this.filter.filterNguoiCham = item
   }
 
 
   openFilterModal() {
-    this.searchStore(this.filterKiKhaoSat);
+    this.searchStore(this.filter.filterKiKhaoSat);
     this.isOpen = true;
   }
 
@@ -133,35 +138,34 @@ export class ListComponent implements OnInit {
   }
 
   onFilter() {
-    this.filterKiKhaoSat = this.inputSearchKiKhaoSat
+    this.filter.filterKiKhaoSat = this.inputSearchKiKhaoSat
     this.lstStore = this.lstSearchStore
-      .filter((s: any) => !this.filterStore?.id || s.id == this.filterStore?.id)
-      .filter((s: any) => !this.filterNguoiCham?.userName ||
-        s.lstChamDiem?.some((x: any) => x == this.filterNguoiCham.userName))
-      .filter((s: any) => this.cuaHangToiCham !== true || s.lstChamDiem?.some((x: any) => x == this.user.userName))
-
+      .filter((s: any) => !this.filter.filterStore?.id || s.id == this.filter.filterStore?.id)
+      .filter((s: any) => !this.filter.filterNguoiCham?.userName ||
+        s.lstChamDiem?.some((x: any) => x == this.filter.filterNguoiCham.userName))
+      .filter((s: any) => this.filter.cuaHangToiCham !== true || s.lstChamDiem?.some((x: any) => x == this.user.userName))
+    localStorage.setItem('filterLS', JSON.stringify(this.filter))
     this.closeFilterModal();
   }
 
 
   navigateTo(item: any) {
-    console.log(item);
-
-    this.router.navigate([`/survey/store/check-list/${item.id}`], {
-      state: {
-        kiKhaoSat: this.filterKiKhaoSat,
-        store: item
-      }
-    });
+    localStorage.setItem('filterCS', JSON.stringify({kiKhaoSat: this.filter.filterKiKhaoSat,store: item}))
+    this.router.navigate([`/survey/store/check-list/${item.id}`]);
   }
 
   resetFilters() {
-    this.filterKiKhaoSat = this.inputSearchKiKhaoSat
-    this.filterStore = {}
-    this.filterNguoiCham = {}
-    this.inSearchStore = '';
-    this.searchNguoiCham = '';
-    this.cuaHangToiCham = false;
+    this.filter.filterKiKhaoSat = this.lstKiKhaoSat.reduce((a: any, b: any) =>
+      new Date(a.endDate) > new Date(b.endDate) ? a : b
+    );
+    this.filter.filterStore = {}
+    this.inputSearchKiKhaoSat = this.filter.filterKiKhaoSat
+    this.filter.filterNguoiCham = {}
+    this.filter.inSearchStore = '';
+    this.filter.searchNguoiCham = '';
+    this.filter.cuaHangToiCham = false;
+    localStorage.setItem('filterLS', JSON.stringify(this.filter))
+
   }
 
 }

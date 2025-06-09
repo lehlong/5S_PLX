@@ -44,7 +44,7 @@ export class CheckListComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private _storageService : StorageService,
+    private _storageService: StorageService,
     private _service: AppEvaluateService
   ) { }
 
@@ -52,25 +52,20 @@ export class CheckListComponent implements OnInit {
     this.route.paramMap.subscribe({
       next: async (params) => {
         const id = params.get('id')
-        const nav = this.router.getCurrentNavigation();
 
-        this.kiKhaoSat = nav?.extras.state?.['kiKhaoSat'];
-        this.store = nav?.extras.state?.['store'];
-        console.log(this.store);
+        const filter = JSON.parse(localStorage.getItem('filterCS') ?? "")
+        this.kiKhaoSat = filter.kiKhaoSat
+        this.store = filter.store
 
         let eva = await this._storageService.get('resultEvaluate')
-
-        console.log(eva);
-
-        if(eva !== ''){
+        if (eva !== '') {
           this.evaluate = eva
-
           this.evaluate.header.storeId == this.store?.id
             ? this.isAdd = "edit"
             : this.isAdd = "del"
           console.log(this.isAdd);
 
-        }else{
+        } else {
           this.isAdd = 'add'
           console.log(this.isAdd);
         }
@@ -112,7 +107,7 @@ export class CheckListComponent implements OnInit {
           });
         }
       })
-    } else if(this.isAdd == 'edit') {
+    } else if (this.isAdd == 'edit') {
       this.router.navigate([`survey/store/evaluate`], {
         state: {
           kiKhaoSat: this.kiKhaoSat,
