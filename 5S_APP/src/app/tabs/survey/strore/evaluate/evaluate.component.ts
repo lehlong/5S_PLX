@@ -68,11 +68,16 @@ export class EvaluateComponent implements OnInit {
   }
 
   isAnswered(id: string): boolean {
-    const item = this.evaluate.lstEvaluate.find(
-      (i: any) => i.tieuChiId === id || i.tieuChiCode === id
-    );
-    return !!item && !!item.pointId; 
-  }
+  const evaluateItem = this.evaluate.lstEvaluate.find(
+    (i: any) => i.tieuChiId === id || i.tieuChiCode === id
+  );
+  const hasPoint = !!evaluateItem && !!evaluateItem.pointId;
+
+  const hasImage = this.evaluate.lstImages.some(
+    (img: any) => img.tieuChiCode === id
+  );
+  return hasPoint || hasImage;
+}
 
   getAllTieuChi() {
     this._service
