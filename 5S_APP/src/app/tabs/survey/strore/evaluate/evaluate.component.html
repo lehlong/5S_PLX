@@ -32,7 +32,10 @@
   >
     <ng-template #recursive let-nodes>
       <ng-container *ngFor="let node of nodes">
-        <ion-accordion [value]="node.key">
+        <ion-accordion
+          [value]="node.key"
+          [ngClass]="{ 'border-link': node.id === selectedAccordionId }"
+        >
           <ion-item slot="header" color="light" id="{{ node.id }}">
             <ion-label>{{ node.title }}</ion-label>
           </ion-item>
@@ -141,17 +144,19 @@
     </ion-toolbar>
   </ion-header>
   <ion-content class="ion-padding">
-    <div style="gap: 10px; display: flex; flex-wrap: wrap;">
-    <a
-      style="padding-left: 5px"
-      *ngFor="let item of lstTieuChi; let i = index"
-      href="survey/store/evaluate#{{ item.id }}"
-      class="custom-button"
-      [ngClass]="{ 'active-link': isActive(item.id), 'answered': isAnswered(item), }"
-      (click)="setItem(item.id)"
-    >
-      {{ i + 1 }}
-    </a>
+    <div style="gap: 10px; display: flex; flex-wrap: wrap">
+      <a
+        style="padding-left: 5px"
+        *ngFor="let item of lstTieuChi; let i = index"
+        class="custom-button"
+        [ngClass]="{
+          'active-link': isActive(item.id),
+          'answered': isAnswered(item)
+        }"
+        (click)="setItem(item.id)"
+      >
+        {{ i + 1 }}
+      </a>
     </div>
   </ion-content>
   <ion-footer>

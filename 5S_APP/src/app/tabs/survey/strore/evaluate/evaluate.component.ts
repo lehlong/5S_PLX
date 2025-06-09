@@ -17,6 +17,7 @@ import { StorageService } from 'src/app/service/storage.service';
 export class EvaluateComponent implements OnInit {
   @ViewChild('accordionGroup', { static: true })
   accordionGroup!: IonAccordionGroup;
+  selectedAccordionId: string = ''
   currentSelect: string = '';
   lstAllTieuChi: any = [];
   store: any = {};
@@ -61,10 +62,19 @@ export class EvaluateComponent implements OnInit {
   setItem(itemId: string) {
     this.currentSelect = itemId;
     console.log(itemId);
+    this.selectedAccordionId = itemId;
+    const element = document.getElementById(itemId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   isActive(itemId: string): boolean {
     return this.currentSelect === itemId;
+  }
+
+  borderActive(data:any):any{
+    console.log('data-border', data.code)
   }
 
   isAnswered(data: any): boolean {
