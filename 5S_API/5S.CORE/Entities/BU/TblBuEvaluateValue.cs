@@ -1,5 +1,4 @@
-﻿
-using PLX5S.CORE.Common;
+﻿using PLX5S.CORE.Common;
 using PLX5S.CORE.Entities.MD;
 using PLX5S.CORE.Migrations;
 using System.ComponentModel.DataAnnotations;

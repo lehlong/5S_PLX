@@ -15,21 +15,21 @@ namespace PLX5S.CORE.Entities.BU
     {
         [Key]
         [Column("ID")]
-        public string Id { get; set; }
+        public string? Id { get; set; }
 
         [Column("MA")]
-        public string Ma { get; set; }
+        public string? Ma { get; set; }
 
         [Column("NAME", TypeName = "NVARCHAR(255)")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Column("MO_TA", TypeName = "NVARCHAR(255)")]
-        public string MoTa { get; set; }
+        public string? MoTa { get; set; }
 
         [Column("DOI_TUONG_ID", TypeName = "NVARCHAR(255)")]
-        public string DoiTuongId { get; set; }
+        public string? DoiTuongId { get; set; }
 
         [Column("IMAGE", TypeName = "NVARCHAR(255)")]
-        public string Image { get; set; }
+        public string? Image { get; set; }
     }
 }

@@ -167,5 +167,4 @@ export class ListComponent implements OnInit {
     localStorage.setItem('filterLS', JSON.stringify(this.filter))
 
   }
-
 }

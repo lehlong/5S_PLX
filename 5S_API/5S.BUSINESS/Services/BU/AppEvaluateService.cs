@@ -18,6 +18,7 @@ namespace PLX5S.BUSINESS.Services.BU
         Task<TieuChiDto> BuildDataTreeForApp(string kiKhaoSatId, string storeId);
         Task<List<TieuChiDto>> GetAllTieuChiLeaves(string kiKhaoSatId, string storeId);
         Task<EvaluateModel> BuildInputEvaluate(string kiKhaoSatId, string storeId);
+        Task InsertEvaluate(EvaluateModel data);
     }
 
     public class AppEvaluateService(AppDbContext dbContext, IMapper mapper) : GenericService<TblBuEvaluateHeader, EvaluateHeaderDto>(dbContext, mapper), IAppEvaluateService
@@ -88,6 +89,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         OrderNumber = menu.OrderNumber,
                         IsImg = menu.IsImg,
                         Report = menu.Report,
+                        NumberImg = menu.NumberImg ?? 0,
                         Expanded = true,
                         IsLeaf = false,
                         DiemTieuChi = _dbContext.TblBuTinhDiemTieuChi.Where(x => x.TieuChiCode == menu.Code).ToList(),
@@ -166,7 +168,7 @@ namespace PLX5S.BUSINESS.Services.BU
                     Header = new TblBuEvaluateHeader()
                     {
                         Code = idHeader,
-                        Name = nameStore ,
+                        Name = "Bản nháp" ,
                         Point = 0,
                         Order = 0,
                         StoreId = storeId,
@@ -188,6 +190,22 @@ namespace PLX5S.BUSINESS.Services.BU
                 return null;
             }
         }
+
+        public async Task InsertEvaluate(EvaluateModel data)
+        {
+            try
+            {
+                _dbContext.TblBuEvaluateImage.AddRange(data.LstImages);
+                _dbContext.TblBuEvaluateValue.AddRange(data.LstEvaluate);
+                _dbContext.SaveChanges();
+            }
+            catch(Exception ex)
+            {
+                this.Status = false;
+            }
+        }
+
+
 
     } 
 }

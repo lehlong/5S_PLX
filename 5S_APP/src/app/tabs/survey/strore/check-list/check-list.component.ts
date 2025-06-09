@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { IonButton } from '@ionic/angular/standalone';
+import { AlertController } from '@ionic/angular';
 import type { OverlayEventDetail } from '@ionic/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppEvaluateService } from 'src/app/service/app-evaluate.service';
-import { Storage } from '@ionic/storage-angular';
 import { StorageService } from 'src/app/service/storage.service';
 
 @Component({
@@ -23,7 +23,12 @@ export class CheckListComponent implements OnInit {
     userName: 'admin',
     fullName: 'Quản trị viên'
   }
-  evaluate: any = {}
+  evaluate: any =
+    {
+      header: {},
+      lstEvaluate: [],
+      lstImages: [],
+    }
   alertButtons: any = [
     {
       text: 'Cancel',
@@ -44,6 +49,7 @@ export class CheckListComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
+    private alertController: AlertController,
     private _storageService: StorageService,
     private _service: AppEvaluateService
   ) { }
@@ -57,13 +63,23 @@ export class CheckListComponent implements OnInit {
         this.kiKhaoSat = filter.kiKhaoSat
         this.store = filter.store
 
-        let eva = await this._storageService.get('resultEvaluate')
-        if (eva !== '') {
+        let eva = await this._storageService.get(this.store.id)
+        console.log(eva);
+
+        if (eva) {
           this.evaluate = eva
-          this.evaluate.header.storeId == this.store?.id
-            ? this.isAdd = "edit"
-            : this.isAdd = "del"
-          console.log(this.isAdd);
+          if(this.evaluate.header.kiKhaoSatId == this.kiKhaoSat.id){
+            this.lstHisEvaluate.push(this.evaluate.header)
+          }
+          // this.lstHisEvaluate = this.lstEvaluates.lstHeader.filter((x: any) =>
+          //   x.kiKhaoSatId === this.kiKhaoSat.id && x.storeId === this.store.id
+          // );
+          console.log(this.lstHisEvaluate);
+
+          // this.evaluate.header.storeId == this.store?.id && this.evaluate.header.kiKhaoSatId == this.kiKhaoSat.id
+          //   ? this.isAdd = "edit"
+          //   : this.isAdd = "del"
+          // console.log(this.isAdd);
 
         } else {
           this.isAdd = 'add'
@@ -79,7 +95,8 @@ export class CheckListComponent implements OnInit {
   getAllEvaluateHistory() {
     this._service.search({ keyWord: this.inStoreId }).subscribe({
       next: (data) => {
-        this.lstHisEvaluate = data.data
+        if(!data)
+        this.lstHisEvaluate.push(data.data)
       }
     })
   }
@@ -91,14 +108,31 @@ export class CheckListComponent implements OnInit {
     ) ?? false;
   }
 
+  openEditEvaluate(code: any) {
+    this.router.navigate([`survey/store/evaluate/${code}`], {
+      state: {
+        kiKhaoSat: this.kiKhaoSat,
+        store: this.store,
+        // evaluate: this.evaluate
+      }
+    });
+  }
+
   navigateTo() {
     if (this.isAdd == 'add' || this.isAdd == 'del') {
       this._service.BuildInputEvaluate(this.kiKhaoSat.id, this.store.id).subscribe({
         next: async (data) => {
-          // await localStorage.setItem('resultEvaluate', JSON.stringify(data));
-          this._storageService.set('resultEvaluate', data)
+
+          this._storageService.set(data.header.storeId, data)
+
+          // this.lstEvaluates.lstHeader.push(data.header);
+          // this.lstEvaluates.lstEvaluate[0].push(...data.lstEvaluate);
+          // this.lstEvaluates.lstImages[0].push(...data.lstImages);
+
+          // this._storageService.set('lstEvaluate', this.lstEvaluates)
+
           console.log(data);
-          this.router.navigate([`survey/store/evaluate`], {
+          this.router.navigate([`survey/store/evaluate/${data.header.code}`], {
             state: {
               kiKhaoSat: this.kiKhaoSat,
               store: this.store,
@@ -107,14 +141,6 @@ export class CheckListComponent implements OnInit {
           });
         }
       })
-    } else if (this.isAdd == 'edit') {
-      this.router.navigate([`survey/store/evaluate`], {
-        state: {
-          kiKhaoSat: this.kiKhaoSat,
-          store: this.store,
-          evaluate: this.evaluate
-        }
-      });
     }
   }
 
@@ -126,4 +152,5 @@ export class CheckListComponent implements OnInit {
 
   BuildInputEvaluate() {
   }
+
 }

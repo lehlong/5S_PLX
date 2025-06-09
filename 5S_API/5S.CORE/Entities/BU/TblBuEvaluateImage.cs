@@ -13,10 +13,10 @@ namespace PLX5S.CORE.Entities.BU
         [Column("CODE", TypeName = "NVARCHAR(50)")]
         public string? Code { get; set; }
 
-        [Column("FILE_NAME", TypeName = "NVARCHAR(50)")]
+        [Column("FILE_NAME", TypeName = "NVARCHAR(500)")]
         public string? FileName { get; set; }
 
-        [Column("FILE_PATH", TypeName = "DECIMAL(18.0)")]
+        [Column("FILE_PATH", TypeName = "NVARCHAR(500)")]
         public string? FilePath { get; set; }
 
         [Column("TIEU_CHI_CODE", TypeName = "NVARCHAR(50)")]

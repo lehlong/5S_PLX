@@ -15,19 +15,19 @@ namespace PLX5S.BUSINESS.Dtos.BU
     {
         [Key]
         [Description("Mã")]
-        public string Id { get; set; }
+        public string? Id { get; set; }
 
         [Description("Mã")]
         public string? Ma { get; set; }
 
         [Description("Tên")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Description("mô tả")]
-        public string MoTa { get; set; }
+        public string? MoTa { get; set; }
 
         [Description("mã đối tượng")]
-        public string DoiTuongId { get; set; }
+        public string? DoiTuongId { get; set; }
 
         [Description("Ảnh")]
         public string? Image { get; set; }

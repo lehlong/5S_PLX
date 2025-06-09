@@ -4,7 +4,7 @@
       <ion-back-button></ion-back-button>
     </ion-button>
     <ion-title class="t-center"> Chấm điểm 5S cửa hàng </ion-title>
-    <ion-button (click)="openFilterModal()" fill="clear" slot="end" color="dark">
+    <ion-button (click)="openFilterModal()" id="open-modal" fill="clear" slot="end" color="dark">
       <ion-icon name="filter-outline" fill="clear"></ion-icon>
     </ion-button>
   </ion-toolbar>
@@ -40,15 +40,12 @@
   </ion-item-group>
 </ion-content>
 
-<!-- Modal -->
-<ion-modal [isOpen]="isOpen" (didDismiss)="closeFilterModal()" style="height: 80vh; bottom: 0; top: auto">
+<ion-modal [isOpen]="isOpen" (didDismiss)="closeFilterModal()" [initialBreakpoint]="1" [breakpoints]="[1]" cssClass="custom-modal">
+<!-- <ion-modal trigger="open-modal" [(isOpen)]="isOpen" [initialBreakpoint]="1" [breakpoints]="[1]" cssClass="custom-modal"> -->
   <ng-template>
     <ion-header>
       <ion-toolbar>
         <ion-title style="text-align: center">Bộ lọc</ion-title>
-        <ion-button (click)="closeFilterModal()" fill="clear" slot="end" color="dark">
-          <ion-icon name="arrow-down-outline"></ion-icon>
-        </ion-button>
       </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding">

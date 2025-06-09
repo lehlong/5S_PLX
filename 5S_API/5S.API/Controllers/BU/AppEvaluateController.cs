@@ -5,6 +5,7 @@ using PLX5S.BUSINESS.Dtos.BU;
 //using PlX5S.BUSINESS.Services.BU;
 using PLX5S.BUSINESS.Services.BU;
 using PLX5S.API.AppCode.Extensions;
+using PLX5S.BUSINESS.Models;
 
 namespace PLX5S.API.Controllers.BU
 {
@@ -91,6 +92,27 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
+
+
+
+        [HttpPost("InsertEvaluate")]
+        public async Task<IActionResult> InsertEvaluate([FromBody] EvaluateModel data)
+        {
+            var transferObject = new TransferObject();
+            await _service.InsertEvaluate(data);
+            if (_service.Status)
+            {
+                transferObject.Status = true;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
+
 
 
         //[HttpPost("upload-image")]

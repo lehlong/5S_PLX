@@ -138,6 +138,8 @@ namespace PLX5S.CORE
         #region Business 
         public DbSet<TblBuTinhDiemTieuChi> TblBuTinhDiemTieuChi { get; set; }
         public DbSet<TblBuEvaluateHeader> TblBuEvaluateHeader { get; set; }
+        public DbSet<TblBuEvaluateImage> TblBuEvaluateImage { get; set; }
+        public DbSet<TblBuEvaluateValue> TblBuEvaluateValue { get; set; }
         public DbSet<TblBuCriteriaExcludedStores> TblBuCriteriaExcludedStores { get; set; }
         public DbSet<TblBuKiKhaoSat> TblBuKiKhaoSat { get; set; }
         public DbSet<TblBuSurveyMgmt> TblBuSurveyMgmt { get; set; }

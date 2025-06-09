@@ -32,6 +32,7 @@ export class EvaluateComponent implements OnInit {
     lstImages: [],
   };
   data: any = {};
+  headerId: any = ''
 
   constructor(
     private router: Router,
@@ -40,16 +41,19 @@ export class EvaluateComponent implements OnInit {
     private _storageService: StorageService,
     private storage: Storage,
     private _service: AppEvaluateService
-  ) {}
+  ) { }
   ngOnInit() {
     this.route.paramMap.subscribe({
       next: async (params) => {
+        this.headerId = params.get('code') ?? ''
         const nav = this.router.getCurrentNavigation();
         console.log(nav?.extras.state);
 
         this.store = nav?.extras.state?.['store'];
         this.kiKhaoSat = nav?.extras.state?.['kiKhaoSat'];
-        this.evaluate = await this._storageService.get('resultEvaluate');
+
+        this.evaluate = await this._storageService.get(this.headerId);
+        console.log(this.evaluate);
 
         this.getAllTieuChi();
         this.getAllTieuChiLeaves();
@@ -73,24 +77,22 @@ export class EvaluateComponent implements OnInit {
     return this.currentSelect === itemId;
   }
 
-  borderActive(data:any):any{
+  borderActive(data: any): any {
     console.log('data-border', data.code)
   }
 
-  isAnswered(data: any): boolean {
-  const evaluateItem = this.evaluate.lstEvaluate.find(
-    (i: any) => i.tieuChiId === data.code || i.tieuChiCode === data.code
-  );
-  const hasPoint = !!evaluateItem && !!evaluateItem.pointId;
-  const numberImgRequired = data?.numberImg || 0
-  const hasImage = this.evaluate.lstImages.filter(
-    (img: any) => img.tieuChiCode === data.code
-  ).length;
-  console.log('Số ảnh đã chọn', hasImage)
-  console.log('Ảnh tối thiểu', numberImgRequired)
-  const hasEnoughImages = hasImage >= numberImgRequired;
-  return hasPoint && hasEnoughImages;
-}
+  isAnswered(data: any) {
+    // const evaluateItem = this.evaluate.lstEvaluate.find(
+    //   (i: any) => i.tieuChiId === data.code || i.tieuChiCode === data.code
+    // );
+    // const hasPoint = !!evaluateItem && !!evaluateItem.pointId;
+    // const numberImgRequired = data?.numberImg || 0
+    // const hasImage = this.evaluate.lstImages.filter(
+    //   (img: any) => img.tieuChiCode === data.code
+    // ).length;
+    // const hasEnoughImages = hasImage >= numberImgRequired;
+    // return hasPoint && hasEnoughImages;
+  }
 
   getAllTieuChi() {
     this._service
@@ -147,10 +149,9 @@ export class EvaluateComponent implements OnInit {
         filePath: base64,
         tieuChiCode: code,
       });
-      localStorage.setItem('resultEvaluate', JSON.stringify(this.evaluate));
+      this._storageService.set(this.headerId, this.evaluate)
+      // localStorage.setItem('resultEvaluate', JSON.stringify(this.evaluate));
 
-      // In ra console kiểm tra
-      console.log('Ảnh đã được lưu vào localStorage:', base64);
       this.previewImage = localStorage.getItem('previewImage');
     };
     reader.readAsDataURL(file); // Chuyển sang base64
@@ -165,27 +166,21 @@ export class EvaluateComponent implements OnInit {
   filterImage(code: any) {
     return Array.isArray(this.evaluate?.lstImages)
       ? this.evaluate.lstImages
-          .filter((x: any) => x.tieuChiCode === code)
-          .map((x: any) => x.filePath)
+        .filter((x: any) => x.tieuChiCode === code)
+        .map((x: any) => x.filePath)
       : [];
   }
 
   setDiem(data: any, event: any) {
-    console.log(this.evaluate);
     const selected = event.detail.value;
-    console.log(`Đã chọn tiêu chí với mã code: ${data}, giá trị: ${selected}`);
+    // console.log(`Đã chọn tiêu chí với mã code: ${data}, giá trị: ${selected}`);
     const idx = this.evaluate.lstEvaluate.findIndex(
       (i: any) => i.tieuChiCode === data
     );
-    console.log(idx);
-    if (idx === -1) {
-      console.warn('Không tìm thấy tiêu chí', data);
-      return;
-    }
+    if (idx === -1) return;
+
     this.evaluate.lstEvaluate[idx].pointId = selected;
-    console.log('Updated pointId:', this.evaluate.lstEvaluate[idx].pointId);
-    this._storageService.set('resultEvaluate', this.evaluate);
-    // localStorage.setItem('resultEvaluate', JSON.stringify(this.evaluate));
+    this._storageService.set(this.headerId, this.evaluate);
   }
 
   onSubmit() {
@@ -193,7 +188,7 @@ export class EvaluateComponent implements OnInit {
   }
 
   navigateTo(itemId: string) {
-    const currentUrl = window.location.href; // Lấy URL hiện tại mà không có hash
+    const currentUrl = window.location.href.split('#')[0]; // Lấy URL hiện tại mà không có hash
     return `${currentUrl}#${itemId}`;
   }
 
@@ -241,4 +236,31 @@ export class EvaluateComponent implements OnInit {
 
     await alert.present();
   }
+
+
+  feedback: string = '';
+
+  async openCamera() {
+    try {
+      // const image = await Camera.getPhoto({
+      //   quality: 90,
+      //   allowEditing: false,
+      //   resultType: CameraResultType.Base64,
+      //   source: CameraSource.Camera,
+      // });
+
+      // const base64Image = `data:image/jpeg;base64,${image.base64String}`;
+      // console.log('Captured image:', base64Image);
+
+      // xử lý tiếp ảnh (hiển thị, upload,...)
+    } catch (err) {
+      console.error('Camera error:', err);
+    }
+  }
+
+  onAttach() {
+    // mở file picker hoặc xử lý đính kèm file
+    console.log('Attach clicked');
+  }
+
 }
