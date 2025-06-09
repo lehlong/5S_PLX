@@ -1,4 +1,3 @@
-
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { SharedModule } from '../../../../shared/shared.module';
 // import { IonicModule } from '@ionic/angular';
@@ -15,23 +14,23 @@ import { StorageService } from 'src/app/service/storage.service';
   templateUrl: './evaluate.component.html',
   styleUrls: ['./evaluate.component.scss'],
 })
-
 export class EvaluateComponent implements OnInit {
-  @ViewChild('accordionGroup', { static: true }) accordionGroup!: IonAccordionGroup;
-
-  lstAllTieuChi: any = []
-  store: any = {}
-  kiKhaoSat: any = {}
+  @ViewChild('accordionGroup', { static: true })
+  accordionGroup!: IonAccordionGroup;
+  currentSelect: string = '';
+  lstAllTieuChi: any = [];
+  store: any = {};
+  kiKhaoSat: any = {};
   treeData: any = [];
-  lstTieuChi: any = []
-  lstTreeOpen: any = []
-  previewImage: any = []
+  lstTieuChi: any = [];
+  lstTreeOpen: any = [];
+  previewImage: any = [];
   evaluate: any = {
     header: {},
     lstEvaluate: [],
-    lstImages: []
-  }
-  data: any = {}
+    lstImages: [],
+  };
+  data: any = {};
 
   constructor(
     private router: Router,
@@ -40,8 +39,7 @@ export class EvaluateComponent implements OnInit {
     private _storageService: StorageService,
     private storage: Storage,
     private _service: AppEvaluateService
-  ) {
-  }
+  ) {}
   ngOnInit() {
     this.route.paramMap.subscribe({
       next: async (params) => {
@@ -50,41 +48,59 @@ export class EvaluateComponent implements OnInit {
 
         this.store = nav?.extras.state?.['store'];
         this.kiKhaoSat = nav?.extras.state?.['kiKhaoSat'];
-        this.evaluate = await this._storageService.get('resultEvaluate')
+        this.evaluate = await this._storageService.get('resultEvaluate');
 
-        this.getAllTieuChi()
-        this.getAllTieuChiLeaves()
+        this.getAllTieuChi();
+        this.getAllTieuChiLeaves();
       },
-    })
+    });
     this.previewImage = localStorage.getItem('previewImage');
   }
 
-  getAllTieuChi() {
-    this._service.buildDataTreeForApp(this.kiKhaoSat.id, this.store.storeId).subscribe({
-      next: (data) => {
-        console.log(data);
-        this.treeData = [data]
-        this.lstTreeOpen = this.extractAllKeys([data])
-      }
-    })
+  //Active
+  setItem(itemId: string) {
+    this.currentSelect = itemId;
+    console.log(itemId);
   }
 
+  isActive(itemId: string): boolean {
+    return this.currentSelect === itemId;
+  }
+
+  isAnswered(id: string): boolean {
+    const item = this.evaluate.lstEvaluate.find(
+      (i: any) => i.tieuChiId === id || i.tieuChiCode === id
+    );
+    return !!item && !!item.pointId; 
+  }
+
+  getAllTieuChi() {
+    this._service
+      .buildDataTreeForApp(this.kiKhaoSat.id, this.store.storeId)
+      .subscribe({
+        next: (data) => {
+          console.log(data);
+          this.treeData = [data];
+          this.lstTreeOpen = this.extractAllKeys([data]);
+        },
+      });
+  }
 
   getAllTieuChiLeaves() {
-    this._service.GetAllTieuChiLeaves(this.kiKhaoSat.id, this.store.storeId).subscribe({
-      next: (data) => {
-        console.log(data);
-        this.lstTieuChi = data
-
-      }
-    })
+    this._service
+      .GetAllTieuChiLeaves(this.kiKhaoSat.id, this.store.storeId)
+      .subscribe({
+        next: (data) => {
+          console.log(data);
+          this.lstTieuChi = data;
+        },
+      });
   }
-
 
   extractAllKeys(tree: any[]): string[] {
     let keys: string[] = [];
 
-    tree.forEach(node => {
+    tree.forEach((node) => {
       if (node.key) {
         keys.push(node.key);
       }
@@ -111,53 +127,51 @@ export class EvaluateComponent implements OnInit {
         code: '-1',
         fileName: '',
         filePath: base64,
-        tieuChiCode: code
-      })
+        tieuChiCode: code,
+      });
       localStorage.setItem('resultEvaluate', JSON.stringify(this.evaluate));
 
       // In ra console kiểm tra
       console.log('Ảnh đã được lưu vào localStorage:', base64);
       this.previewImage = localStorage.getItem('previewImage');
-
     };
     reader.readAsDataURL(file); // Chuyển sang base64
   }
 
   filterDiem(code: any) {
-    const item = this.evaluate?.lstEvaluate?.find((x: any) => x.tieuChiCode === code);
+    const item = this.evaluate?.lstEvaluate?.find(
+      (x: any) => x.tieuChiCode === code
+    );
     return item?.pointId || null;
   }
   filterImage(code: any) {
     return Array.isArray(this.evaluate?.lstImages)
       ? this.evaluate.lstImages
-        .filter((x: any) => x.tieuChiCode === code)
-        .map((x: any) => x.filePath)
+          .filter((x: any) => x.tieuChiCode === code)
+          .map((x: any) => x.filePath)
       : [];
   }
 
   setDiem(data: any, event: any) {
     console.log(this.evaluate);
-
     const selected = event.detail.value;
-
+    console.log(`Đã chọn tiêu chí với mã code: ${data}, giá trị: ${selected}`);
     const idx = this.evaluate.lstEvaluate.findIndex(
       (i: any) => i.tieuChiCode === data
     );
     console.log(idx);
-
     if (idx === -1) {
       console.warn('Không tìm thấy tiêu chí', data);
       return;
     }
-    this.evaluate.lstEvaluate[idx].pointId = selected
-    this._storageService.set('resultEvaluate', this.evaluate)
+    this.evaluate.lstEvaluate[idx].pointId = selected;
+    console.log('Updated pointId:', this.evaluate.lstEvaluate[idx].pointId);
+    this._storageService.set('resultEvaluate', this.evaluate);
     // localStorage.setItem('resultEvaluate', JSON.stringify(this.evaluate));
-
   }
 
   onSubmit() {
     console.log(this.evaluate.lstEvaluate);
-
   }
 
   navigateTo(itemId: string) {
@@ -179,7 +193,9 @@ export class EvaluateComponent implements OnInit {
 
   deleteImage() {
     // Gọi API hoặc xóa khỏi mảng
-    const index = this.evaluate.lstImages.findIndex((img: any) => img.filePath === this.selectedImage);
+    const index = this.evaluate.lstImages.findIndex(
+      (img: any) => img.filePath === this.selectedImage
+    );
     if (index > -1) {
       this.evaluate.lstImages.splice(index, 1);
     }
@@ -193,19 +209,18 @@ export class EvaluateComponent implements OnInit {
       buttons: [
         {
           text: 'Hủy',
-          role: 'cancel'
+          role: 'cancel',
         },
         {
           text: 'Xóa',
           role: 'destructive',
           handler: () => {
             this.deleteImage();
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
 
     await alert.present();
   }
-
 }
