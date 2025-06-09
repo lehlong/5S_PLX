@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { IonicStorageModule } from '@ionic/storage-angular';
 import { addIcons } from 'ionicons';
 import {
   IonTabs,
@@ -289,6 +290,7 @@ const IONIC_COMPONENTS = [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    IonicStorageModule.forRoot(),
     ...IONIC_COMPONENTS,
   ],
   exports: [

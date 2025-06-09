@@ -40,20 +40,14 @@
 </ion-content>
 
 <ion-footer *ngIf="checkRightEvaluate()">
-  <!-- <ion-item> -->
-    <!-- <div style="display: flex; height: 60px; gap: 15px; margin: 15px;"> -->
-    <ion-button (click)="navigateTo()" *ngIf="isAdd == 'edit'" expand="full" (click)="1" style="width: 100%;font-weight: 700;">Chấm điểm</ion-button>
-    <ion-button (click)="navigateTo()" *ngIf="isAdd == 'add'" expand="full" (click)="1" style="width: 100%;font-weight: 700;">Chấm điểm</ion-button>
-    <ion-button id="present-alert" *ngIf="isAdd == 'del'" expand="full" (click)="1" style="width: 100%;font-weight: 700;">Chấm điểm</ion-button>
-    <!-- </div> -->
-  <!-- </ion-item> -->
+  <ion-button (click)="navigateTo()" *ngIf="isAdd == 'edit'" expand="full" style="width: 100%;font-weight: 700;">Chấm
+    điểm</ion-button>
+  <ion-button (click)="navigateTo()" *ngIf="isAdd == 'add'" expand="full" style="width: 100%;font-weight: 700;">Chấm
+    điểm</ion-button>
+  <ion-button id="present-alert" *ngIf="isAdd == 'del'" expand="full" style="width: 100%;font-weight: 700;">Chấm
+    điểm</ion-button>
 </ion-footer>
 
 
-<ion-alert
-  trigger="present-alert"
-  header= "Điểm của {{evaluate.header?.name}} sẽ bị mất"
-  message="Bạn muốn tiếp tục chứ??"
-  [buttons]="alertButtons"
-  (didDismiss)="setResult($event)"
-></ion-alert>
+<ion-alert trigger="present-alert" header="Điểm của {{evaluate.header?.name}} sẽ bị mất"
+  message="Bạn muốn tiếp tục chứ??" [buttons]="alertButtons" (didDismiss)="setResult($event)"></ion-alert>

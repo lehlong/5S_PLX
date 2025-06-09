@@ -4,6 +4,8 @@ import { IonButton } from '@ionic/angular/standalone';
 import type { OverlayEventDetail } from '@ionic/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppEvaluateService } from 'src/app/service/app-evaluate.service';
+import { Storage } from '@ionic/storage-angular';
+import { StorageService } from 'src/app/service/storage.service';
 
 @Component({
   selector: 'app-check-list',
@@ -42,27 +44,28 @@ export class CheckListComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
+    private _storageService : StorageService,
     private _service: AppEvaluateService
   ) { }
 
   ngOnInit() {
-
     this.route.paramMap.subscribe({
-      next: (params) => {
+      next: async (params) => {
         const id = params.get('id')
         const nav = this.router.getCurrentNavigation();
-        console.log(nav?.extras.state);
 
         this.kiKhaoSat = nav?.extras.state?.['kiKhaoSat'];
         this.store = nav?.extras.state?.['store'];
-        const eva = localStorage.getItem('resultEvaluate') ?? ""
+        console.log(this.store);
+
+        let eva = await this._storageService.get('resultEvaluate')
+
         console.log(eva);
-        // this.evaluate = JSON.parse(this.evaluate)
 
         if(eva !== ''){
-          this.evaluate = JSON.parse(eva)
+          this.evaluate = eva
 
-          this.evaluate.header.storeId == this.store.id
+          this.evaluate.header.storeId == this.store?.id
             ? this.isAdd = "edit"
             : this.isAdd = "del"
           console.log(this.isAdd);
@@ -87,7 +90,7 @@ export class CheckListComponent implements OnInit {
   }
 
   checkRightEvaluate() {
-    if (this.kiKhaoSat.trangThaiKi !== '2') return false;
+    if (this.kiKhaoSat?.trangThaiKi !== '2') return false;
     return this.store.lstChamDiem?.some(
       (item: any) => item === this.account.userName
     ) ?? false;
@@ -96,8 +99,9 @@ export class CheckListComponent implements OnInit {
   navigateTo() {
     if (this.isAdd == 'add' || this.isAdd == 'del') {
       this._service.BuildInputEvaluate(this.kiKhaoSat.id, this.store.id).subscribe({
-        next: (data) => {
-          localStorage.setItem('resultEvaluate', JSON.stringify(data));
+        next: async (data) => {
+          // await localStorage.setItem('resultEvaluate', JSON.stringify(data));
+          this._storageService.set('resultEvaluate', data)
           console.log(data);
           this.router.navigate([`survey/store/evaluate`], {
             state: {

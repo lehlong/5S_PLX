@@ -2,10 +2,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { SharedModule } from '../../../../shared/shared.module';
 // import { IonicModule } from '@ionic/angular';
+import { Storage } from '@ionic/storage-angular';
 import { AlertController } from '@ionic/angular';
 import { IonAccordionGroup } from '@ionic/angular';
 import { AppEvaluateService } from 'src/app/service/app-evaluate.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { StorageService } from 'src/app/service/storage.service';
 
 @Component({
   imports: [SharedModule],
@@ -24,35 +26,31 @@ export class EvaluateComponent implements OnInit {
   lstTieuChi: any = []
   lstTreeOpen: any = []
   previewImage: any = []
-  evaluate: any = {}
+  evaluate: any = {
+    header: {},
+    lstEvaluate: [],
+    lstImages: []
+  }
+  data: any = {}
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private alertController: AlertController,
+    private _storageService: StorageService,
+    private storage: Storage,
     private _service: AppEvaluateService
   ) {
   }
   ngOnInit() {
-    this.evaluate = JSON.parse(localStorage.getItem('resultEvaluate') ?? "")
     this.route.paramMap.subscribe({
-      next: (params) => {
-        const id = params.get('id')
-        const status = params.get('status')
+      next: async (params) => {
         const nav = this.router.getCurrentNavigation();
-        if (status === 'new') {
-          // const evaluate = nav?.extras.state?.['evaluate'];
-          // if(evaluate.header.code == this.evaluate.header.code){
-          //   console.log("lưu lại");
-
-          //   localStorage.setItem('resultEvaluate', JSON.stringify(this.evaluate));
-          // }
-        } else {
-        }
         console.log(nav?.extras.state);
 
         this.store = nav?.extras.state?.['store'];
         this.kiKhaoSat = nav?.extras.state?.['kiKhaoSat'];
+        this.evaluate = await this._storageService.get('resultEvaluate')
 
         this.getAllTieuChi()
         this.getAllTieuChiLeaves()
@@ -126,30 +124,34 @@ export class EvaluateComponent implements OnInit {
   }
 
   filterDiem(code: any) {
-    const item = this.evaluate.lstEvaluate.find((x: any) => x.tieuChiCode === code);
-
-    return item.pointId;
-
+    const item = this.evaluate?.lstEvaluate?.find((x: any) => x.tieuChiCode === code);
+    return item?.pointId || null;
   }
-
   filterImage(code: any) {
-    return this.evaluate.lstImages
-      .filter((x: any) => x.tieuChiCode === code)
-      .map((x: any) => x.filePath);
-
+    return Array.isArray(this.evaluate?.lstImages)
+      ? this.evaluate.lstImages
+        .filter((x: any) => x.tieuChiCode === code)
+        .map((x: any) => x.filePath)
+      : [];
   }
 
   setDiem(data: any, event: any) {
-    console.log(data);
+    console.log(this.evaluate);
 
     const selected = event.detail.value;
 
     const idx = this.evaluate.lstEvaluate.findIndex(
       (i: any) => i.tieuChiCode === data
     );
+    console.log(idx);
 
+    if (idx === -1) {
+      console.warn('Không tìm thấy tiêu chí', data);
+      return;
+    }
     this.evaluate.lstEvaluate[idx].pointId = selected
-    localStorage.setItem('resultEvaluate', JSON.stringify(this.evaluate));
+    this._storageService.set('resultEvaluate', this.evaluate)
+    // localStorage.setItem('resultEvaluate', JSON.stringify(this.evaluate));
 
   }
 
