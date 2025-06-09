@@ -147,7 +147,7 @@
       *ngFor="let item of lstTieuChi; let i = index"
       href="survey/store/evaluate#{{ item.id }}"
       class="custom-button"
-      [ngClass]="{ 'active-link': isActive(item.id), 'answered': isAnswered(item.code), }"
+      [ngClass]="{ 'active-link': isActive(item.id), 'answered': isAnswered(item), }"
       (click)="setItem(item.id)"
     >
       {{ i + 1 }}

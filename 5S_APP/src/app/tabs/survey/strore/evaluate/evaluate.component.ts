@@ -67,16 +67,19 @@ export class EvaluateComponent implements OnInit {
     return this.currentSelect === itemId;
   }
 
-  isAnswered(id: string): boolean {
+  isAnswered(data: any): boolean {
   const evaluateItem = this.evaluate.lstEvaluate.find(
-    (i: any) => i.tieuChiId === id || i.tieuChiCode === id
+    (i: any) => i.tieuChiId === data.code || i.tieuChiCode === data.code
   );
   const hasPoint = !!evaluateItem && !!evaluateItem.pointId;
-
-  const hasImage = this.evaluate.lstImages.some(
-    (img: any) => img.tieuChiCode === id
-  );
-  return hasPoint || hasImage;
+  const numberImgRequired = data?.numberImg || 0
+  const hasImage = this.evaluate.lstImages.filter(
+    (img: any) => img.tieuChiCode === data.code
+  ).length;
+  console.log('Số ảnh đã chọn', hasImage)
+  console.log('Ảnh tối thiểu', numberImgRequired)
+  const hasEnoughImages = hasImage >= numberImgRequired;
+  return hasPoint && hasEnoughImages;
 }
 
   getAllTieuChi() {
