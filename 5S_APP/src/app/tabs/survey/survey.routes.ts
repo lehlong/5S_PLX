@@ -14,7 +14,7 @@ export const surveyRoutes: Routes = [
       // { path: 'store/list/:id', component: StoreListComponent },
       { path: 'store/list/:id', component: StoreListComponent },
       { path: 'store/check-list/:id', component: StoreCheckListComponent },
-      { path: 'store/evaluate/:code', component: EvaluateComponent },
+      { path: 'store/evaluate/:mode/:code', component: EvaluateComponent },
       { path: 'ware-house/list/:id', component: WareHouseListComponent },
       { path: 'ware-house/evaluate', component: EvaluateComponent },
     ],

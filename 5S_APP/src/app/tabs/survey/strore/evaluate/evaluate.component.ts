@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { SharedModule } from '../../../../shared/shared.module';
 // import { IonicModule } from '@ionic/angular';
 import { Storage } from '@ionic/storage-angular';
@@ -7,6 +7,7 @@ import { IonAccordionGroup } from '@ionic/angular';
 import { AppEvaluateService } from 'src/app/service/app-evaluate.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StorageService } from 'src/app/service/storage.service';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 @Component({
   imports: [SharedModule],
@@ -15,8 +16,9 @@ import { StorageService } from 'src/app/service/storage.service';
   styleUrls: ['./evaluate.component.scss'],
 })
 export class EvaluateComponent implements OnInit {
-  @ViewChild('accordionGroup', { static: true })
-  accordionGroup!: IonAccordionGroup;
+  @ViewChild('accordionGroup', { static: true }) accordionGroup!: IonAccordionGroup;
+  @ViewChild('fileInput', { static: false }) fileInput!: ElementRef<HTMLInputElement>;
+
   selectedAccordionId: string = ''
   currentSelect: string = '';
   lstAllTieuChi: any = [];
@@ -43,17 +45,22 @@ export class EvaluateComponent implements OnInit {
     private _service: AppEvaluateService
   ) { }
   ngOnInit() {
+
     this.route.paramMap.subscribe({
       next: async (params) => {
         this.headerId = params.get('code') ?? ''
-        const nav = this.router.getCurrentNavigation();
-        console.log(nav?.extras.state);
+        const mode = params.get('mode') ?? ''
 
-        this.store = nav?.extras.state?.['store'];
-        this.kiKhaoSat = nav?.extras.state?.['kiKhaoSat'];
+        let nav = localStorage.getItem('filterCS')
+        this.store = JSON.parse(nav ?? '').store;
+        this.kiKhaoSat = JSON.parse(nav ?? '').kiKhaoSat;
 
-        this.evaluate = await this._storageService.get(this.headerId);
-        console.log(this.evaluate);
+        if(mode == 'draft'){
+
+          this.evaluate = await this._storageService.get(this.store.id);
+        }else{
+
+        }
 
         this.getAllTieuChi();
         this.getAllTieuChiLeaves();
@@ -134,7 +141,6 @@ export class EvaluateComponent implements OnInit {
 
   onImageSelected(event: any, code: any) {
     const file: File = event.target.files[0];
-    console.log(file);
 
     if (!file) return;
 
@@ -142,6 +148,7 @@ export class EvaluateComponent implements OnInit {
     reader.onload = () => {
       const base64 = reader.result as string;
 
+      console.log(this.evaluate);
       // Lưu vào localStorage
       this.evaluate.lstImages.push({
         code: '-1',
@@ -149,7 +156,8 @@ export class EvaluateComponent implements OnInit {
         filePath: base64,
         tieuChiCode: code,
       });
-      this._storageService.set(this.headerId, this.evaluate)
+
+      this._storageService.set(this.store.id, this.evaluate)
       // localStorage.setItem('resultEvaluate', JSON.stringify(this.evaluate));
 
       this.previewImage = localStorage.getItem('previewImage');
@@ -180,11 +188,11 @@ export class EvaluateComponent implements OnInit {
     if (idx === -1) return;
 
     this.evaluate.lstEvaluate[idx].pointId = selected;
-    this._storageService.set(this.headerId, this.evaluate);
+    this._storageService.set(this.store.id, this.evaluate);
   }
 
   onSubmit() {
-    console.log(this.evaluate.lstEvaluate);
+    console.log(this.evaluate);
   }
 
   navigateTo(itemId: string) {
@@ -205,14 +213,19 @@ export class EvaluateComponent implements OnInit {
   }
 
   deleteImage() {
-    // Gọi API hoặc xóa khỏi mảng
     const index = this.evaluate.lstImages.findIndex(
       (img: any) => img.filePath === this.selectedImage
     );
     if (index > -1) {
       this.evaluate.lstImages.splice(index, 1);
     }
+    this._storageService.set(this.store.id, this.evaluate);
     this.closeFullScreen();
+  }
+
+  deleteImage2(img: string) {
+    this.selectedImage = img
+    this.confirmDeleteImage()
   }
 
   async confirmDeleteImage() {
@@ -242,15 +255,15 @@ export class EvaluateComponent implements OnInit {
 
   async openCamera() {
     try {
-      // const image = await Camera.getPhoto({
-      //   quality: 90,
-      //   allowEditing: false,
-      //   resultType: CameraResultType.Base64,
-      //   source: CameraSource.Camera,
-      // });
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Base64,
+        source: CameraSource.Camera,
+      });
 
-      // const base64Image = `data:image/jpeg;base64,${image.base64String}`;
-      // console.log('Captured image:', base64Image);
+      const base64Image = `data:image/jpeg;base64,${image.base64String}`;
+      console.log('Captured image:', base64Image);
 
       // xử lý tiếp ảnh (hiển thị, upload,...)
     } catch (err) {
@@ -259,8 +272,7 @@ export class EvaluateComponent implements OnInit {
   }
 
   onAttach() {
-    // mở file picker hoặc xử lý đính kèm file
-    console.log('Attach clicked');
+    this.fileInput.nativeElement.click();
   }
 
 }

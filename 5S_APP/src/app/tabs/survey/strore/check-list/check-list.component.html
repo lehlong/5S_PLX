@@ -28,7 +28,7 @@
   <ion-item-group style="margin-top: 20px">
     <ion-item *ngFor="let item of lstHisEvaluate">
       <ion-grid>
-        <ion-row (click)="openEditEvaluate(item.code)">
+        <ion-row (click)="openEditEvaluate(item)">
           <ion-col class="text-bold" size="7">{{ item?.name }}</ion-col>
           <ion-col class="text-bold" size="5">1{{ item.diem }}</ion-col>
           <ion-col class="text-italic" size="7">2{{ item.accountUserName }}</ion-col>
@@ -40,13 +40,8 @@
 </ion-content>
 
 <ion-footer *ngIf="checkRightEvaluate()">
-  <ion-button (click)="navigateTo()" *ngIf="isAdd == 'edit'" expand="full" style="width: 100%;font-weight: 700;">Chấm
+  <ion-button (click)="navigateTo()" expand="full" style="width: 100%;font-weight: 700;">Chấm
     điểm</ion-button>
-  <ion-button (click)="navigateTo()" *ngIf="isAdd == 'add'" expand="full" style="width: 100%;font-weight: 700;">Chấm
-    điểm</ion-button>
-  <ion-button id="present-alert" *ngIf="isAdd == 'del'" expand="full" style="width: 100%; font-weight: 700;">
-    Chấm điểm
-  </ion-button>
 </ion-footer>
 
 

@@ -87,3 +87,25 @@
   border: 1px solid green;
   border-radius: 5px;
 }
+
+.image-wrapper {
+  position: relative;
+  display: inline-block;
+  margin: 8px;
+
+  .image-preview {
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+
+  .delete-btn {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    z-index: 10;
+    color: rgba(0, 0, 0, 0.468);
+    font-size: 18px;
+  }
+}

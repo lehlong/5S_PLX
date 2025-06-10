@@ -15,7 +15,7 @@ import { StorageService } from 'src/app/service/storage.service';
 })
 export class CheckListComponent implements OnInit {
   kiKhaoSat: any = {}
-  isAdd: 'add' | 'edit' | 'view' | 'del' = 'add';
+  mode: 'draft' | 'new' = 'draft';
   store: any = {}
   lstHisEvaluate: any = []
   inStoreId: any = ''
@@ -68,22 +68,14 @@ export class CheckListComponent implements OnInit {
 
         if (eva) {
           this.evaluate = eva
-          if(this.evaluate.header.kiKhaoSatId == this.kiKhaoSat.id){
-            this.lstHisEvaluate.push(this.evaluate.header)
+          if (this.evaluate.header.kiKhaoSatId == this.kiKhaoSat.id) {
+            this.lstHisEvaluate = [this.evaluate.header]
           }
-          // this.lstHisEvaluate = this.lstEvaluates.lstHeader.filter((x: any) =>
-          //   x.kiKhaoSatId === this.kiKhaoSat.id && x.storeId === this.store.id
-          // );
-          console.log(this.lstHisEvaluate);
-
-          // this.evaluate.header.storeId == this.store?.id && this.evaluate.header.kiKhaoSatId == this.kiKhaoSat.id
-          //   ? this.isAdd = "edit"
-          //   : this.isAdd = "del"
-          // console.log(this.isAdd);
+          console.log(this.mode);
 
         } else {
-          this.isAdd = 'add'
-          console.log(this.isAdd);
+          this.mode = 'new'
+          console.log(this.mode);
         }
 
         this.inStoreId = id
@@ -95,8 +87,8 @@ export class CheckListComponent implements OnInit {
   getAllEvaluateHistory() {
     this._service.search({ keyWord: this.inStoreId }).subscribe({
       next: (data) => {
-        if(!data)
-        this.lstHisEvaluate.push(data.data)
+        if (!data)
+          this.lstHisEvaluate.push(data.data)
       }
     })
   }
@@ -108,39 +100,30 @@ export class CheckListComponent implements OnInit {
     ) ?? false;
   }
 
-  openEditEvaluate(code: any) {
-    this.router.navigate([`survey/store/evaluate/${code}`], {
-      state: {
-        kiKhaoSat: this.kiKhaoSat,
-        store: this.store,
-        // evaluate: this.evaluate
-      }
-    });
+  openEditEvaluate(data: any) {
+    if (data.name == "Bản nháp") {
+      this.router.navigate([`survey/store/evaluate/draft/${data.code}`]);
+    } else {
+      this.router.navigate([`survey/store/evaluate/view/${data.code}`]);
+    }
   }
 
   navigateTo() {
-    if (this.isAdd == 'add' || this.isAdd == 'del') {
+    if (this.mode == 'new') {
       this._service.BuildInputEvaluate(this.kiKhaoSat.id, this.store.id).subscribe({
         next: async (data) => {
-
           this._storageService.set(data.header.storeId, data)
+          console.log('tạo mới');
 
-          // this.lstEvaluates.lstHeader.push(data.header);
-          // this.lstEvaluates.lstEvaluate[0].push(...data.lstEvaluate);
-          // this.lstEvaluates.lstImages[0].push(...data.lstImages);
+          this.router.navigate([`survey/store/evaluate/draft/${data.header.code}`]);
 
-          // this._storageService.set('lstEvaluate', this.lstEvaluates)
-
-          console.log(data);
-          this.router.navigate([`survey/store/evaluate/${data.header.code}`], {
-            state: {
-              kiKhaoSat: this.kiKhaoSat,
-              store: this.store,
-              evaluate: data
-            }
-          });
         }
       })
+    } else {
+      console.log('chỉnh sửa');
+
+      this.router.navigate([`survey/store/evaluate/draft/${this.evaluate.header.code}`]);
+
     }
   }
 
