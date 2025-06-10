@@ -52,21 +52,7 @@
 
             <ng-template #Child>
               <div class="ion-padding" slot="content">
-                <ng-container *ngIf="node.isImg">
-                  <label style="color: orange">[Chú ý: Tối thiểu 1 ảnh]</label>
                   <p style="color: red">
-                    (*) Tiêu chí này bắt buộc chọn 1 hình ảnh
-                  </p>
-                  <ion-item style="display: none">
-                    <input
-                      #fileInput
-                      type="file"
-                      (change)="onImageSelected($event, node.code)"
-                      accept="image/*"
-                    />
-                  </ion-item>
-                </ng-container>
-
                 <ion-radio-group
                   [value]="filterDiem(node.code)"
                   (ionChange)="setDiem(node.code, $event)"
@@ -78,7 +64,6 @@
                     </ion-item>
                   </ng-container>
                 </ion-radio-group>
-
                 <ion-item
                   lines="none"
                   class="custom-input-box"
@@ -112,6 +97,20 @@
                     </ion-button>
                   </ion-buttons>
                 </ion-item>
+                <div *ngIf="node.isImg" style="margin-top: 10px">
+                  <label style="color: orange">[Chú ý: Tối thiểu {{node.numberImg}} ảnh]</label>
+                  <p *ngIf="hasEnoughImages(node.code, node.numberImg)" style="color: red">
+                    (*) Tiêu chí này bắt buộc chọn {{node.numberImg}} hình ảnh
+                  </p>
+                  <ion-item style="display: none">
+                    <input
+                      #fileInput
+                      type="file"
+                      (change)="onImageSelected($event, node.code)"
+                      accept="image/*"
+                    />
+                  </ion-item>
+                </div>
 
                 <div
                   class="image-wrapper"
@@ -164,19 +163,19 @@
       <ion-title>
         <ion-grid>
           <ion-row>
-            <ion-col size="6" style="display:flex; align-items: center;"
+            <ion-col size="6" style="display: flex; align-items: center"
               ><span style="background-color: blue" class="circle"></span
               ><span class="font-12">Đã trả lời</span></ion-col
             >
-            <ion-col size="6" style="display:flex; align-items: center;"
+            <ion-col size="6" style="display: flex; align-items: center"
               ><span style="background-color: grey" class="circle"></span
               ><span class="font-12">Chưa lưu</span></ion-col
             >
-            <ion-col size="6" style="display:flex; align-items: center;"
+            <ion-col size="6" style="display: flex; align-items: center"
               ><span style="background-color: green" class="circle"></span
               ><span class="font-12">Đang chọn</span></ion-col
             >
-            <ion-col size="6" style="display:flex; align-items: center;"
+            <ion-col size="6" style="display: flex; align-items: center"
               ><span style="background-color: red" class="circle"></span
               ><span class="font-12">Không đạt</span></ion-col
             >

@@ -16,10 +16,12 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
   styleUrls: ['./evaluate.component.scss'],
 })
 export class EvaluateComponent implements OnInit {
-  @ViewChild('accordionGroup', { static: true }) accordionGroup!: IonAccordionGroup;
-  @ViewChild('fileInput', { static: false }) fileInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('accordionGroup', { static: true })
+  accordionGroup!: IonAccordionGroup;
+  @ViewChild('fileInput', { static: false })
+  fileInput!: ElementRef<HTMLInputElement>;
 
-  selectedAccordionId: string = ''
+  selectedAccordionId: string = '';
   currentSelect: string = '';
   lstAllTieuChi: any = [];
   store: any = {};
@@ -34,7 +36,7 @@ export class EvaluateComponent implements OnInit {
     lstImages: [],
   };
   data: any = {};
-  headerId: any = ''
+  headerId: any = '';
 
   constructor(
     private router: Router,
@@ -43,23 +45,20 @@ export class EvaluateComponent implements OnInit {
     private _storageService: StorageService,
     private storage: Storage,
     private _service: AppEvaluateService
-  ) { }
+  ) {}
   ngOnInit() {
-
     this.route.paramMap.subscribe({
       next: async (params) => {
-        this.headerId = params.get('code') ?? ''
-        const mode = params.get('mode') ?? ''
+        this.headerId = params.get('code') ?? '';
+        const mode = params.get('mode') ?? '';
 
-        let nav = localStorage.getItem('filterCS')
+        let nav = localStorage.getItem('filterCS');
         this.store = JSON.parse(nav ?? '').store;
         this.kiKhaoSat = JSON.parse(nav ?? '').kiKhaoSat;
 
-        if(mode == 'draft'){
-
+        if (mode == 'draft') {
           this.evaluate = await this._storageService.get(this.store.id);
-        }else{
-
+        } else {
         }
 
         this.getAllTieuChi();
@@ -85,7 +84,7 @@ export class EvaluateComponent implements OnInit {
   }
 
   borderActive(data: any): any {
-    console.log('data-border', data.code)
+    console.log('data-border', data.code);
   }
 
   isAnswered(data: any) {
@@ -93,12 +92,19 @@ export class EvaluateComponent implements OnInit {
       (i: any) => i.tieuChiId === data.code || i.tieuChiCode === data.code
     );
     const hasPoint = !!evaluateItem && !!evaluateItem.pointId;
-    const numberImgRequired = data?.numberImg || 0
+    const numberImgRequired = data?.numberImg || 0;
     const hasImage = this.evaluate.lstImages.filter(
       (img: any) => img.tieuChiCode === data.code
     ).length;
     const hasEnoughImages = hasImage >= numberImgRequired;
     return hasPoint && hasEnoughImages;
+  }
+
+  hasEnoughImages(code: any, requiredNumber: any): boolean {
+    const imagesSelecting = this.evaluate.lstImages.filter(
+      (img: any) => img.tieuChiCode === code
+    ).length;
+    return imagesSelecting < requiredNumber;
   }
 
   getAllTieuChi() {
@@ -157,7 +163,7 @@ export class EvaluateComponent implements OnInit {
         tieuChiCode: code,
       });
 
-      this._storageService.set(this.store.id, this.evaluate)
+      this._storageService.set(this.store.id, this.evaluate);
       // localStorage.setItem('resultEvaluate', JSON.stringify(this.evaluate));
 
       this.previewImage = localStorage.getItem('previewImage');
@@ -174,8 +180,8 @@ export class EvaluateComponent implements OnInit {
   filterImage(code: any) {
     return Array.isArray(this.evaluate?.lstImages)
       ? this.evaluate.lstImages
-        .filter((x: any) => x.tieuChiCode === code)
-        .map((x: any) => x.filePath)
+          .filter((x: any) => x.tieuChiCode === code)
+          .map((x: any) => x.filePath)
       : [];
   }
 
@@ -224,8 +230,8 @@ export class EvaluateComponent implements OnInit {
   }
 
   deleteImage2(img: string) {
-    this.selectedImage = img
-    this.confirmDeleteImage()
+    this.selectedImage = img;
+    this.confirmDeleteImage();
   }
 
   async confirmDeleteImage() {
@@ -250,7 +256,6 @@ export class EvaluateComponent implements OnInit {
     await alert.present();
   }
 
-
   feedback: string = '';
 
   async openCamera(code: any) {
@@ -272,7 +277,7 @@ export class EvaluateComponent implements OnInit {
         tieuChiCode: code,
       });
 
-      this._storageService.set(this.store.id, this.evaluate)
+      this._storageService.set(this.store.id, this.evaluate);
     } catch (err) {
       console.error('Camera error:', err);
     }
@@ -281,5 +286,4 @@ export class EvaluateComponent implements OnInit {
   onAttach() {
     this.fileInput.nativeElement.click();
   }
-
 }
