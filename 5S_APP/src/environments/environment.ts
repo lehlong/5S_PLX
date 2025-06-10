@@ -1,4 +1,6 @@
 export const environment = {
-   apiUrl: 'http://localhost:5203/api',
-  // production: false
+  production: false,
+  //  apiUrl: 'http://localhost:5203/api',
+   apiUrl: 'http://sso.d2s.com.vn:1347/api',
+
 };

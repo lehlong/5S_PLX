@@ -9,7 +9,11 @@ const config: CapacitorConfig = {
       overlaysWebView: false,
       style: 'light'
     }
-  }
+  },
+  server: {
+  cleartext: true, // Cho phép gọi HTTP
+  androidScheme: 'http' // Không ép dùng HTTPS
+}
 };
 
 export default config;
