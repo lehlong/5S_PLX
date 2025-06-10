@@ -64,11 +64,10 @@
 
                   <ion-buttons slot="end">
                     <ion-button fill="clear" (click)="onAttach()">
-                      <!-- <ion-icon name="document-attach-outline"></ion-icon> -->
                       <ion-icon name="document-outline" slot="icon-only"></ion-icon>
                     </ion-button>
 
-                    <ion-button fill="clear" (click)="openCamera()">
+                    <ion-button fill="clear" (click)="openCamera(node.code)">
                       <ion-icon slot="icon-only" name="camera-outline"></ion-icon>
                     </ion-button>
                   </ion-buttons>
@@ -121,7 +120,7 @@
   </ion-header>
   <ion-content class="ion-padding">
     <div style="gap: 10px; display: flex; flex-wrap: wrap">
-      <a style="padding-left: 5px" *ngFor="let item of lstTieuChi; let i = index" href="{{ navigateTo(item.id) }}"
+      <a style="padding-left: 5px" *ngFor="let item of lstTieuChi; let i = index"
         class="custom-button" [ngClass]="{ 'active-link': isActive(item.id), 'answered': isAnswered(item), }"
         (click)="setItem(item.id)">
         {{ i + 1 }}

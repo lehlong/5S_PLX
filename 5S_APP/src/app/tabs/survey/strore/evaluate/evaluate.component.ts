@@ -89,16 +89,16 @@ export class EvaluateComponent implements OnInit {
   }
 
   isAnswered(data: any) {
-    // const evaluateItem = this.evaluate.lstEvaluate.find(
-    //   (i: any) => i.tieuChiId === data.code || i.tieuChiCode === data.code
-    // );
-    // const hasPoint = !!evaluateItem && !!evaluateItem.pointId;
-    // const numberImgRequired = data?.numberImg || 0
-    // const hasImage = this.evaluate.lstImages.filter(
-    //   (img: any) => img.tieuChiCode === data.code
-    // ).length;
-    // const hasEnoughImages = hasImage >= numberImgRequired;
-    // return hasPoint && hasEnoughImages;
+    const evaluateItem = this.evaluate.lstEvaluate.find(
+      (i: any) => i.tieuChiId === data.code || i.tieuChiCode === data.code
+    );
+    const hasPoint = !!evaluateItem && !!evaluateItem.pointId;
+    const numberImgRequired = data?.numberImg || 0
+    const hasImage = this.evaluate.lstImages.filter(
+      (img: any) => img.tieuChiCode === data.code
+    ).length;
+    const hasEnoughImages = hasImage >= numberImgRequired;
+    return hasPoint && hasEnoughImages;
   }
 
   getAllTieuChi() {
@@ -253,7 +253,7 @@ export class EvaluateComponent implements OnInit {
 
   feedback: string = '';
 
-  async openCamera() {
+  async openCamera(code: any) {
     try {
       const image = await Camera.getPhoto({
         quality: 90,
@@ -263,9 +263,16 @@ export class EvaluateComponent implements OnInit {
       });
 
       const base64Image = `data:image/jpeg;base64,${image.base64String}`;
-      console.log('Captured image:', base64Image);
+      // console.log('Captured image:', base64Image);
 
-      // xử lý tiếp ảnh (hiển thị, upload,...)
+      this.evaluate.lstImages.push({
+        code: '-1',
+        fileName: '',
+        filePath: base64Image,
+        tieuChiCode: code,
+      });
+
+      this._storageService.set(this.store.id, this.evaluate)
     } catch (err) {
       console.error('Camera error:', err);
     }
