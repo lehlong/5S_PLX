@@ -4,35 +4,50 @@
       <ion-back-button></ion-back-button>
     </ion-button>
     <ion-title class="t-center">Chi tiết chấm điểm </ion-title>
-    <ion-button slot="end" fill="clear" color="dark" style="
+    <ion-button
+      slot="end"
+      fill="clear"
+      color="dark"
+      style="
         --padding: 0;
         --padding-end: 0;
         --padding-top: 0;
         --padding-bottom: 0;
-      ">
+      "
+    >
       <ion-icon name="search-outline" style="font-size: 25px"></ion-icon>
     </ion-button>
     <ion-buttons slot="end">
       <ion-menu-button>
-        <ion-icon name="list-outline" style="font-size: 25px"></ion-icon></ion-menu-button>
+        <ion-icon name="list-outline" style="font-size: 25px"></ion-icon
+      ></ion-menu-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content>
-  <ion-accordion-group [multiple]="true" style="margin: 5px" [value]="lstTreeOpen">
+  <ion-accordion-group
+    [multiple]="true"
+    style="margin: 5px"
+    [value]="lstTreeOpen"
+  >
     <ng-template #recursive let-nodes>
       <ng-container *ngFor="let node of nodes">
-        <ion-accordion [value]="node.key" [ngClass]="{ 'border-link': node.id === selectedAccordionId }">
+        <ion-accordion
+          [value]="node.key"
+          [ngClass]="{ 'border-link': node.id === selectedAccordionId }"
+        >
           <ion-item slot="header" color="light" id="{{ node.id }}">
             <ion-label>{{ node.title }}</ion-label>
           </ion-item>
 
           <div style="padding: 5px 0" slot="content">
             <ng-container *ngIf="node.isGroup == true; else Child">
-              <ng-container *ngTemplateOutlet="
+              <ng-container
+                *ngTemplateOutlet="
                   recursive;
                   context: { $implicit: node.children }
-                "></ng-container>
+                "
+              ></ng-container>
             </ng-container>
 
             <ng-template #Child>
@@ -42,13 +57,20 @@
                   <p style="color: red">
                     (*) Tiêu chí này bắt buộc chọn 1 hình ảnh
                   </p>
-                  <ion-item style="display: none;">
-                    <input #fileInput type="file" (change)="onImageSelected($event, node.code)" accept="image/*" />
+                  <ion-item style="display: none">
+                    <input
+                      #fileInput
+                      type="file"
+                      (change)="onImageSelected($event, node.code)"
+                      accept="image/*"
+                    />
                   </ion-item>
-
                 </ng-container>
 
-                <ion-radio-group [value]="filterDiem(node.code)" (ionChange)="setDiem(node.code, $event)">
+                <ion-radio-group
+                  [value]="filterDiem(node.code)"
+                  (ionChange)="setDiem(node.code, $event)"
+                >
                   <ng-container *ngFor="let diem of node.diemTieuChi">
                     <ion-item>
                       <ion-label>{{ diem.moTa }}</ion-label>
@@ -57,26 +79,56 @@
                   </ng-container>
                 </ion-radio-group>
 
-                <ion-item lines="none" class="custom-input-box"
-                  style=" border-radius: 10px; border: 1px solid black; margin-top: 10px; ">
-                  <ion-textarea placeholder="Ý kiến đề xuất" autoGrow="true" [(ngModel)]="feedback" class="textarea">
+                <ion-item
+                  lines="none"
+                  class="custom-input-box"
+                  style="
+                    border-radius: 10px;
+                    border: 1px solid black;
+                    margin-top: 10px;
+                  "
+                >
+                  <ion-textarea
+                    placeholder="Ý kiến đề xuất"
+                    autoGrow="true"
+                    [(ngModel)]="feedback"
+                    class="textarea"
+                  >
                   </ion-textarea>
 
                   <ion-buttons slot="end">
                     <ion-button fill="clear" (click)="onAttach()">
-                      <ion-icon name="document-outline" slot="icon-only"></ion-icon>
+                      <ion-icon
+                        name="document-outline"
+                        slot="icon-only"
+                      ></ion-icon>
                     </ion-button>
 
                     <ion-button fill="clear" (click)="openCamera(node.code)">
-                      <ion-icon slot="icon-only" name="camera-outline"></ion-icon>
+                      <ion-icon
+                        slot="icon-only"
+                        name="camera-outline"
+                      ></ion-icon>
                     </ion-button>
                   </ion-buttons>
                 </ion-item>
 
-                <div class="image-wrapper" *ngFor="let img of filterImage(node.code)">
+                <div
+                  class="image-wrapper"
+                  *ngFor="let img of filterImage(node.code)"
+                >
                   <div class="image-wrapper">
-                    <ion-img [src]="img" class="image-preview" (click)="openFullScreen(img)"></ion-img>
-                    <ion-button fill="clear" class="delete-btn" size="small" (click)="deleteImage2(img)">
+                    <ion-img
+                      [src]="img"
+                      class="image-preview"
+                      (click)="openFullScreen(img)"
+                    ></ion-img>
+                    <ion-button
+                      fill="clear"
+                      class="delete-btn"
+                      size="small"
+                      (click)="deleteImage2(img)"
+                    >
                       <ion-icon name="close-circle" slot="icon-only"></ion-icon>
                     </ion-button>
                   </div>
@@ -90,13 +142,20 @@
     </ng-template>
 
     <!-- Bắt đầu render từ gốc -->
-    <ng-container *ngTemplateOutlet="recursive; context: { $implicit: treeData }"></ng-container>
+    <ng-container
+      *ngTemplateOutlet="recursive; context: { $implicit: treeData }"
+    ></ng-container>
   </ion-accordion-group>
 </ion-content>
 
 <ion-footer>
-  <ion-button (click)="onSubmit()" expand="full" (click)="(1)" style="width: 100%; font-weight: 700">Chấm
-    điểm</ion-button>
+  <ion-button
+    (click)="onSubmit()"
+    expand="full"
+    (click)="(1)"
+    style="width: 100%; font-weight: 700"
+    >Chấm điểm</ion-button
+  >
 </ion-footer>
 
 <ion-menu side="end" contentId="main-content" [style.--width]="'85%'">
@@ -105,14 +164,22 @@
       <ion-title>
         <ion-grid>
           <ion-row>
-            <ion-col size="6"><span style="background-color: blue" class="circle"></span>Đã trả
-              lời</ion-col>
-            <ion-col size="6"><span style="background-color: grey" class="circle"></span>Chưa
-              lưu</ion-col>
-            <ion-col size="6"><span style="background-color: green" class="circle"></span>Đang
-              chọn</ion-col>
-            <ion-col size="6"><span style="background-color: red" class="circle"></span>Không
-              đạt</ion-col>
+            <ion-col size="6" style="display:flex; align-items: center;"
+              ><span style="background-color: blue" class="circle"></span
+              ><span class="font-12">Đã trả lời</span></ion-col
+            >
+            <ion-col size="6" style="display:flex; align-items: center;"
+              ><span style="background-color: grey" class="circle"></span
+              ><span class="font-12">Chưa lưu</span></ion-col
+            >
+            <ion-col size="6" style="display:flex; align-items: center;"
+              ><span style="background-color: green" class="circle"></span
+              ><span class="font-12">Đang chọn</span></ion-col
+            >
+            <ion-col size="6" style="display:flex; align-items: center;"
+              ><span style="background-color: red" class="circle"></span
+              ><span class="font-12">Không đạt</span></ion-col
+            >
           </ion-row>
         </ion-grid>
       </ion-title>
@@ -120,9 +187,13 @@
   </ion-header>
   <ion-content class="ion-padding">
     <div style="gap: 10px; display: flex; flex-wrap: wrap">
-      <a style="padding-left: 5px" *ngFor="let item of lstTieuChi; let i = index"
-        class="custom-button" [ngClass]="{ 'active-link': isActive(item.id), 'answered': isAnswered(item), }"
-        (click)="setItem(item.id)">
+      <a
+        style="padding-left: 5px"
+        *ngFor="let item of lstTieuChi; let i = index"
+        class="custom-button"
+        [ngClass]="{ 'active-link': isActive(item.id), 'answered': isAnswered(item), }"
+        (click)="setItem(item.id)"
+      >
         {{ i + 1 }}
       </a>
     </div>
@@ -131,8 +202,12 @@
     <!-- <ion-item> -->
     <ion-list>
       <ion-item style="height: 36px">
-        <ion-label style="margin: 0; display: block; line-height: 1.2">Người chấm</ion-label>
-        <ion-label style="margin: 0; display: block; line-height: 1.2">Nguyễn Thị Lân</ion-label>
+        <ion-label style="margin: 0; display: block; line-height: 1.2"
+          >Người chấm</ion-label
+        >
+        <ion-label style="margin: 0; display: block; line-height: 1.2"
+          >Nguyễn Thị Lân</ion-label
+        >
       </ion-item>
       <ion-item style="height: 40px">
         <ion-label>Lần chấm thứ 2</ion-label>
@@ -159,7 +234,12 @@
 <ion-modal [isOpen]="isImageModalOpen" (didDismiss)="isImageModalOpen = false">
   <ng-template>
     <ion-content class="full-image-content" (click)="closeFullScreen()">
-      <ion-button class="delete-button" fill="clear" color="danger" (click)="confirmDeleteImage()">
+      <ion-button
+        class="delete-button"
+        fill="clear"
+        color="danger"
+        (click)="confirmDeleteImage()"
+      >
         <ion-icon name="trash-outline" slot="end"></ion-icon>
       </ion-button>
       <img [src]="selectedImage" class="full-image" />

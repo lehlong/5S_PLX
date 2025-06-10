@@ -62,7 +62,7 @@ export class CheckListComponent implements OnInit {
         const filter = JSON.parse(localStorage.getItem('filterCS') ?? "")
         this.kiKhaoSat = filter.kiKhaoSat
         this.store = filter.store
-
+ 
         let eva = await this._storageService.get(this.store.id)
         console.log(eva);
 
