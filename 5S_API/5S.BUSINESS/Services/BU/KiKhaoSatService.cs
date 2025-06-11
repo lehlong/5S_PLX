@@ -210,7 +210,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 foreach (var item in lstInStore)
                 {
                     var store = lstMdStore.Where(x => x.Id == item.StoreId).FirstOrDefault();
-                    var lstChamDiem2 = lstChamDiem.Where(x => x.InStoreId == store.Id).ToList();
+                    var lstChamDiem2 = lstChamDiem.Where(x => x.InStoreId == item.Id).ToList();
                     var inStore = new InputStore()
                     {
                         Id = item.Id,
@@ -232,7 +232,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 foreach (var item in lstInWareHouse)
                 {
                     var WareHouse = lstMdWareHouse.Where(x => x.Id == item.WareHouseId).FirstOrDefault();
-                    var lstChamDiem2 = lstChamDiem.Where(x => x.InStoreId == WareHouse.Id).ToList();
+                    var lstChamDiem2 = lstChamDiem.Where(x => x.InStoreId == item.Id).ToList();
                     var inWareHousee = new InputWarehouse()
                     {
                         Id = item.Id,

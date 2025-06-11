@@ -40,12 +40,12 @@
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('phoneNumber', $event)">
             Số điện thoại
           </th>
-          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('KinhDo', $event)">
+          <!-- <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('KinhDo', $event)">
             Kinh Độ
           </th>
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('ViDo', $event)">
             Vĩ Độ
-          </th>
+          </th> -->
 
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('isActive', $event)" nzAlign="center">
             Trạng thái
@@ -68,16 +68,16 @@
           <td>{{ getNameByCodeAccount(data.cuaHangTruong) }}</td>
           <td>{{ getNameByCodeAccount(data.nguoiPhuTrach) }}</td>
           <td>{{ data.phoneNumber }}</td>
-          <td>{{ data.kinhDo }}</td>
-          <td>{{ data.viDo }}</td>
+          <!-- <td>{{ data.kinhDo }}</td>
+          <td>{{ data.viDo }}</td> -->
           <td nzAlign="center">
             <nz-tag nzColor="success" *ngIf="data.trangThaiCuaHang">
               <nz-icon nzType="check-circle" />
-              <span>Kích hoạt</span>
+              <span>Hoạt động</span>
             </nz-tag>
             <nz-tag nzColor="error" *ngIf="!data.trangThaiCuaHang">
               <nz-icon nzType="close-circle" />
-              <span>Khoá</span>
+              <span>Không hoạt động</span>
             </nz-tag>
           </td>
         </tr>
@@ -179,8 +179,8 @@
         <nz-form-label>Trạng thái</nz-form-label>
         <nz-form-control>
           <nz-radio-group formControlName="isActive">
-            <label nz-radio [nzValue]="true">Kích hoạt</label>
-            <label nz-radio [nzValue]="false">Khoá</label>
+            <label nz-radio [nzValue]="true">Hoạt động</label>
+            <label nz-radio [nzValue]="false">Không hoạt động</label>
           </nz-radio-group>
         </nz-form-control>
       </nz-form-item>
