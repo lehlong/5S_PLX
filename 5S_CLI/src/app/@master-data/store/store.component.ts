@@ -7,6 +7,7 @@ import { StoreService } from '../../service/master-data/store.service'
 import { AccountService } from '../../service/system-manager/account.service'
 import { GlobalService } from '../../service/global.service'
 import { NzMessageService } from 'ng-zorro-antd/message'
+import { NzModalService } from 'ng-zorro-antd/modal'
 
 
 @Component({
@@ -33,6 +34,7 @@ export class StoreComponent {
     private globalService: GlobalService,
     private message: NzMessageService,
     private accountService: AccountService,
+    private modal: NzModalService
   ) {
     this.validateForm = this.fb.group({
       id: ['', [Validators.required]],
@@ -209,7 +211,6 @@ export class StoreComponent {
       this.visible = true
     }, 200)
   }
-
   pageSizeChange(size: number): void {
     this.filter.currentPage = 1
     this.filter.pageSize = size

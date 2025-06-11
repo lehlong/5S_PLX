@@ -46,10 +46,10 @@
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('ViDo', $event)">
             Vĩ Độ
           </th> -->
-
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('isActive', $event)" nzAlign="center">
             Trạng thái
           </th>
+          <th>Thao tác</th>
         </tr>
       </thead>
       <tbody>
@@ -79,6 +79,10 @@
               <nz-icon nzType="close-circle" />
               <span>Không hoạt động</span>
             </nz-tag>
+          </td>
+          <td>
+             <button (click)="openEdit(data)" style="margin-right: 10px;" nz-button nzType="default">Sửa</button>
+             <button (click)="deleteItem(data.id)" nz-button nzType="primary" nzDanger>Xoá</button>
           </td>
         </tr>
       </tbody>
