@@ -38,7 +38,7 @@
             Người Phụ trách
           </th>
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('phoneNumber', $event)">
-            số điện thoại
+            Số điện thoại
           </th>
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('KinhDo', $event)">
             Kinh Độ
@@ -109,26 +109,26 @@
             [control]="$any(validateForm).controls['name']" [required]="true"></app-input-clear>
         </div>
         <div nz-col [nzXs]="24" [nzMd]="12">
-          <app-input-clear placeholder="Nhập tên kinh độ " [required]="true" label="Kinh độ"
-            [control]="$any(validateForm).controls['KinhDo']" [required]="true"></app-input-clear>
+          <app-input-clear placeholder="Nhập tên kinh độ "  label="Kinh độ"
+            [control]="$any(validateForm).controls['KinhDo']" ></app-input-clear>
         </div>
         <div nz-col [nzXs]="24" [nzMd]="12">
-          <app-input-clear placeholder="Nhập tên vĩ độ " [required]="true" label="Vĩ độ"
-            [control]="$any(validateForm).controls['ViDo']" [required]="true"></app-input-clear>
+          <app-input-clear placeholder="Nhập tên vĩ độ " label="Vĩ độ"
+            [control]="$any(validateForm).controls['ViDo']"></app-input-clear>
         </div>
         <div nz-col [nzXs]="24" [nzMd]="12">
-          <app-input-clear placeholder="Nhập số điện thoại" [required]="true" label="Số điện thoại"
-            [control]="$any(validateForm).controls['PhoneNumber']" [required]="true"></app-input-clear>
+          <app-input-clear placeholder="Nhập số điện thoại" label="Số điện thoại"
+            [control]="$any(validateForm).controls['PhoneNumber']"></app-input-clear>
         </div>
 
         <div nz-col [nzXs]="24" [nzMd]="12">
           <nz-form-item>
-            <nz-form-label>Trạng thái cửa hàng</nz-form-label>
+            <nz-form-label>* Trạng thái cửa hàng</nz-form-label>
             <nz-form-control nzErrorTip="Không được để trống">
               <nz-select nzShowSearch nzAllowClear placeholder="Chọn trạng thái cửa hàng"
                 formControlName="TrangThaiCuaHang">
-                <nz-option [nzLabel]="'Đóng cửa'" [nzValue]="false"></nz-option>
-                <nz-option [nzLabel]="'Mở cửa'" [nzValue]="true"></nz-option>
+                <nz-option [nzLabel]="'Không hoạt động'" [nzValue]="false"></nz-option>
+                <nz-option [nzLabel]="'Hoạt động'" [nzValue]="true"></nz-option>
 
               </nz-select>
             </nz-form-control>
@@ -136,7 +136,7 @@
         </div>
         <div nz-col [nzXs]="24" [nzMd]="12">
           <nz-form-item>
-            <nz-form-label>Chon cửa hàng trưởng</nz-form-label>
+            <nz-form-label>* Chon cửa hàng trưởng</nz-form-label>
             <nz-form-control nzErrorTip="Không được để trống">
               <nz-select nzShowSearch nzAllowClear placeholder="Chọn cửa hàng trưởng" formControlName="CuaHangTruong">
                 <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.fullName"
@@ -148,7 +148,7 @@
         </div>
         <div nz-col [nzXs]="24" [nzMd]="12">
           <nz-form-item>
-            <nz-form-label>người phụ trách</nz-form-label>
+            <nz-form-label>* Người phụ trách</nz-form-label>
             <nz-form-control nzErrorTip="Không được để trống">
               <nz-select nzShowSearch nzAllowClear placeholder="Chọn người phụ trách" formControlName="NguoiPhuTrach">
                 <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.fullName"
@@ -160,7 +160,7 @@
         </div>
         <div nz-col [nzXs]="24" [nzMd]="12">
           <nz-form-item>
-            <nz-form-label>ATVSV</nz-form-label>
+            <nz-form-label>* ATVSV</nz-form-label>
             <nz-form-control nzErrorTip="Không được để trống">
               <nz-select [nzMaxTagCount]="3" [nzMaxTagPlaceholder]="tagPlaceHolder" nzMode="multiple"
                 nzPlaceHolder="Please select" formControlName="ATVSV" [(ngModel)]="lstATVSV">
@@ -169,7 +169,6 @@
                 </nz-option>
               </nz-select>
               <ng-template #tagPlaceHolder let-selectedList>and {{ selectedList.length }} more selected</ng-template>
-
             </nz-form-control>
           </nz-form-item>
         </div>
