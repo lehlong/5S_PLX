@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { ShareModule } from '../shared/share-module';
 import { FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
-import {  KiKhaoSatFilter } from '../models/master-data/ki_khao_sat.model';
+import { AccountTypeFilter } from '../models/master-data/account-type.model';
 import { PaginationResult } from '../models/base.model';
 import { KiKhaoSatService } from '../service/master-data/ki-khao-sat.service';
 import { AccountService } from '../service/system-manager/account.service';
@@ -34,9 +34,8 @@ export class KiKhaoSatComponent {
   selectedNode: any = null;
   selectedNodeDetails: any[] = [];
   searchValue = '';
-  filterNguoiChamDiem: string = '';
   treeData: any = [];
-  filter = new KiKhaoSatFilter();
+  filter = new AccountTypeFilter();
   paginationResult = new PaginationResult();
   loading: boolean = false;
   lstAccount: any = [];
@@ -61,7 +60,6 @@ export class KiKhaoSatComponent {
     kiKhaoSat: {},
     lstInputStore: [],
   }
-  lstInputStoreSearch: any = [];
   currentNode: NzTreeNode | undefined;
   parentTitle: string | undefined;
 
@@ -92,17 +90,15 @@ export class KiKhaoSatComponent {
   }
 
   ngOnInit(): void {
-  
     this.route.paramMap.subscribe({
       next: (params) => {
         this.headerId = params.get('id');
-        this.filter.headerId = this.headerId;
+        this.filter.keyWord = this.headerId;
       },
     });
     this.search();
     this.getAllAccount();
     this.getAllKho()
-
   }
 
   onSortChange(name: string, value: any) {
@@ -127,17 +123,6 @@ export class KiKhaoSatComponent {
       },
     });
   }
-  
-  searchNguoiChamDiem() {
- console.log(this.inputKi.lstInputStore);
-  this.lstInputStoreSearch= this.inputKi.lstInputStore?.filter((item:any) => 
-    item.storeId.toLowerCase().includes(this.filterNguoiChamDiem.toLowerCase()) ||
-    item.cuaHangTruong.toLowerCase().includes(this.filterNguoiChamDiem.toLowerCase()) ||
-    item.nguoiPhuTrach.toLowerCase().includes(this.filterNguoiChamDiem.toLowerCase())
- 
-  );
- console.log(this.lstInputStoreSearch)
-  }
 
   isCodeExist(code: string): boolean {
     return this.paginationResult.data?.some(
@@ -146,7 +131,6 @@ export class KiKhaoSatComponent {
   }
 
   onChangeChamDiem(userNames: string[], store: any) {
-    console.log('code chay');
     this.inputKi.lstInputStore.forEach((i: any) => {
       if (i.storeId == store.storeId) {
         this.inputKi.lstInputStore.lstChamDiem.push({
@@ -161,7 +145,6 @@ export class KiKhaoSatComponent {
   }
 
   onUpdateKiKhaoSat() {
-    
     this._service.updateKiKhaoSat(this.inputKi).subscribe({
       next: (data) => {
         this.search();
@@ -251,7 +234,7 @@ export class KiKhaoSatComponent {
     } else {
       this.calculationRows.splice(i, 1);
     }
- 
+    console.log(this.calculationRows);
 
 
   }
@@ -280,11 +263,10 @@ export class KiKhaoSatComponent {
   }
 
   GetTreeLeaves() {
-
     this._treeTieuChiService.GetTreeLeaves(this.treeId, this.kiKhaoSatId).subscribe({
       next: (data) => {
-        this.selectedNode= data.result.code;
-        console.log("data", data);
+        console.log(data.result);
+
         this.selectedNodeDetails = data.result;
       },
       error: (response) => {
@@ -304,17 +286,12 @@ export class KiKhaoSatComponent {
   }
 
   openTieuchi(id: string) {
-
+    console.log(id);
     this.router.navigate([`danh-gia-tieu-chi/${id}`]);
   }
 
   reset() {
-
     this.search();
-  }
-  resetStore() {
-        this.filterNguoiChamDiem="";
-    this.lstInputStoreSearch = this.inputKi.lstInputStore;
   }
 
   getAllAccount() {
@@ -341,12 +318,11 @@ export class KiKhaoSatComponent {
     })
   }
 
-  openCreLeaves(): void {
-    console.log(this.selectedNode);
+  openCreLeaves(data: any): void {
     this.calculationRows = [
       {
         id: '-1',
-       
+        tieuChiCode: this.leavesNode.code,
         moTa: 'Đạt',
         diem: '1',
         isActive: true,
@@ -354,7 +330,7 @@ export class KiKhaoSatComponent {
       },
       {
         id: '-1',
-   
+        tieuChiCode: this.leavesNode.code,
         moTa: 'Không đạt',
         diem: '0',
         isActive: true,
@@ -379,7 +355,7 @@ export class KiKhaoSatComponent {
     this._service.buildObjCreate(this.headerId).subscribe({
       next: (data) => {
         this.inputKi = data
-       this.lstInputStoreSearch = this.inputKi.lstInputStore;
+        // this.search();
       },
       error: (response) => {
         console.log(response);
@@ -390,7 +366,7 @@ export class KiKhaoSatComponent {
   }
 
   getInputCopyKy() {
-   
+    console.log(this.inputKi.kyCopyId);
     if (this.inputKi.kyCopyId == null || this.inputKi.kyCopyId == '') {
       return
     }
@@ -419,14 +395,13 @@ export class KiKhaoSatComponent {
   }
 
   openEditKyKhaoSat(data: any) {
-  
+    console.log(data);
     this._service.getInputKiKhaoSat(data.id).subscribe({
       next: (data) => {
         this.inputKi = data
-        this.lstInputStoreSearch = this.inputKi.lstInputStore;
       }
     })
-   
+    console.log(this.kiKhaoSat)
     setTimeout(() => {
       this.edit = true;
       this.visibleKiKhaoSat = true;
@@ -464,7 +439,9 @@ export class KiKhaoSatComponent {
   }
 
   handleChange(info: NzUploadChangeParam): void {
-   
+    if (info.file.status !== 'uploading') {
+      console.log(info.file, info.fileList);
+    }
     if (info.file.status === 'done') {
       this.messageService.success(
         `${info.file.name} file uploaded successfully`
@@ -543,7 +520,6 @@ export class KiKhaoSatComponent {
   }
 
   updateLeaves(): void {
-   
     this.edit = true;
     this.leavesNode.diemTieuChi = this.calculationRows
     this._treeTieuChiService.UpdateLeaves(this.leavesNode).subscribe({
@@ -581,10 +557,8 @@ export class KiKhaoSatComponent {
     if (!this.isValid()) {
       return;
     }
-    console.log( this.calculationRows);
     this.leavesNode.diemTieuChi = this.calculationRows
     this.leavesNode.kiKhaoSatId = this.kiKhaoSatId
-    this.leavesNode.lstCriteriaExcludedStores = this.lstCheckedStore
     this._treeTieuChiService.addLeaves(this.leavesNode).subscribe({
       next: (res) => {
         this.leavesVisible = false;
@@ -601,7 +575,7 @@ export class KiKhaoSatComponent {
 
   updateTreeGroup(data: any): void {
     this.dataInsertTree = data;
-
+    console.log("object", data)
     this._treeTieuChiService.UpdateTreeGroup(this.dataInsertTree).subscribe({
       next: (res) => {
         this.treeEditVisible = false;
@@ -660,7 +634,7 @@ export class KiKhaoSatComponent {
         });
       }
     });
-   
+    console.log(this.lstCheckedStore);
 
   }
 
@@ -682,7 +656,7 @@ export class KiKhaoSatComponent {
         isDeleted: false
       });
     }
-
+    console.log(this.lstCheckedStore);
 
   }
 

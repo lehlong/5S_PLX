@@ -1,14 +1,13 @@
 ﻿using Common;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using NPOI.SS.Formula.Functions;
 using PLX5S.API.AppCode.Enum;
 using PLX5S.API.AppCode.Extensions;
 using PLX5S.BUSINESS.Dtos.BU;
-using PLX5S.BUSINESS.Models;
 using PLX5S.BUSINESS.Services.BU;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using PLX5S.CORE.Entities.BU;
-using static PLX5S.BUSINESS.Services.BU.KikhaosatService;
+using NPOI.SS.Formula.Functions;
+using PLX5S.BUSINESS.Models;
 
 namespace PLX5S.API.Controllers.BU
 {
@@ -19,10 +18,10 @@ namespace PLX5S.API.Controllers.BU
         public readonly IKikhaosatService _service = service;
 
         [HttpGet("Search")]
-        public async Task<IActionResult> Search([FromQuery] FilterKiKhaoSat filter)
+        public async Task<IActionResult> Search([FromQuery] BaseFilter filter)
         {
             var transferObject = new TransferObject();
-            var result = await _service.SearchKiKhaoSat(filter);
+            var result = await _service.Search(filter);
             if (_service.Status)
             {
                 transferObject.Data = result;

@@ -28,36 +28,24 @@ namespace PLX5S.BUSINESS.Services.BU
         Task UpdateDataInput(KiKhaoSatModel data);
         Task DeleteData(string id);
         Task<KiKhaoSatModel> GetInput(string idKi);
-        Task<PagedResponseDto> SearchKiKhaoSat(FilterKiKhaoSat filter);
 
     }
     public class KikhaosatService(AppDbContext dbContext, IMapper mapper) : GenericService<TblBuKiKhaoSat, KiKhaoSatDto>(dbContext, mapper), IKikhaosatService
     {
-        public class FilterKiKhaoSat : BaseFilter
-        {
-            public string headerId { get; set; }
-        }
-        // Change the method signature to match the base class/interface
-        public  async Task<PagedResponseDto> SearchKiKhaoSat(FilterKiKhaoSat filter)
+        public override async Task<PagedResponseDto> Search(BaseFilter filter)
         {
             try
             {
                 var query = _dbContext.TblBuKiKhaoSat.AsQueryable();
                 if (!string.IsNullOrWhiteSpace(filter.KeyWord))
                 {
-                    query = query.Where(x =>( x.SurveyMgmtId.ToString().Contains(filter.headerId) || x.Name.Contains(filter.KeyWord) )&&x.IsDeleted==false);
-
+                    query = query.Where(x => x.SurveyMgmtId.ToString().Contains(filter.KeyWord) || x.Name.Contains(filter.KeyWord));
+                  
                 }
-                else
-                {
-                    query = query.Where(x => (x.SurveyMgmtId.ToString().Contains(filter.headerId))&& x.IsDeleted == false);
-                }
-
                 if (filter.IsActive.HasValue)
                 {
-                    query = query.Where(x => x.IsActive == filter.IsActive && x.IsDeleted == false);
+                    query = query.Where(x => x.IsActive == filter.IsActive);
                 }
-               
                 return await Paging(query, filter);
 
             }

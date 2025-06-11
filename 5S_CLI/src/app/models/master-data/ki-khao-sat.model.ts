@@ -1,10 +1,9 @@
 import { BaseFilter } from '../base.model'
 
-export class KiKhaoSatFilter extends BaseFilter {
+export class AccountTypeFilter extends BaseFilter {
   id: string = ''
   name: string = ''
   isActive?: boolean | string | null
   SortColumn: string = ''
   IsDescending: boolean = true
-  headerId: string = ''
 }

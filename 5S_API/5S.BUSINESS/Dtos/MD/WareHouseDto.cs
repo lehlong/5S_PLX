@@ -29,10 +29,6 @@ namespace PLX5S.BUSINESS.Dtos.MD
 
         [Description("Trạng Thái cửa hàng")]
         public bool TrangThaiCuaHang { get; set; }
-        [Description("Kinh do")]
-        public string? KinhDo { get; set; }
-        [Description("Vi do")]
-        public string? ViDo { get; set; }
 
         public List<string> ATVSV { get; set; }
 

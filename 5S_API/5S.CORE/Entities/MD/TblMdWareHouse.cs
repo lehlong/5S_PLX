@@ -24,11 +24,6 @@ public class TblMdWareHouse : SoftDeleteEntity
 
     [Column("NGUOI_PHU_TRACH")]
     public string NguoiPhuTrach { get; set; }
-    [Column("KINH_DO")]
-    public string? KinhDo { get; set; }
-    [Column("VI_DO")]
-    public string? ViDo { get; set; }
 
-
-    }
+}
 }
