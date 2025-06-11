@@ -1,8 +1,17 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title class="t-center">
+      <h4><ion-icon name="person-circle-outline"></ion-icon>Tài khoản</h4>
+    </ion-title>
+    <ion-button (click)="navigateTo('/account/setting')" slot="end">Setting</ion-button>
+  </ion-toolbar>
+</ion-header>
 <ion-content>
-  <div class="main-account">
-    <h4><ion-icon name="person-circle-outline"></ion-icon>Tài khoản</h4>
-
+  <div style="background-color: #14ffff; padding: 20px; height: 100%">
     <ion-list lines="inset">
+      <ion-item>
+        <h1>Thông tin cơ bản</h1>
+      </ion-item>
       <ion-item>
         <div class="line-info">
           <ion-icon name="person-outline"></ion-icon>
@@ -14,7 +23,6 @@
           <ion-icon name="call-outline"></ion-icon>
           <div>0981618172</div>
         </div>
-
       </ion-item>
       <ion-item>
         <div class="line-info">
@@ -23,20 +31,27 @@
         </div>
       </ion-item>
     </ion-list>
-
-    <ion-button color="medium">
-      <ion-icon slot="start" name="shield-half"></ion-icon>
-      Điều khoản và Chính sách
-    </ion-button>
-
-    <ion-button>
-      <ion-icon slot="start" name="lock-closed"></ion-icon>
-      Đổi mật khẩu
-    </ion-button>
-
-    <ion-button color="danger">
-      <ion-icon slot="start" name="log-out"></ion-icon>
+    <ion-list
+      style="
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      "
+      (click)="navigateTo('/account/terms-and-polices')"
+    >
+      Điều khoản và chính sách
+    </ion-list>
+    <ion-list
+      style="
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      "
+       (click)="navigateTo('/login')"
+    >
       Đăng xuất
-    </ion-button>
+    </ion-list>
   </div>
 </ion-content>

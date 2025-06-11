@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { SharedModule } from 'src/app/shared/shared.module';
 
 @Component({
@@ -9,7 +10,10 @@ import { SharedModule } from 'src/app/shared/shared.module';
   standalone: true,
 })
 export class AccountComponent implements OnInit {
-  constructor() {}
+  constructor(private router: Router) {}
 
   ngOnInit() {}
+  navigateTo(route: string) {
+    this.router.navigate([route]);
+  }
 }

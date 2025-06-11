@@ -8,6 +8,7 @@ import { AccountComponent } from './tabs/account/account.component';
 import { SurveyComponent } from './tabs/survey/survey.component';
 import { homeRouter } from './tabs/home/home.routes';
 import { surveyRoutes } from './tabs/survey/survey.routes';
+import { accountRoutes } from './tabs/account/account.routes';
 
 export const routes: Routes = [
   {
@@ -19,6 +20,7 @@ export const routes: Routes = [
       { path: 'report', component: ReportComponent },
       { path: 'news', component: NewsComponent },
       { path: 'notifications', component: NotificationsComponent },
+      { path: 'account', children: accountRoutes},
       { path: 'account', component: AccountComponent },
       { path: 'survey', children: surveyRoutes},
       { path: 'survey', component: SurveyComponent },
