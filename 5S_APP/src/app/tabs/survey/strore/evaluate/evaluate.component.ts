@@ -38,8 +38,8 @@ export class EvaluateComponent implements OnInit {
   };
   data: any = {};
   headerId: any = '';
-  isEdit: any = true
-  apiFile: any = environment.apiFile
+  isEdit: any = true;
+  apiFile: any = environment.apiFile;
 
   constructor(
     private router: Router,
@@ -48,7 +48,7 @@ export class EvaluateComponent implements OnInit {
     private _storageService: StorageService,
     private storage: Storage,
     private _service: AppEvaluateService
-  ) { }
+  ) {}
   ngOnInit() {
     this.route.paramMap.subscribe({
       next: async (params) => {
@@ -62,8 +62,8 @@ export class EvaluateComponent implements OnInit {
         if (mode == 'draft') {
           this.evaluate = await this._storageService.get(this.store.id);
         } else {
-          this.isEdit = false
-          this.getResultEvaluate()
+          this.isEdit = false;
+          this.getResultEvaluate();
         }
 
         this.getAllTieuChi();
@@ -74,13 +74,12 @@ export class EvaluateComponent implements OnInit {
   }
 
   getResultEvaluate() {
-    this._service.getResultEvaluate(this.headerId)
-      .subscribe({
-        next: (data) => {
-          console.log(data);
-          this.evaluate = data
-        },
-      });
+    this._service.getResultEvaluate(this.headerId).subscribe({
+      next: (data) => {
+        console.log(data);
+        this.evaluate = data;
+      },
+    });
   }
 
   getAllTieuChi() {
@@ -147,7 +146,6 @@ export class EvaluateComponent implements OnInit {
     return imagesSelecting < requiredNumber;
   }
 
-
   extractAllKeys(tree: any[]): string[] {
     let keys: string[] = [];
 
@@ -162,7 +160,6 @@ export class EvaluateComponent implements OnInit {
 
     return keys;
   }
-
 
   onImageSelected(event: any, code: any) {
     if (!this.isEdit) return;
@@ -192,9 +189,7 @@ export class EvaluateComponent implements OnInit {
     reader.readAsDataURL(file); // Chuyển sang base64
   }
 
-
   filterDiem(code: any) {
-
     const item = this.evaluate?.lstEvaluate?.find(
       (x: any) => x.tieuChiCode === code
     );
@@ -203,8 +198,8 @@ export class EvaluateComponent implements OnInit {
   filterImage(code: any) {
     return Array.isArray(this.evaluate?.lstImages)
       ? this.evaluate.lstImages
-        .filter((x: any) => x.tieuChiCode === code)
-        .map((x: any) => x.filePath)
+          .filter((x: any) => x.tieuChiCode === code)
+          .map((x: any) => x.filePath)
       : [];
   }
 
@@ -214,7 +209,6 @@ export class EvaluateComponent implements OnInit {
     );
     return item?.feedBack || '';
   }
-
 
   setDiem(data: any, event: any) {
     if (!this.isEdit) return;
@@ -229,7 +223,6 @@ export class EvaluateComponent implements OnInit {
     this._storageService.set(this.store.id, this.evaluate);
   }
 
-
   setFeedBack(data: any, event: any) {
     if (!this.isEdit) return;
 
@@ -243,24 +236,60 @@ export class EvaluateComponent implements OnInit {
     this._storageService.set(this.store.id, this.evaluate);
   }
 
-  onSubmit() {
+  async onSubmit() {
     if (!this.isEdit) return;
 
+    let allChecksPassed = true;
+    let errorMessage = '';
+
+    for (const tieuChi of this.lstTieuChi) {
+      const evaluateItem = this.evaluate.lstEvaluate.find(
+        (i: any) => i.tieuChiId === tieuChi.id || i.tieuChiCode === tieuChi.code
+      );
+
+      // 1. Kiểm tra pointId
+      if (!evaluateItem || !evaluateItem.pointId) {
+        errorMessage += `- Tiêu chí "${tieuChi.name}" chưa chấm điểm. `;
+        allChecksPassed = false;
+      }
+
+      // Kiểm tra có đủ ảnh không
+      const numberImgRequired = tieuChi.numberImg || 0;
+      const imagesSelecting = this.evaluate.lstImages.filter(
+        (img: any) => img.tieuChiCode === tieuChi.code
+      ).length;
+
+      if (imagesSelecting < numberImgRequired) {
+        errorMessage += `- Tiêu chí "${tieuChi.name}" thiếu ảnh. `;
+        allChecksPassed = false;
+      }
+    }
+
+    if (!allChecksPassed) {
+      const alert = await this.alertController.create({
+        header: 'Thiếu thông tin',
+        message: errorMessage,
+        buttons: ['OK'],
+      });
+      await alert.present();
+      return; 
+    }
+
+    // Trường hợp đủ
     this._service.insertEvaluate(this.evaluate).subscribe({
       next: () => {
-        console.log("Chấm điểm thành công");
+        console.log('Chấm điểm thành công');
 
-        this._storageService.remove(this.store.id)
+        this._storageService.remove(this.store.id);
       },
+
       error: (ex) => {
         console.log(ex);
-      }
-    })
+      },
+    });
+
     console.log(this.evaluate);
   }
-
-
-
 
   navigateTo(itemId: string) {
     const currentUrl = window.location.href.split('#')[0]; // Lấy URL hiện tại mà không có hash
