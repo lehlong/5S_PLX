@@ -75,7 +75,7 @@
               <span nz-icon nzType="edit"></span>Cập nhập tiêu chí
             </button>
             <button nz-popconfirm nzPopconfirmTitle="Bạn có chắc chắn muốn xóa không?" class="!flex !items-center"
-              style="margin-left: 10px;" nzType="default" nz-button (nzOnConfirm)="DeleteKKS(data.code)">
+              style="margin-left: 10px;" nzType="default" nz-button (nzOnConfirm)="DeleteKKS(data.id)">
               <span nz-icon nzType="delete" nzTheme="outline" style="cursor:pointer;"></span>
             </button>
           </td>
@@ -96,6 +96,7 @@
 <nz-drawer [nzVisible]="visibleKiKhaoSat" [nzExtra]="extra"
   [nzTitle]="edit ? ' CHỈNH SỬA KỲ CHẤM ĐIỂM  ' : ' THÊM MỚI KỲ CHẤM ĐIỂM  '" [nzFooter]=" " (nzOnClose)="closeDrawer()"
   nzWidth="80%">
+ 
   <ng-container *nzDrawerContent>
 
     <!-- <form nz-form nzLayout="vertical" [formGroup]="validateForm" (ngSubmit)="submitForm()"> -->
@@ -106,7 +107,7 @@
             <div class="inner-box">
               <h4>Mã Kì</h4>
               <input nz-input placeholder="Nhập mã" [required]="'true'" [(ngModel)]="inputKi.kiKhaoSat.code" type="text"
-                nzSize="large" />
+                nzSize="large" [disabled]="edit" />
             </div>
           </div>
           <div nz-col [nzXs]="12">
@@ -150,6 +151,17 @@
       </nz-tab>
 
       <nz-tab nzTitle="NGƯỜI CHẤM ĐIỂM">
+         <nz-space style="float: right;">
+        <app-input-clear  placeholder="Tìm kiếm" (enterEvent)="searchNguoiChamDiem()" [(value)]="filterNguoiChamDiem"></app-input-clear>
+        <button (click)="searchNguoiChamDiem()" class="flex !items-center !border-l-0 gray-btn" nzType="default" nz-button
+          nzType="default">
+          <span nz-icon nzType="search"></span>
+        </button>
+        <button (click)="resetStore()" class="flex !items-center !border-l-0 gray-btn" nzType="default" nz-button
+          nzType="default">
+          <span nz-icon nzType="redo"></span>
+        </button>
+      </nz-space>
         <nz-table *ngIf="inputKi.lstInputStore?.length  != 0" class="auto-scroll-table" #headerTable
           [nzData]="inputKi.lstInputStore" [nzFrontPagination]="false" [nzScroll]="{ y: 'calc(100vh - 244px)' }">
           <thead>
@@ -173,7 +185,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let data of inputKi.lstInputStore; let i = index">
+            <tr *ngFor="let data of lstInputStoreSearch let i = index">
 
               <td>{{(paginationResult.currentPage - 1) * paginationResult.pageSize + i + 1}}</td>
               <td nzAlign="center">
@@ -330,7 +342,7 @@
         <nz-page-header nzBackIcon>
           <nz-page-header-title>Chi Tiết Tiêu Chí</nz-page-header-title>
           <nz-page-header-extra>
-            <button nz-button nzType="primary" *ngIf="treeId != ''" class="mt-2" (click)="openCreLeaves(selectedNode)">
+            <button nz-button nzType="primary" *ngIf="treeId != ''" class="mt-2" (click)="openCreLeaves()">
               <i nz-icon nzType="plus-circle"></i> Thêm mới
             </button>
           </nz-page-header-extra>
@@ -385,15 +397,12 @@
           <div nz-col [nzSpan]="12">
             <div class="inner-box" style="padding:5px 0px !important;">
               <label nzRequired class="block-label">Mã tiêu chí</label>
-              <input nz-input [(ngModel)]="leavesNode.id" />
+              <input [disabled]="edit" nz-input [(ngModel)]="leavesNode.id" />
             </div>
           </div>
 
           <div nz-col [nzSpan]="12">
-            <!-- <div class="inner-box" style="padding:5px 0px !important;">
-              <label class="block-label">Số thứ tự</label>
-              <input nz-input [(ngModel)]="leavesNode.orderNumber" type="number" />
-            </div> -->
+         
           </div>
           <div nz-col [nzSpan]="12">
             <div class="inner-box" style="padding:5px 0px;">

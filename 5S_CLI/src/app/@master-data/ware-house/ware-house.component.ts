@@ -6,7 +6,7 @@ import { PaginationResult } from '../../models/base.model';
 import { AccountService } from '../../service/system-manager/account.service';
 import { GlobalService } from '../../service/global.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { ATVSVService } from '../../service/master-data/atvsv.service'; // Import ATVSVService
+import { ATVSVService } from '../../service/master-data/atvsv.service';
 import { WareHouseService } from '../../service/master-data/ware-house.service';
 
 @Component({
@@ -43,6 +43,8 @@ export class WareHouseComponent {
       truongKho: ['', [Validators.required]],
       atvsv: [[],[Validators.required]],
       nguoiPhuTrach: ['', [Validators.required]],
+      KinhDo: [''],
+      ViDo: [''],
     });
     this.globalService.setBreadcrumb([
       {
@@ -199,7 +201,7 @@ export class WareHouseComponent {
 
   openEdit(data: any) {
    this.getATVSV(data.id);
-
+console.log(data);
     this.validateForm.patchValue({
         id: data.id,
         name: data.name,
@@ -207,6 +209,8 @@ export class WareHouseComponent {
         truongKho: data.truongKho,
         atvsv:   this.ATVSVList,
         nguoiPhuTrach: data.nguoiPhuTrach || '',
+        KinhDo: data.kinhDo || '',
+        ViDo: data.viDo || '',
     });
 
     setTimeout(() => {
