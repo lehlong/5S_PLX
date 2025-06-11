@@ -14,6 +14,7 @@ import { StorageService } from 'src/app/service/storage.service';
   styleUrls: ['./check-list.component.scss'],
 })
 export class CheckListComponent implements OnInit {
+  [x: string]: any;
   kiKhaoSat: any = {}
   mode: 'draft' | 'new' = 'draft';
   store: any = {}
@@ -62,7 +63,8 @@ export class CheckListComponent implements OnInit {
         const filter = JSON.parse(localStorage.getItem('filterCS') ?? "")
         this.kiKhaoSat = filter.kiKhaoSat
         this.store = filter.store
- 
+
+        // await this._storageService.clear()
         let eva = await this._storageService.get(this.store.id)
         console.log(eva);
 
@@ -87,8 +89,12 @@ export class CheckListComponent implements OnInit {
   getAllEvaluateHistory() {
     this._service.search({ keyWord: this.inStoreId }).subscribe({
       next: (data) => {
-        if (!data)
-          this.lstHisEvaluate.push(data.data)
+        console.log(data);
+
+        if (data.data.length == 0) return;
+
+        this.lstHisEvaluate.push(...data.data);
+        console.log(this.lstHisEvaluate);
       }
     })
   }
@@ -101,6 +107,8 @@ export class CheckListComponent implements OnInit {
   }
 
   openEditEvaluate(data: any) {
+    this.lstHisEvaluate = []
+
     if (data.name == "Bản nháp") {
       this.router.navigate([`survey/store/evaluate/draft/${data.code}`]);
     } else {
@@ -109,31 +117,19 @@ export class CheckListComponent implements OnInit {
   }
 
   navigateTo() {
+    this.lstHisEvaluate = []
     if (this.mode == 'new') {
       this._service.BuildInputEvaluate(this.kiKhaoSat.id, this.store.id).subscribe({
         next: async (data) => {
           this._storageService.set(data.header.storeId, data)
           console.log('tạo mới');
-
           this.router.navigate([`survey/store/evaluate/draft/${data.header.code}`]);
-
         }
       })
     } else {
       console.log('chỉnh sửa');
-
       this.router.navigate([`survey/store/evaluate/draft/${this.evaluate.header.code}`]);
-
     }
-  }
-
-  setResult(event: CustomEvent<OverlayEventDetail>) {
-    event.detail.role == "cancel"
-      ? null
-      : this.navigateTo()
-  }
-
-  BuildInputEvaluate() {
   }
 
 }

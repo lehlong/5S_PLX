@@ -24,6 +24,14 @@ export class AppEvaluateService {
     return this.commonService.get(`AppEvaluate/BuildDataTreeForApp?kiKhaoSatId=${kiKhaoSatId}&storeId=${storeId}`)
   }
 
+  insertEvaluate(params: any): Observable<any> {
+    return this.commonService.post(`AppEvaluate/InsertEvaluate`, params)
+  }
+
+  getResultEvaluate(params: any): Observable<any> {
+    return this.commonService.get(`AppEvaluate/GetResultEvaluate?code=${params}`)
+  }
+
   getInputKiKhaoSat(params: any): Observable<any> {
     return this.commonService.get(`AppEvaluate/GetInputKiKhaoSat?idKi=${params}`)
   }

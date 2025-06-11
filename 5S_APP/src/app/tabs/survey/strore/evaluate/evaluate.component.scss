@@ -25,6 +25,7 @@
   max-height: 100%;
   object-fit: contain;
 }
+
 .full-image-content {
   --background: black;
   display: flex;
@@ -56,6 +57,7 @@
     font-size: 24px;
   }
 }
+
 .circle {
   width: 20px;
   height: 20px;
@@ -63,9 +65,11 @@
   display: inline-block;
   margin-right: 10px;
 }
-.font-12{
+
+.font-12 {
   font-size: 12px;
 }
+
 .custom-button {
   background-color: grey;
   color: white;
@@ -79,15 +83,18 @@
   height: 25px;
   font-size: 12px;
 }
+
 .active-link {
   background-color: green !important;
   color: white;
 }
+
 .answered {
   background-color: blue;
   color: white
 }
-.border-link{
+
+.border-link {
   border: 1px solid green;
   border-radius: 5px;
 }
@@ -112,4 +119,11 @@
     color: rgba(0, 0, 0, 0.468);
     font-size: 18px;
   }
+}
+
+.file {
+  position: absolute;
+  width: 44px;
+  z-index: 100;
+  opacity: 0;
 }

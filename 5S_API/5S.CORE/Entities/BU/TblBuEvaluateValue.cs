@@ -10,17 +10,20 @@ namespace PLX5S.CORE.Entities.BU
     public class TblBuEvaluateValue : SoftDeleteEntity
     {
         [Key]
-        [Column("CODE", TypeName = "NVARCHAR(50)")]
+        [Column("CODE", TypeName = "NVARCHAR(150)")]
         public string? Code { get; set; }
 
-        [Column("EVALUATE_HEADER_CODE", TypeName = "NVARCHAR(50)")]
+        [Column("EVALUATE_HEADER_CODE", TypeName = "NVARCHAR(150)")]
         public string? EvaluateHeaderCode { get; set; }
 
-        [Column("POINT_ID", TypeName = "NVARCHAR(50)")]
+        [Column("POINT_ID", TypeName = "NVARCHAR(150)")]
         public string? PointId { get; set; }
 
-        [Column("TIEU_CHI_CODE", TypeName = "NVARCHAR(50)")]
+        [Column("TIEU_CHI_CODE", TypeName = "NVARCHAR(150)")]
         public string? TieuChiCode { get; set; }
+
+        [Column("FEED_BACK", TypeName = "NVARCHAR(1500)")]
+        public string? FeedBack { get; set; }
 
     }
 }

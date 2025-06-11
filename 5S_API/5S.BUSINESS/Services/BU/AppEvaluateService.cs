@@ -1,6 +1,11 @@
 ﻿using AutoMapper;
 using Common;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using NPOI.HPSF;
+using NPOI.SS.Formula.Functions;
 using PLX5S.BUSINESS.Common;
 using PLX5S.BUSINESS.Dtos.BU;
 using PLX5S.BUSINESS.Models;
@@ -19,10 +24,20 @@ namespace PLX5S.BUSINESS.Services.BU
         Task<List<TieuChiDto>> GetAllTieuChiLeaves(string kiKhaoSatId, string storeId);
         Task<EvaluateModel> BuildInputEvaluate(string kiKhaoSatId, string storeId);
         Task InsertEvaluate(EvaluateModel data);
+        Task<TblBuEvaluateImage> HandelFile(TblBuEvaluateImage request);
+        Task<EvaluateModel> GetResultEvaluate(string code);
     }
 
-    public class AppEvaluateService(AppDbContext dbContext, IMapper mapper) : GenericService<TblBuEvaluateHeader, EvaluateHeaderDto>(dbContext, mapper), IAppEvaluateService
+    public class AppEvaluateService : GenericService<TblBuEvaluateHeader, EvaluateHeaderDto>, IAppEvaluateService
     {
+        private readonly IWebHostEnvironment _environment;
+
+        public AppEvaluateService(AppDbContext dbContext, IMapper mapper, IWebHostEnvironment environment)
+            : base(dbContext, mapper)
+        {
+            _environment = environment;
+        }
+
         public override async Task<PagedResponseDto> Search(BaseFilter filter)
         {
             try
@@ -168,24 +183,26 @@ namespace PLX5S.BUSINESS.Services.BU
                     Header = new TblBuEvaluateHeader()
                     {
                         Code = idHeader,
-                        Name = "Bản nháp" ,
+                        Name = "Bản nháp",
                         Point = 0,
                         Order = 0,
                         StoreId = storeId,
                         KiKhaoSatId = kiKhaoSatId,
+                        CreateDate = DateTime.Now,
                     },
                     LstEvaluate = lstTieuChi.Select(x => new TblBuEvaluateValue
                     {
                         Code = Guid.NewGuid().ToString(),
                         PointId = "",
                         TieuChiCode = x.Code,
+                        FeedBack = "",
                         EvaluateHeaderCode = idHeader,
 
                     }).ToList(),
                 };
             }
-            catch (Exception ex) 
-            { 
+            catch (Exception ex)
+            {
 
                 return null;
             }
@@ -195,17 +212,108 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
-                _dbContext.TblBuEvaluateImage.AddRange(data.LstImages);
+                var lstImage = new List<TblBuEvaluateImage>();
+
+                var header = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == data.Header.KiKhaoSatId && x.StoreId == data.Header.StoreId).OrderBy(x => x.Order).FirstOrDefault();
+                var number = header != null ? header.Order + 1 : 1;
+
+                data.Header.Name = "Lần chấm thứ " + (number).ToString();
+                data.Header.Order = number;
+
+                _dbContext.TblBuEvaluateHeader.Add(data.Header);
+
+                foreach (var item in data.LstImages)
+                {
+                    var a = await HandelFile(item);
+                    lstImage.Add(a);
+                }
+
+                _dbContext.TblBuEvaluateImage.AddRange(lstImage);
                 _dbContext.TblBuEvaluateValue.AddRange(data.LstEvaluate);
-                _dbContext.SaveChanges();
+
+                await _dbContext.SaveChangesAsync();
+                this.Status = true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 this.Status = false;
             }
         }
 
 
+        public async Task<TblBuEvaluateImage> HandelFile(TblBuEvaluateImage request)
+        {
+            if (string.IsNullOrEmpty(request.FilePath))
+                return null;
 
-    } 
+            try
+            {
+                // Tách phần data:image/jpeg;base64,...
+                var base64Data = request.FilePath;
+                var base64Parts = base64Data.Split(',');
+
+                if (base64Parts.Length != 2)
+                    return null;
+
+                var base64String = base64Parts[1];
+                var imageBytes = Convert.FromBase64String(base64String);
+
+                // Lấy extension từ phần đầu chuỗi (vd: data:image/jpeg;)
+                var mimeTypePart = base64Parts[0]; // vd: data:image/jpeg;base64
+                var extension = ".jpg"; // mặc định
+
+                if (mimeTypePart.Contains("image/png")) extension = ".png";
+                else if (mimeTypePart.Contains("image/jpeg")) extension = ".jpg";
+                else if (mimeTypePart.Contains("image/webp")) extension = ".webp";
+
+                // Đặt tên file (ưu tiên từ request.FileName, nếu rỗng thì tự sinh)
+                var fileName = !string.IsNullOrEmpty(request.FileName)
+                    ? Path.GetFileNameWithoutExtension(request.FileName) + extension
+                    : $"{Guid.NewGuid()}{extension}";
+
+                var uploadsFolder = Path.Combine("Uploads/Images");
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                await System.IO.File.WriteAllBytesAsync(filePath, imageBytes);
+
+                // Có thể lưu vào DB thêm nếu cần (request.TieuChiCode, request.Code...)
+
+                return new TblBuEvaluateImage()
+                {
+                    Code = Guid.NewGuid().ToString(),
+                    FileName = fileName,
+                    FilePath = filePath,
+                    TieuChiCode = request.TieuChiCode,
+                    EvaluateHeaderCode = request.EvaluateHeaderCode
+                };
+            }
+            catch (Exception ex)
+            {
+                this.Status = false;
+                return null;
+            }
+
+        }
+
+        public async Task<EvaluateModel> GetResultEvaluate(string code)
+        {
+            try
+            {
+                return new EvaluateModel()
+                {
+                    Header = _dbContext.TblBuEvaluateHeader.FirstOrDefault(x => x.Code == code),
+                    LstEvaluate = _dbContext.TblBuEvaluateValue.Where(x => x.EvaluateHeaderCode == code).ToList(),
+                    LstImages = _dbContext.TblBuEvaluateImage.Where(x => x.EvaluateHeaderCode == code).ToList()
+                };
+            }
+            catch(Exception ex)
+            {
+                this.Status = false;
+                return null;
+            }
+        }
+    }
 }

@@ -7,6 +7,7 @@ import { IonAccordionGroup } from '@ionic/angular';
 import { AppEvaluateService } from 'src/app/service/app-evaluate.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StorageService } from 'src/app/service/storage.service';
+import { environment } from 'src/environments/environment';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 @Component({
@@ -37,6 +38,8 @@ export class EvaluateComponent implements OnInit {
   };
   data: any = {};
   headerId: any = '';
+  isEdit: any = true
+  apiFile: any = environment.apiFile
 
   constructor(
     private router: Router,
@@ -45,7 +48,7 @@ export class EvaluateComponent implements OnInit {
     private _storageService: StorageService,
     private storage: Storage,
     private _service: AppEvaluateService
-  ) {}
+  ) { }
   ngOnInit() {
     this.route.paramMap.subscribe({
       next: async (params) => {
@@ -59,6 +62,8 @@ export class EvaluateComponent implements OnInit {
         if (mode == 'draft') {
           this.evaluate = await this._storageService.get(this.store.id);
         } else {
+          this.isEdit = false
+          this.getResultEvaluate()
         }
 
         this.getAllTieuChi();
@@ -68,8 +73,43 @@ export class EvaluateComponent implements OnInit {
     this.previewImage = localStorage.getItem('previewImage');
   }
 
+  getResultEvaluate() {
+    this._service.getResultEvaluate(this.headerId)
+      .subscribe({
+        next: (data) => {
+          console.log(data);
+          this.evaluate = data
+        },
+      });
+  }
+
+  getAllTieuChi() {
+    this._service
+      .buildDataTreeForApp(this.kiKhaoSat.id, this.store.storeId)
+      .subscribe({
+        next: (data) => {
+          console.log(data);
+          this.treeData = [data];
+          this.lstTreeOpen = this.extractAllKeys([data]);
+        },
+      });
+  }
+
+  getAllTieuChiLeaves() {
+    this._service
+      .GetAllTieuChiLeaves(this.kiKhaoSat.id, this.store.storeId)
+      .subscribe({
+        next: (data) => {
+          console.log(data);
+          this.lstTieuChi = data;
+        },
+      });
+  }
+
   //Active
   setItem(itemId: string) {
+    if (!this.isEdit) return;
+
     this.currentSelect = itemId;
     console.log(itemId);
     this.selectedAccordionId = itemId;
@@ -107,28 +147,6 @@ export class EvaluateComponent implements OnInit {
     return imagesSelecting < requiredNumber;
   }
 
-  getAllTieuChi() {
-    this._service
-      .buildDataTreeForApp(this.kiKhaoSat.id, this.store.storeId)
-      .subscribe({
-        next: (data) => {
-          console.log(data);
-          this.treeData = [data];
-          this.lstTreeOpen = this.extractAllKeys([data]);
-        },
-      });
-  }
-
-  getAllTieuChiLeaves() {
-    this._service
-      .GetAllTieuChiLeaves(this.kiKhaoSat.id, this.store.storeId)
-      .subscribe({
-        next: (data) => {
-          console.log(data);
-          this.lstTieuChi = data;
-        },
-      });
-  }
 
   extractAllKeys(tree: any[]): string[] {
     let keys: string[] = [];
@@ -145,9 +163,11 @@ export class EvaluateComponent implements OnInit {
     return keys;
   }
 
-  onImageSelected(event: any, code: any) {
-    const file: File = event.target.files[0];
 
+  onImageSelected(event: any, code: any) {
+    if (!this.isEdit) return;
+
+    const file: File = event.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
@@ -161,6 +181,7 @@ export class EvaluateComponent implements OnInit {
         fileName: '',
         filePath: base64,
         tieuChiCode: code,
+        evaluateHeaderCode: this.headerId,
       });
 
       this._storageService.set(this.store.id, this.evaluate);
@@ -171,7 +192,9 @@ export class EvaluateComponent implements OnInit {
     reader.readAsDataURL(file); // Chuyển sang base64
   }
 
+
   filterDiem(code: any) {
+
     const item = this.evaluate?.lstEvaluate?.find(
       (x: any) => x.tieuChiCode === code
     );
@@ -180,14 +203,37 @@ export class EvaluateComponent implements OnInit {
   filterImage(code: any) {
     return Array.isArray(this.evaluate?.lstImages)
       ? this.evaluate.lstImages
-          .filter((x: any) => x.tieuChiCode === code)
-          .map((x: any) => x.filePath)
+        .filter((x: any) => x.tieuChiCode === code)
+        .map((x: any) => x.filePath)
       : [];
   }
 
+  filterFeedBack(code: any) {
+    const item = this.evaluate?.lstEvaluate?.find(
+      (x: any) => x.tieuChiCode === code
+    );
+    return item?.feedBack || '';
+  }
+
+
   setDiem(data: any, event: any) {
+    if (!this.isEdit) return;
+
     const selected = event.detail.value;
-    // console.log(`Đã chọn tiêu chí với mã code: ${data}, giá trị: ${selected}`);
+    const idx = this.evaluate.lstEvaluate.findIndex(
+      (i: any) => i.tieuChiCode === data
+    );
+    if (idx === -1) return;
+
+    this.evaluate.lstEvaluate[idx].pointId = selected;
+    this._storageService.set(this.store.id, this.evaluate);
+  }
+
+
+  setFeedBack(data: any, event: any) {
+    if (!this.isEdit) return;
+
+    const selected = event.detail.value;
     const idx = this.evaluate.lstEvaluate.findIndex(
       (i: any) => i.tieuChiCode === data
     );
@@ -198,8 +244,23 @@ export class EvaluateComponent implements OnInit {
   }
 
   onSubmit() {
+    if (!this.isEdit) return;
+
+    this._service.insertEvaluate(this.evaluate).subscribe({
+      next: () => {
+        console.log("Chấm điểm thành công");
+
+        this._storageService.remove(this.store.id)
+      },
+      error: (ex) => {
+        console.log(ex);
+      }
+    })
     console.log(this.evaluate);
   }
+
+
+
 
   navigateTo(itemId: string) {
     const currentUrl = window.location.href.split('#')[0]; // Lấy URL hiện tại mà không có hash
@@ -219,6 +280,8 @@ export class EvaluateComponent implements OnInit {
   }
 
   deleteImage() {
+    if (!this.isEdit) return;
+
     const index = this.evaluate.lstImages.findIndex(
       (img: any) => img.filePath === this.selectedImage
     );
@@ -235,6 +298,8 @@ export class EvaluateComponent implements OnInit {
   }
 
   async confirmDeleteImage() {
+    if (!this.isEdit) return;
+
     const alert = await this.alertController.create({
       header: 'Xác nhận',
       message: 'Bạn có chắc muốn xóa ảnh này?',
@@ -259,6 +324,8 @@ export class EvaluateComponent implements OnInit {
   feedback: string = '';
 
   async openCamera(code: any) {
+    if (!this.isEdit) return;
+
     try {
       const image = await Camera.getPhoto({
         quality: 90,

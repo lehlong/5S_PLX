@@ -10,7 +10,7 @@ namespace PLX5S.CORE.Entities.BU
     public class TblBuEvaluateHeader : SoftDeleteEntity
     {
         [Key]
-        [Column("CODE", TypeName = "NVARCHAR(50)")]
+        [Column("CODE", TypeName = "NVARCHAR(150)")]
         public string? Code { get; set; }
 
         [Column("NAME", TypeName = "NVARCHAR(150)")]
@@ -19,16 +19,16 @@ namespace PLX5S.CORE.Entities.BU
         [Column("POINT", TypeName = "DECIMAL(18.0)")]
         public decimal? Point { get; set; }
 
-        [Column("ACCOUNT_USER_NAME", TypeName = "NVARCHAR(50)")]
+        [Column("ACCOUNT_USER_NAME", TypeName = "NVARCHAR(150)")]
         public string? AccountUserName { get; set; }
 
         [Column("ORDER_NUMBER", TypeName = "DECIMAL(18.0)")]
         public decimal? Order { get; set; }
 
-        [Column("STORE_ID", TypeName = "NVARCHAR(50)")]
+        [Column("STORE_ID", TypeName = "NVARCHAR(150)")]
         public string? StoreId { get; set; }
 
-        [Column("KI_KHAO_SAT_ID", TypeName = "NVARCHAR(50)")]
+        [Column("KI_KHAO_SAT_ID", TypeName = "NVARCHAR(150)")]
         public string? KiKhaoSatId { get; set; }
 
     }

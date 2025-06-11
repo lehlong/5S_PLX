@@ -36,38 +36,4 @@ export class StorageService {
     return this.storage.clear();
   }
 
-  async getByCode(code: any) {
-    await this.init()
-    let eva = await this.storage.get('lstEvaluate')
-    if (!eva) return;
-
-    const header = eva.lstHeader.find((x: any) => x.code === code);
-    if (!header) return;
-
-    return {
-      header: header,
-      lstEvaluate: eva.lstEvaluate.filter((x: any) => x.evaluateHeaderCode == header.code),
-      lstImages: eva.lstEvaluate.filter((x: any) => x.evaluateHeaderCode == header.code) || []
-    }
-  }
-
-  async getByStoreIdKiKhaoSatId() {
-
-  }
-  async updateEvaluateList(data: any) {
-    await this.init();
-    let eva = await this.storage.get('lstEvaluate');
-    if (!eva) return;
-
-    for (const item of data.lstEvaluate) {
-      const index = eva.lstEvaluate.findIndex((x: any) => x.code === item.code);
-      eva.lstEvaluate[index] = item;
-    }
-    // array.forEach(element => {
-
-    // });
-
-    await this.storage.set('lstEvaluate', eva);
-  }
-
 }

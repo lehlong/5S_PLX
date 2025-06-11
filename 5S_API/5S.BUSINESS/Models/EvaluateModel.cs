@@ -9,7 +9,7 @@ namespace PLX5S.BUSINESS.Models
 {
     public class EvaluateModel
     {
-        public TblBuEvaluateHeader Header { set; get; } = new TblBuEvaluateHeader();
+        public TblBuEvaluateHeader? Header { set; get; } = new TblBuEvaluateHeader();
         public List<TblBuEvaluateValue>? LstEvaluate { set; get; } = new List<TblBuEvaluateValue>();
         public List<TblBuEvaluateImage>? LstImages { set; get; } = new List<TblBuEvaluateImage>();
     }

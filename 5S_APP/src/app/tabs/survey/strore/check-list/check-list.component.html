@@ -30,9 +30,9 @@
       <ion-grid>
         <ion-row (click)="openEditEvaluate(item)">
           <ion-col class="text-bold" size="7">{{ item?.name }}</ion-col>
-          <ion-col class="text-bold" size="5">1{{ item.diem }}</ion-col>
-          <ion-col class="text-italic" size="7">2{{ item.accountUserName }}</ion-col>
-          <ion-col class="text-italic" size="5">1{{ item.createDate }}</ion-col>
+          <ion-col class="text-bold" size="5">{{ item.diem ?? '0' }}</ion-col>
+          <ion-col class="text-italic" size="7">{{ item.createBy ?? account.fullName }}</ion-col>
+          <ion-col class="text-italic" size="5">{{ item.createDate | date: 'HH:mm dd/MM/yyyy' }}</ion-col>
         </ion-row>
       </ion-grid>
     </ion-item>
