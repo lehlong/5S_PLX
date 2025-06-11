@@ -1,0 +1,70 @@
+.login {
+    background-image: url(/img/bg-auth.png);
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.login-form{
+    width: 16%;
+}
+.btn-login{
+    width: 100%;
+    margin-top: 12px;
+}
+nz-input-group{
+    margin-bottom: 12px;
+}
+
+
+
+.noti-item {
+  padding: 12px;
+  border-radius: 4px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 10px;
+  background: var(--ion-card-background);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:active {
+    transform: scale(0.97);
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 6px;
+  }
+
+  &:hover {
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 4px 12px;
+  }
+}
+
+.noti-title {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.noti-time,
+.noti-content {
+  font-size: small;
+  margin-bottom: 6px;
+}
+
+
+.form-login{
+  padding: 10px 20px;
+}
+.check-box{
+
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-around
+}
+.password-toggle-icon {
+  position: absolute;
+  font-size: 22px;
+  right: 17px;
+  z-index: 100;
+  cursor: pointer;
+}
