@@ -1,0 +1,24 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-button fill="" slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-button>
+    <ion-title class="t-center"> Cài đặt </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content color="light" class="ion-padding">
+  <ion-list>
+    <ion-item (click)="navigateTo('/account/password')">
+      <div class="line-info">
+        <ion-icon slot="start" name="lock-closed"></ion-icon>
+        <p>Đổi mật khẩu</p>
+      </div>
+    </ion-item>
+    <ion-item>
+      <div class="line-info">
+        <ion-icon name="mail-outline"></ion-icon>
+        <p style="color: red;">Xoá tài khoản</p>
+      </div>
+    </ion-item>
+  </ion-list>
+</ion-content>

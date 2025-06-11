@@ -3,11 +3,12 @@
     <ion-title class="t-center">
       <h4><ion-icon name="person-circle-outline"></ion-icon>Tài khoản</h4>
     </ion-title>
-    <ion-button (click)="navigateTo('/account/setting')" slot="end">Setting</ion-button>
+    <ion-button (click)="navigateTo('/account/setting-account')" slot="end"
+      >Setting</ion-button
+    >
   </ion-toolbar>
 </ion-header>
-<ion-content>
-  <div style="background-color: #14ffff; padding: 20px; height: 100%">
+<ion-content color="light" class="ion-padding">
     <ion-list lines="inset">
       <ion-item>
         <h1>Thông tin cơ bản</h1>
@@ -40,6 +41,7 @@
       "
       (click)="navigateTo('/account/terms-and-polices')"
     >
+     <ion-icon slot="start" name="shield-half"></ion-icon>
       Điều khoản và chính sách
     </ion-list>
     <ion-list
@@ -49,9 +51,9 @@
         align-items: center;
         justify-content: center;
       "
-       (click)="navigateTo('/login')"
+      (click)="navigateTo('/login')"
     >
+      <ion-icon slot="start" name="log-out"></ion-icon>
       Đăng xuất
     </ion-list>
-  </div>
 </ion-content>
