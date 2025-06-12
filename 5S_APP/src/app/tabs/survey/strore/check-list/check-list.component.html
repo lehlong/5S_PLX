@@ -4,7 +4,7 @@
       <ion-back-button></ion-back-button>
     </ion-button>
 
-    <ion-title class="t-center"> Chấm điểm 5S cửa hàng </ion-title>
+    <ion-title class=""> Chấm điểm 5S cửa hàng </ion-title>
   </ion-toolbar>
 </ion-header>
 <ion-content color="light" class="ion-padding">
@@ -26,18 +26,18 @@
     </ion-item>
   </ion-item-group>
   <ion-item-group style="margin-top: 20px">
-    <ion-item *ngFor="let item of lstHisEvaluate">
+    <ion-item *ngFor="let item of lstHisEvaluate" style="--padding-start: 0px;  --inner-padding-end: 0px; ">
       <ion-grid>
-
-
-        <ion-item-sliding>
-          <ion-item [button]="true">
-            <ion-row (click)="openEditEvaluate(item)">
-              <ion-col class="text-bold" size="7">{{ item?.name }}</ion-col>
-              <ion-col class="text-bold" size="5">{{ item.diem ?? '0' }}</ion-col>
-              <ion-col class="text-italic" size="7">{{ item.createBy ?? account.fullName }}</ion-col>
-              <ion-col class="text-italic" size="5">{{ item.createDate | date: 'HH:mm dd/MM/yyyy' }}</ion-col>
-            </ion-row>
+        <ion-item-sliding lines="none" style="padding: 0;">
+          <ion-item lines="none" [button]="true" style="display: flex; width: 100%; padding: 0; justify-content: space-between;"   (click)="openEditEvaluate(item)">
+            <div class="">
+              <h5 class="mg-0">{{ item?.name }}</h5>
+              <span class="text-italic">{{ item.accountUserName ?? account.fullName }}</span>
+            </div>
+            <div slot="end">
+              <p class="mg-0">{{ item.diem ?? '0' }}</p>
+              <span class="text-italic">{{ item.createDate | date: 'HH:mm dd/MM/yyyy' }}</span>
+            </div>
           </ion-item>
           <ion-item-options *ngIf="item.name == 'Bản nháp'" slot="end">
             <ion-item-option color="danger" expandable="true" (click)="remove(item.code)">

@@ -45,7 +45,7 @@ export class EvaluateComponent implements OnInit {
   maxCount: any = 0
   isEdit: any = true;
   apiFile = (environment as any).apiFile;
-
+  account: any = {}
 
 
   constructor(
@@ -56,6 +56,8 @@ export class EvaluateComponent implements OnInit {
     private cdr: ChangeDetectorRef,
   ) { }
   ngOnInit() {
+    this.account = JSON.parse(localStorage.getItem('UserInfo') ?? "")
+
     this.route.paramMap.subscribe({
       next: async (params) => {
         this.headerId = params.get('code') ?? '';
@@ -306,6 +308,7 @@ export class EvaluateComponent implements OnInit {
     }
 
     // Trường hợp đủ
+    this.evaluate.header.accountUserName = this.account.userName
     this._service.insertEvaluate(this.evaluate).subscribe({
       next: () => {
         console.log('Chấm điểm thành công');

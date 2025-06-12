@@ -40,7 +40,7 @@
 
             <ng-template #Child>
               <div class="ion-padding" slot="content">
-                <p style="color: red">
+                <p style="color: red; margin: 0">
                   <ion-radio-group [value]="filterDiem(node.code)" (ionChange)="setDiem(node.code, $event)">
                     <ng-container *ngFor="let diem of node.diemTieuChi; trackBy: trackByKey">
                       <ion-item>

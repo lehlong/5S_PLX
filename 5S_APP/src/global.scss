@@ -35,6 +35,10 @@ ion-content::part(scroll)::-webkit-scrollbar {
   width: 4px;
 }
 
+.mg-0{
+  margin: 0;
+}
+
 ion-content::part(scroll)::-webkit-scrollbar-thumb {
   background-color: rgba(255,255,255,0.2);
   border-radius: 10px;
