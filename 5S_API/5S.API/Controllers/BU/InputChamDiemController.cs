@@ -91,5 +91,24 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
+        [HttpDelete("Delete/by-store/{storeId}")]
+        public async Task<IActionResult> DeleteStoreId([FromRoute] string storeId)
+        {
+            var transferObject = new TransferObject();
+            await _service.DeleteInputChamDiemByStoreId(storeId);
+            if (_service.Status)
+            {
+                transferObject.Status = true;
+                transferObject.MessageObject.MessageType = MessageType.Success;
+                transferObject.GetMessage("0105", _service);
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0106", _service);
+            }
+            return Ok(transferObject);
+        }
     }
 }

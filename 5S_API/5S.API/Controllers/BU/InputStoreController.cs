@@ -31,7 +31,7 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
-       
+
         [HttpPost("Insert")]
         public async Task<IActionResult> Insert([FromBody] InputStoreDto time)
         {
@@ -79,6 +79,26 @@ namespace PLX5S.API.Controllers.BU
         {
             var transferObject = new TransferObject();
             await _service.Delete(id);
+            if (_service.Status)
+            {
+                transferObject.Status = true;
+                transferObject.MessageObject.MessageType = MessageType.Success;
+                transferObject.GetMessage("0105", _service);
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0106", _service);
+            }
+            return Ok(transferObject);
+        }
+        
+        [HttpDelete("Delete/by-store/{storeId}")]
+        public async Task<IActionResult> DeleteStoreId([FromRoute] string storeId)
+        {
+            var transferObject = new TransferObject();
+            await _service.DeleteInputStoresByStoreId(storeId);
             if (_service.Status)
             {
                 transferObject.Status = true;
