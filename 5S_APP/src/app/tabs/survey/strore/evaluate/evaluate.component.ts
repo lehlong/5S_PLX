@@ -182,7 +182,7 @@ export class EvaluateComponent implements OnInit {
 
     const file: File = event.target.files[0];
     if (!file) return;
-    const type = file.type.startsWith('image/') ? 'img' : file.type.startsWith('video/') ? "mp4" : ''
+    const type = this.detectFileType(file)
     console.log(type);
 
     console.log('Loại:', file.type);
@@ -207,6 +207,21 @@ export class EvaluateComponent implements OnInit {
     reader.readAsDataURL(file); // Chuyển sang base64
 
 
+  }
+
+  detectFileType(file: File): string {
+    const mime = file.type;
+
+    if (mime.startsWith('image/')) return 'img';
+    if (mime.startsWith('video/')) return 'mp4';
+    if (mime === 'application/pdf') return 'pdf';
+    if (mime === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') return 'docx';
+    if (mime === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') return 'xlsx';
+    if (mime === 'application/vnd.ms-excel.sheet.macroEnabled.12') return 'xlsm';
+    if (mime === 'application/vnd.ms-powerpoint') return 'ppt';
+    if (mime === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') return 'pptx';
+
+    return 'other';
   }
 
   filterDiem(code: any) {
@@ -333,15 +348,15 @@ export class EvaluateComponent implements OnInit {
   selectedImage: any = {};
 
   openFullScreen(img: any) {
-    if(this.isEdit == false){
+    if (this.isEdit == false) {
       img.filePath = this.apiFile + img.filePath
     }
     this.selectedImage = img;
     this.isImageModalOpen = true;
   }
 
-  filePath(filePath: string){
-    if(this.isEdit) return filePath;
+  filePath(filePath: string) {
+    if (this.isEdit) return filePath;
     return this.apiFile + filePath
   }
 
@@ -414,7 +429,7 @@ export class EvaluateComponent implements OnInit {
         filePath: base64Image,
         tieuChiCode: code,
       });
-    this.cdr.detectChanges();
+      this.cdr.detectChanges();
 
       this._storageService.set(this.store.id, this.evaluate);
     } catch (err) {

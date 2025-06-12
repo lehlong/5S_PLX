@@ -243,7 +243,6 @@ namespace PLX5S.BUSINESS.Services.BU
             }
         }
 
-
         public async Task<TblBuEvaluateImage> HandelFile(TblBuEvaluateImage request)
         {
             if (string.IsNullOrEmpty(request.FilePath))
@@ -251,7 +250,6 @@ namespace PLX5S.BUSINESS.Services.BU
 
             try
             {
-                // Tách phần data:video/mp4;base64,... hoặc data:image/jpeg;base64,...
                 var base64Data = request.FilePath;
                 var base64Parts = base64Data.Split(',');
 
@@ -261,41 +259,15 @@ namespace PLX5S.BUSINESS.Services.BU
                 var base64String = base64Parts[1];
                 var fileBytes = Convert.FromBase64String(base64String);
 
-                // Xác định MIME và extension
-                var mimeTypePart = base64Parts[0];
-                string extension;
-                string folder;
+                var mimeTypePart = base64Parts[0]; // "data:application/pdf;base64"
 
-                if (mimeTypePart.Contains("image/png"))
-                {
-                    extension = ".png";
-                    folder = "Uploads/Images";
-                }
-                else if (mimeTypePart.Contains("image/jpeg"))
-                {
-                    extension = ".jpg";
-                    folder = "Uploads/Images";
-                }
-                else if (mimeTypePart.Contains("image/webp"))
-                {
-                    extension = ".webp";
-                    folder = "Uploads/Images";
-                }
-                else if (mimeTypePart.Contains("video/mp4"))
-                {
-                    extension = ".mp4";
-                    folder = "Uploads/Videos";
-                }
-                else if (mimeTypePart.Contains("video/webm"))
-                {
-                    extension = ".webm";
-                    folder = "Uploads/Videos";
-                }
-                else
-                {
-                    // Không hỗ trợ định dạng
+                // Xác định extension dựa theo MIME
+                string extension = GetExtensionFromMimeType(mimeTypePart);
+                if (string.IsNullOrEmpty(extension))
                     return null;
-                }
+
+                // Chọn folder phù hợp
+                string folder = GetFolderByExtension(extension);
 
                 // Tạo tên file
                 var fileName = !string.IsNullOrEmpty(request.FileName)
@@ -315,11 +287,11 @@ namespace PLX5S.BUSINESS.Services.BU
                     Code = Guid.NewGuid().ToString(),
                     FileName = fileName,
                     FilePath = filePath,
-                    TieuChiCode = request.TieuChiCode,
                     Type = request.Type,
                     KinhDo = request.KinhDo,
                     ViDo = request.ViDo,
-                    EvaluateHeaderCode = request.EvaluateHeaderCode
+                    EvaluateHeaderCode = request.EvaluateHeaderCode,
+                    TieuChiCode = request.TieuChiCode
                 };
             }
             catch (Exception ex)
@@ -327,7 +299,6 @@ namespace PLX5S.BUSINESS.Services.BU
                 this.Status = false;
                 return null;
             }
-
         }
 
         public async Task<EvaluateModel> GetResultEvaluate(string code)
@@ -347,5 +318,35 @@ namespace PLX5S.BUSINESS.Services.BU
                 return null;
             }
         }
+
+
+
+        private string GetExtensionFromMimeType(string mime)
+        {
+            if (mime.Contains("image/jpeg")) return ".jpg";
+            if (mime.Contains("image/png")) return ".png";
+            if (mime.Contains("image/webp")) return ".webp";
+            if (mime.Contains("video/mp4")) return ".mp4";
+            if (mime.Contains("video/webm")) return ".webm";
+            if (mime.Contains("application/pdf")) return ".pdf";
+            if (mime.Contains("application/vnd.openxmlformats-officedocument.wordprocessingml.document")) return ".docx";
+            if (mime.Contains("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")) return ".xlsx";
+            if (mime.Contains("application/vnd.ms-excel.sheet.macroEnabled.12")) return ".xlsm";
+            if (mime.Contains("application/vnd.openxmlformats-officedocument.presentationml.presentation")) return ".pptx";
+
+            return null; // không hỗ trợ
+        }
+
+        private string GetFolderByExtension(string ext)
+        {
+            if (ext.StartsWith(".jpg") || ext.StartsWith(".png") || ext.StartsWith(".webp"))
+                return "Uploads/Images";
+
+            if (ext.StartsWith(".mp4") || ext.StartsWith(".webm"))
+                return "Uploads/Videos";
+
+            return "Uploads/Files"; // mặc định cho .docx, .xlsx, .pdf, ...
+        }
+
     }
 }

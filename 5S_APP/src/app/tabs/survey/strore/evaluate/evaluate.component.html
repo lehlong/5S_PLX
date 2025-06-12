@@ -80,15 +80,28 @@
 
                 <div *ngIf="!node.isGroup" class="image-wrapper">
                   <div class="image-wrapper" *ngFor="let img of filterImage(node); trackBy: trackByKey">
-
                     <ion-img *ngIf="img.type == 'img'" [src]="filePath(img.filePath)" class="image-preview"
                       (click)="openFullScreen(img)"></ion-img>
                     <video *ngIf="img.type == 'mp4'" [src]="filePath(img.filePath)" class="image-preview"
                       (click)="openFullScreen(img)" controls style="max-width: 100%;"></video>
 
+
                     <ion-button fill="clear" class="delete-btn" size="small" (click)="deleteImage2(img)">
                       <ion-icon name="close-circle" slot="icon-only"></ion-icon>
                     </ion-button>
+
+                    <div *ngIf="img.type === 'docx' || img.type === 'xlsx' || img.type === 'xlsm' || img.type === 'pdf'" class="file-preview">
+                      <ion-chip style="height: 20px;">
+                        <ion-icon name="document-outline" size="large"></ion-icon>
+                        <ion-label>
+                          <a [href]="filePath(img.filePath)" target="_blank" download>
+                            Tải xuống
+                          </a>
+                        </ion-label>
+                        <ion-icon name=""></ion-icon>
+                      </ion-chip>
+
+                    </div>
                   </div>
                   <!-- <ion-img [src]="img" class="image-preview" (click)="openFullScreen(img)"></ion-img> -->
                 </div>
@@ -183,8 +196,8 @@
         <ion-icon name="trash-outline" slot="end"></ion-icon>
       </ion-button>
       <img *ngIf="selectedImage.type == 'img'" [src]="selectedImage.filePath" class="full-image" />
-      <video *ngIf="selectedImage.type == 'mp4'" class="full-image" [src]="selectedImage.filePath"
-        controls style="max-width: 100%;"></video>
+      <video *ngIf="selectedImage.type == 'mp4'" class="full-image" [src]="selectedImage.filePath" controls
+        style="max-width: 100%;"></video>
 
     </ion-content>
   </ng-template>
