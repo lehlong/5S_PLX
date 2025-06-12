@@ -1,23 +1,23 @@
 <ion-content>
   <div class="main-report">
     <h4><ion-icon name="list-outline"></ion-icon>Danh sách báo cáo</h4>
-    <div class="item-report">
+    <div (click)="navigateTo('report/ket-qua-cham-diem')" class="item-report">
       <p>Báo cáo kết quả chấm điểm 5S</p>
     </div>
 
-    <div class="item-report">
+    <div (click)="navigateTo('report/cham-diem-theo-khung-thoi-gian')" class="item-report">
       <p>Báo cáo lần chấm điểm theo khung thời gian</p>
     </div>
 
-    <div class="item-report">
+    <div (click)="navigateTo('report/thoi-gian-cham-diem')" class="item-report">
       <p>Báo cáo thời gian chấm điểm</p>
     </div>
 
-    <div class="item-report">
+    <div (click)="navigateTo('report/thiet-bi-cham-diem')" class="item-report">
       <p>Báo cáo thiết bị chấm điểm</p>
     </div>
 
-    <div class="item-report">
+    <div (click)="navigateTo('report/tong-hop-y-kien')" class="item-report">
       <p>Báo cáo tổng hợp ý kiến đề xuất</p>
     </div>
   </div>

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { IonContent } from "@ionic/angular/standalone";
 import { SharedModule } from 'src/app/shared/shared.module';
 
@@ -11,8 +12,12 @@ import { SharedModule } from 'src/app/shared/shared.module';
 })
 export class ReportComponent  implements OnInit {
 
-  constructor() { }
+  constructor(
+    private router: Router
+  ) { }
 
   ngOnInit() {}
-
+  navigateTo(route: string){
+    this.router.navigate([route])
+  }
 }
