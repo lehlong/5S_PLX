@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { SharedModule } from '../../../../shared/shared.module';
-// import { IonicModule } from '@ionic/angular';
+import { Geolocation } from '@capacitor/geolocation';
 import { Storage } from '@ionic/storage-angular';
 import { AlertController } from '@ionic/angular';
 import { IonAccordionGroup } from '@ionic/angular';
@@ -10,6 +10,7 @@ import { StorageService } from 'src/app/service/storage.service';
 import { environment } from 'src/environments/environment';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Input, ChangeDetectionStrategy } from '@angular/core';
+import { MessageService } from 'src/app/service/message.service';
 
 @Component({
   imports: [SharedModule],
@@ -53,6 +54,7 @@ export class EvaluateComponent implements OnInit {
     private alertController: AlertController,
     private _storageService: StorageService,
     private _service: AppEvaluateService,
+    private messageService: MessageService,
     private cdr: ChangeDetectorRef,
   ) { }
   ngOnInit() {
@@ -199,6 +201,8 @@ export class EvaluateComponent implements OnInit {
         filePath: base64,
         tieuChiCode: code,
         type: type,
+        kinhDo: '123',
+        viDo: "1234",
         evaluateHeaderCode: this.headerId,
       })
       this.cdr.detectChanges();
@@ -328,6 +332,7 @@ export class EvaluateComponent implements OnInit {
       next: () => {
         console.log('Chấm điểm thành công');
 
+        this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
         this._storageService.remove(this.store.id);
       },
 
@@ -414,6 +419,13 @@ export class EvaluateComponent implements OnInit {
     if (!this.isEdit) return;
 
     try {
+
+      // 👉 Lấy vị trí hiện tại
+      const position = await Geolocation.getCurrentPosition();
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+
+
       const image = await Camera.getPhoto({
         quality: 90,
         allowEditing: false,
@@ -428,6 +440,9 @@ export class EvaluateComponent implements OnInit {
         fileName: '',
         filePath: base64Image,
         tieuChiCode: code,
+        viDo: latitude,
+        kinhDo: longitude,
+        type: 'img'
       });
       this.cdr.detectChanges();
 

@@ -18,7 +18,8 @@ export class LoginComponent {
     private router: Router,
     private globalService: GlobalService,
     private authService: AuthService,
-    private messageService: MessageService
+    private messageService: MessageService,
+
   ) { }
   model = {
     userName: '',

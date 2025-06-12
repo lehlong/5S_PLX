@@ -217,7 +217,7 @@ namespace PLX5S.BUSINESS.Services.BU
             {
                 var lstImage = new List<TblBuEvaluateImage>();
 
-                var header = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == data.Header.KiKhaoSatId && x.StoreId == data.Header.StoreId).OrderBy(x => x.Order).FirstOrDefault();
+                var header = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == data.Header.KiKhaoSatId && x.StoreId == data.Header.StoreId).OrderByDescending(x => x.Order).FirstOrDefault();
                 var number = header != null ? header.Order + 1 : 1;
 
                 data.Header.Name = "Lần chấm thứ " + (number).ToString();
