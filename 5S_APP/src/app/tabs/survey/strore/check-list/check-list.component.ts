@@ -20,10 +20,7 @@ export class CheckListComponent implements OnInit {
   store: any = {}
   lstHisEvaluate: any = []
   inStoreId: any = ''
-  account: any = {
-    userName: 'admin',
-    fullName: 'Quản trị viên'
-  }
+  account: any = {}
   evaluate: any =
     {
       header: {},
@@ -56,6 +53,9 @@ export class CheckListComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.account = JSON.parse(localStorage.getItem('UserInfo') ?? "")
+    console.log(this.account);
+
     this.route.paramMap.subscribe({
       next: async (params) => {
         const id = params.get('id')
@@ -130,6 +130,11 @@ export class CheckListComponent implements OnInit {
       console.log('chỉnh sửa');
       this.router.navigate([`survey/store/evaluate/draft/${this.evaluate.header.code}`]);
     }
+  }
+
+  async remove(code: any) {
+    await this._storageService.remove(this.store.id)
+    this.lstHisEvaluate.shift();
   }
 
 }

@@ -4,6 +4,7 @@ import { IonButton } from '@ionic/angular/standalone';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { KyKhaoSatService } from 'src/app/service/ky-khao-sat.service';
+import { AuthService } from 'src/app/service/auth.service';
 
 @Component({
   selector: 'app-scoring-five-s',
@@ -35,19 +36,19 @@ export class ListComponent implements OnInit {
   surveyId: any;
   filterForm!: FormGroup;
   isOpen = false;
+  lstAccount: any = []
 
-  user: any = {
-    userName: 'admin',
-    fullName: 'Nguyễn Đình Thi'
-  }
+  user: any = {  }
 
   constructor(
     private _service: KyKhaoSatService,
+    private _authService: AuthService,
     private router: Router,
     private route: ActivatedRoute
   ) { }
 
   ngOnInit() {
+    this.user = JSON.parse(localStorage.getItem('UserInfo') ?? "")
     this.route.paramMap.subscribe({
       next: (params) => {
         const id = params.get('id');
@@ -97,6 +98,18 @@ export class ListComponent implements OnInit {
       },
     });
   }
+
+  // getAllAccount() {
+  //   this._authService.(this.filter.filterKiKhaoSat.id).subscribe({
+  //     next: (data) => {
+  //       this.lstStore = data.lstInputStore;
+  //       this.lstSearchStore = data.lstInputStore;
+  //     },
+  //     error: (response) => {
+  //       console.log(response);
+  //     },
+  //   });
+  // }
 
   searchStore(kiKhaoSat: any) {
     this.inputSearchKiKhaoSat = kiKhaoSat;

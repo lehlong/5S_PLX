@@ -28,12 +28,24 @@
   <ion-item-group style="margin-top: 20px">
     <ion-item *ngFor="let item of lstHisEvaluate">
       <ion-grid>
-        <ion-row (click)="openEditEvaluate(item)">
-          <ion-col class="text-bold" size="7">{{ item?.name }}</ion-col>
-          <ion-col class="text-bold" size="5">{{ item.diem ?? '0' }}</ion-col>
-          <ion-col class="text-italic" size="7">{{ item.createBy ?? account.fullName }}</ion-col>
-          <ion-col class="text-italic" size="5">{{ item.createDate | date: 'HH:mm dd/MM/yyyy' }}</ion-col>
-        </ion-row>
+
+
+        <ion-item-sliding>
+          <ion-item [button]="true">
+            <ion-row (click)="openEditEvaluate(item)">
+              <ion-col class="text-bold" size="7">{{ item?.name }}</ion-col>
+              <ion-col class="text-bold" size="5">{{ item.diem ?? '0' }}</ion-col>
+              <ion-col class="text-italic" size="7">{{ item.createBy ?? account.fullName }}</ion-col>
+              <ion-col class="text-italic" size="5">{{ item.createDate | date: 'HH:mm dd/MM/yyyy' }}</ion-col>
+            </ion-row>
+          </ion-item>
+          <ion-item-options *ngIf="item.name == 'Bản nháp'" slot="end">
+            <ion-item-option color="danger" expandable="true" (click)="remove(item.code)">
+              <ion-icon slot="icon-only" name="trash"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+
       </ion-grid>
     </ion-item>
   </ion-item-group>

@@ -67,25 +67,28 @@ namespace PLX5S.BUSINESS.Services.BU
             var lstNode = new List<TieuChiDto>();
             var node = _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == kiKhaoSatId && x.PId == "-1" && x.IsDeleted != true).FirstOrDefault();
             var lstBlack = _dbContext.TblBuCriteriaExcludedStores.Where(x => x.IsDeleted != true).ToList();
+            var lstAllTieuChi = await _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == kiKhaoSatId && x.PId != "-1" && x.IsDeleted != true).OrderBy(x => x.OrderNumber).ToListAsync();
+            var count = lstAllTieuChi.Count;
+
             var rootNode = new TieuChiDto()
             {
                 Code = node.Code,
                 Id = node.Id,
-                Key = node.Id,
+                Key = node.Id,   
                 Name = node.Name,
                 Title = node.Name,
                 PId = node.PId,
                 IsGroup = node.IsGroup,
                 KiKhaoSatId = node.KiKhaoSatId,
-                OrderNumber = 1,
+                OrderNumber = count,
                 IsImg = node.IsImg,
                 Report = node.Report,
                 Expanded = true,
                 IsLeaf = false
             };
-            lstNode.Add(rootNode);
 
-            var lstAllTieuChi = await _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == kiKhaoSatId && x.PId != "-1" && x.IsDeleted != true).OrderBy(x => x.OrderNumber).ToListAsync();
+
+            lstNode.Add(rootNode);
             foreach (var menu in lstAllTieuChi)
             {
                 var checkBack = lstBlack.FirstOrDefault(x => x.TieuChiCode == menu.Code && x.StoreId == storeId);
@@ -248,7 +251,7 @@ namespace PLX5S.BUSINESS.Services.BU
 
             try
             {
-                // Tách phần data:image/jpeg;base64,...
+                // Tách phần data:video/mp4;base64,... hoặc data:image/jpeg;base64,...
                 var base64Data = request.FilePath;
                 var base64Parts = base64Data.Split(',');
 
@@ -256,30 +259,56 @@ namespace PLX5S.BUSINESS.Services.BU
                     return null;
 
                 var base64String = base64Parts[1];
-                var imageBytes = Convert.FromBase64String(base64String);
+                var fileBytes = Convert.FromBase64String(base64String);
 
-                // Lấy extension từ phần đầu chuỗi (vd: data:image/jpeg;)
-                var mimeTypePart = base64Parts[0]; // vd: data:image/jpeg;base64
-                var extension = ".jpg"; // mặc định
+                // Xác định MIME và extension
+                var mimeTypePart = base64Parts[0];
+                string extension;
+                string folder;
 
-                if (mimeTypePart.Contains("image/png")) extension = ".png";
-                else if (mimeTypePart.Contains("image/jpeg")) extension = ".jpg";
-                else if (mimeTypePart.Contains("image/webp")) extension = ".webp";
+                if (mimeTypePart.Contains("image/png"))
+                {
+                    extension = ".png";
+                    folder = "Uploads/Images";
+                }
+                else if (mimeTypePart.Contains("image/jpeg"))
+                {
+                    extension = ".jpg";
+                    folder = "Uploads/Images";
+                }
+                else if (mimeTypePart.Contains("image/webp"))
+                {
+                    extension = ".webp";
+                    folder = "Uploads/Images";
+                }
+                else if (mimeTypePart.Contains("video/mp4"))
+                {
+                    extension = ".mp4";
+                    folder = "Uploads/Videos";
+                }
+                else if (mimeTypePart.Contains("video/webm"))
+                {
+                    extension = ".webm";
+                    folder = "Uploads/Videos";
+                }
+                else
+                {
+                    // Không hỗ trợ định dạng
+                    return null;
+                }
 
-                // Đặt tên file (ưu tiên từ request.FileName, nếu rỗng thì tự sinh)
+                // Tạo tên file
                 var fileName = !string.IsNullOrEmpty(request.FileName)
                     ? Path.GetFileNameWithoutExtension(request.FileName) + extension
                     : $"{Guid.NewGuid()}{extension}";
 
-                var uploadsFolder = Path.Combine("Uploads/Images");
+                var uploadsFolder = Path.Combine(folder);
                 if (!Directory.Exists(uploadsFolder))
                     Directory.CreateDirectory(uploadsFolder);
 
                 var filePath = Path.Combine(uploadsFolder, fileName);
 
-                await System.IO.File.WriteAllBytesAsync(filePath, imageBytes);
-
-                // Có thể lưu vào DB thêm nếu cần (request.TieuChiCode, request.Code...)
+                await System.IO.File.WriteAllBytesAsync(filePath, fileBytes);
 
                 return new TblBuEvaluateImage()
                 {
@@ -287,6 +316,9 @@ namespace PLX5S.BUSINESS.Services.BU
                     FileName = fileName,
                     FilePath = filePath,
                     TieuChiCode = request.TieuChiCode,
+                    Type = request.Type,
+                    KinhDo = request.KinhDo,
+                    ViDo = request.ViDo,
                     EvaluateHeaderCode = request.EvaluateHeaderCode
                 };
             }

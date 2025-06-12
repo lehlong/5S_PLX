@@ -1,16 +1,4 @@
-.image-wrapper {
-  display: inline-block;
-  margin: 5px;
 
-  .image-preview {
-    width: 90px;
-    height: 90px;
-    object-fit: cover;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    cursor: pointer;
-  }
-}
 
 .full-image-content {
   --background: black;
@@ -21,6 +9,8 @@
 
 .full-image {
   width: 100%;
+ max-width: 50vh;
+ max-height: 60vh !important;
   height: auto;
   max-height: 100%;
   object-fit: contain;
@@ -102,7 +92,7 @@
 .image-wrapper {
   position: relative;
   display: inline-block;
-  margin: 8px;
+  margin:  3px;
 
   .image-preview {
     width: 100px;
@@ -119,6 +109,10 @@
     color: rgba(0, 0, 0, 0.468);
     font-size: 18px;
   }
+}
+
+.ion-padding{
+  padding: 5px !important;
 }
 
 .file {

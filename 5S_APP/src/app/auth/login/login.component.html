@@ -24,6 +24,7 @@
 
   <ion-accordion-group class="form-login">
     <ion-item>
+      <ion-icon name="person-outline" style="padding-right: 7px;"></ion-icon>
       <ion-input color="dark" label="Tài khoản" labelPlacement="stacked" labelPlacement="floating" [clearInput]="true"
         placeholder="" [(ngModel)]="model.userName">
       </ion-input>
@@ -31,9 +32,9 @@
   </ion-accordion-group>
 
   <ion-accordion-group class="form-login"><ion-item>
-      <!-- <ion-label position="stacked">Mật khẩu</ion-label> -->
-      <ion-input [type]="showPassword ? 'text' : 'password'" label="Mật khẩu" labelPlacement="floating" placeholder="" [(ngModel)]="model.password"
-        ></ion-input>
+      <ion-icon name="lock-closed-outline" style="padding-right: 7px;"></ion-icon>
+      <ion-input [type]="showPassword ? 'text' : 'password'" label="Mật khẩu" labelPlacement="floating" placeholder=""
+        [(ngModel)]="model.password"></ion-input>
       <ion-icon [name]="showPassword ? 'eye-off' : 'eye'" slot="end" class="password-toggle-icon"
         (click)="togglePasswordVisibility()"></ion-icon>
     </ion-item>

@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { SharedModule } from '../../../../shared/shared.module';
 // import { IonicModule } from '@ionic/angular';
 import { Storage } from '@ionic/storage-angular';
@@ -9,12 +9,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { StorageService } from 'src/app/service/storage.service';
 import { environment } from 'src/environments/environment';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { Input, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   imports: [SharedModule],
   selector: 'app-evaluate',
   templateUrl: './evaluate.component.html',
   styleUrls: ['./evaluate.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EvaluateComponent implements OnInit {
   @ViewChild('accordionGroup', { static: true })
@@ -22,14 +24,15 @@ export class EvaluateComponent implements OnInit {
   @ViewChild('fileInput', { static: false })
   fileInput!: ElementRef<HTMLInputElement>;
 
+
   selectedAccordionId: string = '';
   currentSelect: string = '';
   lstAllTieuChi: any = [];
   store: any = {};
   kiKhaoSat: any = {};
-  treeData: any = [];
   lstTieuChi: any = [];
-  lstTreeOpen: any = [];
+  @Input() treeData: any = [];
+  @Input() lstTreeOpen!: string[];
   previewImage: any = [];
   evaluate: any = {
     header: {},
@@ -38,17 +41,20 @@ export class EvaluateComponent implements OnInit {
   };
   data: any = {};
   headerId: any = '';
+  count: any = 0
+  maxCount: any = 0
   isEdit: any = true;
-  apiFile: any = environment.apiFile;
+  apiFile = (environment as any).apiFile;
+
+
 
   constructor(
-    private router: Router,
     private route: ActivatedRoute,
     private alertController: AlertController,
     private _storageService: StorageService,
-    private storage: Storage,
-    private _service: AppEvaluateService
-  ) {}
+    private _service: AppEvaluateService,
+    private cdr: ChangeDetectorRef,
+  ) { }
   ngOnInit() {
     this.route.paramMap.subscribe({
       next: async (params) => {
@@ -70,7 +76,7 @@ export class EvaluateComponent implements OnInit {
         this.getAllTieuChiLeaves();
       },
     });
-    this.previewImage = localStorage.getItem('previewImage');
+
   }
 
   getResultEvaluate() {
@@ -84,25 +90,33 @@ export class EvaluateComponent implements OnInit {
 
   getAllTieuChi() {
     this._service
-      .buildDataTreeForApp(this.kiKhaoSat.id, this.store.storeId)
+      .buildDataTreeForApp(this.kiKhaoSat.id, this.store.id)
       .subscribe({
         next: (data) => {
           console.log(data);
+          this.maxCount = data.orderNumber
           this.treeData = [data];
-          this.lstTreeOpen = this.extractAllKeys([data]);
+          this.lstTreeOpen = [...this.extractAllKeys([data])];
+
+          this.cdr.detectChanges();
         },
+
       });
   }
 
   getAllTieuChiLeaves() {
     this._service
-      .GetAllTieuChiLeaves(this.kiKhaoSat.id, this.store.storeId)
+      .GetAllTieuChiLeaves(this.kiKhaoSat.id, this.store.id)
       .subscribe({
         next: (data) => {
           console.log(data);
           this.lstTieuChi = data;
         },
       });
+  }
+
+  isValidChildren(children: any): boolean {
+    return Array.isArray(children) && children.length > 0;
   }
 
   //Active
@@ -166,27 +180,31 @@ export class EvaluateComponent implements OnInit {
 
     const file: File = event.target.files[0];
     if (!file) return;
+    const type = file.type.startsWith('image/') ? 'img' : file.type.startsWith('video/') ? "mp4" : ''
+    console.log(type);
 
+    console.log('Loại:', file.type);
     const reader = new FileReader();
+    console.log(this.evaluate);
+
     reader.onload = () => {
       const base64 = reader.result as string;
 
-      console.log(this.evaluate);
       // Lưu vào localStorage
       this.evaluate.lstImages.push({
         code: '-1',
         fileName: '',
         filePath: base64,
         tieuChiCode: code,
+        type: type,
         evaluateHeaderCode: this.headerId,
-      });
-
+      })
+      this.cdr.detectChanges();
       this._storageService.set(this.store.id, this.evaluate);
-      // localStorage.setItem('resultEvaluate', JSON.stringify(this.evaluate));
-
-      this.previewImage = localStorage.getItem('previewImage');
-    };
+    }
     reader.readAsDataURL(file); // Chuyển sang base64
+
+
   }
 
   filterDiem(code: any) {
@@ -195,12 +213,21 @@ export class EvaluateComponent implements OnInit {
     );
     return item?.pointId || null;
   }
-  filterImage(code: any) {
-    return Array.isArray(this.evaluate?.lstImages)
+
+  filterImage(node: any) {
+
+    if (node.isGroup == true) return;
+
+    const data = Array.isArray(this.evaluate?.lstImages)
       ? this.evaluate.lstImages
-          .filter((x: any) => x.tieuChiCode === code)
-          .map((x: any) => x.filePath)
-      : [];
+        .filter((x: any) => x.tieuChiCode === node.code)
+      : null;
+    if (!data) return;
+
+    return data.map((x: any) => ({
+      filePath: x.filePath,
+      type: x.type
+    }))
   }
 
   filterFeedBack(code: any) {
@@ -217,9 +244,12 @@ export class EvaluateComponent implements OnInit {
     const idx = this.evaluate.lstEvaluate.findIndex(
       (i: any) => i.tieuChiCode === data
     );
+    console.log(data, idx);
+
     if (idx === -1) return;
 
     this.evaluate.lstEvaluate[idx].pointId = selected;
+    console.log(this.evaluate);
     this._storageService.set(this.store.id, this.evaluate);
   }
 
@@ -272,7 +302,7 @@ export class EvaluateComponent implements OnInit {
         buttons: ['OK'],
       });
       await alert.present();
-      return; 
+      return;
     }
 
     // Trường hợp đủ
@@ -297,11 +327,19 @@ export class EvaluateComponent implements OnInit {
   }
 
   isImageModalOpen = false;
-  selectedImage: string = '';
+  selectedImage: any = {};
 
-  openFullScreen(img: string) {
+  openFullScreen(img: any) {
+    if(this.isEdit == false){
+      img.filePath = this.apiFile + img.filePath
+    }
     this.selectedImage = img;
     this.isImageModalOpen = true;
+  }
+
+  filePath(filePath: string){
+    if(this.isEdit) return filePath;
+    return this.apiFile + filePath
   }
 
   closeFullScreen() {
@@ -312,16 +350,18 @@ export class EvaluateComponent implements OnInit {
     if (!this.isEdit) return;
 
     const index = this.evaluate.lstImages.findIndex(
-      (img: any) => img.filePath === this.selectedImage
+      (img: any) => img.filePath === this.selectedImage.filePath
     );
     if (index > -1) {
       this.evaluate.lstImages.splice(index, 1);
     }
     this._storageService.set(this.store.id, this.evaluate);
+    this.cdr.detectChanges();
+
     this.closeFullScreen();
   }
 
-  deleteImage2(img: string) {
+  deleteImage2(img: any) {
     this.selectedImage = img;
     this.confirmDeleteImage();
   }
@@ -364,7 +404,6 @@ export class EvaluateComponent implements OnInit {
       });
 
       const base64Image = `data:image/jpeg;base64,${image.base64String}`;
-      // console.log('Captured image:', base64Image);
 
       this.evaluate.lstImages.push({
         code: '-1',
@@ -372,6 +411,7 @@ export class EvaluateComponent implements OnInit {
         filePath: base64Image,
         tieuChiCode: code,
       });
+    this.cdr.detectChanges();
 
       this._storageService.set(this.store.id, this.evaluate);
     } catch (err) {
@@ -379,7 +419,20 @@ export class EvaluateComponent implements OnInit {
     }
   }
 
-  onAttach() {
-    this.fileInput.nativeElement.click();
+  dem() {
+    this.count += 1
+    console.log(this.count);
+
   }
+
+
+  shouldRender(): boolean {
+    this.count++;
+    return this.count <= this.maxCount;
+  }
+
+  trackByKey(index: number, item: any): string {
+    return item.key; // hoặc item.id nếu bạn dùng id
+  }
+
 }
