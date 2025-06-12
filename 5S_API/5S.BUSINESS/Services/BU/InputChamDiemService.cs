@@ -11,8 +11,6 @@ namespace Services.BU
 {
     public interface IInputChamDiemService : IGenericService<TblBuInputChamDiem, InputChamDiemDto>
     {
-        Task DeleteInputChamDiemByStoreId(string storeId);
-
         Task Insert(InputChamDiemDto data);
     }
 
@@ -56,32 +54,5 @@ namespace Services.BU
                 Exception = ex;
             }
         }
-        public async Task DeleteInputChamDiemByStoreId(string storeId)
-        {
-            try
-            {
-                var entitiesToDelete = await _dbContext.TblBuInputStore
-                                                       .Where(x => x.StoreId == storeId)
-                                                       .ToListAsync();
-
-                if (entitiesToDelete != null && entitiesToDelete.Any())
-                {
-                    _dbContext.TblBuInputStore.RemoveRange(entitiesToDelete);
-                    await _dbContext.SaveChangesAsync();
-                    this.Status = true;
-                }
-                else
-                {
-                    this.Status = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                Status = false;
-                Exception = ex;
-                throw;
-            }
-        }
     }
 }
-

@@ -49,12 +49,79 @@ namespace PLX5S.BUSINESS.Services.MD
                 return null;
             }
         }
+        public new async Task Delete(string id)
+        {
+            try
+            {
+                var atvsvsToSoftDelete = await _dbContext.tblMdAtvsv
+                                                         .Where(x => x.StoreId == id && x.IsDeleted == false) 
+                                                         .ToListAsync();
+                foreach (var atvsv in atvsvsToSoftDelete)
+                {
+                    atvsv.IsDeleted = true;
+                    _dbContext.Entry(atvsv).State = EntityState.Modified;
+                }
+                if (atvsvsToSoftDelete.Any())
+                {
+                    await _dbContext.SaveChangesAsync();
+                }
 
+                var excludedStoresToSoftDelete = await _dbContext.TblBuCriteriaExcludedStores
+                                                                 .Where(x => x.StoreId == id && x.IsDeleted == false) 
+                                                                 .ToListAsync();
+                foreach (var excludedStore in excludedStoresToSoftDelete)
+                {
+                    excludedStore.IsDeleted = true;
+                    _dbContext.Entry(excludedStore).State = EntityState.Modified;
+                    if (excludedStoresToSoftDelete.Any())
+                    {
+                        await _dbContext.SaveChangesAsync();
+                    }
+
+                    var evaluateHeadersToSoftDelete = await _dbContext.TblBuEvaluateHeader
+                                                                      .Where(x => x.StoreId == id && x.IsDeleted == false)
+                                                                      .ToListAsync();
+                    foreach (var header in evaluateHeadersToSoftDelete)
+                    {
+                        header.IsDeleted = true;
+                        _dbContext.Entry(header).State = EntityState.Modified;
+                    }
+                    if (evaluateHeadersToSoftDelete.Any())
+                    {
+                        await _dbContext.SaveChangesAsync();
+                    }
+
+                    var inputStoresToSoftDelete = await _dbContext.TblBuInputStore
+                                                                  .Where(x => x.StoreId == id && x.IsDeleted == false)
+                                                                  .ToListAsync();
+                    foreach (var inputStore in inputStoresToSoftDelete)
+                    {
+                        inputStore.IsDeleted = true;
+                        _dbContext.Entry(inputStore).State = EntityState.Modified;
+                    }
+                    if (inputStoresToSoftDelete.Any())
+                    {
+                        await _dbContext.SaveChangesAsync();
+                    }
+
+
+                    await base.Delete(id);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Status = false;
+                Exception = ex;
+                Console.WriteLine($"Lỗi khi xóa mềm cửa hàng và dữ liệu liên quan: {ex.InnerException?.Message ?? ex.Message}");
+                throw;
+            }
+        }
         public async Task Insert(StoreDto data)
         {
             try
             {
-                
+
                 var store = new TblMdStore()
                 {
                     Id = data.Id,
@@ -66,7 +133,7 @@ namespace PLX5S.BUSINESS.Services.MD
                     ViDo = data.ViDo,
                     TrangThaiCuaHang = data.TrangThaiCuaHang,
                     IsActive = data.IsActive
-                   
+
                 };
                 _dbContext.tblMdStore.Add(store);
 
@@ -110,7 +177,7 @@ namespace PLX5S.BUSINESS.Services.MD
                     IsActive = data.IsActive
                 };
                 _dbContext.tblMdStore.Update(store);
-                var lstdel= _dbContext.tblMdAtvsv.Where(x => x.StoreId == data.Id);
+                var lstdel = _dbContext.tblMdAtvsv.Where(x => x.StoreId == data.Id);
                 _dbContext.tblMdAtvsv.RemoveRange(lstdel);
                 var lst = new List<TblBuInputAtvsv>();
                 foreach (var item in data.ATVSV)
@@ -124,7 +191,7 @@ namespace PLX5S.BUSINESS.Services.MD
                     lst.Add(atvsv);
                 }
                 _dbContext.TblBuInputAtvsv.AddRange(lst);
-                
+
 
                 await _dbContext.SaveChangesAsync();
             }
@@ -155,13 +222,13 @@ namespace PLX5S.BUSINESS.Services.MD
                 return null;
             }
         }
-        public async  Task<List<string>> GetATVSV( string headerId)
+        public async Task<List<string>> GetATVSV(string headerId)
         {
             try
             {
-                var lst = _dbContext.TblBuInputAtvsv.Where(x => x.InputStoreId == headerId).Select(x=>x.Name).ToList();
-                
-                return  lst;
+                var lst = _dbContext.TblBuInputAtvsv.Where(x => x.InputStoreId == headerId).Select(x => x.Name).ToList();
+
+                return lst;
             }
             catch (Exception ex)
             {

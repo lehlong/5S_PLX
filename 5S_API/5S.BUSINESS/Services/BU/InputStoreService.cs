@@ -14,8 +14,6 @@ namespace PLX5S.BUSINESS.Services.BU
 {
     public interface IInputStoreService : IGenericService<TblBuInputStore, InputStoreDto>
     {
-        Task DeleteInputStoresByStoreId(string storeId);
-
         Task<IList<InputStoreDto>> GetAll(BaseMdFilter filter);
         Task Insert(InputStoreDto data);
     }
@@ -78,33 +76,6 @@ namespace PLX5S.BUSINESS.Services.BU
                 Status = false;
                 Exception = ex;
                 return null;
-            }
-        }
-
-        public async Task DeleteInputStoresByStoreId(string storeId)
-        {
-            try
-            {
-                var entitiesToDelete = await _dbContext.TblBuInputStore
-                                                       .Where(x => x.StoreId == storeId)
-                                                       .ToListAsync();
-
-                if (entitiesToDelete != null && entitiesToDelete.Any())
-                {
-                    _dbContext.TblBuInputStore.RemoveRange(entitiesToDelete);
-                    await _dbContext.SaveChangesAsync();
-                    this.Status = true;
-                }
-                else
-                {
-                    this.Status = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                Status = false;
-                Exception = ex;
-                throw;
             }
         }
     }
