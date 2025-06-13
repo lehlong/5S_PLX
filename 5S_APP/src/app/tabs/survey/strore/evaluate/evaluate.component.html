@@ -78,32 +78,53 @@
                   </p>
                 </div>
 
-                <div *ngIf="!node.isGroup" class="image-wrapper">
-                  <div class="image-wrapper" *ngFor="let img of filterImage(node); trackBy: trackByKey">
-                    <ion-img *ngIf="img.type == 'img'" [src]="filePath(img.filePath)" class="image-preview"
+                <div *ngIf="!node.isGroup && filterImage(node)?.images.length > 0" class="images-container">
+                  <div class="images-wrapper" *ngFor="let img of filterImage(node)?.images; trackBy: trackByKey">
+                    <ion-img [src]="filePath(img.filePath)" class="image-preview"
                       (click)="openFullScreen(img)"></ion-img>
-                    <video *ngIf="img.type == 'mp4'" [src]="filePath(img.filePath)" class="image-preview"
-                      (click)="openFullScreen(img)" controls style="max-width: 100%;"></video>
-
-
                     <ion-button fill="clear" class="delete-btn" size="small" (click)="deleteImage2(img)">
                       <ion-icon name="close-circle" slot="icon-only"></ion-icon>
                     </ion-button>
 
-                    <div *ngIf="img.type === 'docx' || img.type === 'xlsx' || img.type === 'xlsm' || img.type === 'pdf'" class="file-preview">
-                      <ion-chip style="height: 20px;">
+                  </div>
+                </div>
+
+                <!-- Hiển thị video -->
+                <div *ngIf="!node.isGroup && filterImage(node)?.videos.length > 0" class="videos-container">
+
+
+                  <div class="file-wrapper" *ngFor="let video of filterImage(node)?.videos; trackBy: trackByKey">
+
+                    <video class="image-preview" [src]="filePath(video.filePath)" (click)="openFullScreen(video)"
+                      controls></video>
+                    <ion-button fill="clear" class="delete-btn" size="small" (click)="deleteImage2(video)">
+                      <ion-icon name="close-circle" slot="icon-only"></ion-icon>
+                    </ion-button>
+                  </div>
+
+                </div>
+
+                <!-- Hiển thị tài liệu -->
+                <div *ngIf="!node.isGroup && filterImage(node)?.documents.length > 0" class="file-wrapper">
+
+
+                  <div class="image-preview" *ngFor="let doc of filterImage(node)?.documents; trackBy: trackByKey">
+                    <div class="file-preview">
+                      <ion-chip style="height: 50px;">
                         <ion-icon name="document-outline" size="large"></ion-icon>
                         <ion-label>
-                          <a [href]="filePath(img.filePath)" target="_blank" download>
-                            Tải xuống
+                          <a [href]="filePath(doc.filePath)" target="_blank" download>
+                            {{ doc.fileName }}
                           </a>
                         </ion-label>
-                        <ion-icon name=""></ion-icon>
+                        <ion-button  fill="clear" class="delete-btn" size="small" (click)="deleteImage2(doc)">
+                          <ion-icon name="close-circle" slot="icon-only"></ion-icon>
+                        </ion-button>
                       </ion-chip>
+
 
                     </div>
                   </div>
-                  <!-- <ion-img [src]="img" class="image-preview" (click)="openFullScreen(img)"></ion-img> -->
                 </div>
               </div>
             </ng-template>

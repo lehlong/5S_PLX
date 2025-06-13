@@ -89,7 +89,7 @@
   border-radius: 5px;
 }
 
-.image-wrapper {
+.images-wrapper {
   position: relative;
   display: inline-block;
   margin:  3px;
@@ -110,6 +110,29 @@
     font-size: 18px;
   }
 }
+.file-wrapper {
+  position: relative;
+  display: inline-block;
+  margin:  3px;
+
+  .image-preview {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+  ion-chip.md.ion-activatable{
+   
+  .delete-btn {
+    position: absolute;
+    top:-10px;
+    right: -10px;
+    z-index: 1000;
+   color: rgba(0, 0, 0, 0.468);
+    font-size: 18px;
+  }
+  }
+}
 
 .ion-padding{
   padding: 5px !important;
@@ -120,4 +143,9 @@
   width: 44px;
   z-index: 100;
   opacity: 0;
+}
+.image-item{
+  flex-direction: row;
+  width: 100%;
+
 }

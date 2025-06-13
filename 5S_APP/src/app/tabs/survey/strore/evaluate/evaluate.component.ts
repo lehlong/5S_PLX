@@ -12,6 +12,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Input, ChangeDetectionStrategy } from '@angular/core';
 import { MessageService } from 'src/app/service/message.service';
 
+
 @Component({
   imports: [SharedModule],
   selector: 'app-evaluate',
@@ -185,9 +186,7 @@ export class EvaluateComponent implements OnInit {
     const file: File = event.target.files[0];
     if (!file) return;
     const type = this.detectFileType(file)
-    console.log(type);
-
-    console.log('Loại:', file.type);
+    
     const reader = new FileReader();
     console.log(this.evaluate);
 
@@ -197,7 +196,7 @@ export class EvaluateComponent implements OnInit {
       // Lưu vào localStorage
       this.evaluate.lstImages.push({
         code: '-1',
-        fileName: '',
+        fileName: file.name,
         filePath: base64,
         tieuChiCode: code,
         type: type,
@@ -245,10 +244,21 @@ export class EvaluateComponent implements OnInit {
       : null;
     if (!data) return;
 
-    return data.map((x: any) => ({
+     data.map((x: any) => ({
       filePath: x.filePath,
       type: x.type
     }))
+ 
+  const images = data.filter((x:any) => x.type === 'img');
+  const videos = data.filter((x:any)=> x.type === 'mp4');
+  const documents = data.filter((x:any) => ['docx', 'xlsx', 'xlsm', 'pdf'].includes(x.type));
+
+  return {
+    images: images,
+    videos: videos,
+    documents: documents
+  };
+    
   }
 
   filterFeedBack(code: any) {
@@ -385,6 +395,7 @@ export class EvaluateComponent implements OnInit {
   }
 
   deleteImage2(img: any) {
+    console.log('deleteImage2', img);
     this.selectedImage = img;
     this.confirmDeleteImage();
   }
