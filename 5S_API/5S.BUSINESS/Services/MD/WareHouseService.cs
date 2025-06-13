@@ -58,7 +58,9 @@ namespace PLX5S.BUSINESS.Services.MD
                     Name = data.Name,
                     TruongKho = data.TruongKho,
                     NguoiPhuTrach = data.NguoiPhuTrach,
-                    IsActive = data.IsActive
+                    IsActive = data.IsActive,
+                    KinhDo = data.KinhDo,
+                    ViDo = data.ViDo
                 };
                 _dbContext.TblMdWareHouse.Add(store);
 
@@ -94,7 +96,10 @@ namespace PLX5S.BUSINESS.Services.MD
                     Name = data.Name,
                     TruongKho = data.TruongKho,
                     NguoiPhuTrach = data.NguoiPhuTrach,
-                    IsActive = data.IsActive
+                    IsActive = data.IsActive,
+                    KinhDo = data.KinhDo,
+                    ViDo = data.ViDo
+
                 };
                 _dbContext.TblMdWareHouse.Update(store);
                 var lstdel = _dbContext.TblBuInputAtvsv.Where(x => x.InputStoreId == data.Id);

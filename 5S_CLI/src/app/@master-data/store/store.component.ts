@@ -182,6 +182,7 @@ export class StoreComponent {
   GetATVSV(params: any) {
     this._service.getATVSV(params).subscribe({
       next: (data) => {
+        console.log(data)
         this.lstATVSV = data
       },
       error: (response) => {

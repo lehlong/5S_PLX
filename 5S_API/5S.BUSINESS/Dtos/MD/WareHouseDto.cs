@@ -31,6 +31,10 @@ namespace PLX5S.BUSINESS.Dtos.MD
         public bool TrangThaiCuaHang { get; set; }
 
         public List<string> ATVSV { get; set; }
+        [Description("Kinh do")]
+        public string? KinhDo { get; set; }
+        [Description("Vi do")]
+        public string? ViDo { get; set; }
 
 
         [Description("Trạng thái")]

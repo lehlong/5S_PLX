@@ -18,6 +18,7 @@ import { WareHouseService } from '../../service/master-data/ware-house.service';
 })
 export class WareHouseComponent {
   validateForm: FormGroup;
+
   isSubmit: boolean = false;
   visible: boolean = false;
   edit: boolean = false;
@@ -41,8 +42,10 @@ export class WareHouseComponent {
       name: ['', [Validators.required]],
       isActive: [true, [Validators.required]],
       truongKho: ['', [Validators.required]],
-      atvsv: [[],[Validators.required]],
+      atvsv: [[], [Validators.required]],
       nguoiPhuTrach: ['', [Validators.required]],
+      kinhDo: [''],
+      viDo: [''],
     });
     this.globalService.setBreadcrumb([
       {
@@ -60,6 +63,7 @@ export class WareHouseComponent {
   }
 
   ngOnInit(): void {
+  
     this.search();
     this.getAllAccount();
     this.getAllATVSV();
@@ -79,7 +83,7 @@ export class WareHouseComponent {
     this._service.search(this.filter).subscribe({
       next: (data) => {
         this.paginationResult = data;
-        this.lstKKS=data
+        this.lstKKS = data
       },
       error: (response) => {
         console.log(response);
@@ -102,6 +106,7 @@ export class WareHouseComponent {
     this.atvsvService.getAll().subscribe({
       next: (data) => {
         this.ATVSVList = data;
+        
       },
       error: (response) => {
         console.log(response);
@@ -116,8 +121,8 @@ export class WareHouseComponent {
   }
 
   submitForm(): void {
-    console.log(this.validateForm.valid);
     console.log(this.validateForm.getRawValue());
+    
     this.isSubmit = true;
     if (this.validateForm.valid) {
       if (this.edit) {
@@ -130,8 +135,8 @@ export class WareHouseComponent {
           },
         });
       } else {
-        const formData = this.validateForm.getRawValue();
-        console.log('create');
+
+     
         this._service.create(this.validateForm.getRawValue()).subscribe({
           next: (data) => {
             this.search();
@@ -185,33 +190,36 @@ export class WareHouseComponent {
       },
     });
   }
-  getATVSV(data:any) {
-      this._service.getATVSV(data).subscribe({
-        next: (data) => {
-          this.ATVSVList = data;
-        },
-        error: (response) => {
-          console.log(response);
+  getATVSV(dataKho: any) {
+    this._service.getATVSV(dataKho.id).subscribe({
+      next: (data) => {
+      
+        this.ATVSVList = data;
+      this.validateForm.patchValue({
+      id: dataKho.id,
+      name: dataKho.name,
+      isActive: dataKho.isActive,
+      truongKho: dataKho.truongKho,
+      atvsv: this.ATVSVList,
+      nguoiPhuTrach: dataKho.nguoiPhuTrach || '',
+      kinhDo: dataKho.kinhDo || '',
+      viDo: dataKho.viDo || '',
+    });
+      },
+      error: (response) => {
+        console.log(response);
 
-      }});
-    }
+      }
+    });
+  }
 
 
   openEdit(data: any) {
-   this.getATVSV(data.id);
-
-    this.validateForm.patchValue({
-        id: data.id,
-        name: data.name,
-        isActive: data.isActive,
-        truongKho: data.truongKho,
-        atvsv:   this.ATVSVList,
-        nguoiPhuTrach: data.nguoiPhuTrach || '',
-    });
-
+    this.getATVSV(data);
+    console.log(data);
     setTimeout(() => {
-        this.edit = true;
-        this.visible = true;
+      this.edit = true;
+      this.visible = true;
     }, 200);
   }
 
