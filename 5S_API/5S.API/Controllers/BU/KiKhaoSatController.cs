@@ -95,6 +95,7 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
+
         [HttpPut("Update")]
         public async Task<IActionResult> Update([FromBody] KiKhaoSatModel time)
         {
@@ -114,6 +115,28 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
+
+
+        [HttpPut("UpdateKhaoSatTrangThai")]
+        public async Task<IActionResult> UpdateKhaoSatTrangThai([FromBody] TblBuKiKhaoSat kiKhaoSat)
+        {
+            var transferObject = new TransferObject();
+            await _service.UpdateKhaoSatTrangThai(kiKhaoSat);
+            if (_service.Status)
+            {
+                transferObject.Status = true;
+                transferObject.MessageObject.MessageType = MessageType.Success;
+                transferObject.GetMessage("0103", _service);
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0104", _service);
+            }
+            return Ok(transferObject);
+        }
+
         [HttpDelete("Delete/{id}")]
         public async Task<IActionResult> Delete([FromRoute] string id)
         {

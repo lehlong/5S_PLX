@@ -54,7 +54,6 @@ export class CheckListComponent implements OnInit {
 
   ngOnInit() {
     this.account = JSON.parse(localStorage.getItem('UserInfo') ?? "")
-    console.log(this.account);
 
     this.route.paramMap.subscribe({
       next: async (params) => {

@@ -65,7 +65,20 @@
           <td nzAlign="center">{{ data.name }}</td>
           <td>{{data.startDate | date: 'dd/MM/yyyy' }}</td>
           <td>{{data.endDate | date: 'dd/MM/yyyy' }}</td>
-          <td></td>
+          <td nzAlign="center">
+            <nz-tag nzColor="default" *ngIf="data.trangThaiKi == '1'">
+              <nz-icon nzType="clock-circle" />
+              <span>Khởi tạo</span>
+            </nz-tag>
+            <nz-tag nzColor="success" *ngIf="data.trangThaiKi == '2'">
+              <nz-icon nzType="check-circle" />
+              <span>Đang mở</span>
+            </nz-tag>
+            <nz-tag nzColor="error" *ngIf="data.trangThaiKi == '0'">
+              <nz-icon nzType="close-circle" />
+              <span>Đã đóng</span>
+            </nz-tag>
+          </td>
 
           <td></td>
           <td></td>
@@ -75,7 +88,7 @@
               <span nz-icon nzType="edit"></span>Cập nhập tiêu chí
             </button>
             <button nz-popconfirm nzPopconfirmTitle="Bạn có chắc chắn muốn xóa không?" class="!flex !items-center"
-              style="margin-left: 10px;" nzType="default" nz-button (nzOnConfirm)="DeleteKKS(data.code)">
+              style="margin-left: 10px;" nzType="default" nz-button (nzOnConfirm)="DeleteKKS(data.id)">
               <span nz-icon nzType="delete" nzTheme="outline" style="cursor:pointer;"></span>
             </button>
           </td>
@@ -257,14 +270,19 @@
 <ng-template #extra>
   <nz-space>
     <ng-container *ngIf="edit">
-
+      <ng-container *nzSpaceItem>
+        <button *ngIf="inputKi.kiKhaoSat.trangThaiKi == '0' || inputKi.kiKhaoSat.trangThaiKi == '1'"
+          [nzLoading]="loading" nz-button nzType="default" style="background-color: #04AA6D; color: white; border: none;" class="!flex !items-center" (click)="onUpdateKhaoSatTrangThai('2')">
+          <span nz-icon nzType="save" nzTheme="outline"></span>Mở kỳ
+        </button>
+        <button *ngIf="inputKi.kiKhaoSat.trangThaiKi == '2'"  [nzLoading]="loading" nz-button nzType="default" style="background-color: #722ed1; color: white; border: none;"
+          class="!flex !items-center" (click)="onUpdateKhaoSatTrangThai('0')">
+          <span nz-icon nzType="save" nzTheme="outline"></span>Đóng kỳ
+        </button>
+      </ng-container>
       <button [nzLoading]="loading" *nzSpaceItem nz-button nzType="primary" class="!flex !items-center"
         (click)="onUpdateKiKhaoSat()">
         <span nz-icon nzType="save" nzTheme="outline"></span>Lưu
-      </button>
-      <button *nzSpaceItem nz-button nzType="default" nzType="primary" class="!flex !items-center" nzDanger
-        (click)="closeDrawer()">
-        <span nz-icon nzType="close-circle" nzTheme="outline"></span>Huỷ
       </button>
     </ng-container>
     <ng-container *ngIf="!edit">
@@ -272,11 +290,11 @@
         (click)="submitForm()">
         <span nz-icon nzType="save" nzTheme="outline"></span>Thêm
       </button>
-      <button *nzSpaceItem nz-button nzType="default" nzType="primary" class="!flex !items-center" nzDanger
-        (click)="closeDrawer()">
-        <span nz-icon nzType="close-circle" nzTheme="outline"></span>Huỷ
-      </button>
     </ng-container>
+    <button *nzSpaceItem nz-button nzType="default" nzType="primary" class="!flex !items-center" nzDanger
+      (click)="closeDrawer()">
+      <span nz-icon nzType="close-circle" nzTheme="outline"></span>Huỷ
+    </button>
   </nz-space>
 </ng-template>
 
@@ -385,7 +403,7 @@
           <div nz-col [nzSpan]="12">
             <div class="inner-box" style="padding:5px 0px !important;">
               <label nzRequired class="block-label">Mã tiêu chí</label>
-              <input nz-input [(ngModel)]="leavesNode.id" />
+              <input nz-input [(ngModel)]="leavesNode.id" [disabled]="edit" />
             </div>
           </div>
 
@@ -505,18 +523,17 @@
             </tr>
           </thead>
           <tbody>
-            <tr >
-
+            <tr>
               <td><span nz-icon nzType="history"></span></td>
               <td nzAlign="center"><input nz-input type="text"></td>
-              <td nzAlign="left"></td>
-              <td nzAlign="left"></td>
-              <td nzAlign="left"></td>
+              <td nzAlign="left"><input nz-input type="text"></td>
+              <td nzAlign="left"><input nz-input type="text"></td>
+              <td nzAlign="left"><input nz-input type="text"></td>
             </tr>
 
             <tr *ngFor="let data of inputKi.lstInputStore; let i = index">
-
-              <td nzWidth="60px" [nzChecked]="isCheckedStore(data.id)" (nzCheckedChange)="onItemCheckedStore(data, $event)"></td>
+              <td nzWidth="60px" [nzChecked]="isCheckedStore(data.id)"
+                (nzCheckedChange)="onItemCheckedStore(data, $event)"></td>
               <td nzAlign="center">
                 <a>{{ data.storeId }}</a>
               </td>

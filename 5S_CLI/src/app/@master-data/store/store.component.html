@@ -25,16 +25,16 @@
       <thead>
         <tr>
           <th nzWidth="60px">STT</th>
-          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('name', $event)">
-            Mã cửa hàng
+          <th [nzSortFn]="true" nzWidth="160px" (nzSortOrderChange)="onSortChange('name', $event)">
+            Mã
           </th>
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('name', $event)">
             Tên của hàng
           </th>
-          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('CuaHangTruong', $event)">
+          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('cuaHangTruong', $event)">
             Của hàng trưởng
           </th>
-          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('NguoiPhuTrach', $event)">
+          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('nguoiPhuTrach', $event)">
             Người Phụ trách
           </th>
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('phoneNumber', $event)">
@@ -61,15 +61,13 @@
             1
             }}
           </td>
-          <td>
+          <td nzAlign="center">
             <a (click)="openEdit(data)">{{ data.id }}</a>
           </td>
           <td>{{ data.name }}</td>
           <td>{{ getNameByCodeAccount(data.cuaHangTruong) }}</td>
           <td>{{ getNameByCodeAccount(data.nguoiPhuTrach) }}</td>
-          <td>{{ data.phoneNumber }}</td>
-          <!-- <td>{{ data.kinhDo }}</td>
-          <td>{{ data.viDo }}</td> -->
+          <td nzAlign="center">{{ data.phoneNumber }}</td>
           <td nzAlign="center">
             <nz-tag nzColor="success" *ngIf="data.trangThaiCuaHang">
               <nz-icon nzType="check-circle" />
@@ -80,8 +78,10 @@
               <span>Không hoạt động</span>
             </nz-tag>
           </td>
-          <td>
-             <button (click)="openEdit(data)" style="margin-right: 10px;" nz-button nzType="default">Sửa</button>
+          <td nzAlign="center">
+             <button (click)="openEdit(data)" style="margin-right: 10px;" nz-button nzType="default">
+              <span nz-icon nzType="edit"></span> Sửa
+            </button>
              <button (click)="deleteItem(data.id)" nz-button nzType="primary" nzDanger>Xoá</button>
           </td>
         </tr>
@@ -114,15 +114,15 @@
         </div>
         <div nz-col [nzXs]="24" [nzMd]="12">
           <app-input-clear placeholder="Nhập tên kinh độ "  label="Kinh độ"
-            [control]="$any(validateForm).controls['KinhDo']" ></app-input-clear>
+            [control]="$any(validateForm).controls['kinhDo']" ></app-input-clear>
         </div>
         <div nz-col [nzXs]="24" [nzMd]="12">
           <app-input-clear placeholder="Nhập tên vĩ độ " label="Vĩ độ"
-            [control]="$any(validateForm).controls['ViDo']"></app-input-clear>
+            [control]="$any(validateForm).controls['viDo']"></app-input-clear>
         </div>
         <div nz-col [nzXs]="24" [nzMd]="12">
           <app-input-clear placeholder="Nhập số điện thoại" label="Số điện thoại"
-            [control]="$any(validateForm).controls['PhoneNumber']"></app-input-clear>
+            [control]="$any(validateForm).controls['phoneNumber']"></app-input-clear>
         </div>
 
         <div nz-col [nzXs]="24" [nzMd]="12">
@@ -130,7 +130,7 @@
             <nz-form-label>* Trạng thái cửa hàng</nz-form-label>
             <nz-form-control nzErrorTip="Không được để trống">
               <nz-select nzShowSearch nzAllowClear placeholder="Chọn trạng thái cửa hàng"
-                formControlName="TrangThaiCuaHang">
+                formControlName="trangThaiCuaHang">
                 <nz-option [nzLabel]="'Không hoạt động'" [nzValue]="false"></nz-option>
                 <nz-option [nzLabel]="'Hoạt động'" [nzValue]="true"></nz-option>
 
@@ -142,7 +142,7 @@
           <nz-form-item>
             <nz-form-label>* Chon cửa hàng trưởng</nz-form-label>
             <nz-form-control nzErrorTip="Không được để trống">
-              <nz-select nzShowSearch nzAllowClear placeholder="Chọn cửa hàng trưởng" formControlName="CuaHangTruong">
+              <nz-select nzShowSearch nzAllowClear placeholder="Chọn cửa hàng trưởng" formControlName="cuaHangTruong">
                 <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.fullName"
                   [nzValue]="item.userName">
                 </nz-option>
@@ -154,7 +154,7 @@
           <nz-form-item>
             <nz-form-label>* Người phụ trách</nz-form-label>
             <nz-form-control nzErrorTip="Không được để trống">
-              <nz-select nzShowSearch nzAllowClear placeholder="Chọn người phụ trách" formControlName="NguoiPhuTrach">
+              <nz-select nzShowSearch nzAllowClear placeholder="Chọn người phụ trách" formControlName="nguoiPhuTrach">
                 <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.fullName"
                   [nzValue]="item.userName">
                 </nz-option>

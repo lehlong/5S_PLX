@@ -39,14 +39,14 @@ export class StoreComponent {
     this.validateForm = this.fb.group({
       id: ['', [Validators.required]],
       name: ['', [Validators.required]],
-      KinhDo: [''],
-      ViDo: [''],
-      PhoneNumber: [''],
+      kinhDo: [''],
+      viDo: [''],
+      phoneNumber: [''],
       isActive: [true, [Validators.required]],
-      TrangThaiCuaHang: [true],
-      CuaHangTruong: ['', [Validators.required]],
+      trangThaiCuaHang: [true],
+      cuaHangTruong: ['', [Validators.required]],
       ATVSV: [[], [Validators.required]],
-      NguoiPhuTrach: ['', [Validators.required]],
+      nguoiPhuTrach: ['', [Validators.required]],
 
     })
     this.globalService.setBreadcrumb([
@@ -180,6 +180,7 @@ export class StoreComponent {
     })
   }
   GetATVSV(params: any) {
+    this.lstATVSV = []
     this._service.getATVSV(params).subscribe({
       next: (data) => {
         console.log(data)
@@ -196,13 +197,13 @@ export class StoreComponent {
     this.validateForm.setValue({
       id: data.id,
       name: data.name,
-      KinhDo: data.kinhDo,
-      ViDo: data.viDo,
-      PhoneNumber: data.phoneNumber,
-      TrangThaiCuaHang: data.trangThaiCuaHang,
-      CuaHangTruong: data.cuaHangTruong,
+      kinhDo: data.kinhDo,
+      viDo: data.viDo,
+      phoneNumber: data.phoneNumber,
+      trangThaiCuaHang: data.trangThaiCuaHang,
+      cuaHangTruong: data.cuaHangTruong,
       ATVSV: this.lstATVSV,
-      NguoiPhuTrach: data.nguoiPhuTrach,
+      nguoiPhuTrach: data.nguoiPhuTrach,
 
       isActive: data.isActive,
 

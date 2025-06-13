@@ -39,6 +39,7 @@ namespace PLX5S.BUSINESS.Services.MD
                 {
                     query = query.Where(x => x.IsActive == filter.IsActive);
                 }
+                query = query.Where(x => x.IsActive == true);
                 return await Paging(query, filter);
 
             }
@@ -53,61 +54,13 @@ namespace PLX5S.BUSINESS.Services.MD
         {
             try
             {
-                var atvsvsToSoftDelete = await _dbContext.tblMdAtvsv
-                                                         .Where(x => x.StoreId == id && x.IsDeleted == false) 
-                                                         .ToListAsync();
-                foreach (var atvsv in atvsvsToSoftDelete)
-                {
-                    atvsv.IsDeleted = true;
-                    _dbContext.Entry(atvsv).State = EntityState.Modified;
-                }
-                if (atvsvsToSoftDelete.Any())
-                {
-                    await _dbContext.SaveChangesAsync();
-                }
+                var store = _dbContext.tblMdStore.FirstOrDefault(x => x.Id == id);
 
-                var excludedStoresToSoftDelete = await _dbContext.TblBuCriteriaExcludedStores
-                                                                 .Where(x => x.StoreId == id && x.IsDeleted == false) 
-                                                                 .ToListAsync();
-                foreach (var excludedStore in excludedStoresToSoftDelete)
-                {
-                    excludedStore.IsDeleted = true;
-                    _dbContext.Entry(excludedStore).State = EntityState.Modified;
-                    if (excludedStoresToSoftDelete.Any())
-                    {
-                        await _dbContext.SaveChangesAsync();
-                    }
+                store.IsActive = false;
+                _dbContext.tblMdStore.Update(store);
 
-                    var evaluateHeadersToSoftDelete = await _dbContext.TblBuEvaluateHeader
-                                                                      .Where(x => x.StoreId == id && x.IsDeleted == false)
-                                                                      .ToListAsync();
-                    foreach (var header in evaluateHeadersToSoftDelete)
-                    {
-                        header.IsDeleted = true;
-                        _dbContext.Entry(header).State = EntityState.Modified;
-                    }
-                    if (evaluateHeadersToSoftDelete.Any())
-                    {
-                        await _dbContext.SaveChangesAsync();
-                    }
+                await _dbContext.SaveChangesAsync();
 
-                    var inputStoresToSoftDelete = await _dbContext.TblBuInputStore
-                                                                  .Where(x => x.StoreId == id && x.IsDeleted == false)
-                                                                  .ToListAsync();
-                    foreach (var inputStore in inputStoresToSoftDelete)
-                    {
-                        inputStore.IsDeleted = true;
-                        _dbContext.Entry(inputStore).State = EntityState.Modified;
-                    }
-                    if (inputStoresToSoftDelete.Any())
-                    {
-                        await _dbContext.SaveChangesAsync();
-                    }
-
-
-                    await base.Delete(id);
-
-                }
             }
             catch (Exception ex)
             {
@@ -163,7 +116,6 @@ namespace PLX5S.BUSINESS.Services.MD
         {
             try
             {
-
                 var store = new TblMdStore()
                 {
                     Id = data.Id,
@@ -177,20 +129,23 @@ namespace PLX5S.BUSINESS.Services.MD
                     IsActive = data.IsActive
                 };
                 _dbContext.tblMdStore.Update(store);
+
                 var lstdel = _dbContext.tblMdAtvsv.Where(x => x.StoreId == data.Id);
+
                 _dbContext.tblMdAtvsv.RemoveRange(lstdel);
-                var lst = new List<TblBuInputAtvsv>();
+                
+                var lst = new List<TblMdAtvsv>();
+                
                 foreach (var item in data.ATVSV)
                 {
-                    var atvsv = new TblBuInputAtvsv();
+                    var atvsv = new TblMdAtvsv();
                     atvsv.Id = Guid.NewGuid().ToString();
                     atvsv.Name = item;
-                    atvsv.InputStoreId = data.Id;
+                    atvsv.StoreId = data.Id;
                     atvsv.IsActive = true;
-                    atvsv.Type = "DT1";
                     lst.Add(atvsv);
                 }
-                _dbContext.TblBuInputAtvsv.AddRange(lst);
+                _dbContext.tblMdAtvsv.AddRange(lst);
 
 
                 await _dbContext.SaveChangesAsync();
@@ -226,7 +181,7 @@ namespace PLX5S.BUSINESS.Services.MD
         {
             try
             {
-                var lst = _dbContext.TblBuInputAtvsv.Where(x => x.InputStoreId == headerId).Select(x => x.Name).ToList();
+                var lst = _dbContext.tblMdAtvsv.Where(x => x.StoreId == headerId && x.IsDeleted != true).Select(x => x.Name).ToList();
 
                 return lst;
             }

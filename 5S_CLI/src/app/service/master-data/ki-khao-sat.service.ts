@@ -33,6 +33,10 @@ export class KiKhaoSatService {
   }
 
 
+  updateKhaoSatTrangThai(params: any = {}): Observable<any> {
+    return this.commonService.put('KiKhaoSat/UpdateKhaoSatTrangThai', params)
+  }
+
 
   getAll(param:any): Observable<any> {
     return this.commonService.get(`KiKhaoSat/GetAll?kiKhaoSatId=${param}`)

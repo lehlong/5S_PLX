@@ -60,7 +60,7 @@ namespace PLX5S.BUSINESS.Services.BU
 
                 if (doiTuongId == "DT1") 
                 {
-                    var lstStore = _dbContext.tblMdStore.Where(x => x.IsActive == true).ToList();
+                    var lstStore = _dbContext.tblMdStore.Where(x => x.IsActive == true).OrderBy(x => x.Id).ToList();
 
                     foreach (var s in lstStore)
                     {
@@ -187,7 +187,6 @@ namespace PLX5S.BUSINESS.Services.BU
 
                 foreach (var item in lstInStore)
                 {
-
                     InputStores.Add(new InputStoreModel
                     {
                         InputStore = item,

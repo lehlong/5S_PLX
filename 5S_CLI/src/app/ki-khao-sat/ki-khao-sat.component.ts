@@ -156,6 +156,19 @@ export class KiKhaoSatComponent {
     });
   }
 
+  onUpdateKhaoSatTrangThai(trangThai: string) {
+    this.inputKi.kiKhaoSat.trangThaiKi = trangThai
+    this._service.updateKhaoSatTrangThai(this.inputKi.kiKhaoSat).subscribe({
+      next: (data) => {
+        this.search();
+        this.visible = false;
+      },
+      error: (response) => {
+        console.log(response);
+      },
+    });
+  }
+
   submitForm(): void {
     if (this.isCodeExist(this.inputKi.kiKhaoSat.code)) {
       this.message.error(
@@ -175,7 +188,6 @@ export class KiKhaoSatComponent {
   }
 
   DeleteKKS(data: any) {
-    console.log(data);
     this._service.delete(data).subscribe({
       next: (data) => {
         this.search();
@@ -559,18 +571,21 @@ export class KiKhaoSatComponent {
     }
     this.leavesNode.diemTieuChi = this.calculationRows
     this.leavesNode.kiKhaoSatId = this.kiKhaoSatId
+    this.leavesNode.lstCriteriaExcludedStores = this.lstCheckedStore
+    console.log(this.leavesNode);
+
     this._treeTieuChiService.addLeaves(this.leavesNode).subscribe({
       next: (res) => {
         this.leavesVisible = false;
         this.loading = false;
         this.GetTreeLeaves();
+        this.closeModal();
       },
       error: (err) => {
         this.loading = false;
       },
     });
 
-    this.closeModal();
   }
 
   updateTreeGroup(data: any): void {

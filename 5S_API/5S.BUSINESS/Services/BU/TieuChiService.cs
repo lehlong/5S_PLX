@@ -74,6 +74,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 foreach (var item in data.LstCriteriaExcludedStores)
                 {
                     item.Code = Guid.NewGuid().ToString();
+                    item.TieuChiCode = tieuChi.Code;
                     _dbContext.TblBuCriteriaExcludedStores.Add(item);
                 }
 

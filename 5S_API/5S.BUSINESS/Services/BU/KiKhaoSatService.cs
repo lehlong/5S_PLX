@@ -28,6 +28,7 @@ namespace PLX5S.BUSINESS.Services.BU
         Task UpdateDataInput(KiKhaoSatModel data);
         Task DeleteData(string id);
         Task<KiKhaoSatModel> GetInput(string idKi);
+        Task UpdateKhaoSatTrangThai(TblBuKiKhaoSat kiKhaoSat);
 
     }
     public class KikhaosatService(AppDbContext dbContext, IMapper mapper) : GenericService<TblBuKiKhaoSat, KiKhaoSatDto>(dbContext, mapper), IKikhaosatService
@@ -40,7 +41,6 @@ namespace PLX5S.BUSINESS.Services.BU
                 if (!string.IsNullOrWhiteSpace(filter.KeyWord))
                 {
                     query = query.Where(x => x.SurveyMgmtId.ToString().Contains(filter.KeyWord) || x.Name.Contains(filter.KeyWord));
-                  
                 }
                 if (filter.IsActive.HasValue)
                 {
@@ -60,7 +60,7 @@ namespace PLX5S.BUSINESS.Services.BU
         public async Task<KiKhaoSatModel> BuilObjCreate(string surveyMgmtId)
         {
             var lstInStore = _dbContext.TblBuInputStore.Where(x => x.IsActive == true && x.SurveyMgmtId == surveyMgmtId).ToList();
-            var lstMdStore = _dbContext.tblMdStore.Where(x => x.IsDeleted != true).ToList();
+            var lstMdStore = _dbContext.tblMdStore.Where(x => x.IsActive == true).OrderBy(x => x.Id).ToList();
             var lstMdWareHouse = _dbContext.TblMdWareHouse.Where(x => x.IsDeleted != true).ToList();
             var lstInWareHouse = _dbContext.TblBuInputWareHouse.Where(x => x.IsActive == true && x.SurveyMgmtId == surveyMgmtId).ToList();
             var kiKhaoSatModel = new KiKhaoSatModel();
@@ -130,31 +130,12 @@ namespace PLX5S.BUSINESS.Services.BU
                 }
                 else
                 {
-                    var lstTieuTri = _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == data.KyCopyId && x.IsDeleted != true).ToList();
-
-                    foreach (var item in lstTieuTri)
-                    {
-                        item.Code = Guid.NewGuid().ToString();
-                        item.Name = item.PId == "-1" ? data.KiKhaoSat.Name : item.Name;
-                        item.KiKhaoSatId = data.KiKhaoSat.Id;
-                        var lstDiemTieuChi = _dbContext.TblBuTinhDiemTieuChi.Where(x => x.TieuChiCode == item.Code).ToList();
-
-                        lstDiemTieuChi.Select(x => new TblBuTinhDiemTieuChi
-                        {
-                            Id = Guid.NewGuid().ToString(),
-                            MoTa = x.MoTa,
-                            Diem = x.Diem,
-                            TieuChiCode = item.Code,
-                            IsActive = x.IsActive,
-                            IsDeleted = x.IsDeleted,
-                        });
-                        _dbContext.TblBuTinhDiemTieuChi.AddRange(lstDiemTieuChi);
-
-                    }
-                    _dbContext.TblBuTieuChi.AddRange(lstTieuTri);
+                    await InsertKyCopy(data);
                 }
-
+                data.KiKhaoSat.TrangThaiKi = "1";
                 _dbContext.TblBuKiKhaoSat.Add(data.KiKhaoSat);
+
+
                 foreach (var item in data.lstInputStore)
                 {
                     foreach (var d in item.LstChamDiem)
@@ -185,13 +166,75 @@ namespace PLX5S.BUSINESS.Services.BU
                         });
                     }
                 }
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
             catch (Exception ex)
             {
                 Status = false;
                 Exception = ex;
             }
+        }
+
+        public async Task InsertKyCopy(KiKhaoSatModel data)
+        {
+            var lstTieuTri = _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == data.KyCopyId && x.IsDeleted != true).ToList();
+
+            var newTieuChiList = new List<TblBuTieuChi>();
+            var newDiemTieuChiList = new List<TblBuTinhDiemTieuChi>();
+            var newExcludedStoresList = new List<TblBuCriteriaExcludedStores>();
+
+            foreach (var item in lstTieuTri)
+            {
+                var newCode = Guid.NewGuid().ToString();
+
+                var lstDiemTieuChi = _dbContext.TblBuTinhDiemTieuChi.Where(x => x.TieuChiCode == item.Code).ToList();
+
+                var lstBack = _dbContext.TblBuCriteriaExcludedStores.Where(x => x.TieuChiCode == item.Code).ToList();
+
+                var newItem = new TblBuTieuChi
+                {
+                    Id = item.Id,
+                    Code = newCode,
+                    Name = item.PId == "-1" ? data.KiKhaoSat.Name : item.Name,
+                    PId = item.PId,
+                    KiKhaoSatId = data.KiKhaoSat.Id,
+                    IsGroup = item.IsGroup,
+                    IsImg = item.IsImg,
+                    OrderNumber = item.OrderNumber,
+                    Report = item.Report,
+                    IsDeleted = item.IsDeleted
+                };
+                newTieuChiList.Add(newItem);
+
+                if (lstDiemTieuChi.Any())
+                {
+                    newDiemTieuChiList.AddRange(lstDiemTieuChi.Select(x => new TblBuTinhDiemTieuChi
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        MoTa = x.MoTa,
+                        Diem = x.Diem,
+                        TieuChiCode = newCode,
+                        IsActive = x.IsActive,
+                        IsDeleted = x.IsDeleted,
+                    }));
+                }
+
+                if (lstBack.Any())
+                {
+                    newExcludedStoresList.AddRange(lstBack.Select(x => new TblBuCriteriaExcludedStores
+                    {
+                        Code = Guid.NewGuid().ToString(),
+                        TieuChiCode = newCode,
+                        StoreId = x.StoreId,
+                        IsActive = x.IsActive,
+                        IsDeleted = x.IsDeleted,
+                    }));
+                }
+            }
+
+            _dbContext.TblBuTieuChi.AddRange(newTieuChiList);
+            _dbContext.TblBuTinhDiemTieuChi.AddRange(newDiemTieuChiList);
+            _dbContext.TblBuCriteriaExcludedStores.AddRange(newExcludedStoresList);
         }
 
         public async Task<KiKhaoSatModel> GetInput(string idKi)
@@ -257,6 +300,19 @@ namespace PLX5S.BUSINESS.Services.BU
             {
                 Status = false;
                 return null;
+            }
+        }
+
+        public async Task UpdateKhaoSatTrangThai(TblBuKiKhaoSat kiKhaoSat)
+        {
+            try
+            {
+                _dbContext.TblBuKiKhaoSat.Update(kiKhaoSat);
+                _dbContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                this.Status = false;
             }
         }
 
@@ -345,6 +401,10 @@ namespace PLX5S.BUSINESS.Services.BU
 
                 var kiKhaoSat = await GetInput(kiKhaoSatId);
                 kiKhaoSat.KiKhaoSat.Id = idKi;
+                kiKhaoSat.KiKhaoSat.StartDate = DateTime.Now;
+                kiKhaoSat.KiKhaoSat.EndDate = DateTime.Now;
+                kiKhaoSat.KiKhaoSat.TrangThaiKi = "1";
+
                 kiKhaoSat.KyCopyId = kiKhaoSatId;
 
                 foreach (var s in kiKhaoSat.lstInputStore) 
