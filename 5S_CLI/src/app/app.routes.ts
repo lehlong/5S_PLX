@@ -22,6 +22,7 @@ export const routes: Routes = [
       {path: 'home', component: HomeComponent, canActivate: [AuthGuard]},
       {path: 'system-manager', children: systemManagerRoutes, canActivate: [AuthGuard]},
       {path: 'master-data', children: masterDataRoutes, canActivate: [AuthGuard]},
+    
       {path: 'survey-report', children: surveyReportRoutes, canActivate: [AuthGuard]},
       {path: `ki-khao-sat/:id`, component: KiKhaoSatComponent, canActivate: [AuthGuard]},
       {path: `danh-gia-tieu-chi/:id`, component: DanhGiaTieuChiComponent, canActivate: [AuthGuard]},
