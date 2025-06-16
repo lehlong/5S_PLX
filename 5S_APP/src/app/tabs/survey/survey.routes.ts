@@ -12,11 +12,39 @@ export const surveyRoutes: Routes = [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: '', component: SurveyComponent },
       // { path: 'store/list/:id', component: StoreListComponent },
-      { path: 'store/list/:id', component: StoreListComponent },
-      { path: 'store/check-list/:id', component: StoreCheckListComponent },
-      { path: 'store/evaluate/:mode/:code', component: EvaluateComponent },
-      { path: 'ware-house/list/:id', component: WareHouseListComponent },
-      { path: 'ware-house/evaluate', component: EvaluateComponent },
+      {
+        path: 'store/list/:id',
+        loadComponent: () =>
+          import('./strore/list/list.component').then((m) => m.ListComponent),
+      },
+      {
+        path: 'store/check-list/:id',
+        loadComponent: () =>
+          import('./strore/check-list/check-list.component').then(
+            (m) => m.CheckListComponent
+          ),
+      },
+      {
+        path: 'store/evaluate/:mode/:code',
+        loadComponent: () =>
+          import('./strore/evaluate/evaluate.component').then(
+            (m) => m.EvaluateComponent
+          ),
+      },
+      {
+        path: 'ware-house/list/:id',
+        loadComponent: () =>
+          import('./ware-house/list/list.component').then(
+            (m) => m.ListComponent
+          ),
+      },
+      {
+        path: 'ware-house/evaluate',
+        loadComponent: () =>
+          import('./ware-house/evaluate/evaluate.component').then(
+            (m) => m.EvaluateComponent
+          ),
+      },
     ],
   },
 ];

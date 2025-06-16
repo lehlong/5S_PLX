@@ -18,22 +18,48 @@ export const routes: Routes = [
     component: MainLayoutComponent,
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
-      { path: 'account', children: accountRoutes},
-      { path: 'home', children: homeRouter, canActivate: [AuthGuard] },
+      {
+        path: 'account',
+        loadChildren: () =>
+          import('./tabs/account/account.routes').then((m) => m.accountRoutes),
+      },
+      {
+        path: 'home',
+        loadChildren: () =>
+        import('./tabs/home/home.routes').then((m) => m.homeRouter),
+        canActivate: [AuthGuard],
+      },
       // { path: 'report', component: ReportComponent, canActivate: [AuthGuard] },
       { path: 'news', component: NewsComponent, canActivate: [AuthGuard] },
-      { path: 'notifications', component: NotificationsComponent, canActivate: [AuthGuard] },
-      { path: 'account', component: AccountComponent, canActivate: [AuthGuard] },
+      {
+        path: 'notifications',
+        loadComponent: () =>
+          import('./tabs/notifications/notifications.component').then(
+            (m) => m.NotificationsComponent
+          ),
+        canActivate: [AuthGuard],
+      },
+      // {
+      //   path: 'account',
+      //   loadComponent: ()=>import('./tabs/account/account.component').then((m)=>m.AccountComponent),
+      //   canActivate: [AuthGuard],
+      // },
     ],
   },
   {
-    path: 'survey', children: surveyRoutes, canActivate: [AuthGuard]
+    path: 'survey',
+    loadChildren: () =>
+      import('./tabs/survey/survey.routes').then((m) => m.surveyRoutes),
+    canActivate: [AuthGuard],
   },
   {
-    path:'report', children: reportRoutes, canActivate: [AuthGuard]
+    path: 'report',
+    loadChildren: () =>
+      import('./tabs/report/report.routes').then((m) => m.reportRoutes),
+    canActivate: [AuthGuard],
   },
   {
     path: 'login',
     component: LoginComponent,
-  }
+  },
 ];

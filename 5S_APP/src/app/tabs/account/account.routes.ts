@@ -10,9 +10,30 @@ export const accountRoutes: Routes = [
     children: [
       { path: '', redirectTo: 'account', pathMatch: 'full' },
       { path: '', component: AccountComponent },
-      { path: 'terms-and-polices', component: TermsPoliciesComponent },
-      { path: 'password', component: ChangePasswordComponent },
-      { path: 'setting-account', component: SettingAccountComponent}
+      {
+        path: 'terms-and-polices',
+        loadComponent: () =>
+          import('./page/terms-policies/terms-policies.component').then(
+            (m) => m.TermsPoliciesComponent
+          ),
+      },
+      // { path: 'terms-and-polices', component: TermsPoliciesComponent },
+      {
+        path: 'password',
+        loadComponent: () =>
+          import('./page/change-password/change-password.component').then(
+            (m) => m.ChangePasswordComponent
+          ),
+      },
+      // { path: 'password', component: ChangePasswordComponent },
+      // { path: 'setting-account', component: SettingAccountComponent },
+       {
+        path: 'setting-account',
+        loadComponent: () =>
+          import('./page/setting-account/setting-account.component').then(
+            (m) => m.SettingAccountComponent
+          ),
+      },
     ],
   },
 ];
