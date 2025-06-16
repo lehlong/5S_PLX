@@ -7,43 +7,43 @@
       color="light"
       (click)="navigateTo('/account/setting-account')"
       slot="end"
-      ><ion-icon name="settings-outline"></ion-icon
+      ><ion-icon name="settings"></ion-icon
     ></ion-button>
   </ion-toolbar>
 </ion-header>
 <ion-content color="light" class="ion-padding">
   <ion-list lines="inset">
     <ng-container *ngIf="userInfo">
-      <ion-item>
-        <h1>Thông tin cơ bản</h1>
-      </ion-item>
-      <ion-item>
-        <div class="line-info">
-          <ion-icon
-            style="font-size: 25px; color: yellow"
-            name="person-outline"
-          ></ion-icon>
-          <div>{{ userInfo.fullName }}</div>
-        </div>
-      </ion-item>
-      <ion-item>
-        <div class="line-info">
-          <ion-icon
-            style="font-size: 25px; color: green"
-            name="call-outline"
-          ></ion-icon>
-          <div>{{ userInfo.phoneNumber }}</div>
-        </div>
-      </ion-item>
-      <ion-item>
-        <div class="line-info">
-          <ion-icon
-            style="font-size: 25px; color: blue"
-            name="mail-outline"
-          ></ion-icon>
-          <div>{{ userInfo.email }}</div>
-        </div>
-      </ion-item>
+      <ion-list>
+         <h1 class="text-head">Thông tin cơ bản</h1>
+        <ion-item>
+          <div class="line-info">
+            <ion-icon
+              style="font-size: 25px; color: yellow"
+              name="person-outline"
+            ></ion-icon>
+            <div>{{ userInfo.fullName }}</div>
+          </div>
+        </ion-item>
+        <ion-item>
+          <div class="line-info">
+            <ion-icon
+              style="font-size: 25px; color: green"
+              name="call-outline"
+            ></ion-icon>
+            <div>{{ userInfo.phoneNumber }}</div>
+          </div>
+        </ion-item>
+        <ion-item>
+          <div class="line-info">
+            <ion-icon
+              style="font-size: 25px; color: blue"
+              name="mail-outline"
+            ></ion-icon>
+            <div>{{ userInfo.email }}</div>
+          </div>
+        </ion-item>
+      </ion-list>
     </ng-container>
   </ion-list>
   <ion-list
@@ -51,29 +51,34 @@
       margin-top: 20px;
       display: flex;
       align-items: center;
-      justify-content: center;
+      padding: 10px 15px;
+      justify-content: space-between;
     "
     (click)="navigateTo('/account/terms-and-polices')"
   >
-    <ion-icon
-      style="font-size: 25px; margin-right: 5px"
-      slot="start"
-      name="shield-half"
-    ></ion-icon>
-    Điều khoản và chính sách
+    <span style="display: flex; align-items: center">
+      <ion-icon
+        style="font-size: 25px; margin-right: 25px; color: grey"
+        slot="start"
+        name="person-circle-outline"
+      ></ion-icon>
+      Điều khoản và chính sách
+    </span>
+
+    <ion-icon style="font-size: 25px" name="chevron-forward-outline"></ion-icon>
   </ion-list>
   <ion-list
     style="
       margin-top: 20px;
       display: flex;
       align-items: center;
-      justify-content: center;
       color: red;
+      padding: 10px 15px;
     "
     (click)="Logout()"
   >
     <ion-icon
-      style="font-size: 25px; margin-right: 5px"
+      style="font-size: 25px; margin-right: 25px"
       slot="start"
       name="log-out"
     ></ion-icon>

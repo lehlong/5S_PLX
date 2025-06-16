@@ -1,4 +1,3 @@
-
 h4 {
   display: flex;
   align-items: center;
@@ -7,7 +6,14 @@ h4 {
 }
 .line-info {
   display: flex;
-  gap: 10px;
+  gap: 25px;
   align-items: center;
 }
-
+.text-head {
+  margin-left: 15px;
+  font-size: 18px;
+}
+.list-md {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
