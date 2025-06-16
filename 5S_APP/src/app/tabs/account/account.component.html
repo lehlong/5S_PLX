@@ -3,7 +3,10 @@
     <ion-title class="t-center">
       <h4><ion-icon name="person-circle-outline"></ion-icon>Tài khoản</h4>
     </ion-title>
-    <ion-button color="light" (click)="navigateTo('/account/setting-account')" slot="end"
+    <ion-button
+      color="light"
+      (click)="navigateTo('/account/setting-account')"
+      slot="end"
       ><ion-icon name="settings-outline"></ion-icon
     ></ion-button>
   </ion-toolbar>
@@ -16,19 +19,28 @@
       </ion-item>
       <ion-item>
         <div class="line-info">
-          <ion-icon name="person-outline"></ion-icon>
+          <ion-icon
+            style="font-size: 25px; color: yellow"
+            name="person-outline"
+          ></ion-icon>
           <div>{{ userInfo.fullName }}</div>
         </div>
       </ion-item>
       <ion-item>
         <div class="line-info">
-          <ion-icon name="call-outline"></ion-icon>
+          <ion-icon
+            style="font-size: 25px; color: green"
+            name="call-outline"
+          ></ion-icon>
           <div>{{ userInfo.phoneNumber }}</div>
         </div>
       </ion-item>
       <ion-item>
         <div class="line-info">
-          <ion-icon name="mail-outline"></ion-icon>
+          <ion-icon
+            style="font-size: 25px; color: blue"
+            name="mail-outline"
+          ></ion-icon>
           <div>{{ userInfo.email }}</div>
         </div>
       </ion-item>
@@ -43,7 +55,11 @@
     "
     (click)="navigateTo('/account/terms-and-polices')"
   >
-    <ion-icon slot="start" name="shield-half"></ion-icon>
+    <ion-icon
+      style="font-size: 25px; margin-right: 5px"
+      slot="start"
+      name="shield-half"
+    ></ion-icon>
     Điều khoản và chính sách
   </ion-list>
   <ion-list
@@ -52,10 +68,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      color: red;
     "
     (click)="Logout()"
   >
-    <ion-icon slot="start" name="log-out"></ion-icon>
+    <ion-icon
+      style="font-size: 25px; margin-right: 5px"
+      slot="start"
+      name="log-out"
+    ></ion-icon>
     Đăng xuất
   </ion-list>
 </ion-content>
