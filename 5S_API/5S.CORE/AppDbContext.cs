@@ -132,6 +132,7 @@ namespace PLX5S.CORE
         public DbSet<TblMdStore> tblMdStore { get; set; }
         public DbSet<TblMdWareHouse> TblMdWareHouse { get; set; }
         public DbSet<TblMdAtvsv> tblMdAtvsv { get; set; }
+        public DbSet<TblMdDevice> tblMdDevice { get; set; }
 
         #endregion
 

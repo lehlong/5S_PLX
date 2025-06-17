@@ -23,8 +23,10 @@ data: any[] = [];
   ) { }
 
   ngOnInit() {
-    this.getSurveyMgmt()
+    this.getSurveyMgmt();
+
   }
+
 
   navigateTo(item: any) {
     const { doiTuongId, id } = item

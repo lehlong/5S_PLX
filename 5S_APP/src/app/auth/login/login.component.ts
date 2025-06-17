@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
+
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { GlobalService } from '../../service/global.service';
 import { AuthService } from 'src/app/service/auth.service';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ToastController } from '@ionic/angular';
 import { MessageService } from 'src/app/service/message.service';
-
+import { Device } from '@capacitor/device';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -13,7 +14,7 @@ import { MessageService } from 'src/app/service/message.service';
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   constructor(
     private router: Router,
     private globalService: GlobalService,
@@ -21,20 +22,55 @@ export class LoginComponent {
     private messageService: MessageService,
 
   ) { }
+  info: any = {};
+  deviceId: string = '';
   model = {
     userName: '',
     password: '',
+    deviceId: '',
+    deviceName: '',
+    model: '',
+    operatingSystem: '',
+    osVersion: '',
+    manufacturer: '',
+
   }
+  ngOnInit() {
+    this.logDeviceID();
+    this.logDeviceInfo();
+  }
+  
+ logDeviceID = async () => {
+  const Id = await Device.getId();
+ this.deviceId = Id ? Id.identifier : '';
+ 
+};
+
+logDeviceInfo = async () => {
+  const infoDevice = await Device.getInfo();
+ this.info = infoDevice
+}
 
   saveAccount: boolean = false
 
   processLogin() {
+   
+    this.model.deviceId = this.deviceId;
+    this.model.deviceName = this.info.name ;
+    this.model.model = this.info.model ;
+    this.model.operatingSystem = this.info.operatingSystem ;
+    this.model.osVersion = this.info.osVersion ;
+    this.model.manufacturer = this.info.manufacturer ;
+
+
+   
     if (this.model.userName == '' || this.model.password == '') {
       this.messageService.show('Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!', 'danger');
       return;
     }
     this.authService.login(this.model).subscribe({
       next: (response) => {
+      
         localStorage.setItem('token', response.accessToken)
         localStorage.setItem('refreshToken', response.refreshToken)
         this.globalService.setUserInfo(response.accountInfo)
@@ -53,14 +89,16 @@ export class LoginComponent {
               this.router.navigate(['/'])
             },
             error: (error) => {
+              
               this.messageService.show(`Lỗi không lấy được danh sách quyền của user!`, 'warning');
               console.log('Lỗi hệ thống:', error)
             },
           })
       },
       error: (error) => {
-        this.messageService.show(`Tên đăng nhập hoặc mật khẩu không đúng!`, 'warning');
-        console.log(error)
+        
+        this.messageService.show(`${error}`, 'warning');
+        console.log(error);
       }
     });
   }
