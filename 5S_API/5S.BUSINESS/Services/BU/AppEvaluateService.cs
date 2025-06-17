@@ -68,7 +68,6 @@ namespace PLX5S.BUSINESS.Services.BU
             var node = _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == kiKhaoSatId && x.PId == "-1" && x.IsDeleted != true).FirstOrDefault();
             var lstBlack = _dbContext.TblBuCriteriaExcludedStores.Where(x => x.IsDeleted != true).ToList();
             var lstAllTieuChi = await _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == kiKhaoSatId && x.PId != "-1" && x.IsDeleted != true).OrderBy(x => x.OrderNumber).ToListAsync();
-            var count = lstAllTieuChi.Count;
 
             var rootNode = new TieuChiDto()
             {
@@ -80,7 +79,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 PId = node.PId,
                 IsGroup = node.IsGroup,
                 KiKhaoSatId = node.KiKhaoSatId,
-                OrderNumber = count,
+                OrderNumber = 0,
                 IsImg = node.IsImg,
                 Report = node.Report,
                 Expanded = true,

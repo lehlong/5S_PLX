@@ -11,6 +11,7 @@ import { environment } from 'src/environments/environment';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Input, ChangeDetectionStrategy } from '@angular/core';
 import { MessageService } from 'src/app/service/message.service';
+import * as L from 'leaflet';
 
 
 @Component({
@@ -26,7 +27,7 @@ export class EvaluateComponent implements OnInit {
   @ViewChild('fileInput', { static: false })
   fileInput!: ElementRef<HTMLInputElement>;
 
-
+  private map: L.Map | undefined;
   selectedAccordionId: string = '';
   currentSelect: string = '';
   lstAllTieuChi: any = [];
@@ -44,10 +45,13 @@ export class EvaluateComponent implements OnInit {
   data: any = {};
   headerId: any = '';
   count: any = 0
-  maxCount: any = 0
   isEdit: any = true;
   apiFile = (environment as any).apiFile;
   account: any = {}
+  dataTree: any = {
+    leaves: [],
+    tree: []
+  }
 
 
   constructor(
@@ -60,7 +64,6 @@ export class EvaluateComponent implements OnInit {
   ) { }
   ngOnInit() {
     this.account = JSON.parse(localStorage.getItem('UserInfo') ?? "")
-
     this.route.paramMap.subscribe({
       next: async (params) => {
         this.headerId = params.get('code') ?? '';
@@ -77,8 +80,17 @@ export class EvaluateComponent implements OnInit {
           this.getResultEvaluate();
         }
 
-        this.getAllTieuChi();
-        this.getAllTieuChiLeaves();
+        let data = localStorage.getItem(this.kiKhaoSat.name);
+        if (data == null) {
+          this.getAllTieuChi();
+          this.getAllTieuChiLeaves();
+        } else {
+          this.dataTree = JSON.parse(data);
+          this.treeData = this.dataTree?.tree
+          this.lstTreeOpen = [...this.extractAllKeys(this.treeData)];
+          this.lstTieuChi = this.dataTree?.leaves
+          await this.cdr.detectChanges();
+        }
       },
     });
 
@@ -87,7 +99,7 @@ export class EvaluateComponent implements OnInit {
   getResultEvaluate() {
     this._service.getResultEvaluate(this.headerId).subscribe({
       next: (data) => {
-        console.log(data);
+        // console.log(data);
         this.evaluate = data;
       },
     });
@@ -98,14 +110,15 @@ export class EvaluateComponent implements OnInit {
       .buildDataTreeForApp(this.kiKhaoSat.id, this.store.id)
       .subscribe({
         next: (data) => {
-          console.log(data);
-          this.maxCount = data.orderNumber
           this.treeData = [data];
           this.lstTreeOpen = [...this.extractAllKeys([data])];
 
+          this.dataTree.tree = this.treeData
+          console.log(this.dataTree);
+          localStorage.setItem(this.kiKhaoSat.name, JSON.stringify(this.dataTree))
+
           this.cdr.detectChanges();
         },
-
       });
   }
 
@@ -114,8 +127,10 @@ export class EvaluateComponent implements OnInit {
       .GetAllTieuChiLeaves(this.kiKhaoSat.id, this.store.id)
       .subscribe({
         next: (data) => {
-          console.log(data);
           this.lstTieuChi = data;
+
+          this.dataTree.leaves = this.lstTieuChi
+          console.log(this.dataTree);
         },
       });
   }
@@ -136,6 +151,24 @@ export class EvaluateComponent implements OnInit {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
+
+  private initMap(): void {
+    // L.Icon.Default.mergeOptions({
+    //   iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
+    //   iconUrl: 'assets/leaflet/marker-icon.png',
+    //   shadowUrl: 'assets/leaflet/marker-shadow.png',
+    // });
+    this.map = L.map('map').setView([21.0285, 105.8542], 13); // Hà Nội
+
+    L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap France'
+    }).addTo(this.map);
+
+    L.marker([21.0285, 105.8542]).addTo(this.map)
+      .bindPopup('Chưa có tọa độ')
+      .openPopup();
+  }
+
 
   isActive(itemId: string): boolean {
     return this.currentSelect === itemId;
@@ -186,7 +219,7 @@ export class EvaluateComponent implements OnInit {
     const file: File = event.target.files[0];
     if (!file) return;
     const type = this.detectFileType(file)
-    
+
     const reader = new FileReader();
     console.log(this.evaluate);
 
@@ -200,8 +233,8 @@ export class EvaluateComponent implements OnInit {
         filePath: base64,
         tieuChiCode: code,
         type: type,
-        kinhDo: '123',
-        viDo: "1234",
+        kinhDo: '',
+        viDo: "",
         evaluateHeaderCode: this.headerId,
       })
       this.cdr.detectChanges();
@@ -244,21 +277,21 @@ export class EvaluateComponent implements OnInit {
       : null;
     if (!data) return;
 
-     data.map((x: any) => ({
+    data.map((x: any) => ({
       filePath: x.filePath,
       type: x.type
     }))
- 
-  const images = data.filter((x:any) => x.type === 'img');
-  const videos = data.filter((x:any)=> x.type === 'mp4');
-  const documents = data.filter((x:any) => ['docx', 'xlsx', 'xlsm', 'pdf'].includes(x.type));
 
-  return {
-    images: images,
-    videos: videos,
-    documents: documents
-  };
-    
+    const images = data.filter((x: any) => x.type === 'img');
+    const videos = data.filter((x: any) => x.type === 'mp4');
+    const documents = data.filter((x: any) => ['docx', 'xlsx', 'xlsm', 'pdf'].includes(x.type));
+
+    return {
+      images: images,
+      videos: videos,
+      documents: documents
+    };
+
   }
 
   filterFeedBack(code: any) {
@@ -368,6 +401,9 @@ export class EvaluateComponent implements OnInit {
     }
     this.selectedImage = img;
     this.isImageModalOpen = true;
+    setTimeout(() => {
+      this.initMap();
+    }, 300);
   }
 
   filePath(filePath: string) {
@@ -461,18 +497,6 @@ export class EvaluateComponent implements OnInit {
     } catch (err) {
       console.error('Camera error:', err);
     }
-  }
-
-  dem() {
-    this.count += 1
-    console.log(this.count);
-
-  }
-
-
-  shouldRender(): boolean {
-    this.count++;
-    return this.count <= this.maxCount;
   }
 
   trackByKey(index: number, item: any): string {
