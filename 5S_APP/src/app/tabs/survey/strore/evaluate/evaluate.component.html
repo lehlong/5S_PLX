@@ -41,7 +41,7 @@
             <ng-template #Child>
               <div class="ion-padding" slot="content">
                 <p style="color: red; margin: 0">
-                  <ion-radio-group [value]="filterDiem(node.code)" (ionChange)="setDiem(node.code, $event)">
+                  <ion-radio-group [value]="filterDiem(node.code)" (ionChange)="setDiem(node, $event)">
                     <ng-container *ngFor="let diem of node.diemTieuChi; trackBy: trackByKey">
                       <ion-item>
                         <ion-label>{{ diem.moTa }}</ion-label>
@@ -80,49 +80,43 @@
 
                 <div *ngIf="!node.isGroup && filterImage(node)?.images.length > 0" class="images-container">
                   <div class="images-wrapper" *ngFor="let img of filterImage(node)?.images; trackBy: trackByKey">
-                    <ion-img [src]="filePath(img.filePath)" class="image-preview"
+
+                    <ion-img *ngIf="img.type == 'img'" [src]="filePath(img.filePath)" class="image-preview"
                       (click)="openFullScreen(img)"></ion-img>
+
+                    <video *ngIf="img.type == 'mp4'" [src]="filePath(img.filePath)" class="image-preview"
+                      (click)="openFullScreen(img)" controls style="max-width: 100%;"></video>
+
+                    <div style="opacity: 0.5; text-align: center;">{{ img.createDate }}</div>
+
                     <ion-button fill="clear" class="delete-btn" size="small" (click)="deleteImage2(img)">
                       <ion-icon name="close-circle" slot="icon-only"></ion-icon>
                     </ion-button>
-
                   </div>
-                </div>
-
-                <!-- Hiển thị video -->
-                <div *ngIf="!node.isGroup && filterImage(node)?.videos.length > 0" class="videos-container">
-
-
-                  <div class="file-wrapper" *ngFor="let video of filterImage(node)?.videos; trackBy: trackByKey">
-
-                    <video class="image-preview" [src]="filePath(video.filePath)" (click)="openFullScreen(video)"
-                      controls></video>
-                    <ion-button fill="clear" class="delete-btn" size="small" (click)="deleteImage2(video)">
-                      <ion-icon name="close-circle" slot="icon-only"></ion-icon>
-                    </ion-button>
-                  </div>
-
                 </div>
 
                 <!-- Hiển thị tài liệu -->
-                <div *ngIf="!node.isGroup && filterImage(node)?.documents.length > 0" class="file-wrapper">
-
-
-                  <div class="image-preview" *ngFor="let doc of filterImage(node)?.documents; trackBy: trackByKey">
+                <div *ngIf="!node.isGroup && filterImage(node)?.documents.length > 0" class="file-wrapper d-flex"
+                  style="width: 100vw; ">
+                  <div class="image-preview" *ngFor="let doc of filterImage(node)?.documents; trackBy: trackByKey"
+                    style="height: 50px; width: 100vw;">
                     <div class="file-preview">
-                      <ion-chip style="height: 50px;">
+                      <ion-chip style=" width: 90vw;">
                         <ion-icon name="document-outline" size="large"></ion-icon>
+
                         <ion-label>
                           <a [href]="filePath(doc.filePath)" target="_blank" download>
                             {{ doc.fileName }}
                           </a>
                         </ion-label>
+
                         <ion-button fill="clear" class="delete-btn" size="small" (click)="deleteImage2(doc)">
                           <ion-icon name="close-circle" slot="icon-only"></ion-icon>
                         </ion-button>
+
+                        <div style="opacity: 0.5; text-align: center; margin: 0 10px;">20/10/2025</div>
+
                       </ion-chip>
-
-
                     </div>
                   </div>
                 </div>

@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { IonButton } from '@ionic/angular/standalone';
-import { AlertController } from '@ionic/angular';
-import type { OverlayEventDetail } from '@ionic/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppEvaluateService } from 'src/app/service/app-evaluate.service';
 import { StorageService } from 'src/app/service/storage.service';
@@ -27,27 +25,10 @@ export class CheckListComponent implements OnInit {
       lstEvaluate: [],
       lstImages: [],
     }
-  alertButtons: any = [
-    {
-      text: 'Cancel',
-      role: 'cancel',
-      handler: () => {
-        console.log('Alert canceled');
-      },
-    },
-    {
-      text: 'OK',
-      role: 'confirm',
-      handler: () => {
-        console.log('Alert confirmed');
-      },
-    },
-  ];
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private alertController: AlertController,
     private _storageService: StorageService,
     private _service: AppEvaluateService
   ) { }
@@ -86,10 +67,8 @@ export class CheckListComponent implements OnInit {
   }
 
   getAllEvaluateHistory() {
-    this._service.search({ keyWord: this.inStoreId }).subscribe({
+    this._service.search({ keyWord: this.inStoreId, sortColumn: this.kiKhaoSat.id }).subscribe({
       next: (data) => {
-        console.log(data);
-
         if (data.data.length == 0) return;
 
         this.lstHisEvaluate.push(...data.data);

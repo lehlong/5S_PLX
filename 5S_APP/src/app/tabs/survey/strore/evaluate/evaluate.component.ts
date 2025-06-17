@@ -77,6 +77,8 @@ export class EvaluateComponent implements OnInit {
           this.evaluate = await this._storageService.get(this.store.id);
         } else {
           this.isEdit = false;
+          console.log(mode);
+
           this.getResultEvaluate();
         }
 
@@ -98,9 +100,10 @@ export class EvaluateComponent implements OnInit {
 
   getResultEvaluate() {
     this._service.getResultEvaluate(this.headerId).subscribe({
-      next: (data) => {
-        // console.log(data);
+      next: async (data) => {
+        console.log(data);
         this.evaluate = data;
+          await this.cdr.detectChanges();
       },
     });
   }
@@ -152,6 +155,7 @@ export class EvaluateComponent implements OnInit {
     }
   }
 
+
   private initMap(): void {
     // L.Icon.Default.mergeOptions({
     //   iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
@@ -170,6 +174,7 @@ export class EvaluateComponent implements OnInit {
   }
 
 
+
   isActive(itemId: string): boolean {
     return this.currentSelect === itemId;
   }
@@ -179,15 +184,19 @@ export class EvaluateComponent implements OnInit {
   }
 
   isAnswered(data: any) {
+    let hasEnoughImages = true
     const evaluateItem = this.evaluate.lstEvaluate.find(
       (i: any) => i.tieuChiId === data.code || i.tieuChiCode === data.code
     );
     const hasPoint = !!evaluateItem && !!evaluateItem.pointId;
-    const numberImgRequired = data?.numberImg || 0;
-    const hasImage = this.evaluate.lstImages.filter(
-      (img: any) => img.tieuChiCode === data.code
-    ).length;
-    const hasEnoughImages = hasImage >= numberImgRequired;
+    if (data.isImg) {
+
+      const numberImgRequired = data?.numberImg || 0;
+      const hasImage = this.evaluate.lstImages.filter(
+        (img: any) => img.tieuChiCode === data.code
+      ).length;
+      hasEnoughImages = hasImage >= numberImgRequired;
+    }
     return hasPoint && hasEnoughImages;
   }
 
@@ -233,16 +242,45 @@ export class EvaluateComponent implements OnInit {
         filePath: base64,
         tieuChiCode: code,
         type: type,
-        kinhDo: '',
-        viDo: "",
+        kinhDo: 0,
+        viDo: 0,
         evaluateHeaderCode: this.headerId,
       })
       this.cdr.detectChanges();
       this._storageService.set(this.store.id, this.evaluate);
     }
     reader.readAsDataURL(file); // Chuyển sang base64
+  }
 
+  generateThumbnail(base64: string, maxWidth: number, maxHeight: number): Promise<string> {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d')!;
+        let width = img.width;
+        let height = img.height;
 
+        // Tính toán tỷ lệ thu nhỏ
+        if (width > height) {
+          if (width > maxWidth) {
+            height *= maxWidth / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width *= maxHeight / height;
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL()); // Trả về base64 ảnh nhỏ
+      };
+      img.src = base64;
+    });
   }
 
   detectFileType(file: File): string {
@@ -282,13 +320,13 @@ export class EvaluateComponent implements OnInit {
       type: x.type
     }))
 
-    const images = data.filter((x: any) => x.type === 'img');
-    const videos = data.filter((x: any) => x.type === 'mp4');
+    const images = data.filter((x: any) => x.type === 'img' || x.type == 'mp4');
+    // const videos = data.filter((x: any) => x.type === 'mp4');
     const documents = data.filter((x: any) => ['docx', 'xlsx', 'xlsm', 'pdf'].includes(x.type));
 
+    // videos: videos,
     return {
       images: images,
-      videos: videos,
       documents: documents
     };
 
@@ -306,14 +344,27 @@ export class EvaluateComponent implements OnInit {
 
     const selected = event.detail.value;
     const idx = this.evaluate.lstEvaluate.findIndex(
-      (i: any) => i.tieuChiCode === data
+      (i: any) => i.tieuChiCode === data.code
     );
-    console.log(data, idx);
+    // console.log(data.diemTieuChi.filter((i: any) => i.id == selected)[0].diem);
 
     if (idx === -1) return;
 
+    this.evaluate.lstEvaluate[idx].point = data.diemTieuChi.filter((i: any) => i.id == selected)[0].diem
     this.evaluate.lstEvaluate[idx].pointId = selected;
-    console.log(this.evaluate);
+    this.tinhTong()
+  }
+
+
+  tinhTong() {
+    const tongDiem = this.lstTieuChi.reduce((sum: number, leaf: any) => {
+      const diemMax = (leaf.diemTieuChi || []).reduce((max: number, d: any) => {
+        return Math.max(max, d.diem || 0);
+      }, 0);
+      return sum + diemMax;
+    }, 0);
+    this.evaluate.header.point = ((this.evaluate.lstEvaluate.reduce((sum: any, item: any) => sum + (item.point || 0), 0) / tongDiem) * 100).toFixed(2);
+
     this._storageService.set(this.store.id, this.evaluate);
   }
 
@@ -348,14 +399,16 @@ export class EvaluateComponent implements OnInit {
       }
 
       // Kiểm tra có đủ ảnh không
-      const numberImgRequired = tieuChi.numberImg || 0;
-      const imagesSelecting = this.evaluate.lstImages.filter(
-        (img: any) => img.tieuChiCode === tieuChi.code
-      ).length;
+      if (tieuChi.isImg) {
 
-      if (imagesSelecting < numberImgRequired) {
-        errorMessage += `- Tiêu chí "${tieuChi.name}" thiếu ảnh. `;
-        allChecksPassed = false;
+        const numberImgRequired = tieuChi.numberImg || 0;
+        const imagesSelecting = this.evaluate.lstImages.filter(
+          (img: any) => img.tieuChiCode === tieuChi.code
+        ).length;
+        if (imagesSelecting < numberImgRequired) {
+          errorMessage += `- Tiêu chí "${tieuChi.name}" thiếu ảnh. `;
+          allChecksPassed = false;
+        }
       }
     }
 

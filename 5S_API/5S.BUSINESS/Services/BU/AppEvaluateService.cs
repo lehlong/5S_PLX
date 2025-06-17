@@ -32,8 +32,7 @@ namespace PLX5S.BUSINESS.Services.BU
     {
         private readonly IWebHostEnvironment _environment;
 
-        public AppEvaluateService(AppDbContext dbContext, IMapper mapper, IWebHostEnvironment environment)
-            : base(dbContext, mapper)
+        public AppEvaluateService(AppDbContext dbContext, IMapper mapper, IWebHostEnvironment environment) : base(dbContext, mapper)
         {
             _environment = environment;
         }
@@ -46,6 +45,10 @@ namespace PLX5S.BUSINESS.Services.BU
                 if (!string.IsNullOrWhiteSpace(filter.KeyWord))
                 {
                     query = query.Where(x => x.StoreId.Contains(filter.KeyWord));
+                }
+                if (!string.IsNullOrWhiteSpace(filter.SortColumn))
+                {
+                    query = query.Where(x => x.KiKhaoSatId.Contains(filter.SortColumn));
                 }
                 if (filter.IsActive.HasValue)
                 {
@@ -136,6 +139,7 @@ namespace PLX5S.BUSINESS.Services.BU
             {
                 var tieuChi = _dbContext.TblBuTieuChi.Where(x => x.IsDeleted != true && x.KiKhaoSatId == kiKhaoSatId && x.IsGroup == false).OrderBy(x => x.Id).ToList();
                 var lstBlack = _dbContext.TblBuCriteriaExcludedStores.Where(x => x.IsDeleted != true).ToList();
+                var lstDiem = _dbContext.TblBuTinhDiemTieuChi.OrderBy(x => x.MoTa).ToList();
                 var lstTieuChiLeaves = new List<TieuChiDto>();
                 foreach (var item in tieuChi)
                 {
@@ -155,7 +159,7 @@ namespace PLX5S.BUSINESS.Services.BU
                             NumberImg = item.NumberImg,
                             KiKhaoSatId = item.KiKhaoSatId,
                             OrderNumber = item.OrderNumber,
-
+                            DiemTieuChi = lstDiem.Where(x => x.TieuChiCode == item.Code).ToList(),
                         };
                         lstTieuChiLeaves.Add(leaves);
                     }
