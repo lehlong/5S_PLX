@@ -163,6 +163,18 @@
       </nz-tab>
 
       <nz-tab nzTitle="NGƯỜI CHẤM ĐIỂM">
+        <nz-space style="float: right;">
+          <app-input-clear placeholder="Tìm kiếm" (enterEvent)="searchNguoiChamDiem()"
+            [(value)]="filterNguoiChamDiem"></app-input-clear>
+          <button (click)="searchNguoiChamDiem()" class="flex !items-center !border-l-0 gray-btn" nzType="default"
+            nz-button nzType="default">
+            <span nz-icon nzType="search"></span>
+          </button>
+          <button (click)="resetStore()" class="flex !items-center !border-l-0 gray-btn" nzType="default" nz-button
+            nzType="default">
+            <span nz-icon nzType="redo"></span>
+          </button>
+        </nz-space>
         <nz-table *ngIf="inputKi.lstInputStore?.length  != 0" class="auto-scroll-table" #headerTable
           [nzData]="inputKi.lstInputStore" [nzFrontPagination]="false" [nzScroll]="{ y: 'calc(100vh - 244px)' }">
           <thead>
@@ -186,7 +198,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let data of inputKi.lstInputStore; let i = index">
+            <tr *ngFor="let data of lstInputStoreSearch let i = index">
 
               <td>{{(paginationResult.currentPage - 1) * paginationResult.pageSize + i + 1}}</td>
               <td nzAlign="center">
@@ -272,11 +284,14 @@
     <ng-container *ngIf="edit">
       <ng-container *nzSpaceItem>
         <button *ngIf="inputKi.kiKhaoSat.trangThaiKi == '0' || inputKi.kiKhaoSat.trangThaiKi == '1'"
-          [nzLoading]="loading" nz-button nzType="default" style="background-color: #04AA6D; color: white; border: none;" class="!flex !items-center" (click)="onUpdateKhaoSatTrangThai('2')">
+          [nzLoading]="loading" nz-button nzType="default"
+          style="background-color: #04AA6D; color: white; border: none;" class="!flex !items-center"
+          (click)="onUpdateKhaoSatTrangThai('2')">
           <span nz-icon nzType="save" nzTheme="outline"></span>Mở kỳ
         </button>
-        <button *ngIf="inputKi.kiKhaoSat.trangThaiKi == '2'"  [nzLoading]="loading" nz-button nzType="default" style="background-color: #722ed1; color: white; border: none;"
-          class="!flex !items-center" (click)="onUpdateKhaoSatTrangThai('0')">
+        <button *ngIf="inputKi.kiKhaoSat.trangThaiKi == '2'" [nzLoading]="loading" nz-button nzType="default"
+          style="background-color: #722ed1; color: white; border: none;" class="!flex !items-center"
+          (click)="onUpdateKhaoSatTrangThai('0')">
           <span nz-icon nzType="save" nzTheme="outline"></span>Đóng kỳ
         </button>
       </ng-container>

@@ -29,8 +29,10 @@ export class AccountIndexComponent {
   showCreate: boolean = false
   showEdit: boolean = false
   userName: string = ''
+  isVisibleModal= false;
 
   listAccountGroup: any[] = []
+    listDevice: any[] = []
   //listPartner: any[] = []
   accountType: any[] = []
   positionList: any[] = []
@@ -205,4 +207,63 @@ export class AccountIndexComponent {
     this.showEditAcg = true
     this.accountGroupEditComponent.loadDetail(this.idDetail)
   }
+  getDviceByID(id: string) {
+    this.dropdownService.getDeviceByUser(id).subscribe({
+      next: (data) => {
+       
+        this.listDevice = data
+    
+      
+       
+         console.log(this.listDevice )
+           
+      },
+      error: (response) => {
+        console.log(response)
+      },
+    })
+  }
+   showModal(id:string): void {
+      this.getDviceByID(id);
+     this.isVisibleModal = true;
+  
+
+  }
+
+  handleOk(): void {
+ 
+    this.isVisibleModal = false;
+  }
+
+  handleCancel(): void {
+  
+    this.isVisibleModal = false;
+  }
+  enableDevice(id: string) {
+    console.log(id)
+    this.dropdownService.enableDevice(id).subscribe({
+      next: (data) => {
+
+       
+        this.getDviceByID(id)
+      },
+      error: (response) => {
+        
+        console.log(response)
+      },
+    })
+  }
+  mainDevice(id: string) {
+    this.dropdownService.mainDevice(id).subscribe({
+      next: (data) => {
+        
+        this.getDviceByID(id)
+      },
+      error: (response) => {
+       
+        console.log(response)
+      },
+    })
+  }
+
 }

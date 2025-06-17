@@ -32,6 +32,26 @@ namespace PLX5S.API.Controllers.Auth
             }
             return Ok(transferObject);
         }
+        [HttpPost("LoginMobile")]
+        [AllowAnonymous]
+        public async Task<IActionResult> LoginMobile([FromBody] LoginDto loginInfo)
+        {
+            var transferObject = new TransferObject();
+            var loginResult = await _service.LoginMobile(loginInfo);
+            if (_service.Status)
+            {
+                transferObject.Data = loginResult;
+            }
+            else
+            {
+           
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("1000", _service);
+                transferObject.MessageObject.MessageDetail = loginResult.MessenDevice;
+            }
+            return Ok(transferObject);
+        }
 
         [HttpPost("RefreshToken")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDto refreshTokenDto)

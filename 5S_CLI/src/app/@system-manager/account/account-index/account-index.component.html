@@ -8,17 +8,17 @@
         [(ngModel)]="filter.GroupId">
         <nz-option *ngFor="let item of listAccountGroup" [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
       </nz-select>
-      <nz-select class="flex-grow" nzShowSearch nzAllowClear nzPlaceHolder="Kiểu người dùng"
+      <!-- <nz-select class="flex-grow" nzShowSearch nzAllowClear nzPlaceHolder="Kiểu người dùng"
         [(ngModel)]="filter.AccountType">
         <nz-option cdkScrollable *ngFor="let item of accountType" [nzLabel]="item.name" [nzValue]="item.id">
         </nz-option>
-      </nz-select>
+      </nz-select> -->
 
-      <nz-select class="flex-grow" nzShowSearch nzAllowClear nzPlaceHolder="Chức vụ"
+      <!-- <nz-select class="flex-grow" nzShowSearch nzAllowClear nzPlaceHolder="Chức vụ"
         [(ngModel)]="filter.positionCode">
         <nz-option cdkScrollable *ngFor="let item of positionList" [nzLabel]="item.name" [nzValue]="item.code">
         </nz-option>
-      </nz-select>
+      </nz-select> -->
 
       <nz-select class="flex-grow" nzShowSearch nzAllowClear nzPlaceHolder="Trạng thái" [(ngModel)]="filter.IsActive">
         <nz-option *ngFor="let item of listStatus" [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
@@ -50,17 +50,18 @@
     <nz-table class="auto-scroll-table" [nzShowPagination]="false" [nzFrontPagination]="false" #headerTable [nzData]="paginationResult.data" [nzScroll]="{ y: 'calc(100vh - 244px)' }">
       <thead>
         <tr>
-          <th nzWidth="80px">STT</th>
-          <th nzWidth="150px">Nhóm tài khoản</th>
-          <th nzWidth="150px" [nzSortFn]="true" (nzSortOrderChange)="onSortChange('userName', $event)">
+          <th nzWidth="100px">STT</th>
+          <th nzWidth="300px">Nhóm tài khoản</th>
+          <th nzWidth="350px" [nzSortFn]="true" (nzSortOrderChange)="onSortChange('userName', $event)">
             Tên tài khoản
           </th>
-          <th nzWidth="200px" [nzSortFn]="true" (nzSortOrderChange)="onSortChange('fullName', $event)">
+          <th nzWidth="300px" [nzSortFn]="true" (nzSortOrderChange)="onSortChange('fullName', $event)">
             Tên đầy đủ
           </th>
-          <th>Kiểu người dùng</th>
-          <th>Chức vụ</th>
+          <!-- <th>Kiểu người dùng</th>
+          <th>Chức vụ</th> -->
           <th nzAlign="center">Trạng thái</th>
+          <th nzAlign="center">Thiết bị</th>
         </tr>
       </thead>
       <tbody>
@@ -77,8 +78,8 @@
             <a (click)="openEdit(data.userName)">{{ data.userName }}</a>
           </td>
           <td>{{ data.fullName }}</td>
-          <td>{{ getAccountTypeNameById(data?.accountType) }}</td>
-          <td>{{ getPositionCodeNameById(data?.positionCode) }}</td>
+          <!-- <td>{{ getAccountTypeNameById(data?.accountType) }}</td>
+          <td>{{ getPositionCodeNameById(data?.positionCode) }}</td> -->
           <td nzAlign="center">
             <nz-tag nzColor="success" *ngIf="data.isActive">
               <nz-icon nzType="check-circle" />
@@ -89,6 +90,7 @@
               <span>Khoá</span>
             </nz-tag>
           </td>
+          <td><span nz-icon nzType="tablet" (click)="showModal(data.userName)"></span></td>
         </tr>
       </tbody>
     </nz-table>
@@ -110,3 +112,38 @@
 <app-account-group-edit [id]="idDetail" [close]="close.bind(this)" [reset]="loadInit.bind(this)"
   [visible]="showEditAcg">
 </app-account-group-edit>
+
+    <nz-modal [nzWidth]="2000" [(nzVisible)]="isVisibleModal" nzTitle="bảng thiết bị" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()">
+      <ng-container *nzModalContent>
+      <nz-table [nzData]="listDevice" [nzFrontPagination]="false" [nzScroll]="{ y: 'calc(100vh - 244px)' }">
+        <thead>
+          <tr>
+            <th nzWidth="80px">STT</th>
+             <th>Địa chỉ IP</th>
+            <th>Tên thiết bị</th>
+            <th>Nhà sản xuất</th>
+            <th>Hệ điều hành</th>
+            <th>Phiên bản</th>
+            <th>Trạng thái</th>
+            <th>Thiết bị chính</th>
+            <th>#</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let device of listDevice; let i = index">
+            <td  nzAlign="center">{{ i + 1 }}</td>
+            <td  nzAlign="center">{{ device.deviceId }}</td>
+            <td  nzAlign="center">{{ device.deviceName }}</td>
+            <td nzAlign="center">{{ device.manufacturer }}</td>
+            <td  nzAlign="center">{{ device.operatingSystem }}</td>
+            <td  nzAlign="center">{{ device.osVersion }}</td>
+            <td  nzAlign="center">{{ device.enableLogin ? 'Kích hoạt' : 'Khoá' }}</td>
+            <td  nzAlign="center">{{ device.mainDevice ? 'Thiết bị chính' : '' }}</td>
+            <td  nzAlign="center"><span nz-icon nz-popover nzType="lock"  nzPopoverContent="kích hoạt thiết bị" (click)="enableDevice(device.id)"></span>
+            <span nz-icon nz-popover nzType="check-square"  nzPopoverContent="Chọn làm thiết bị chính" (click)="mainDevice(device.id)"></span></td>
+
+          </tr>
+        </tbody>
+      </nz-table>
+      </ng-container>
+    </nz-modal>

@@ -1,23 +1,26 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Common;
+using Common.Util;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using PLX5S.BUSINESS.Common;
 using PLX5S.BUSINESS.Dtos.AD;
 using PLX5S.BUSINESS.Dtos.Auth;
 using PLX5S.CORE;
-using Microsoft.IdentityModel.Tokens;
+using PLX5S.CORE.Entities.AD;
+using PLX5S.CORE.Entities.MD;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using PLX5S.CORE.Entities.AD;
-using Microsoft.Extensions.Configuration;
-using AutoMapper;
-using Common.Util;
 
 namespace PLX5S.BUSINESS.Services.Auth
 {
     public interface IAuthService : IGenericService<TblAdAccount, AccountDto>
     {
         Task<JWTTokenDto> Login(LoginDto loginInfo);
+        Task<JWTTokenDto> LoginMobile(LoginDto loginInfo);
         Task<AccountDto> GetAccount(string userName);
         Task ChangePassword(ChangePasswordDto changePasswordDto);
         Task<JWTTokenDto> RefreshToken(RefreshTokenDto refreshTokenDto);
@@ -50,12 +53,15 @@ namespace PLX5S.BUSINESS.Services.Auth
         {
             try
             {
+                
                 await _dbContext.Database.BeginTransactionAsync();
                 var authUser = await AuthenticationProcess(loginInfo);
+                
                 if (Status)
-                {
-                    var account = _mapper.Map<AccountLoginDto>(authUser);
+                { 
+                  var account = _mapper.Map<AccountLoginDto>(authUser);
                     var refreshToken = await GenerateRefreshToken(account.UserName);
+                    
                     if (Status)
                     {
                         var token = GeneratenJwtToken(account.UserName, account.FullName);
@@ -69,6 +75,7 @@ namespace PLX5S.BUSINESS.Services.Auth
                             ExpireDateRefreshToken = refreshToken.Item2,
                         };
                     }
+                   
                 }
                 await _dbContext.Database.CommitTransactionAsync();
                 return null;
@@ -82,6 +89,122 @@ namespace PLX5S.BUSINESS.Services.Auth
             }
         }
 
+        public async Task<JWTTokenDto> LoginMobile(LoginDto loginInfo)
+        {
+            try
+            {
+
+                await _dbContext.Database.BeginTransactionAsync();
+                var authUser = await AuthenticationProcess(loginInfo);
+                
+
+                if (Status)
+                {
+                    var CheckInfoDevice = CheckDevice(loginInfo);
+                    MessageObject.Message = CheckInfoDevice.ToString();
+                    var account = _mapper.Map<AccountLoginDto>(authUser);
+                    var refreshToken = await GenerateRefreshToken(account.UserName);
+
+                    if (Status)
+                    {
+                        var token = GeneratenJwtToken(account.UserName, account.FullName);
+                        await _dbContext.Database.CommitTransactionAsync();
+                        return new()
+                        {
+                            AccountInfo = account,
+                            AccessToken = token.Item1,
+                            ExpireDate = token.Item2,
+                            RefreshToken = refreshToken.Item1,
+                            ExpireDateRefreshToken = refreshToken.Item2,
+                        };
+                    }
+
+                }
+                else
+                {
+                    MessageObject.Message = "Tên đăng nhập hoặc mật khẩu không đúng";
+                }
+                    await _dbContext.Database.CommitTransactionAsync();
+                return new JWTTokenDto()
+                {
+                    MessenDevice = MessageObject.Message
+                };
+            }
+            catch (Exception ex)
+            {
+                await _dbContext.Database.RollbackTransactionAsync();
+                Status = false;
+                Exception = ex;
+                return null;
+            }
+        }
+
+        public string CheckDevice(LoginDto loginInfo)
+        {
+            try
+            {
+                var Mess = "";
+                var device = _dbContext.tblMdDevice.FirstOrDefault(x => x.DeviceId == loginInfo.DeviceId && x.UserName == loginInfo.UserName);
+                var devicewrongip = _dbContext.tblMdDevice.FirstOrDefault(x => x.DeviceName==loginInfo.DeviceName && x.OsVersion==loginInfo.osVersion && x.Manufacturer==loginInfo.Manufacturer &&x.OperatingSystem==loginInfo.OperatingSystem);
+                if (device?.Id!=null)
+                {
+                    if (device.EnableLogin == true)
+                    {
+                        Status = true;
+                        Mess= "thiết bị được đăng nhâp";
+                        
+                    }
+                    else
+                    {
+                        Status = false;
+                        Mess= "Thiết bị không có quyền đăng nhập";
+                     
+                    }
+                }
+                else if (devicewrongip?.Id != null)
+                {
+                    devicewrongip.DeviceId = loginInfo.DeviceId;
+                    devicewrongip.EnableLogin = false;
+                    devicewrongip.MainDevice = false;
+                    _dbContext.tblMdDevice.Update(devicewrongip);
+                    Mess = "Thiết bị sai mã id";
+                    _dbContext.SaveChanges();
+
+                }
+                else
+                {
+                    var newDevice = new TblMdDevice()
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        UserName = loginInfo.UserName,
+                        DeviceId = loginInfo.DeviceId,
+                        DeviceName = loginInfo.DeviceName,
+                        OperatingSystem = loginInfo.OperatingSystem,
+                        Model = loginInfo.Model,
+                        Manufacturer = loginInfo.Manufacturer,
+                        OsVersion = loginInfo.osVersion,
+                        MainDevice = false,
+                        EnableLogin = false
+                    };
+                     _dbContext.tblMdDevice.Add(newDevice);
+                    Status = false;
+                    Mess= "Thiết bị không có quyền đăng nhập";
+                    _dbContext.SaveChanges();
+
+                }
+          
+
+                return Mess;
+            }
+            catch (Exception ex)
+            {
+                Status = false;
+               
+                return null;
+            }
+
+
+        }
         public async Task<AccountDto> GetAccount(string userName)
         {
             var account = await _dbContext.TblAdAccount.FirstOrDefaultAsync(

@@ -7,7 +7,7 @@ import { CommonService } from './common.service';
 })
 export class AuthService {
   private authEndpoints = {
-    login: 'Auth/Login',
+    login: 'Auth/LoginMobile',
     register: 'auth/register',
     forgotPassword: 'auth/forgot-password',
     resetPassword: 'auth/reset-password',

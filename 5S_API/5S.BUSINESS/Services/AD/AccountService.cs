@@ -11,6 +11,8 @@ using Common;
 using Common.Util;
 using PLX5S.BUSINESS.Common.Enum;
 using Org.BouncyCastle.Tsp;
+using PLX5S.BUSINESS.Dtos.MD;
+using PLX5S.CORE.Entities.MD;
 
 namespace PLX5S.BUSINESS.Services.AD
 {
@@ -20,6 +22,9 @@ namespace PLX5S.BUSINESS.Services.AD
         Task UpdateInformation(AccountUpdateInformationDto dto);
         Task<IList<AccountDto>> GetAll(AccountFilterLite filter);
         Task<AccountTreeRightDto> GetByIdWithRightTree(object id);
+        Task<IList<DeviceDto>> GetDiviceByUser(string username);
+        Task MainDevice(string id);
+        Task EnableDevice(string id);
         void ResetPassword(string username);
     }
 
@@ -404,5 +409,64 @@ namespace PLX5S.BUSINESS.Services.AD
                 Exception = ex;
             }
         }
+        public async Task<IList<DeviceDto>> GetDiviceByUser(string username)
+        {
+            try
+            {
+                var listDevice =  _dbContext.tblMdDevice.Where(x => x.UserName == username).AsQueryable();
+                return _mapper.Map<IList<DeviceDto>>(await listDevice.ToListAsync());
+            }
+            catch (Exception ex)
+            {
+                Status = false;
+                Exception = ex;
+                return null;
+            }
+        }
+        public async Task EnableDevice(string id)
+        {
+            try
+            {
+                var Device = _dbContext.tblMdDevice.FirstOrDefault(x => x.Id.ToString() == id);
+                Device.EnableLogin = true;
+                _dbContext.tblMdDevice.Update(Device);
+                _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Status = false;
+                Exception = ex;
+                
+            }
+        }
+        public async Task MainDevice(string id)
+        {
+            try
+            {
+                var lstDevice = new List<TblMdDevice>();
+                var Device = _dbContext.tblMdDevice.FirstOrDefault(x => x.Id.ToString() == id);
+
+                var lstdevice = _dbContext.tblMdDevice.Where(x => x.UserName == Device.UserName && x.Id!=Device.Id).ToList();
+                foreach (var device in lstdevice)
+                {
+                    device.MainDevice = false;
+                    lstDevice.Add(device);
+                }
+                _dbContext.tblMdDevice.UpdateRange(lstDevice);
+                Device.MainDevice = true;
+                 _dbContext.tblMdDevice.Update(Device);
+                _dbContext.SaveChangesAsync();
+
+            }
+            catch (Exception ex)
+            {
+                Status = false;
+                Exception = ex;
+
+            }
+        }
+
+
+
     }
 }

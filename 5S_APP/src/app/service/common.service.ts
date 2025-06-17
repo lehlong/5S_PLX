@@ -324,7 +324,14 @@ export class CommonService {
         }
       }
       if (error.error && error.error.messageObject) {
-        errorMessage = `MSG${error.error.messageObject.code} ${error.error.message}`;
+        if(error.error.messageObject.messageDetail){
+          console.log(error.error.messageObject.messageDetail)
+          errorMessage=error.error.messageObject.messageDetail
+        }else{
+ errorMessage = `MSG${error.error.messageObject.code} ${error.error.message}`;  
+        }
+       
+        
 
         //console.log(error)
         //this.showError(error.error.messageObject.messageDetail.message)

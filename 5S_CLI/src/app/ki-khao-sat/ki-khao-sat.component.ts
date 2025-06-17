@@ -5,6 +5,7 @@ import { AccountTypeFilter } from '../models/master-data/account-type.model';
 import { PaginationResult } from '../models/base.model';
 import { KiKhaoSatService } from '../service/master-data/ki-khao-sat.service';
 import { AccountService } from '../service/system-manager/account.service';
+import {  KiKhaoSatFilter } from '../models/master-data/ki-khao-sat.model';
 import { GlobalService } from '../service/global.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -34,8 +35,10 @@ export class KiKhaoSatComponent {
   selectedNode: any = null;
   selectedNodeDetails: any[] = [];
   searchValue = '';
+   filterNguoiChamDiem: string = '';
   treeData: any = [];
-  filter = new AccountTypeFilter();
+  filter = new KiKhaoSatFilter();
+    lstInputStoreSearch: any = [];
   paginationResult = new PaginationResult();
   loading: boolean = false;
   lstAccount: any = [];
@@ -93,7 +96,7 @@ export class KiKhaoSatComponent {
     this.route.paramMap.subscribe({
       next: (params) => {
         this.headerId = params.get('id');
-        this.filter.keyWord = this.headerId;
+         this.filter.headerId = this.headerId;
       },
     });
     this.search();
@@ -109,7 +112,16 @@ export class KiKhaoSatComponent {
     };
     this.search();
   }
-
+  searchNguoiChamDiem() {
+ console.log(this.inputKi.lstInputStore);
+  this.lstInputStoreSearch= this.inputKi.lstInputStore?.filter((item:any) => 
+    item.storeId.toLowerCase().includes(this.filterNguoiChamDiem.toLowerCase()) ||
+    item.cuaHangTruong.toLowerCase().includes(this.filterNguoiChamDiem.toLowerCase()) ||
+    item.nguoiPhuTrach.toLowerCase().includes(this.filterNguoiChamDiem.toLowerCase())
+ 
+  );
+ console.log(this.lstInputStoreSearch)
+  }
   search() {
     this.isSubmit = false;
 
@@ -280,11 +292,16 @@ export class KiKhaoSatComponent {
         console.log(data.result);
 
         this.selectedNodeDetails = data.result;
+    
       },
       error: (response) => {
         console.log(response);
       },
     });
+  }
+    resetStore() {
+        this.filterNguoiChamDiem="";
+    this.lstInputStoreSearch = this.inputKi.lstInputStore;
   }
 
   onClick(node: any) {
@@ -368,6 +385,7 @@ export class KiKhaoSatComponent {
       next: (data) => {
         this.inputKi = data
         // this.search();
+             this.lstInputStoreSearch = this.inputKi.lstInputStore;
       },
       error: (response) => {
         console.log(response);
@@ -411,6 +429,7 @@ export class KiKhaoSatComponent {
     this._service.getInputKiKhaoSat(data.id).subscribe({
       next: (data) => {
         this.inputKi = data
+         this.lstInputStoreSearch = this.inputKi.lstInputStore;
       }
     })
     console.log(this.kiKhaoSat)

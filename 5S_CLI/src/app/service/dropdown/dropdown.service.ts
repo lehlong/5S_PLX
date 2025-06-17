@@ -63,11 +63,29 @@ export class DropdownService {
   getAllDriver(params: any = {}, IsActive: boolean = true): Observable<any> {
     return this.commonService.get('Driver/GetAll', { ...params, IsActive })
   }
+  getDeviceByID(params:string): Observable<any> {
+    return this.commonService.get(`Account/GetByID?id=${params}`)
 
+  }
+  getDeviceByUser(params:string): Observable<any> {
+    return this.commonService.get(`Account/GetDeviceByUser?username=${params}`)
+
+  }
+
+  enableDevice(params:string): Observable<any> {
+    return this.commonService.put(`Account/EnableDevice?id=${params}`,{ })
+
+  }
+  mainDevice(params:string): Observable<any> {
+    return this.commonService.put(`Account/MainDevice?id=${params}`,{})
+
+  }
+   
   // địa bàn
   getAllArea(params: any = {}, IsActive: boolean = true): Observable<any> {
     return this.commonService.get('Area/GetAll', { ...params, IsActive })
   }
+
 
   // sản phẩm
   getAllItem(params: any = {}, IsActive: boolean = true): Observable<any> {

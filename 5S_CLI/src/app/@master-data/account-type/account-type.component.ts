@@ -175,4 +175,5 @@ export class AccountTypeComponent {
     this.filter.currentPage = index
     this.search()
   }
+  
 }

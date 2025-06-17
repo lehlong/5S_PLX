@@ -17,6 +17,7 @@ using DocumentFormat.OpenXml.Office2010.Excel;
 using PLX5S.BUSINESS.Models;
 using NPOI.SS.Formula.Functions;
 
+
 namespace PLX5S.BUSINESS.Services.BU
 {
 
@@ -29,10 +30,43 @@ namespace PLX5S.BUSINESS.Services.BU
         Task DeleteData(string id);
         Task<KiKhaoSatModel> GetInput(string idKi);
         Task UpdateKhaoSatTrangThai(TblBuKiKhaoSat kiKhaoSat);
+        Task<PagedResponseDto> SearchKiKhaoSat(FilterKiKhaoSat filter);
 
     }
     public class KikhaosatService(AppDbContext dbContext, IMapper mapper) : GenericService<TblBuKiKhaoSat, KiKhaoSatDto>(dbContext, mapper), IKikhaosatService
     {
+        public class FilterKiKhaoSat : BaseFilter
+        {
+            public string headerId { get; set; }
+        }
+        public async Task<PagedResponseDto> SearchKiKhaoSat(FilterKiKhaoSat filter)
+        {
+            try
+            {
+                var query = _dbContext.TblBuKiKhaoSat.AsQueryable();
+                if (!string.IsNullOrWhiteSpace(filter.KeyWord))
+                {
+                    query = query.Where(x => (x.SurveyMgmtId.ToString().Contains(filter.headerId) || x.Name.Contains(filter.KeyWord)) && x.IsDeleted == false);
+
+                }
+                else
+                {
+                    query = query.Where(x => (x.SurveyMgmtId.ToString().Contains(filter.headerId)) && x.IsDeleted == false);
+                }
+                if (filter.IsActive.HasValue)
+                {
+                    query = query.Where(x => x.IsActive == filter.IsActive && x.IsDeleted == false);
+                }
+                return await Paging(query, filter);
+
+            }
+            catch (Exception ex)
+            {
+                Status = false;
+                Exception = ex;
+                return null;
+            }
+        }
         public override async Task<PagedResponseDto> Search(BaseFilter filter)
         {
             try
@@ -40,11 +74,13 @@ namespace PLX5S.BUSINESS.Services.BU
                 var query = _dbContext.TblBuKiKhaoSat.AsQueryable();
                 if (!string.IsNullOrWhiteSpace(filter.KeyWord))
                 {
-                    query = query.Where(x => x.SurveyMgmtId.ToString().Contains(filter.KeyWord) || x.Name.Contains(filter.KeyWord));
+                    query = query.Where(x => ( x.Name.Contains(filter.KeyWord)) && x.IsDeleted == false);
+
                 }
+               
                 if (filter.IsActive.HasValue)
                 {
-                    query = query.Where(x => x.IsActive == filter.IsActive);
+                    query = query.Where(x => x.IsActive == filter.IsActive && x.IsDeleted == false);
                 }
                 return await Paging(query, filter);
 
@@ -64,6 +100,7 @@ namespace PLX5S.BUSINESS.Services.BU
             var lstMdWareHouse = _dbContext.TblMdWareHouse.Where(x => x.IsDeleted != true).ToList();
             var lstInWareHouse = _dbContext.TblBuInputWareHouse.Where(x => x.IsActive == true && x.SurveyMgmtId == surveyMgmtId).ToList();
             var kiKhaoSatModel = new KiKhaoSatModel();
+           
 
             return new KiKhaoSatModel()
             {

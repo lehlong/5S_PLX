@@ -4,6 +4,7 @@ namespace PLX5S.BUSINESS.Dtos.Auth
 {
     public class JWTTokenDto
     {
+        public string? MessenDevice { get; set; }
         public string AccessToken { get; set; }
 
         public DateTime ExpireDate { get; set; }
