@@ -47,17 +47,17 @@
     </ion-item>
   </ion-item-group>
   <ion-item-group style="background-color: white; margin-top: 10px">
-    <ion-row style="padding: 15px 0px; background-color: #fafafa;">
-      <ion-col style="display: flex; align-items: center; justify-content: center; font-weight: 700;" size="6">Cửa hàng</ion-col>
-      <ion-col style="display: flex; align-items: center; justify-content: center; font-weight: 700;" size="2">Lần chấm</ion-col>
-      <ion-col style="display: flex; align-items: center; justify-content: center; font-weight: 700;" size="2">Bình quân</ion-col>
-      <ion-col style="display: flex; align-items: center; justify-content: center; font-weight: 700;" size="2">Xếp hạng</ion-col>
+    <ion-row style="background-color: #fafafa;">
+      <ion-col style="display: flex; align-items: center; justify-content: center; font-weight: 700; text-align: center;" size="6">Cửa hàng</ion-col>
+      <ion-col style="display: flex; align-items: center; justify-content: center; font-weight: 700; text-align: center;" size="2">Lần chấm</ion-col>
+      <ion-col style="display: flex; align-items: center; justify-content: center; font-weight: 700; text-align: center;" size="2">Bình quân</ion-col>
+      <ion-col style="display: flex; align-items: center; justify-content: center; font-weight: 700; text-align: center;" size="2">Xếp hạng</ion-col>
     </ion-row>
     <ion-row *ngFor="let data of lstData">
-      <ion-col style="display: flex; align-items: center; justify-content: center;" size="6">{{ data.store }}</ion-col>
-      <ion-col style="display: flex; align-items: center; justify-content: center;" size="2">{{ data.lanCham }}</ion-col>
-      <ion-col style="display: flex; align-items: center; justify-content: center;" size="2">{{ data.binhQuan }}</ion-col>
-      <ion-col style="display: flex; align-items: center; justify-content: center;" size="2">
+      <ion-col style="display: flex; align-items: center; justify-content: center; text-align: center;" size="6">{{ data.store }}</ion-col>
+      <ion-col style="display: flex; align-items: center; justify-content: center; text-align: center;" size="2">{{ data.lanCham }}</ion-col>
+      <ion-col style="display: flex; align-items: center; justify-content: center; text-align: center;" size="2">{{ data.binhQuan }}</ion-col>
+      <ion-col style="display: flex; align-items: center; justify-content: center; text-align: center;" size="2">
         <ion-chip
         *ngIf="data.rank === '0'"
         slot="end"

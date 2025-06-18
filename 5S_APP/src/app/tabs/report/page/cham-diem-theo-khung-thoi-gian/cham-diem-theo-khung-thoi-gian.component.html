@@ -3,8 +3,16 @@
     <ion-button fill="" slot="start">
       <ion-back-button></ion-back-button>
     </ion-button>
-    <ion-title class="t-center"> Báo cáo lần chấm điểm theo khung thời gian </ion-title>
-    <ion-button (click)="openFilterModal()" id="open-modal" fill="clear" slot="end" color="dark">
+    <ion-title class="t-center">
+      Báo cáo lần chấm điểm theo khung thời gian
+    </ion-title>
+    <ion-button
+      (click)="openFilterModal()"
+      id="open-modal"
+      fill="clear"
+      slot="end"
+      color="dark"
+    >
       <ion-icon name="filter-outline" fill="clear"></ion-icon>
     </ion-button>
   </ion-toolbar>
@@ -18,21 +26,259 @@
     <ion-item>
       <ion-icon slot="start" name="warning-outline"></ion-icon>
       <p>Trạng thái</p>
-      <ion-chip *ngIf="filter.filterKiKhaoSat.trangThaiKi === '0'" slot="end" color="danger">Đã đóng</ion-chip>
-      <ion-chip *ngIf="filter.filterKiKhaoSat.trangThaiKi === '1'" slot="end" color="primary">Khởi tạo</ion-chip>
-      <ion-chip *ngIf="filter.filterKiKhaoSat.trangThaiKi === '2'" slot="end" color="success">Đang mở</ion-chip>
+      <ion-chip
+        *ngIf="filter.filterKiKhaoSat.trangThaiKi === '0'"
+        slot="end"
+        color="danger"
+        >Đã đóng</ion-chip
+      >
+      <ion-chip
+        *ngIf="filter.filterKiKhaoSat.trangThaiKi === '1'"
+        slot="end"
+        color="primary"
+        >Khởi tạo</ion-chip
+      >
+      <ion-chip
+        *ngIf="filter.filterKiKhaoSat.trangThaiKi === '2'"
+        slot="end"
+        color="success"
+        >Đang mở</ion-chip
+      >
     </ion-item>
   </ion-item-group>
-   <ion-item-group style="margin-top: 10px">
-    <ion-list >
-      <ion-item>
-      </ion-item>
-    </ion-list>
+  <ion-item-group style="background-color: white; margin-top: 10px">
+    <ion-row style="background-color: #fafafa">
+      <ion-col
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          text-align: center;
+          padding: 10px 0px;
+        "
+        size="6"
+        >Cửa hàng</ion-col
+      >
+      <ion-col
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          text-align: center;
+          padding: 10px 0px;
+        "
+        size="2"
+        >CHT</ion-col
+      >
+      <ion-col
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          text-align: center;
+          padding: 10px 0px;
+        "
+        size="2"
+        >ATVSV</ion-col
+      >
+      <ion-col
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          text-align: center;
+          padding: 10px 0px;
+        "
+        size="1"
+        >C.G</ion-col
+      >
+      <ion-col
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          text-align: center;
+          padding: 10px 0px;
+        "
+        size="1"
+        >B.Q</ion-col
+      >
+    </ion-row>
+    <ion-row style="background-color: #fafafa">
+      <ion-col
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          text-align: center;
+        "
+        size="6"
+      ></ion-col>
+      <ion-col
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          text-align: center;
+        "
+        size="1"
+        >T</ion-col
+      >
+      <ion-col
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          text-align: center;
+        "
+        size="1"
+        >N</ion-col
+      >
+      <ion-col
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          text-align: center;
+        "
+        size="1"
+        >T</ion-col
+      >
+      <ion-col
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          text-align: center;
+        "
+        size="1"
+        >N</ion-col
+      >
+      <ion-col
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          text-align: center;
+        "
+        size="1"
+      ></ion-col>
+      <ion-col
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          text-align: center;
+        "
+        size="1"
+      ></ion-col>
+    </ion-row>
+    <ion-row *ngFor="let data of lstData">
+      <ion-col
+        class="custom-border"
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+        "
+        size="6"
+        >{{ data.store }}</ion-col
+      >
+      <ion-col
+        class="custom-border"
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+        "
+        size="1"
+        >{{ data.CHT_T }}</ion-col
+      >
+      <ion-col
+        class="custom-border"
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+        "
+        size="1"
+        >{{ data.CHT_N }}</ion-col
+      >
+      <ion-col
+        class="custom-border"
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+        "
+        size="1"
+      >
+        {{ data.ATSV_T }}
+      </ion-col>
+      <ion-col
+        class="custom-border"
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+        "
+        size="1"
+      >
+        {{ data.ATSV_N }}
+      </ion-col>
+      <ion-col
+        class="custom-border"
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+        "
+        size="1"
+      >
+        {{ data.CG }}
+      </ion-col>
+      <ion-col
+        class="custom-border"
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+        "
+        size="1"
+      >
+        {{ data.BQ }}
+      </ion-col>
+    </ion-row>
   </ion-item-group>
 </ion-content>
 
-<ion-modal [isOpen]="isOpen" (didDismiss)="closeFilterModal()" [initialBreakpoint]="1" [breakpoints]="[1]" cssClass="custom-modal">
-<!-- <ion-modal trigger="open-modal" [(isOpen)]="isOpen" [initialBreakpoint]="1" [breakpoints]="[1]" cssClass="custom-modal"> -->
+<ion-modal
+  [isOpen]="isOpen"
+  (didDismiss)="closeFilterModal()"
+  [initialBreakpoint]="1"
+  [breakpoints]="[1]"
+  cssClass="custom-modal"
+>
+  <!-- <ion-modal trigger="open-modal" [(isOpen)]="isOpen" [initialBreakpoint]="1" [breakpoints]="[1]" cssClass="custom-modal"> -->
   <ng-template>
     <ion-header>
       <ion-toolbar>
@@ -44,13 +290,26 @@
         <ion-accordion value="first">
           <ion-item slot="header" color="light">
             <ion-label>
-              <ion-input label="Kỳ thời gian" labelPlacement="stacked" labelPlacement="floating" [clearInput]="true"
-                [readonly]="true" placeholder="Chọn kỳ thời gian" [(ngModel)]="inputSearchKiKhaoSat.name">
+              <ion-input
+                label="Kỳ thời gian"
+                labelPlacement="stacked"
+                labelPlacement="floating"
+                [clearInput]="true"
+                [readonly]="true"
+                placeholder="Chọn kỳ thời gian"
+                [(ngModel)]="inputSearchKiKhaoSat.name"
+              >
               </ion-input>
             </ion-label>
           </ion-item>
-          <div slot="content" style="max-height: 25vh; overflow-y: auto; padding: 5px;">
-            <ion-item *ngFor="let item of lstKiKhaoSat" (click)="searchStore(item)">
+          <div
+            slot="content"
+            style="max-height: 25vh; overflow-y: auto; padding: 5px"
+          >
+            <ion-item
+              *ngFor="let item of lstKiKhaoSat"
+              (click)="searchStore(item)"
+            >
               <ion-label>{{ item.name }}</ion-label>
             </ion-item>
           </div>
@@ -59,13 +318,26 @@
         <ion-accordion value="second">
           <ion-item slot="header" color="light">
             <ion-label>
-              <ion-input label="Cửa hàng" labelPlacement="stacked" labelPlacement="floating" [clearInput]="true"
-                [readonly]="true" placeholder="Chọn cửa hàng" [(ngModel)]="filter.filterStore.name">
+              <ion-input
+                label="Cửa hàng"
+                labelPlacement="stacked"
+                labelPlacement="floating"
+                [clearInput]="true"
+                [readonly]="true"
+                placeholder="Chọn cửa hàng"
+                [(ngModel)]="filter.filterStore.name"
+              >
               </ion-input>
             </ion-label>
           </ion-item>
-          <div slot="content" style="max-height: 25vh; overflow-y: auto; padding: 5px;">
-            <ion-item *ngFor="let item of lstSearchStore" (click)="selectSearchStore(item)">
+          <div
+            slot="content"
+            style="max-height: 25vh; overflow-y: auto; padding: 5px"
+          >
+            <ion-item
+              *ngFor="let item of lstSearchStore"
+              (click)="selectSearchStore(item)"
+            >
               <ion-label>{{ item?.name }}</ion-label>
             </ion-item>
           </div>
@@ -74,13 +346,26 @@
         <ion-accordion value="third">
           <ion-item slot="header" color="light">
             <ion-label>
-              <ion-input label="Người chấm" labelPlacement="stacked" labelPlacement="floating" [clearInput]="true"
-                [readonly]="true" placeholder="Chọn người chấm" [(ngModel)]="filter.filterNguoiCham.userName">
+              <ion-input
+                label="Người chấm"
+                labelPlacement="stacked"
+                labelPlacement="floating"
+                [clearInput]="true"
+                [readonly]="true"
+                placeholder="Chọn người chấm"
+                [(ngModel)]="filter.filterNguoiCham.userName"
+              >
               </ion-input>
             </ion-label>
           </ion-item>
-          <div slot="content" style="max-height: 25vh; overflow-y: auto; padding: 5px;">
-            <ion-item *ngFor="let item of lstSearchChamDiem" (click)="selectSearchChamDiem(item)">
+          <div
+            slot="content"
+            style="max-height: 25vh; overflow-y: auto; padding: 5px"
+          >
+            <ion-item
+              *ngFor="let item of lstSearchChamDiem"
+              (click)="selectSearchChamDiem(item)"
+            >
               <ion-label>{{ item.userName }}</ion-label>
             </ion-item>
           </div>
@@ -90,8 +375,11 @@
       <div style="margin-top: 5px">
         <ion-item>
           <ion-label>
-            <ion-checkbox [(ngModel)]="filter.cuaHangToiCham" labelPlacement="end">Cửa hàng
-              tôi chấm</ion-checkbox>
+            <ion-checkbox
+              [(ngModel)]="filter.cuaHangToiCham"
+              labelPlacement="end"
+              >Cửa hàng tôi chấm</ion-checkbox
+            >
           </ion-label>
         </ion-item>
 
@@ -103,7 +391,12 @@
       </div>
     </ion-content>
     <div style="display: flex; height: 60px; gap: 15px; margin: 15px">
-      <ion-button expand="full" (click)="onFilter()" style="width: 70vh; font-weight: 700">Xác nhận</ion-button>
+      <ion-button
+        expand="full"
+        (click)="onFilter()"
+        style="width: 70vh; font-weight: 700"
+        >Xác nhận</ion-button
+      >
       <ion-button fill="outline" slot="end" (click)="resetFilters()">
         <ion-icon name="sync-outline"></ion-icon>
       </ion-button>

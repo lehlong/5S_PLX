@@ -30,19 +30,19 @@ export class KetQuaChamDiemComponent implements OnInit {
       store: 'PETROLIMEX-CỬA HÀNG 1',
       lanCham: 1,
       binhQuan: 0,
-      rank: 0,
+      rank: '0',
     },
     {
       store: 'PETROLIMEX-CỬA HÀNG 2',
       lanCham: 1,
       binhQuan: 0,
-      rank: 1,
+      rank: '1',
     },
     {
       store: 'PETROLIMEX-CỬA HÀNG 3',
       lanCham: 1,
       binhQuan: 0,
-      rank: 2,
+      rank: '2',
     },
   ]
   lstAccout: any = [];
