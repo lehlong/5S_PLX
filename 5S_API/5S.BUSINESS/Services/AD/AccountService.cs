@@ -428,9 +428,9 @@ namespace PLX5S.BUSINESS.Services.AD
             try
             {
                 var Device = _dbContext.tblMdDevice.FirstOrDefault(x => x.Id.ToString() == id);
-                Device.EnableLogin = true;
-                _dbContext.tblMdDevice.Update(Device);
-                _dbContext.SaveChangesAsync();
+                Device.EnableLogin = Device.EnableLogin ? false:true;
+                  _dbContext.tblMdDevice.Update(Device);
+                await _dbContext.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -455,7 +455,7 @@ namespace PLX5S.BUSINESS.Services.AD
                 _dbContext.tblMdDevice.UpdateRange(lstDevice);
                 Device.MainDevice = true;
                  _dbContext.tblMdDevice.Update(Device);
-                _dbContext.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync();
 
             }
             catch (Exception ex)

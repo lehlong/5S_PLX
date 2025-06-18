@@ -148,7 +148,10 @@ namespace PLX5S.API.Controllers.MD
             }
             return Ok(transferObject);
         }
-
+        public class IdDto 
+        {
+            public string Id { get; set; }
+        }
         [HttpPut("ResetPassword")]
         public IActionResult ResetPassword([FromQuery] string username)
         {
@@ -186,42 +189,40 @@ namespace PLX5S.API.Controllers.MD
             return Ok(transferObject);
         }
         [HttpPut("EnableDevice")]
-         public async Task<IActionResult> EnableDevice([FromQuery] string id)
+         public async Task<IActionResult> EnableDevice([FromBody] IdDto deviceID)
         {
             var transferObject = new TransferObject();
-           await _service.EnableDevice(id);
+           await _service.EnableDevice(deviceID.Id);
             if (_service.Status)
             {
-          
                 transferObject.Status = true;
                 transferObject.MessageObject.MessageType = MessageType.Success;
-                transferObject.GetMessage("0100", _service);
+                transferObject.GetMessage("0103", _service);
             }
             else
             {
                 transferObject.Status = false;
                 transferObject.MessageObject.MessageType = MessageType.Error;
-                transferObject.GetMessage("0101", _service);
+                transferObject.GetMessage("0104", _service);
             }
             return Ok(transferObject);
         }
         [HttpPut("MainDevice")]
-        public async Task<IActionResult> MainDevice([FromQuery] string id)
+        public async Task<IActionResult> MainDevice([FromBody] IdDto deviceID)
         {
             var transferObject = new TransferObject();
-            await _service.MainDevice(id);
+            await _service.MainDevice(deviceID.Id);
             if (_service.Status)
             {
-             
                 transferObject.Status = true;
                 transferObject.MessageObject.MessageType = MessageType.Success;
-                transferObject.GetMessage("0100", _service);
+                transferObject.GetMessage("0103", _service);
             }
             else
             {
                 transferObject.Status = false;
                 transferObject.MessageObject.MessageType = MessageType.Error;
-                transferObject.GetMessage("0101", _service);
+                transferObject.GetMessage("0104", _service);
             }
             return Ok(transferObject);
         }

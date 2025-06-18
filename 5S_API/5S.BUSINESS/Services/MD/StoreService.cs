@@ -33,7 +33,7 @@ namespace PLX5S.BUSINESS.Services.MD
                 var query = _dbContext.tblMdStore.AsQueryable();
                 if (!string.IsNullOrWhiteSpace(filter.KeyWord))
                 {
-                    query = query.Where(x => x.Id.ToString().Contains(filter.KeyWord) || x.Name.Contains(filter.KeyWord));
+                    query = query.Where(x => x.Id.ToString().Contains(filter.KeyWord) || x.Name.Contains(filter.KeyWord) ||x.CuaHangTruong.Contains(filter.KeyWord)||x.NguoiPhuTrach.Contains(filter.KeyWord));
                 }
                 if (filter.IsActive.HasValue)
                 {

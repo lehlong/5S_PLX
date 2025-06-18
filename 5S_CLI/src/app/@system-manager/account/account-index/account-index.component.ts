@@ -81,8 +81,13 @@ export class AccountIndexComponent {
       if (params['create_nmtv']) {
         this.openCreate()
       }
+      
     })
   }
+//   trackByDeviceId(index: number, device: any): string {
+    
+//   return device.id; 
+// }
 
   onSortChange(key: string, value: string | null) {
     this.filter = {
@@ -95,7 +100,7 @@ export class AccountIndexComponent {
 
   loadInit() {
     this.getAllAccountGroup()
-    this.getAllAccountType()
+    // this.getAllAccountType()
     this.search()
   }
 
@@ -143,6 +148,7 @@ export class AccountIndexComponent {
         },
       })
   }
+  
   getAllAccountGroup() {
     this.dropdownService.getAllAccountGroup().subscribe({
       next: (data) => {
@@ -239,13 +245,11 @@ export class AccountIndexComponent {
   
     this.isVisibleModal = false;
   }
-  enableDevice(id: string) {
-    console.log(id)
+  enableDevice(id: string,Username: string) {
+    
     this.dropdownService.enableDevice(id).subscribe({
       next: (data) => {
-
-       
-        this.getDviceByID(id)
+        this.getDviceByID(Username)
       },
       error: (response) => {
         
@@ -253,11 +257,10 @@ export class AccountIndexComponent {
       },
     })
   }
-  mainDevice(id: string) {
+  mainDevice(id: string,Username: string) {
     this.dropdownService.mainDevice(id).subscribe({
       next: (data) => {
-        
-        this.getDviceByID(id)
+        this.getDviceByID(Username)
       },
       error: (response) => {
        

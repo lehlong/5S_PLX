@@ -18,7 +18,7 @@ export class AccountCreateComponent {
   @Input() reset: () => void = () => { }
   @Input() visible: boolean = false
   @Input() close: () => void = () => { }
-  @ViewChild('fileInput') fileInput!: ElementRef;
+  
 
   validateForm: FormGroup
   avatarBase64: string = ''
@@ -43,14 +43,16 @@ export class AccountCreateComponent {
       address: [''],
       phoneNumber: ['', [Validators.pattern("^[0-9]*$"),]],
       email: ['', [Validators.email]],
+      allowScoring: [false],
       isActive: [true],
+
       // accountType: ['', [Validators.required]],
     })
   }
 
   ngOnInit(): void {
     // this.loadInit()
-    this.getAllAccountType()
+    // this.getAllAccountType()
     this.getAllOrg()
   }
 
@@ -129,16 +131,16 @@ export class AccountCreateComponent {
   closeDrawer() {
     this.close()
     this.resetForm()
-    this.clearImage()
+    // this.clearImage()
   }
 
   resetForm() {
     this.validateForm.reset()
   }
-  clearImage() {
-    this.avatarBase64 = ''; 
-    this.fileInput.nativeElement.value = '';
-  }
+  // clearImage() {
+  //   this.avatarBase64 = ''; 
+  //   this.fileInput.nativeElement.value = '';
+  // }
 
   onFileSelected(event: any) {
     const file = event.target.files[0];

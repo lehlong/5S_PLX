@@ -14,25 +14,25 @@ namespace PLX5S.CORE.Entities.MD
         public string Id { get; set; }
 
         [Column("USERNAME")]
-        public string UserName { get; set; }
+        public string ? UserName { get; set; }
 
         [Column("DEVICE_ID")]
-        public string DeviceId { get; set; }
+        public string? DeviceId { get; set; }
 
         [Column("DEVICE_NAME")]
-        public string DeviceName { get; set; }
+        public string? DeviceName { get; set; }
 
         [Column("OPERATINGSYSTEM")]
-        public string OperatingSystem { get; set; }
+        public string? OperatingSystem { get; set; }
 
         [Column("MODEL")]
-        public string Model { get; set; }
+        public string? Model { get; set; }
 
         [Column("MANUFACTURER")]
-        public string Manufacturer { get; set; }
+        public string? Manufacturer { get; set; }
 
         [Column("OSVERSION")]
-        public string OsVersion { get; set; }
+        public string? OsVersion { get; set; }
         [Column("MAIN_DEVICE")]
         public bool MainDevice { get; set; }
         [Column("ENABLE_LOGIN")]

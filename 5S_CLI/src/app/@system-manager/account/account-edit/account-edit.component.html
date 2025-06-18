@@ -25,7 +25,7 @@
               [control]="$any(validateForm).controls['email']"></app-input-clear>
           </div>
           <div nz-col [nzXs]="24" [nzMd]="12">
-            <nz-form-item>
+            <!-- <nz-form-item>
               <nz-form-label>Kiểu người dùng</nz-form-label>
               <nz-form-control nzErrorTip="Không được để trống">
                 <nz-select nzShowSearch nzAllowClear placeholder="Chọn kiểu người dùng" formControlName="accountType">
@@ -33,7 +33,7 @@
                   </nz-option>
                 </nz-select>
               </nz-form-control>
-            </nz-form-item>
+            </nz-form-item> -->
           </div>
           <div nz-col [nzXs]="24">
             <nz-form-item>
@@ -46,10 +46,21 @@
               </nz-form-control>
             </nz-form-item>
           </div>
+          <div nz-col [nzXs]="24">
+            <nz-form-item>
+              <nz-form-label>Chấm tất cả các cửa hàng</nz-form-label>
+              <nz-form-control>
+                <nz-radio-group formControlName="allowScoring">
+                  <label nz-radio [nzValue]="true">Kích hoạt</label>
+                  <label nz-radio [nzValue]="false">Khoá</label>
+                </nz-radio-group>
+              </nz-form-control>
+            </nz-form-item>
+          </div>
         </div>
       </form>
-      <label>Chọn ảnh</label>
-    <div class="main-upload">
+      <!-- <label>Chọn ảnh</label> -->
+    <!-- <div class="main-upload">
       <div class="upload-avatar" (click)="fileInput.click()">
         <nz-icon nzType="cloud-upload" nzTheme="outline" style="font-size: 24px;"/>
         <div>Chọn ảnh</div>
@@ -57,8 +68,8 @@
       <div class="avatar-preview" *ngIf="avatarBase64 != null && avatarBase64 != ''">
         <img [src]="avatarBase64" width="128" height="128"/>
       </div>
-    </div>
-    <input type="file" #fileInput accept="image/*" (change)="onFileSelected($event)" style="display: none;" />
+    </div> -->
+    <!-- <input type="file" #fileInput accept="image/*" (change)="onFileSelected($event)" style="display: none;" /> -->
     </nz-tab>
     <nz-tab nzTitle="Nhóm người dùng">
       <div style="overflow: auto">

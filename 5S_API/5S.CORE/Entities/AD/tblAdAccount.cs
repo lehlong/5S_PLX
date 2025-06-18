@@ -36,6 +36,9 @@ namespace PLX5S.CORE.Entities.AD
 
         [Column("URL_IMAGE", TypeName = "VARCHAR(100)")]
         public string? UrlImage { get; set; }
+        //allowScoring
+        [Column("ALLOW_SCRORING")]
+        public bool ? AllowScoring { get; set; }
 
 
         public virtual ICollection<TblAdAccount_AccountGroup> Account_AccountGroups { get; set; }

@@ -32,7 +32,7 @@ export class AccountEditComponent {
   @Input() visible: boolean = false
   @Input() close: () => void = () => { }
   @Input() userName: string | number = ''
-  @ViewChild('fileInput') fileInput!: ElementRef;
+  // @ViewChild('fileInput') fileInput!: ElementRef;
 
   optionsGroup: any[] = []
   widthDeault: string = '0px'
@@ -72,7 +72,8 @@ export class AccountEditComponent {
       phoneNumber: ['', [Validators.pattern('^0\\d{8,9}$')]],
       email: ['', [Validators.email]],
       isActive: [true],
-      accountType: ['', [Validators.required]],
+      allowScoring: [false],
+     
       urlImage: [''],
     })
     this.widthDeault =
@@ -88,7 +89,7 @@ export class AccountEditComponent {
   }
 
   loadInit() {
-    this.getAllAccountType()
+    // this.getAllAccountType()
     this.getRight()
     this.getAllOrg()
   }
@@ -244,18 +245,21 @@ export class AccountEditComponent {
       })
       .subscribe({
         next: (data) => {
+          console.log('data', data)
           this.getAllGroup(data?.account_AccountGroups)
-          this.validateForm.setValue({
+          this.validateForm.patchValue({
             userName: data.userName,
             fullName: data.fullName,
             address: data.address,
             phoneNumber: data.phoneNumber,
             email: data.email,
             isActive: data.isActive,
-            accountType: data.accountType,
-            urlImage : data.urlImage
+            // accountType: data.accountType,
+            urlImage : data.urlImage,
+            allowScoring: data.allowScoring,
             //partnerId: data.partnerId || '',
           })
+          console.log('validate' ,this.validateForm.value);
           this.avatarBase64 = environment.urlFiles + data.urlImage;
           //this.isShowSelectPartner = data.accountType === 'KH' ? true : false
           this.initialCheckedNodes = data?.listAccountGroupRight?.map(
@@ -440,7 +444,7 @@ export class AccountEditComponent {
   closeDrawer() {
     this.close()
     this.resetForm()
-    this.clearImage()
+    // this.clearImage()
   }
 
   resetForm() {
@@ -454,10 +458,10 @@ export class AccountEditComponent {
     })
   }
 
-  clearImage() {
-    this.avatarBase64 = ''; 
-    this.fileInput.nativeElement.value = '';
-  }
+  // clearImage() {
+  //   this.avatarBase64 = ''; 
+  //   this.fileInput.nativeElement.value = '';
+  // }
 
   onFileSelected(event: any) {
     const file = event.target.files[0];

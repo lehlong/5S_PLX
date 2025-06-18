@@ -130,7 +130,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let device of listDevice; let i = index">
+          <tr *ngFor="let device of listDevice; let i = index ">
             <td  nzAlign="center">{{ i + 1 }}</td>
             <td  nzAlign="center">{{ device.deviceId }}</td>
             <td  nzAlign="center">{{ device.deviceName }}</td>
@@ -139,8 +139,8 @@
             <td  nzAlign="center">{{ device.osVersion }}</td>
             <td  nzAlign="center">{{ device.enableLogin ? 'Kích hoạt' : 'Khoá' }}</td>
             <td  nzAlign="center">{{ device.mainDevice ? 'Thiết bị chính' : '' }}</td>
-            <td  nzAlign="center"><span nz-icon nz-popover nzType="lock"  nzPopoverContent="kích hoạt thiết bị" (click)="enableDevice(device.id)"></span>
-            <span nz-icon nz-popover nzType="check-square"  nzPopoverContent="Chọn làm thiết bị chính" (click)="mainDevice(device.id)"></span></td>
+            <td  nzAlign="center"><span nz-icon nz-popover nzType="lock"  nzPopoverContent="kích hoạt thiết bị" (click)="enableDevice(device.id,device.userName)"></span>
+            <span nz-icon nz-popover nzType="check-square"  nzPopoverContent="Chọn làm thiết bị chính" (click)="mainDevice(device.id,device.userName)"></span></td>
 
           </tr>
         </tbody>

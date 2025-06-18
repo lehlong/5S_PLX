@@ -183,6 +183,17 @@
             </nz-form-control>
           </nz-form-item>
         </div>
+          <div nz-col [nzXs]="24">
+            <nz-form-item>
+              <nz-form-label>Chấm tất cả các cửa hàng</nz-form-label>
+              <nz-form-control>
+                <nz-radio-group formControlName="allowScoring">
+                  <label nz-radio [nzValue]="true">Kích hoạt</label>
+                  <label nz-radio [nzValue]="false">Khoá</label>
+                </nz-radio-group>
+              </nz-form-control>
+            </nz-form-item>
+          </div>
       </div>
     </form>
 

@@ -72,12 +72,12 @@ export class DropdownService {
 
   }
 
-  enableDevice(params:string): Observable<any> {
-    return this.commonService.put(`Account/EnableDevice?id=${params}`,{ })
+  enableDevice(id:string): Observable<any> {
+    return this.commonService.put(`Account/EnableDevice`,{id })
 
   }
-  mainDevice(params:string): Observable<any> {
-    return this.commonService.put(`Account/MainDevice?id=${params}`,{})
+  mainDevice(id:string): Observable<any> {
+    return this.commonService.put(`Account/MainDevice`,{id})
 
   }
    

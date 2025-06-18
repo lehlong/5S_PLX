@@ -35,6 +35,9 @@ namespace PLX5S.BUSINESS.Dtos.AD
         public string? OrganizeCode { get; set; }
         public string? UrlImage { get; set; }
 
+        [Description("Quyền chấm tất cả các cửa hàng")]
+        public bool ? AllowScoring { get; set; }
+
         //  public int? DriverId { get; set; }
 
 
@@ -107,6 +110,7 @@ namespace PLX5S.BUSINESS.Dtos.AD
         public string? OrganizeCode { get; set; }
         public string? ImageBase64 { get; set; }
         public string? UrlImage { get; set; }
+        public bool  AllowScoring { get; set; }
 
         public void Mapping(Profile profile)
         {
@@ -131,7 +135,7 @@ namespace PLX5S.BUSINESS.Dtos.AD
 
         public string? OrganizeCode { get; set; }
         public string? UrlImage { get; set; }
-
+        public bool ? AllowScoring { get; set; }
         public virtual List<Account_AccountGroupDto> Account_AccountGroups { get; set; }
 
         public void Mapping(Profile profile)
@@ -180,6 +184,7 @@ namespace PLX5S.BUSINESS.Dtos.AD
         public string? OrganizeCode { get; set; }
         public string? ImageBase64 { get; set; }
         public string? UrlImage { get; set; }
+        public bool ? AllowScoring { get; set; }
 
         public virtual List<TblAccount_AccountGroupUpdateGroupDto> Account_AccountGroups { get; set; }
 
@@ -209,6 +214,7 @@ namespace PLX5S.BUSINESS.Dtos.AD
         public string? OrganizeCode { get; set; }
 
         public string? UrlImage { get; set; }
+        public bool ? AllowScoring { get;set; }
         public virtual List<TblAccount_AccountGroupLiteGroupDto> Account_AccountGroups { get; set; }
 
         public RightDto TreeRight { get; set; }
