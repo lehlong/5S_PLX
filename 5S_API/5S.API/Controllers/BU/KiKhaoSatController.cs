@@ -36,7 +36,7 @@ namespace PLX5S.API.Controllers.BU
             return Ok(transferObject);
         }
         [HttpGet("Search")]
-        public async Task<IActionResult> Search([FromQuery] FilterKiKhaoSat filter)
+        public async Task<IActionResult> Search([FromQuery] BaseFilter filter)
         {
             var transferObject = new TransferObject();
             var result = await _service.Search(filter);

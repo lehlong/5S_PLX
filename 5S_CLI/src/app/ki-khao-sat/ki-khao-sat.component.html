@@ -4,8 +4,8 @@
   <nz-page-header-extra>
     <div class="flex-grow-2 flex">
       <nz-space>
-        <app-input-clear placeholder="Tìm kiếm" (enterEvent)="search()" [(value)]="filter.keyWord"></app-input-clear>
-        <button (click)="search()" class="flex !items-center !border-l-0 gray-btn" nzType="default" nz-button
+        <app-input-clear placeholder="Tìm kiếm" (enterEvent)="setInSearchKKS()" [(value)]="inputSearchKKS"></app-input-clear>
+        <button (click)="setInSearchKKS()" class="flex !items-center !border-l-0 gray-btn" nzType="default" nz-button
           nzType="default">
           <span nz-icon nzType="search"></span>
         </button>

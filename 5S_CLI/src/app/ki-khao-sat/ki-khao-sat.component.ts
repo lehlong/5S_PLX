@@ -5,7 +5,7 @@ import { AccountTypeFilter } from '../models/master-data/account-type.model';
 import { PaginationResult } from '../models/base.model';
 import { KiKhaoSatService } from '../service/master-data/ki-khao-sat.service';
 import { AccountService } from '../service/system-manager/account.service';
-import {  KiKhaoSatFilter } from '../models/master-data/ki-khao-sat.model';
+import { KiKhaoSatFilter } from '../models/master-data/ki-khao-sat.model';
 import { GlobalService } from '../service/global.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -35,10 +35,10 @@ export class KiKhaoSatComponent {
   selectedNode: any = null;
   selectedNodeDetails: any[] = [];
   searchValue = '';
-   filterNguoiChamDiem: string = '';
+  filterNguoiChamDiem: string = '';
   treeData: any = [];
   filter = new KiKhaoSatFilter();
-    lstInputStoreSearch: any = [];
+  lstInputStoreSearch: any = [];
   paginationResult = new PaginationResult();
   loading: boolean = false;
   lstAccount: any = [];
@@ -63,6 +63,7 @@ export class KiKhaoSatComponent {
     kiKhaoSat: {},
     lstInputStore: [],
   }
+  inputSearchKKS: any = ''
   currentNode: NzTreeNode | undefined;
   parentTitle: string | undefined;
 
@@ -96,7 +97,9 @@ export class KiKhaoSatComponent {
     this.route.paramMap.subscribe({
       next: (params) => {
         this.headerId = params.get('id');
-         this.filter.headerId = this.headerId;
+
+        this.filter.keyWord = this.headerId;
+        // this.filter.headerId = this.headerId;
       },
     });
     this.search();
@@ -113,18 +116,27 @@ export class KiKhaoSatComponent {
     this.search();
   }
   searchNguoiChamDiem() {
- console.log(this.inputKi.lstInputStore);
-  this.lstInputStoreSearch= this.inputKi.lstInputStore?.filter((item:any) => 
-    item.storeId.toLowerCase().includes(this.filterNguoiChamDiem.toLowerCase()) ||
-    item.cuaHangTruong.toLowerCase().includes(this.filterNguoiChamDiem.toLowerCase()) ||
-    item.nguoiPhuTrach.toLowerCase().includes(this.filterNguoiChamDiem.toLowerCase())
- 
-  );
- console.log(this.lstInputStoreSearch)
+    console.log(this.inputKi.lstInputStore);
+    this.lstInputStoreSearch = this.inputKi.lstInputStore?.filter((item: any) =>
+      item.storeId.toLowerCase().includes(this.filterNguoiChamDiem.toLowerCase()) ||
+      item.cuaHangTruong.toLowerCase().includes(this.filterNguoiChamDiem.toLowerCase()) ||
+      item.nguoiPhuTrach.toLowerCase().includes(this.filterNguoiChamDiem.toLowerCase())
+
+    );
+    console.log(this.lstInputStoreSearch)
   }
+
+  setInSearchKKS() {
+    if (this.inputSearchKKS == '') {
+      this.filter.keyWord = this.headerId;
+    } else {
+      this.filter.keyWord = this.inputSearchKKS
+    }
+    this.search()
+  }
+
   search() {
     this.isSubmit = false;
-
     this._service.search(this.filter).subscribe({
       next: (data) => {
         this.paginationResult = data;
@@ -292,15 +304,15 @@ export class KiKhaoSatComponent {
         console.log(data.result);
 
         this.selectedNodeDetails = data.result;
-    
+
       },
       error: (response) => {
         console.log(response);
       },
     });
   }
-    resetStore() {
-        this.filterNguoiChamDiem="";
+  resetStore() {
+    this.filterNguoiChamDiem = "";
     this.lstInputStoreSearch = this.inputKi.lstInputStore;
   }
 
@@ -385,7 +397,7 @@ export class KiKhaoSatComponent {
       next: (data) => {
         this.inputKi = data
         // this.search();
-             this.lstInputStoreSearch = this.inputKi.lstInputStore;
+        this.lstInputStoreSearch = this.inputKi.lstInputStore;
       },
       error: (response) => {
         console.log(response);
@@ -429,7 +441,7 @@ export class KiKhaoSatComponent {
     this._service.getInputKiKhaoSat(data.id).subscribe({
       next: (data) => {
         this.inputKi = data
-         this.lstInputStoreSearch = this.inputKi.lstInputStore;
+        this.lstInputStoreSearch = this.inputKi.lstInputStore;
       }
     })
     console.log(this.kiKhaoSat)

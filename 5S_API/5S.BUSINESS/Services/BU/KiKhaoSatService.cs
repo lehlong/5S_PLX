@@ -74,13 +74,15 @@ namespace PLX5S.BUSINESS.Services.BU
                 var query = _dbContext.TblBuKiKhaoSat.AsQueryable();
                 if (!string.IsNullOrWhiteSpace(filter.KeyWord))
                 {
-                    query = query.Where(x => ( x.Name.Contains(filter.KeyWord)) && x.IsDeleted == false);
-
+                    query = query.Where(x => x.SurveyMgmtId.ToString().Contains(filter.KeyWord) || 
+                    x.Name.Contains(filter.KeyWord) || 
+                    x.Code.Contains(filter.KeyWord) || 
+                    x.StartDate.ToString().Contains(filter.KeyWord) || 
+                    x.EndDate.ToString().Contains(filter.KeyWord));
                 }
-               
                 if (filter.IsActive.HasValue)
                 {
-                    query = query.Where(x => x.IsActive == filter.IsActive && x.IsDeleted == false);
+                    query = query.Where(x => x.IsActive == filter.IsActive);
                 }
                 return await Paging(query, filter);
 

@@ -39,11 +39,11 @@ export class LoginComponent implements OnInit {
     this.logDeviceID();
     this.logDeviceInfo();
   }
-  
+
  logDeviceID = async () => {
   const Id = await Device.getId();
  this.deviceId = Id ? Id.identifier : '';
- 
+
 };
 
 logDeviceInfo = async () => {
@@ -54,23 +54,25 @@ logDeviceInfo = async () => {
   saveAccount: boolean = false
 
   processLogin() {
-   
-    this.model.deviceId = this.deviceId;
-    this.model.deviceName = this.info.name ;
+
+    // this.model.deviceId = this.deviceId;
+    this.model.deviceId = 'faf599b6-41d0-4156-b34d-ad6b16d69282';
+    // this.model.deviceName = this.info.name ;
+    this.model.deviceName = 'máy của kienn' ;
     this.model.model = this.info.model ;
     this.model.operatingSystem = this.info.operatingSystem ;
     this.model.osVersion = this.info.osVersion ;
     this.model.manufacturer = this.info.manufacturer ;
 
 
-   
+
     if (this.model.userName == '' || this.model.password == '') {
       this.messageService.show('Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!', 'danger');
       return;
     }
     this.authService.login(this.model).subscribe({
       next: (response) => {
-      
+
         localStorage.setItem('token', response.accessToken)
         localStorage.setItem('refreshToken', response.refreshToken)
         this.globalService.setUserInfo(response.accountInfo)
@@ -89,14 +91,14 @@ logDeviceInfo = async () => {
               this.router.navigate(['/'])
             },
             error: (error) => {
-              
+
               this.messageService.show(`Lỗi không lấy được danh sách quyền của user!`, 'warning');
               console.log('Lỗi hệ thống:', error)
             },
           })
       },
       error: (error) => {
-        
+
         this.messageService.show(`${error}`, 'warning');
         console.log(error);
       }
