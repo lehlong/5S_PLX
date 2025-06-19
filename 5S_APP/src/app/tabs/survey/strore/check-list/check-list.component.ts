@@ -112,6 +112,10 @@ export class CheckListComponent implements OnInit {
 
   async remove(code: any) {
     await this._storageService.remove(this.store.id)
+    console.log(this.kiKhaoSat.code);
+
+    localStorage.removeItem(this.kiKhaoSat.code)
+
     this.lstHisEvaluate.shift();
   }
 

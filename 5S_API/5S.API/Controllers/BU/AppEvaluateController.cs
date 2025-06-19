@@ -6,6 +6,7 @@ using PLX5S.BUSINESS.Dtos.BU;
 using PLX5S.BUSINESS.Services.BU;
 using PLX5S.API.AppCode.Extensions;
 using PLX5S.BUSINESS.Models;
+using PLX5S.CORE.Entities.BU;
 
 namespace PLX5S.API.Controllers.BU
 {
@@ -95,6 +96,7 @@ namespace PLX5S.API.Controllers.BU
 
 
 
+
         [HttpPost("InsertEvaluate")]
         public async Task<IActionResult> InsertEvaluate([FromBody] EvaluateModel data)
         {
@@ -134,6 +136,42 @@ namespace PLX5S.API.Controllers.BU
             return Ok(transferObject);
         }
 
+        [HttpPost("TinhTongLanCham")]
+        public async Task<IActionResult> TinhTongLanCham([FromBody] TblBuPointStore data)
+        {
+            var transferObject = new TransferObject();
+            await _service.TinhTongLanCham(data);
+            if (_service.Status)
+            {
+                transferObject.Status = true;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
+
+        [HttpGet("GetPointStore")]
+        public async Task<IActionResult> GetPointStore([FromQuery] string kiKhaoSatId, string surveyId)
+        {
+            var transferObject = new TransferObject();
+            var data = await _service.GetPointStore(kiKhaoSatId, surveyId);
+            if (_service.Status)
+            {
+                transferObject.Data = data;
+                transferObject.Status = true;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
 
         //[HttpPost("upload-image")]
         //public async Task<IActionResult> UploadImage([FromBody] ImageUploadRequest request)

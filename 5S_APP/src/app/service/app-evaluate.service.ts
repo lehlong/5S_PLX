@@ -28,8 +28,16 @@ export class AppEvaluateService {
     return this.commonService.post(`AppEvaluate/InsertEvaluate`, params)
   }
 
+  tinhTongLanCham(params: any): Observable<any> {
+    return this.commonService.post(`AppEvaluate/TinhTongLanCham`, params)
+  }
+
   getResultEvaluate(params: any): Observable<any> {
     return this.commonService.get(`AppEvaluate/GetResultEvaluate?code=${params}`)
+  }
+
+  getPointStore(params: any): Observable<any> {
+    return this.commonService.get(`AppEvaluate/GetPointStore?kiKhaoSatId=${params.kiKhaoSatId}&surveyId=${params.surveyId}`)
   }
 
   getInputKiKhaoSat(params: any): Observable<any> {

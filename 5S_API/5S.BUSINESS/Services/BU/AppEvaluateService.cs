@@ -26,6 +26,8 @@ namespace PLX5S.BUSINESS.Services.BU
         Task InsertEvaluate(EvaluateModel data);
         Task<TblBuEvaluateImage> HandelFile(TblBuEvaluateImage request);
         Task<EvaluateModel> GetResultEvaluate(string code);
+        Task TinhTongLanCham(TblBuPointStore point);
+        Task<List<TblBuPointStore>> GetPointStore(string kiKhaoSatid, string surveyId);
     }
 
     public class AppEvaluateService : GenericService<TblBuEvaluateHeader, EvaluateHeaderDto>, IAppEvaluateService
@@ -350,6 +352,48 @@ namespace PLX5S.BUSINESS.Services.BU
 
             return "Uploads/Files"; // mặc định cho .docx, .xlsx, .pdf, ...
         }
+
+
+        public async Task TinhTongLanCham(TblBuPointStore point)
+        {
+            try
+            {
+                var diem = _dbContext.TblBuPointStore.FirstOrDefault(x => x.InStoreId == point.InStoreId && x.KiKhaoSatId == point.KiKhaoSatId && x.SurveyId == point.SurveyId);
+                if(diem == null)
+                {
+                    point.Code = Guid.NewGuid().ToString();
+                    _dbContext.TblBuPointStore.Add(point);
+                }
+                else
+                {
+                    diem.Point = point.Point;
+                    _dbContext.Update(diem);
+                }
+                await _dbContext.SaveChangesAsync();
+                this.Status = true;
+            }
+            catch(Exception ex)
+            {
+                this.Status = false;
+                //return null;
+            }
+        }
+
+        public  async Task<List<TblBuPointStore>> GetPointStore(string kiKhaoSatid, string surveyId)
+        {
+            try
+            {
+                var lstPointStore = new List<TblBuPointStore>();
+                lstPointStore = await _dbContext.TblBuPointStore.Where(x => x.KiKhaoSatId == kiKhaoSatid && x.SurveyId == surveyId).ToListAsync();
+                return lstPointStore;
+            }
+            catch(Exception ex)
+            {
+                this.Status = false;
+                return null;
+            }
+        }
+
 
     }
 }

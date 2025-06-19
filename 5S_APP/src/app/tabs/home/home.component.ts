@@ -11,8 +11,8 @@ import { IonAccordionGroup } from '@ionic/angular';
   imports: [SharedModule, RouterModule],
   standalone: true
 })
-export class HomeComponent  implements OnInit {
-data: any[] = [];
+export class HomeComponent implements OnInit {
+  data: any[] = [];
 
   @ViewChild('accordionGroup', { static: true })
   accordionGroup!: IonAccordionGroup;
@@ -30,6 +30,8 @@ data: any[] = [];
 
   navigateTo(item: any) {
     const { doiTuongId, id } = item
+    localStorage.setItem('surveyId', id);
+
     if (doiTuongId === 'DT1') {
       this.router.navigate([`/survey/store/list/${id}`]);
     } else if (doiTuongId === 'DT2') {

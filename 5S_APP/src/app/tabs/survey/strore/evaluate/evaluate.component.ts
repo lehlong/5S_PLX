@@ -65,6 +65,8 @@ export class EvaluateComponent implements OnInit {
   };
   private highlightClass = 'highlight-search';
   private currentHighlights: HTMLElement[] = [];
+  lstHisEvaluate: any = []
+
 
   constructor(
     private route: ActivatedRoute,
@@ -533,10 +535,12 @@ export class EvaluateComponent implements OnInit {
     }
 
     // Trường hợp đủ
-    this.evaluate.header.accountUserName = this.account.userName;
+    this.evaluate.header.accountUserName = this.account.userName
+
     this._service.insertEvaluate(this.evaluate).subscribe({
       next: () => {
         console.log('Chấm điểm thành công');
+        this.tinhTongLanCham()
 
         this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
         this._storageService.remove(this.store.id);
@@ -546,8 +550,31 @@ export class EvaluateComponent implements OnInit {
         console.log(ex);
       },
     });
+  }
 
-    console.log(this.evaluate);
+
+  tinhTongLanCham() {
+    this._service.search({ keyWord: this.store.id, sortColumn: this.kiKhaoSat.id }).subscribe({
+      next: (data) => {
+
+        const total = data.data.reduce((sum: any, item: any) => sum + item.point, 0);
+        const avg = total / data.data.length;
+
+        const point = {
+          code: '',
+          inStoreId: this.store.id,
+          surveyId: localStorage.getItem('surveyId'),
+          kiKhaoSatId: this.kiKhaoSat.id,
+          point: avg
+        }
+        this._service.tinhTongLanCham(point).subscribe({
+          next: (data) => {
+            console.log("tính tổng điểm thành công");
+
+          }
+        })
+      }
+    })
   }
 
   navigateTo(itemId: string) {

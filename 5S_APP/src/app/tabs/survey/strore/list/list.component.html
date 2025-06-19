@@ -34,7 +34,7 @@
     <ion-list *ngFor="let item of lstStore">
       <ion-item>
         <ion-label (click)="navigateTo(item)">{{ item?.name }}</ion-label>
-        <ion-label slot="end">0 điểm</ion-label>
+        <ion-label slot="end">{{ filterPoint(item.id) }} điểm</ion-label>
       </ion-item>
     </ion-list>
   </ion-item-group>

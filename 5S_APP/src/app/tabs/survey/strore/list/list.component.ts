@@ -5,6 +5,7 @@ import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { KyKhaoSatService } from 'src/app/service/ky-khao-sat.service';
 import { AuthService } from 'src/app/service/auth.service';
+import { AppEvaluateService } from 'src/app/service/app-evaluate.service';
 
 @Component({
   selector: 'app-scoring-five-s',
@@ -37,11 +38,13 @@ export class ListComponent implements OnInit {
   filterForm!: FormGroup;
   isOpen = false;
   lstAccount: any = []
+  lstPointStore: any = []
 
-  user: any = {  }
+  user: any = {}
 
   constructor(
     private _service: KyKhaoSatService,
+    private _appService: AppEvaluateService,
     private _authService: AuthService,
     private router: Router,
     private route: ActivatedRoute
@@ -79,6 +82,8 @@ export class ListComponent implements OnInit {
           }
 
           this.getAllStore();
+          this.getPointStore();
+
           this.inputSearchKiKhaoSat = this.filter.filterKiKhaoSat;
         },
         error: (response) => {
@@ -97,6 +102,21 @@ export class ListComponent implements OnInit {
         console.log(response);
       },
     });
+  }
+
+  getPointStore() {
+    this._appService.getPointStore({ kiKhaoSatId: this.filter.filterKiKhaoSat.id, surveyId: this.surveyId }).subscribe({
+      next: (data) => {
+        console.log(data);
+
+        this.lstPointStore = data
+      }
+    })
+  }
+
+  filterPoint(inStoreId: any){
+    const record = this.lstPointStore.find((x: any) => x.inStoreId === inStoreId);
+    return record?.point ?? 0;
   }
 
   // getAllAccount() {
@@ -162,7 +182,7 @@ export class ListComponent implements OnInit {
 
 
   navigateTo(item: any) {
-    localStorage.setItem('filterCS', JSON.stringify({kiKhaoSat: this.filter.filterKiKhaoSat,store: item}))
+    localStorage.setItem('filterCS', JSON.stringify({ kiKhaoSat: this.filter.filterKiKhaoSat, store: item }))
     this.router.navigate([`/survey/store/check-list/${item.id}`]);
   }
 
