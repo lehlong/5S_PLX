@@ -1,4 +1,11 @@
-import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnInit,
+  Renderer2,
+  ViewChild,
+} from '@angular/core';
 import { SharedModule } from '../../../../shared/shared.module';
 import { Geolocation } from '@capacitor/geolocation';
 import { Storage } from '@ionic/storage-angular';
@@ -12,16 +19,20 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Input, ChangeDetectionStrategy } from '@angular/core';
 import { MessageService } from 'src/app/service/message.service';
 import * as L from 'leaflet';
-
+import { HighlightSearchPipe } from '../../../../shared/pipes/highlight-search.pipe';
 
 @Component({
-  imports: [SharedModule],
+  imports: [SharedModule, HighlightSearchPipe],
   selector: 'app-evaluate',
   templateUrl: './evaluate.component.html',
   styleUrls: ['./evaluate.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EvaluateComponent implements OnInit {
+  isSearchVisible: boolean = false
+  searchKeyword = '';
+  searchResults: { id: string; type: string }[] = [];
+  currentIndex = 0;
   @ViewChild('accordionGroup', { static: true })
   accordionGroup!: IonAccordionGroup;
   @ViewChild('fileInput', { static: false })
@@ -44,15 +55,16 @@ export class EvaluateComponent implements OnInit {
   };
   data: any = {};
   headerId: any = '';
-  count: any = 0
+  count: any = 0;
   isEdit: any = true;
   apiFile = (environment as any).apiFile;
-  account: any = {}
+  account: any = {};
   dataTree: any = {
     leaves: [],
-    tree: []
-  }
-
+    tree: [],
+  };
+  private highlightClass = 'highlight-search';
+  private currentHighlights: HTMLElement[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -61,9 +73,10 @@ export class EvaluateComponent implements OnInit {
     private _service: AppEvaluateService,
     private messageService: MessageService,
     private cdr: ChangeDetectorRef,
-  ) { }
+    private renderer: Renderer2
+  ) {}
   ngOnInit() {
-    this.account = JSON.parse(localStorage.getItem('UserInfo') ?? "")
+    this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
     this.route.paramMap.subscribe({
       next: async (params) => {
         this.headerId = params.get('code') ?? '';
@@ -88,22 +101,96 @@ export class EvaluateComponent implements OnInit {
           this.getAllTieuChiLeaves();
         } else {
           this.dataTree = JSON.parse(data);
-          this.treeData = this.dataTree?.tree
+          this.treeData = this.dataTree?.tree;
           this.lstTreeOpen = [...this.extractAllKeys(this.treeData)];
-          this.lstTieuChi = this.dataTree?.leaves
+          this.lstTieuChi = this.dataTree?.leaves;
           await this.cdr.detectChanges();
         }
       },
     });
-
   }
 
+  //Hàm search
+  openSearchInput() {
+    this.isSearchVisible = !this.isSearchVisible;
+  }
+  private removeHighlights() {
+    this.currentHighlights.forEach((el) => {
+      this.renderer.removeClass(el, this.highlightClass);
+    });
+    this.currentHighlights = [];
+  }
+
+  onSearchChange() {
+    this.removeHighlights();
+    this.searchResults = [];
+    this.currentIndex = 0;
+
+    const keyword = this.searchKeyword?.trim().toLowerCase();
+    if (!keyword) {
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const searchTree = (nodes: any[]) => {
+      nodes.forEach((node) => {
+        if (node.title && node.title.toLowerCase().includes(keyword)) {
+          this.searchResults.push({ id: node.id, type: 'accordion' });
+        }
+
+        if (!node.isGroup && node.diemTieuChi) {
+          node.diemTieuChi.forEach((diem: any) => {
+            if (diem.moTa && diem.moTa.toLowerCase().includes(keyword)) {
+              this.searchResults.push({ id: node.id, type: 'item' });
+            }
+          });
+        }
+
+        if (node.isGroup && Array.isArray(node.children)) {
+          searchTree(node.children);
+        }
+      });
+    };
+
+    searchTree(this.treeData);
+
+    if (this.searchResults.length > 0) {
+      this.scrollToAndHighlight(this.searchResults[0].id);
+    }
+    this.cdr.detectChanges();
+  }
+
+  goNext() {
+    if (this.currentIndex < this.searchResults.length - 1) {
+      this.currentIndex++;
+      this.scrollToAndHighlight(this.searchResults[this.currentIndex].id);
+    }
+  }
+
+  goPrev() {
+    if (this.currentIndex > 0) {
+      this.currentIndex--;
+      this.scrollToAndHighlight(this.searchResults[this.currentIndex].id);
+    }
+  }
+
+  scrollToAndHighlight(id: string) {
+    this.removeHighlights();
+
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      this.renderer.addClass(el, this.highlightClass);
+      this.currentHighlights.push(el);
+    }
+  }
+  //--------------------------
   getResultEvaluate() {
     this._service.getResultEvaluate(this.headerId).subscribe({
       next: async (data) => {
         console.log(data);
         this.evaluate = data;
-          await this.cdr.detectChanges();
+        await this.cdr.detectChanges();
       },
     });
   }
@@ -116,9 +203,12 @@ export class EvaluateComponent implements OnInit {
           this.treeData = [data];
           this.lstTreeOpen = [...this.extractAllKeys([data])];
 
-          this.dataTree.tree = this.treeData
+          this.dataTree.tree = this.treeData;
           console.log(this.dataTree);
-          localStorage.setItem(this.kiKhaoSat.name, JSON.stringify(this.dataTree))
+          localStorage.setItem(
+            this.kiKhaoSat.name,
+            JSON.stringify(this.dataTree)
+          );
 
           this.cdr.detectChanges();
         },
@@ -132,7 +222,7 @@ export class EvaluateComponent implements OnInit {
         next: (data) => {
           this.lstTieuChi = data;
 
-          this.dataTree.leaves = this.lstTieuChi
+          this.dataTree.leaves = this.lstTieuChi;
           console.log(this.dataTree);
         },
       });
@@ -155,7 +245,6 @@ export class EvaluateComponent implements OnInit {
     }
   }
 
-
   private initMap(): void {
     // L.Icon.Default.mergeOptions({
     //   iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
@@ -165,15 +254,14 @@ export class EvaluateComponent implements OnInit {
     this.map = L.map('map').setView([21.0285, 105.8542], 13); // Hà Nội
 
     L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap France'
+      attribution: '© OpenStreetMap France',
     }).addTo(this.map);
 
-    L.marker([21.0285, 105.8542]).addTo(this.map)
+    L.marker([21.0285, 105.8542])
+      .addTo(this.map)
       .bindPopup('Chưa có tọa độ')
       .openPopup();
   }
-
-
 
   isActive(itemId: string): boolean {
     return this.currentSelect === itemId;
@@ -184,13 +272,12 @@ export class EvaluateComponent implements OnInit {
   }
 
   isAnswered(data: any) {
-    let hasEnoughImages = true
+    let hasEnoughImages = true;
     const evaluateItem = this.evaluate.lstEvaluate.find(
       (i: any) => i.tieuChiId === data.code || i.tieuChiCode === data.code
     );
     const hasPoint = !!evaluateItem && !!evaluateItem.pointId;
     if (data.isImg) {
-
       const numberImgRequired = data?.numberImg || 0;
       const hasImage = this.evaluate.lstImages.filter(
         (img: any) => img.tieuChiCode === data.code
@@ -227,7 +314,7 @@ export class EvaluateComponent implements OnInit {
 
     const file: File = event.target.files[0];
     if (!file) return;
-    const type = this.detectFileType(file)
+    const type = this.detectFileType(file);
 
     const reader = new FileReader();
     console.log(this.evaluate);
@@ -245,14 +332,18 @@ export class EvaluateComponent implements OnInit {
         kinhDo: 0,
         viDo: 0,
         evaluateHeaderCode: this.headerId,
-      })
+      });
       this.cdr.detectChanges();
       this._storageService.set(this.store.id, this.evaluate);
-    }
+    };
     reader.readAsDataURL(file); // Chuyển sang base64
   }
 
-  generateThumbnail(base64: string, maxWidth: number, maxHeight: number): Promise<string> {
+  generateThumbnail(
+    base64: string,
+    maxWidth: number,
+    maxHeight: number
+  ): Promise<string> {
     return new Promise((resolve) => {
       const img = new Image();
       img.onload = () => {
@@ -289,11 +380,24 @@ export class EvaluateComponent implements OnInit {
     if (mime.startsWith('image/')) return 'img';
     if (mime.startsWith('video/')) return 'mp4';
     if (mime === 'application/pdf') return 'pdf';
-    if (mime === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') return 'docx';
-    if (mime === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') return 'xlsx';
-    if (mime === 'application/vnd.ms-excel.sheet.macroEnabled.12') return 'xlsm';
+    if (
+      mime ===
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    )
+      return 'docx';
+    if (
+      mime ===
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+      return 'xlsx';
+    if (mime === 'application/vnd.ms-excel.sheet.macroEnabled.12')
+      return 'xlsm';
     if (mime === 'application/vnd.ms-powerpoint') return 'ppt';
-    if (mime === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') return 'pptx';
+    if (
+      mime ===
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+    )
+      return 'pptx';
 
     return 'other';
   }
@@ -306,30 +410,29 @@ export class EvaluateComponent implements OnInit {
   }
 
   filterImage(node: any) {
-
     if (node.isGroup == true) return;
 
     const data = Array.isArray(this.evaluate?.lstImages)
-      ? this.evaluate.lstImages
-        .filter((x: any) => x.tieuChiCode === node.code)
+      ? this.evaluate.lstImages.filter((x: any) => x.tieuChiCode === node.code)
       : null;
     if (!data) return;
 
     data.map((x: any) => ({
       filePath: x.filePath,
-      type: x.type
-    }))
+      type: x.type,
+    }));
 
     const images = data.filter((x: any) => x.type === 'img' || x.type == 'mp4');
     // const videos = data.filter((x: any) => x.type === 'mp4');
-    const documents = data.filter((x: any) => ['docx', 'xlsx', 'xlsm', 'pdf'].includes(x.type));
+    const documents = data.filter((x: any) =>
+      ['docx', 'xlsx', 'xlsm', 'pdf'].includes(x.type)
+    );
 
     // videos: videos,
     return {
       images: images,
-      documents: documents
+      documents: documents,
     };
-
   }
 
   filterFeedBack(code: any) {
@@ -350,11 +453,12 @@ export class EvaluateComponent implements OnInit {
 
     if (idx === -1) return;
 
-    this.evaluate.lstEvaluate[idx].point = data.diemTieuChi.filter((i: any) => i.id == selected)[0].diem
+    this.evaluate.lstEvaluate[idx].point = data.diemTieuChi.filter(
+      (i: any) => i.id == selected
+    )[0].diem;
     this.evaluate.lstEvaluate[idx].pointId = selected;
-    this.tinhTong()
+    this.tinhTong();
   }
-
 
   tinhTong() {
     const tongDiem = this.lstTieuChi.reduce((sum: number, leaf: any) => {
@@ -363,7 +467,14 @@ export class EvaluateComponent implements OnInit {
       }, 0);
       return sum + diemMax;
     }, 0);
-    this.evaluate.header.point = ((this.evaluate.lstEvaluate.reduce((sum: any, item: any) => sum + (item.point || 0), 0) / tongDiem) * 100).toFixed(2);
+    this.evaluate.header.point = (
+      (this.evaluate.lstEvaluate.reduce(
+        (sum: any, item: any) => sum + (item.point || 0),
+        0
+      ) /
+        tongDiem) *
+      100
+    ).toFixed(2);
 
     this._storageService.set(this.store.id, this.evaluate);
   }
@@ -400,7 +511,6 @@ export class EvaluateComponent implements OnInit {
 
       // Kiểm tra có đủ ảnh không
       if (tieuChi.isImg) {
-
         const numberImgRequired = tieuChi.numberImg || 0;
         const imagesSelecting = this.evaluate.lstImages.filter(
           (img: any) => img.tieuChiCode === tieuChi.code
@@ -423,7 +533,7 @@ export class EvaluateComponent implements OnInit {
     }
 
     // Trường hợp đủ
-    this.evaluate.header.accountUserName = this.account.userName
+    this.evaluate.header.accountUserName = this.account.userName;
     this._service.insertEvaluate(this.evaluate).subscribe({
       next: () => {
         console.log('Chấm điểm thành công');
@@ -450,7 +560,7 @@ export class EvaluateComponent implements OnInit {
 
   openFullScreen(img: any) {
     if (this.isEdit == false) {
-      img.filePath = this.apiFile + img.filePath
+      img.filePath = this.apiFile + img.filePath;
     }
     this.selectedImage = img;
     this.isImageModalOpen = true;
@@ -461,7 +571,7 @@ export class EvaluateComponent implements OnInit {
 
   filePath(filePath: string) {
     if (this.isEdit) return filePath;
-    return this.apiFile + filePath
+    return this.apiFile + filePath;
   }
 
   closeFullScreen() {
@@ -519,12 +629,10 @@ export class EvaluateComponent implements OnInit {
     if (!this.isEdit) return;
 
     try {
-
       // 👉 Lấy vị trí hiện tại
       const position = await Geolocation.getCurrentPosition();
       const latitude = position.coords.latitude;
       const longitude = position.coords.longitude;
-
 
       const image = await Camera.getPhoto({
         quality: 90,
@@ -542,7 +650,7 @@ export class EvaluateComponent implements OnInit {
         tieuChiCode: code,
         viDo: latitude,
         kinhDo: longitude,
-        type: 'img'
+        type: 'img',
       });
       this.cdr.detectChanges();
 
@@ -555,5 +663,4 @@ export class EvaluateComponent implements OnInit {
   trackByKey(index: number, item: any): string {
     return item.key; // hoặc item.id nếu bạn dùng id
   }
-
 }
