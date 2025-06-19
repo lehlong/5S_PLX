@@ -1,6 +1,52 @@
 ion-col {
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 0.5px solid rgba(0, 0, 0, 0.06);
 }
 .custom-modal {
   --height: 80vh;
+}
+.grey-background {
+  background-color: #fafafa;
+}
+ion-item-group ion-row:not([style*="background-color: #fafafa"]) {
+  color: initial;
+}
+
+@media (prefers-color-scheme: dark) {
+  ion-item-group ion-row[style*="background-color: #fafafa"] {
+    background-color: var(--ion-color-step-100, #333333);
+    color: var(--ion-text-color, #ffffff);
+  }
+
+  ion-item-group ion-row:not([style*="background-color: #fafafa"]) {
+    background-color: var(--ion-background-color);
+    color: var(--ion-text-color, #ffffff);
+
+    .custom-border {
+      border-color: var(--ion-border-color, rgba(255, 255, 255, 0.1));
+    }
+  }
+
+  ion-col {
+    color: var(--ion-text-color, #ffffff);
+    border: 0.5px solid #363636;
+  }
+
+  ion-chip {
+    color: var(--ion-text-color, #ffffff);
+  }
+
+  ion-item {
+    --background: var(--ion-background-color);
+    --color: var(--ion-text-color);
+  }
+
+  ion-item-group {
+    --background: var(--ion-background-color);
+    --ion-text-color: var(--ion-text-color);
+  }
+
+  .custom-modal {
+    --background: var(--ion-background-color);
+    --color: var(--ion-text-color);
+  }
 }
