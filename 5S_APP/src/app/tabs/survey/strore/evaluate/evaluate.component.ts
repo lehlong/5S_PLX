@@ -544,6 +544,7 @@ export class EvaluateComponent implements OnInit {
 
         this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
         this._storageService.remove(this.store.id);
+        localStorage.removeItem(this.kiKhaoSat.code)
       },
 
       error: (ex) => {
@@ -565,7 +566,8 @@ export class EvaluateComponent implements OnInit {
           inStoreId: this.store.id,
           surveyId: localStorage.getItem('surveyId'),
           kiKhaoSatId: this.kiKhaoSat.id,
-          point: avg
+          point: avg,
+          length: data.data.length
         }
         this._service.tinhTongLanCham(point).subscribe({
           next: (data) => {

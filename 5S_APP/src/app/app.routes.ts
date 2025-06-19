@@ -26,7 +26,13 @@ export const routes: Routes = [
       {
         path: 'home',
         loadChildren: () =>
-        import('./tabs/home/home.routes').then((m) => m.homeRouter),
+          import('./tabs/home/home.routes').then((m) => m.homeRouter),
+        canActivate: [AuthGuard],
+      },
+      {
+        path: 'report',
+        loadChildren: () =>
+          import('./tabs/report/report.routes').then((m) => m.reportRoutes),
         canActivate: [AuthGuard],
       },
       // { path: 'report', component: ReportComponent, canActivate: [AuthGuard] },
@@ -50,12 +56,6 @@ export const routes: Routes = [
     path: 'survey',
     loadChildren: () =>
       import('./tabs/survey/survey.routes').then((m) => m.surveyRoutes),
-    canActivate: [AuthGuard],
-  },
-  {
-    path: 'report',
-    loadChildren: () =>
-      import('./tabs/report/report.routes').then((m) => m.reportRoutes),
     canActivate: [AuthGuard],
   },
   {

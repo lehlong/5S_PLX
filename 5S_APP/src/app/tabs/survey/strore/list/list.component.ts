@@ -116,6 +116,7 @@ export class ListComponent implements OnInit {
 
   filterPoint(inStoreId: any){
     const record = this.lstPointStore.find((x: any) => x.inStoreId === inStoreId);
+
     return record?.point ?? 0;
   }
 

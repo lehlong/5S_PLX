@@ -367,6 +367,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 else
                 {
                     diem.Point = point.Point;
+                    diem.Length = point.Length;
                     _dbContext.Update(diem);
                 }
                 await _dbContext.SaveChangesAsync();

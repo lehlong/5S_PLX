@@ -5,6 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from 'src/app/service/auth.service';
 import { KyKhaoSatService } from 'src/app/service/ky-khao-sat.service';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { AppReportService } from 'src/app/service/app-report.service';
 
 @Component({
   selector: 'app-ket-qua-cham-diem',
@@ -25,26 +26,7 @@ export class KetQuaChamDiemComponent implements OnInit {
   searchNguoiCham: any = '';
   inSearchStore: any = '';
   selectValue = '1';
-  lstData: any[]= [
-   {
-      store: 'PETROLIMEX-CỬA HÀNG 1',
-      lanCham: 1,
-      binhQuan: 0,
-      rank: '0',
-    },
-    {
-      store: 'PETROLIMEX-CỬA HÀNG 2',
-      lanCham: 1,
-      binhQuan: 0,
-      rank: '1',
-    },
-    {
-      store: 'PETROLIMEX-CỬA HÀNG 3',
-      lanCham: 1,
-      binhQuan: 0,
-      rank: '2',
-    },
-  ]
+  lstData: any = [  ]
   lstAccout: any = [];
   lstSearchChamDiem: any = [];
   lstSearchStore: any = [];
@@ -57,7 +39,8 @@ export class KetQuaChamDiemComponent implements OnInit {
   user: any = {};
 
   constructor(
-    private _service: KyKhaoSatService,
+    private _kyKhaoSatService: KyKhaoSatService,
+    private _service : AppReportService,
     private _authService: AuthService,
     private router: Router,
     private route: ActivatedRoute
@@ -74,8 +57,17 @@ export class KetQuaChamDiemComponent implements OnInit {
     });
   }
 
+  getReport(){
+    this._service.KetQuaChamDiem({kiKhaoSatId: this.filter.filterKiKhaoSat.id}).subscribe({
+      next: (data)=> {
+        console.log(data);
+        this.lstData = data
+      }
+    })
+  }
+
   getAllKyKhaoSat() {
-    this._service.search({ keyWord: this.surveyId }).subscribe({
+    this._kyKhaoSatService.search({ keyWord: this.surveyId }).subscribe({
       next: (data) => {
         this.lstKiKhaoSat = data.data;
 
@@ -93,6 +85,7 @@ export class KetQuaChamDiemComponent implements OnInit {
         }
 
         this.inputSearchKiKhaoSat = this.filter.filterKiKhaoSat;
+        this.getReport()
       },
       error: (response) => {
         console.log(response);
@@ -114,7 +107,7 @@ export class KetQuaChamDiemComponent implements OnInit {
 
   searchStore(kiKhaoSat: any) {
     this.inputSearchKiKhaoSat = kiKhaoSat;
-    this._service.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
+    this._kyKhaoSatService.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
       next: (data) => {
         this.lstSearchStore = data.lstInputStore;
         this.lstSearchChamDiem = Array.from(
@@ -157,6 +150,7 @@ export class KetQuaChamDiemComponent implements OnInit {
         s.lstChamDiem?.some((x: any) => x == this.filter.filterNguoiCham.userName))
       .filter((s: any) => this.filter.cuaHangToiCham !== true || s.lstChamDiem?.some((x: any) => x == this.user.userName))
     localStorage.setItem('filterLS', JSON.stringify(this.filter))
+    this.getReport()
     this.closeFilterModal();
   }
 
