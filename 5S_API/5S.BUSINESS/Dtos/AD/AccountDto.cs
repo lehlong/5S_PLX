@@ -32,6 +32,7 @@ namespace PLX5S.BUSINESS.Dtos.AD
 
         [Description("Loại")]
         public string? AccountType { get; set; }
+        public string? ChucVuId { get; set; }
         public string? OrganizeCode { get; set; }
         public string? UrlImage { get; set; }
 
@@ -70,7 +71,7 @@ namespace PLX5S.BUSINESS.Dtos.AD
 
         public string? Address { get; set; }
 
-        public string? AccountType { get; set; }
+        public string? ChucVuId { get; set; }
 
         public string? OrganizeCode { get; set; }
         public string? UrlImage { get; set; }
@@ -105,7 +106,7 @@ namespace PLX5S.BUSINESS.Dtos.AD
 
         public string? Address { get; set; }
 
-        public string? AccountType { get; set; }
+        public string? ChucVuId { get; set; }
 
         public string? OrganizeCode { get; set; }
         public string? ImageBase64 { get; set; }
@@ -131,7 +132,7 @@ namespace PLX5S.BUSINESS.Dtos.AD
 
         public string? Address { get; set; }
 
-        public string? AccountType { get; set; }
+        public string? ChucVuId { get; set; }
 
         public string? OrganizeCode { get; set; }
         public string? UrlImage { get; set; }
@@ -157,6 +158,7 @@ namespace PLX5S.BUSINESS.Dtos.AD
         public string? Email { get; set; }
 
         public string? Address { get; set; }
+        public string? ChucVuId { get; set; }
         public string? OrganizeCode { get; set; }
         public string? UrlImage { get; set; }
         public void Mapping(Profile profile)
@@ -179,7 +181,7 @@ namespace PLX5S.BUSINESS.Dtos.AD
 
         public string? Address { get; set; }
 
-        public string? AccountType { get; set; }
+        public string? ChucVuId { get; set; }
 
         public string? OrganizeCode { get; set; }
         public string? ImageBase64 { get; set; }
@@ -209,7 +211,7 @@ namespace PLX5S.BUSINESS.Dtos.AD
 
         public string? Address { get; set; }
 
-        public string? AccountType { get; set; }
+        public string? ChucVuId { get; set; }
 
         public string? OrganizeCode { get; set; }
 

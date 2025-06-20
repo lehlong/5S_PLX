@@ -31,5 +31,10 @@ namespace PLX5S.CORE.Entities.BU
         [Column("KI_KHAO_SAT_ID", TypeName = "NVARCHAR(150)")]
         public string? KiKhaoSatId { get; set; }
 
+        [Column("DEVICE_ID", TypeName = "NVARCHAR(150)")]
+        public string? DeviceId { get; set; }
+
+        [Column("CHUC_VU_ID", TypeName = "NVARCHAR(150)")]
+        public string? ChucVuId { get; set; }
     }
 }

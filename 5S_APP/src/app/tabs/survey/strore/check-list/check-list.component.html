@@ -36,7 +36,7 @@
             </div>
             <div slot="end">
               <p class="mg-0">{{ item.point ?? '0' }} điểm</p>
-              <span class="text-italic">{{ item.createDate | date: 'HH:mm dd/MM/yyyy' }}</span>
+              <span class="text-italic">{{ item.updateDate | date: 'HH:mm dd/MM/yyyy' }}</span>
             </div>
           </ion-item>
           <ion-item-options *ngIf="item.name == 'Bản nháp'" slot="end">

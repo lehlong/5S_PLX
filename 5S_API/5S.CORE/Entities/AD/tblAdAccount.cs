@@ -34,6 +34,9 @@ namespace PLX5S.CORE.Entities.AD
         [Column("ORG_CODE", TypeName = "VARCHAR(50)")]
         public string? OrganizeCode { get; set; }
 
+        [Column("CHUC_VU_ID", TypeName = "VARCHAR(50)")]
+        public string? ChucVuId { get; set; }
+
         [Column("URL_IMAGE", TypeName = "VARCHAR(100)")]
         public string? UrlImage { get; set; }
         //allowScoring

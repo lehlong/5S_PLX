@@ -26,4 +26,14 @@ namespace PLX5S.BUSINESS.Models
         public decimal? Length { set; get; }
         public decimal? point { set; get; }
     }
+
+    public class ThoiGianChamDiem
+    {
+        public string stt { set; get; }
+        public string StoreName { set; get; }
+        public decimal? Point { set; get; }
+        public List<string>? Cht { set; get; }
+        public List<string>? Atvsv { set; get; }
+        public List<string>? ChuyenGia { set; get; }
+    }
 }

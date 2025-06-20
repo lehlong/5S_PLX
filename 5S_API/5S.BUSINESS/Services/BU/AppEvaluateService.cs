@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PLX5S.BUSINESS.Services.BU
 {
@@ -28,6 +29,7 @@ namespace PLX5S.BUSINESS.Services.BU
         Task<EvaluateModel> GetResultEvaluate(string code);
         Task TinhTongLanCham(TblBuPointStore point);
         Task<List<TblBuPointStore>> GetPointStore(string kiKhaoSatid, string surveyId);
+        Task<List<TblBuEvaluateHeader>> FilterLstChamDiem(BaseFilter filter);
     }
 
     public class AppEvaluateService : GenericService<TblBuEvaluateHeader, EvaluateHeaderDto>, IAppEvaluateService
@@ -225,8 +227,19 @@ namespace PLX5S.BUSINESS.Services.BU
                 var header = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == data.Header.KiKhaoSatId && x.StoreId == data.Header.StoreId).OrderByDescending(x => x.Order).FirstOrDefault();
                 var number = header != null ? header.Order + 1 : 1;
 
+                var dateNow = DateTime.Now;
+                data.Header.IsActive = true;
+
+                if (data.Header.ChucVuId == "CHT" || data.Header.ChucVuId == "ATVSV")
+                {
+                    if (dateNow.Day > 07 && dateNow.Day < 15 || dateNow.Day > 23)
+                    {
+                        data.Header.IsActive = false;
+                    }
+                }
                 data.Header.Name = "Lần chấm thứ " + (number).ToString();
                 data.Header.Order = number;
+                data.Header.UpdateDate = DateTime.Now;
 
                 _dbContext.TblBuEvaluateHeader.Add(data.Header);
 
@@ -377,6 +390,26 @@ namespace PLX5S.BUSINESS.Services.BU
             {
                 this.Status = false;
                 //return null;
+            }
+        }
+
+        public async Task<List<TblBuEvaluateHeader>> FilterLstChamDiem(BaseFilter filter)
+        {
+            try
+            {
+                var lstEvaHeader = await _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filter.KeyWord && x.StoreId == filter.SortColumn).ToListAsync();
+                var filterLst = lstEvaHeader.Where(x => x.IsActive == false).ToList();
+
+                foreach (var item in filterLst)
+                {
+                    lstEvaHeader.RemoveAll(x => x.AccountUserName == item.AccountUserName);
+                }
+                return lstEvaHeader;
+            }
+            catch (Exception ex)
+            {
+                this.Status = false;
+                return null;
             }
         }
 

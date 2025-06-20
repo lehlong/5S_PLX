@@ -6,6 +6,7 @@ import { AccountService } from '../../../service/system-manager/account.service'
 import { ActivatedRoute } from '@angular/router'
 import { NzUploadFile, NzUploadModule, NzUploadXHRArgs } from 'ng-zorro-antd/upload';
 import { Observable, Observer, Subscription } from 'rxjs'
+import { ChucVuService } from '../../../service/master-data/chuc-vu.service'
 
 @Component({
   selector: 'app-account-create',
@@ -18,7 +19,7 @@ export class AccountCreateComponent {
   @Input() reset: () => void = () => { }
   @Input() visible: boolean = false
   @Input() close: () => void = () => { }
-  
+
 
   validateForm: FormGroup
   avatarBase64: string = ''
@@ -32,6 +33,7 @@ export class AccountCreateComponent {
 
   constructor(
     private _service: AccountService,
+    private _chucVuService: ChucVuService,
     private fb: NonNullableFormBuilder,
     private dropdownService: DropdownService,
     private route: ActivatedRoute,
@@ -43,17 +45,15 @@ export class AccountCreateComponent {
       address: [''],
       phoneNumber: ['', [Validators.pattern("^[0-9]*$"),]],
       email: ['', [Validators.email]],
+      chucVuId: [''],
       allowScoring: [false],
       isActive: [true],
-
-      // accountType: ['', [Validators.required]],
     })
   }
 
   ngOnInit(): void {
-    // this.loadInit()
-    // this.getAllAccountType()
     this.getAllOrg()
+    this.getAllChucVu()
   }
 
   loadInit() {
@@ -86,6 +86,18 @@ export class AccountCreateComponent {
         },
       })
   }
+
+  getAllChucVu() {
+    this._chucVuService.getAll().subscribe({
+      next: (data) => {
+        this.positionList = data
+      },
+      error: (response) => {
+        console.log(response)
+      },
+    })
+  }
+
   getAllOrg() {
     this.dropdownService.getAllOrg().subscribe({
       next: (data) => {
@@ -100,7 +112,7 @@ export class AccountCreateComponent {
   submitForm(): void {
     if (this.validateForm.valid) {
       const formValue = this.validateForm.value
-     
+
       this._service.create(formValue).subscribe({
         next: (data) => {
           this.reset()
@@ -138,7 +150,7 @@ export class AccountCreateComponent {
     this.validateForm.reset()
   }
   // clearImage() {
-  //   this.avatarBase64 = ''; 
+  //   this.avatarBase64 = '';
   //   this.fileInput.nativeElement.value = '';
   // }
 
@@ -147,10 +159,10 @@ export class AccountCreateComponent {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e: any) => {
-        this.avatarBase64 = e.target.result; 
+        this.avatarBase64 = e.target.result;
       };
       reader.readAsDataURL(file);
     }
   }
-  
+
 }

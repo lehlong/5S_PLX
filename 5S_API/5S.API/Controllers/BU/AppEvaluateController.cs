@@ -136,6 +136,25 @@ namespace PLX5S.API.Controllers.BU
             return Ok(transferObject);
         }
 
+        [HttpGet("FilterLstChamDiem")]
+        public async Task<IActionResult> FilterLstChamDiem([FromQuery] BaseFilter filter)
+        {
+            var transferObject = new TransferObject();
+            var data = await _service.FilterLstChamDiem(filter);
+            if (_service.Status)
+            {
+                transferObject.Data = data;
+                transferObject.Status = true;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
+
         [HttpPost("TinhTongLanCham")]
         public async Task<IActionResult> TinhTongLanCham([FromBody] TblBuPointStore data)
         {
@@ -153,6 +172,26 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
+
+
+        //[HttpGet("")]
+        //public async Task<IActionResult> GetPointStore([FromQuery] string kiKhaoSatId, string surveyId)
+        //{
+        //    var transferObject = new TransferObject();
+        //    var data = await _service.GetPointStore(kiKhaoSatId, surveyId);
+        //    if (_service.Status)
+        //    {
+        //        transferObject.Data = data;
+        //        transferObject.Status = true;
+        //    }
+        //    else
+        //    {
+        //        transferObject.Status = false;
+        //        transferObject.MessageObject.MessageType = MessageType.Error;
+        //        transferObject.GetMessage("0001", _service);
+        //    }
+        //    return Ok(transferObject);
+        //}
 
         [HttpGet("GetPointStore")]
         public async Task<IActionResult> GetPointStore([FromQuery] string kiKhaoSatId, string surveyId)

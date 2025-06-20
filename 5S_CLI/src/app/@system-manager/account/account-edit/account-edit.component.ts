@@ -11,6 +11,7 @@ import { AuthService } from '../../../service/auth.service'
 import { GlobalService } from '../../../service/global.service'
 import { AccountGroupService } from '../../../service/system-manager/account-group.service'
 import { environment } from '../../../../environments/environment'
+import { ChucVuService } from '../../../service/master-data/chuc-vu.service'
 
 @Component({
   selector: 'app-account-edit',
@@ -32,7 +33,6 @@ export class AccountEditComponent {
   @Input() visible: boolean = false
   @Input() close: () => void = () => { }
   @Input() userName: string | number = ''
-  // @ViewChild('fileInput') fileInput!: ElementRef;
 
   optionsGroup: any[] = []
   widthDeault: string = '0px'
@@ -44,9 +44,6 @@ export class AccountEditComponent {
   nodesConstant: any[] = []
   initialCheckedNodes: any[] = []
   searchValue = ''
-  // listPartnerCustomer: any[] = []
-  // UserTypeCodes = UserTypeCodes
-  // isShowSelectPartner: boolean = false
   accountType: any[] = []
   orgList: any[] = []
   warehouseList: any[] = []
@@ -60,6 +57,7 @@ export class AccountEditComponent {
     private fb: NonNullableFormBuilder,
     private dropdownService: DropdownService,
     private rightService: RightService,
+    private _chucVuService: ChucVuService,
     private accountGroupService: AccountGroupService,
     private route: ActivatedRoute,
     private authService: AuthService,
@@ -71,9 +69,9 @@ export class AccountEditComponent {
       address: [''],
       phoneNumber: ['', [Validators.pattern('^0\\d{8,9}$')]],
       email: ['', [Validators.email]],
+      chucVuId: [''],
       isActive: [true],
       allowScoring: [false],
-     
       urlImage: [''],
     })
     this.widthDeault =
@@ -85,6 +83,7 @@ export class AccountEditComponent {
 
   ngOnInit(): void {
     this.loadInit()
+    this.getAllChucVu()
     this.selectedOrg = this.validateForm.getRawValue().organizeCode
   }
 
@@ -94,6 +93,16 @@ export class AccountEditComponent {
     this.getAllOrg()
   }
 
+  getAllChucVu() {
+    this._chucVuService.getAll().subscribe({
+      next: (data) => {
+        this.positionList = data
+      },
+      error: (response) => {
+        console.log(response)
+      },
+    })
+  }
   getAllOrg() {
     this.dropdownService.getAllOrg().subscribe({
       next: (data) => {
@@ -254,6 +263,7 @@ export class AccountEditComponent {
             phoneNumber: data.phoneNumber,
             email: data.email,
             isActive: data.isActive,
+            chucVuId: data.chucVuId || '',
             // accountType: data.accountType,
             urlImage : data.urlImage,
             allowScoring: data.allowScoring,
@@ -459,7 +469,7 @@ export class AccountEditComponent {
   }
 
   // clearImage() {
-  //   this.avatarBase64 = ''; 
+  //   this.avatarBase64 = '';
   //   this.fileInput.nativeElement.value = '';
   // }
 
@@ -468,7 +478,7 @@ export class AccountEditComponent {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e: any) => {
-        this.avatarBase64 = e.target.result;  
+        this.avatarBase64 = e.target.result;
       };
       reader.readAsDataURL(file);
     }

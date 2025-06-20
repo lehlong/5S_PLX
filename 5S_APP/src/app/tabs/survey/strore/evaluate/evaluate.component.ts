@@ -76,7 +76,7 @@ export class EvaluateComponent implements OnInit {
     private messageService: MessageService,
     private cdr: ChangeDetectorRef,
     private renderer: Renderer2
-  ) {}
+  ) { }
   ngOnInit() {
     this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
     this.route.paramMap.subscribe({
@@ -469,13 +469,9 @@ export class EvaluateComponent implements OnInit {
       }, 0);
       return sum + diemMax;
     }, 0);
-    this.evaluate.header.point = (
-      (this.evaluate.lstEvaluate.reduce(
-        (sum: any, item: any) => sum + (item.point || 0),
-        0
-      ) /
-        tongDiem) *
-      100
+    this.evaluate.header.point = ((this.evaluate.lstEvaluate.reduce(
+      (sum: any, item: any) => sum + (item.point || 0),
+      0) / tongDiem) * 100
     ).toFixed(2);
 
     this._storageService.set(this.store.id, this.evaluate);
@@ -533,9 +529,11 @@ export class EvaluateComponent implements OnInit {
       await alert.present();
       return;
     }
+        // this.tinhTongLanCham()
 
     // Trường hợp đủ
     this.evaluate.header.accountUserName = this.account.userName
+    this.evaluate.header.chucVuId = this.account.chucVuId;
 
     this._service.insertEvaluate(this.evaluate).subscribe({
       next: () => {
@@ -555,11 +553,21 @@ export class EvaluateComponent implements OnInit {
 
 
   tinhTongLanCham() {
-    this._service.search({ keyWord: this.store.id, sortColumn: this.kiKhaoSat.id }).subscribe({
+    this._service.filterLstChamDiem({ sortColumn: this.store.id, keyWord: this.kiKhaoSat.id }).subscribe({
       next: (data) => {
+        console.log(data.length);
 
-        const total = data.data.reduce((sum: any, item: any) => sum + item.point, 0);
-        const avg = total / data.data.length;
+        const total = data.reduce((sum: any, item: any) => {
+          let pointitem =  item.point
+          if(item.ChucVuId === "CHT" || item.ChucVuId === "ATVSV"){
+            pointitem =  item.point / 2
+            console.log(pointitem);
+          }
+            console.log(pointitem);
+
+          return sum + pointitem;
+        }, 0);
+        const avg = data.length >= 0 ? total / data.length : 0;
 
         const point = {
           code: '',
@@ -567,7 +575,7 @@ export class EvaluateComponent implements OnInit {
           surveyId: localStorage.getItem('surveyId'),
           kiKhaoSatId: this.kiKhaoSat.id,
           point: avg,
-          length: data.data.length
+          length: data.length
         }
         this._service.tinhTongLanCham(point).subscribe({
           next: (data) => {

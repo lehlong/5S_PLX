@@ -17,6 +17,7 @@ namespace PLX5S.BUSINESS.Dtos.BU
         public string? StoreId { get; set; }
         public string? KiKhaoSatId { get; set; }
         public DateTime CreateDate { get; set; }
+        public DateTime UpdateDate { get; set; }
         public string CreateBy { set; get; }
 
         public void Mapping(Profile profile)

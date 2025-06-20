@@ -38,5 +38,24 @@ namespace PLX5S.API.Controllers.BU
         }
 
 
+        [HttpGet("ThoiGianChamDiem")]
+        public async Task<IActionResult> ThoiGianChamDiem([FromQuery] FilterReport filterReport)
+        {
+            var transferObject = new TransferObject();
+            var result = await _service.ThoiGianChamDiem(filterReport);
+
+            if (_service.Status)
+            {
+                transferObject.Data = result;
+                transferObject.Status = true;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
     }
 }

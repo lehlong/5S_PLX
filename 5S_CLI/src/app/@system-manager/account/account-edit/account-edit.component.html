@@ -24,6 +24,19 @@
             <app-input-clear placeholder="Nhập email" label="Email"
               [control]="$any(validateForm).controls['email']"></app-input-clear>
           </div>
+
+          <div nz-col [nzXs]="24" [nzMd]="12">
+            <nz-form-item>
+              <nz-form-label>Chức vụ</nz-form-label>
+              <nz-form-control nzErrorTip="Không được để trống">
+                <nz-select nzShowSearch nzAllowClear placeholder="Chọn chức vụ" formControlName="chucVuId">
+                  <nz-option cdkScrollable *ngFor="let item of positionList" [nzLabel]="item.name"
+                    [nzValue]="item.id">
+                  </nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </div>
           <div nz-col [nzXs]="24" [nzMd]="12">
             <!-- <nz-form-item>
               <nz-form-label>Kiểu người dùng</nz-form-label>
@@ -60,7 +73,7 @@
         </div>
       </form>
       <!-- <label>Chọn ảnh</label> -->
-    <!-- <div class="main-upload">
+      <!-- <div class="main-upload">
       <div class="upload-avatar" (click)="fileInput.click()">
         <nz-icon nzType="cloud-upload" nzTheme="outline" style="font-size: 24px;"/>
         <div>Chọn ảnh</div>
@@ -69,7 +82,7 @@
         <img [src]="avatarBase64" width="128" height="128"/>
       </div>
     </div> -->
-    <!-- <input type="file" #fileInput accept="image/*" (change)="onFileSelected($event)" style="display: none;" /> -->
+      <!-- <input type="file" #fileInput accept="image/*" (change)="onFileSelected($event)" style="display: none;" /> -->
     </nz-tab>
     <nz-tab nzTitle="Nhóm người dùng">
       <div style="overflow: auto">
