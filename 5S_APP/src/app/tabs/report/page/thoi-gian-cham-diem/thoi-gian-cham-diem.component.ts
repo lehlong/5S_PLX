@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { AppReportService } from 'src/app/service/app-report.service';
 import { AuthService } from 'src/app/service/auth.service';
 import { KyKhaoSatService } from 'src/app/service/ky-khao-sat.service';
 import { SharedModule } from 'src/app/shared/shared.module';
@@ -24,30 +25,7 @@ export class ThoiGianChamDiemComponent implements OnInit {
   searchNguoiCham: any = '';
   inSearchStore: any = '';
   selectValue = '1';
-  lstData: any[] = [
-     {
-      store: 'PETROLIMEX-CỬA HÀNG 1',
-      CHT: '',
-      ATVSV: 0,
-      CGIA_5S: 0,
-      BQPoint: 0
-      
-    },
-    {
-      store: 'PETROLIMEX-CỬA HÀNG 2',
-      CHT: '',
-      ATVSV: 0,
-      CGIA_5S: 1,
-      BQPoint: 0
-    },
-    {
-      store: 'PETROLIMEX-CỬA HÀNG 3',
-      CHT: '',
-      ATVSV: 0,
-      CGIA_5S: 2,
-      BQPoint: 0
-    }
-  ];
+  lstData: any[] = [];
   lstAccout: any = [];
   lstSearchChamDiem: any = [];
   lstSearchStore: any = [];
@@ -60,7 +38,8 @@ export class ThoiGianChamDiemComponent implements OnInit {
   user: any = {};
 
   constructor(
-    private _service: KyKhaoSatService,
+    private _service: AppReportService,
+    private _kyKhaoSatService: KyKhaoSatService,
     private _authService: AuthService,
     private router: Router,
     private route: ActivatedRoute
@@ -77,8 +56,23 @@ export class ThoiGianChamDiemComponent implements OnInit {
     });
   }
 
+  getThoiGianChamDiem() {
+    this._service
+      .ThoiGianChamDiem({
+        kiKhaoSatId: this.filter.filterKiKhaoSat.id,
+        InstoreId: this.filter.filterStore,
+        AccountUserName: this.filter.filterNguoiCham,
+        SurveyId: this.filter.cuaHangToiCham
+      })
+      .subscribe({
+        next: (data) => {
+          this.lstData = data;
+          console.log(data);
+        },
+      });
+  }
   getAllKyKhaoSat() {
-    this._service.search({ keyWord: this.surveyId }).subscribe({
+    this._kyKhaoSatService.search({ keyWord: this.surveyId }).subscribe({
       next: (data) => {
         this.lstKiKhaoSat = data.data;
 
@@ -96,6 +90,7 @@ export class ThoiGianChamDiemComponent implements OnInit {
         }
 
         this.inputSearchKiKhaoSat = this.filter.filterKiKhaoSat;
+        this.getThoiGianChamDiem();
       },
       error: (response) => {
         console.log(response);
@@ -117,7 +112,7 @@ export class ThoiGianChamDiemComponent implements OnInit {
 
   searchStore(kiKhaoSat: any) {
     this.inputSearchKiKhaoSat = kiKhaoSat;
-    this._service.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
+    this._kyKhaoSatService.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
       next: (data) => {
         this.lstSearchStore = data.lstInputStore;
         this.lstSearchChamDiem = Array.from(
@@ -172,6 +167,7 @@ export class ThoiGianChamDiemComponent implements OnInit {
           s.lstChamDiem?.some((x: any) => x == this.user.userName)
       );
     localStorage.setItem('filterLS', JSON.stringify(this.filter));
+    this.getThoiGianChamDiem();
     this.closeFilterModal();
   }
 
