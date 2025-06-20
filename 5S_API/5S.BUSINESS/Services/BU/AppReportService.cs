@@ -83,7 +83,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
                 var lstInStore = inputKy.Result.lstInputStore.ToList();
                 var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.IsActive == true && x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
-                var lstPoint = _dbContext.TblBuPointStore.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId && x.IsActive == true).ToList();
+                var lstPoint = _dbContext.TblBuPointStore.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
 
                 if (!string.IsNullOrWhiteSpace(filterReport.InstoreId))
                 {
@@ -121,8 +121,8 @@ namespace PLX5S.BUSINESS.Services.BU
             {
                 var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
                 var lstInStore = inputKy.Result.lstInputStore.ToList();
-                var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.IsActive == true && x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
-                var lstPoint = _dbContext.TblBuPointStore.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId && x.IsActive == true).ToList();
+                var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                var lstPoint = _dbContext.TblBuPointStore.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
 
                 if (!string.IsNullOrWhiteSpace(filterReport.InstoreId))
                 {
