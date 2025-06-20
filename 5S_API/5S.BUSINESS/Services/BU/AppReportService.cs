@@ -24,6 +24,7 @@ namespace PLX5S.BUSINESS.Services.BU
     {
         Task<List<KetQuaChamDiem>> KetQuaChamDiem(FilterReport filterReport);
         Task<List<ThoiGianChamDiem>> ThoiGianChamDiem(FilterReport filterReport);
+        Task<List<TheoKhungThoiGian>> TheoKhungThoiGian(FilterReport filterReport);
     }
 
     public class AppReportService : GenericService<TblBuEvaluateHeader, EvaluateHeaderDto>, IAppReportService
@@ -45,6 +46,10 @@ namespace PLX5S.BUSINESS.Services.BU
                 var lstInStore = inputKy.Result.lstInputStore.ToList();
                 var lstPoint = _dbContext.TblBuPointStore.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
 
+                if (!string.IsNullOrWhiteSpace(filterReport.InstoreId))
+                {
+                    lstInStore = lstInStore.Where(x => x.Id == filterReport.InstoreId).ToList();
+                }
 
                 var result = new List<KetQuaChamDiem>();
 
@@ -80,14 +85,15 @@ namespace PLX5S.BUSINESS.Services.BU
                 var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.IsActive == true && x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
                 var lstPoint = _dbContext.TblBuPointStore.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId && x.IsActive == true).ToList();
 
+                if (!string.IsNullOrWhiteSpace(filterReport.InstoreId))
+                {
+                    lstInStore = lstInStore.Where(x => x.Id == filterReport.InstoreId).ToList();
+                }
 
                 var result = new List<ThoiGianChamDiem>();
 
                 foreach (var item in lstInStore)
                 {
-                    var i = 0;
-                    var a = 0;
-                    var c = 0;
                     var report = new ThoiGianChamDiem()
                     {
                         stt = item.StoreId,
@@ -109,6 +115,45 @@ namespace PLX5S.BUSINESS.Services.BU
             }
         }
 
+        public async Task<List<TheoKhungThoiGian>> TheoKhungThoiGian(FilterReport filterReport)
+        {
+            try
+            {
+                var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
+                var lstInStore = inputKy.Result.lstInputStore.ToList();
+                var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.IsActive == true && x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                var lstPoint = _dbContext.TblBuPointStore.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId && x.IsActive == true).ToList();
 
+                if (!string.IsNullOrWhiteSpace(filterReport.InstoreId))
+                {
+                    lstInStore = lstInStore.Where(x => x.Id == filterReport.InstoreId).ToList();
+                }
+                var result = new List<TheoKhungThoiGian>();
+
+                foreach (var item in lstInStore)
+                {
+                    var report = new TheoKhungThoiGian()
+                    {
+                        stt = item.StoreId,
+                        StoreName = item.Name,
+                        Cht_T = lstEvaHeader.Count(x => x.IsActive == true  && x.StoreId == item.Id && x.ChucVuId == "CHT"),
+                        Cht_N = lstEvaHeader.Count(x => x.IsActive == false && x.StoreId == item.Id && x.ChucVuId == "CHT"),
+                        Atvsv_T = lstEvaHeader.Count(x => x.IsActive == true && x.StoreId == item.Id && x.ChucVuId == "ATVSV"),
+                        Atvsv_N = lstEvaHeader.Count(x => x.IsActive == false && x.StoreId == item.Id && x.ChucVuId == "ATVSV"),
+                        ChuyenGia = lstEvaHeader.Count(x => x.StoreId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT"),
+                        Point = lstPoint.FirstOrDefault(x => x.InStoreId == item.Id)?.Point ?? 0,
+                    };
+
+                    result.Add(report);
+                }
+                return result;
+
+            }
+            catch (Exception ex)
+            {
+                this.Status = false;
+                return null;
+            }
+        }
     }
 }

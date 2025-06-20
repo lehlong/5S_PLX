@@ -36,4 +36,18 @@ namespace PLX5S.BUSINESS.Models
         public List<string>? Atvsv { set; get; }
         public List<string>? ChuyenGia { set; get; }
     }
+
+
+    public class TheoKhungThoiGian
+    {
+        public string stt { set; get; }
+        public string StoreName { set; get; }
+        public decimal? Cht_T { set; get; }
+        public decimal? Cht_N { set; get; }
+        public decimal? Atvsv_T { set; get; }
+        public decimal? Atvsv_N { set; get; }
+        public decimal? ChuyenGia { set; get; }
+        public decimal? Point { set; get; }
+    }
+
 }

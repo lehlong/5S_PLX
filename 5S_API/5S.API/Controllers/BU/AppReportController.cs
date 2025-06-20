@@ -57,5 +57,27 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
+
+
+
+        [HttpGet("TheoKhungThoiGian")]
+        public async Task<IActionResult> TheoKhungThoiGian([FromQuery] FilterReport filterReport)
+        {
+            var transferObject = new TransferObject();
+            var result = await _service.TheoKhungThoiGian(filterReport);
+
+            if (_service.Status)
+            {
+                transferObject.Data = result;
+                transferObject.Status = true;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
     }
 }
