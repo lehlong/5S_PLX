@@ -60,7 +60,7 @@ export class ThoiGianChamDiemComponent implements OnInit {
     this._service
       .ThoiGianChamDiem({
         kiKhaoSatId: this.filter.filterKiKhaoSat.id,
-        InstoreId: this.filter.filterStore,
+        InstoreId: this.filter.filterStore.id,
         AccountUserName: this.filter.filterNguoiCham,
         SurveyId: this.filter.cuaHangToiCham
       })
