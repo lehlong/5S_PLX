@@ -79,5 +79,28 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
+
+
+        [HttpGet("TongHopYKienDeXuat")]
+        public async Task<IActionResult> TongHopYKienDeXuat([FromQuery] FilterReport filterReport)
+        {
+            var transferObject = new TransferObject();
+            var result = await _service.TongHopYKienDeXuat(filterReport);
+
+            if (_service.Status)
+            {
+                transferObject.Data = result;
+                transferObject.Status = true;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
+
+
     }
 }

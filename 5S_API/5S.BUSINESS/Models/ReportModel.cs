@@ -50,4 +50,20 @@ namespace PLX5S.BUSINESS.Models
         public decimal? Point { set; get; }
     }
 
+    public class TongHopYKienDeXuat
+    {
+        public string? stt { set; get; }
+        public string? StoreName { set; get; }
+        public List<LstTieuChiDeXuat>? lstTieuChiDeXuat { set; get; } = new List<LstTieuChiDeXuat>();
+    }
+    public class LstTieuChiDeXuat
+    {
+        public string? TieuChi { set; get; }
+        public string? DeXuat { set; get; }
+        public string? CanBo { set; get; }
+        public string? ChucVu { set; get; }
+        public string? ThoiGian { set; get; }
+
+    }
+
 }

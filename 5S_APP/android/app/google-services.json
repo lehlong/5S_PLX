@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "582808362309",
+    "project_id": "com-plx5s-app",
+    "storage_bucket": "com-plx5s-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:582808362309:android:f1c783179f23242e15b22c",
+        "android_client_info": {
+          "package_name": "com.plx5s.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAe-z5mQezXk0bBltszb9Y9rWJydzT4Zzs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

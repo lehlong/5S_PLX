@@ -25,17 +25,20 @@ namespace PLX5S.BUSINESS.Services.BU
         Task<List<KetQuaChamDiem>> KetQuaChamDiem(FilterReport filterReport);
         Task<List<ThoiGianChamDiem>> ThoiGianChamDiem(FilterReport filterReport);
         Task<List<TheoKhungThoiGian>> TheoKhungThoiGian(FilterReport filterReport);
+        Task<List<TongHopYKienDeXuat>> TongHopYKienDeXuat(FilterReport filterReport);
     }
 
     public class AppReportService : GenericService<TblBuEvaluateHeader, EvaluateHeaderDto>, IAppReportService
     {
         private readonly IWebHostEnvironment _environment;
         private readonly IKikhaosatService _kiKhaoSatService;
+        private readonly ITieuChiService _tieuChiService;
 
-        public AppReportService(AppDbContext dbContext, IMapper mapper, IWebHostEnvironment environment, IKikhaosatService KiKhaoSatService) : base(dbContext, mapper)
+        public AppReportService(AppDbContext dbContext, IMapper mapper, IWebHostEnvironment environment, IKikhaosatService KiKhaoSatService, ITieuChiService TieuChiService) : base(dbContext, mapper)
         {
             _environment = environment;
             _kiKhaoSatService = KiKhaoSatService;
+            _tieuChiService = TieuChiService;
         }
 
         public async Task<List<KetQuaChamDiem>> KetQuaChamDiem(FilterReport filterReport)
@@ -146,6 +149,57 @@ namespace PLX5S.BUSINESS.Services.BU
 
                     result.Add(report);
                 }
+                return result;
+
+            }
+            catch (Exception ex)
+            {
+                this.Status = false;
+                return null;
+            }
+        }
+
+
+        public async Task<List<TongHopYKienDeXuat>> TongHopYKienDeXuat(FilterReport filterReport)
+        {
+            try
+            {
+                var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
+                var lstTieuChi = _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId && x.IsGroup == false).ToList();
+                var lstInStore = inputKy.Result.lstInputStore.ToList();
+                var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                var lstEvaValue = _dbContext.TblBuEvaluateValue.Where(x => x.FeedBack != "").ToList();
+                var lstPoint = _dbContext.TblBuPointStore.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+
+                if (!string.IsNullOrWhiteSpace(filterReport.InstoreId))
+                {
+                    lstInStore = lstInStore.Where(x => x.Id == filterReport.InstoreId).ToList();
+                }
+                var result = new List<TongHopYKienDeXuat>();
+
+
+                foreach (var i in lstEvaHeader)
+                {
+                    var lstValue = lstEvaValue.Where(x => x.EvaluateHeaderCode == i.Code).ToList();
+                    foreach (var v in lstValue)
+                    {
+                        var a = new TongHopYKienDeXuat()
+                        {
+                            stt = lstInStore.FirstOrDefault(x => x.Id == i.StoreId).Id,
+                            StoreName = lstInStore.FirstOrDefault(x => x.Id == i.StoreId).Name,
+                            lstTieuChiDeXuat = lstValue.Select(x => new LstTieuChiDeXuat()
+                            {
+                                TieuChi = lstTieuChi.FirstOrDefault(b => b.Code == x.TieuChiCode).Name,
+                                DeXuat = x.FeedBack,
+                                CanBo = i.AccountUserName,
+                                ChucVu = i.ChucVuId,
+                                ThoiGian = i.UpdateDate?.ToString("HH:mm dd/MM/yyyy")
+                            }).ToList() ?? null,
+                        };
+                        result.Add(a);
+                    }
+                }
+
                 return result;
 
             }

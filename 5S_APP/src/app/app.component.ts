@@ -3,6 +3,7 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { Storage } from '@ionic/storage-angular';
 import { Platform } from '@ionic/angular';
 import { StatusBar, Style } from '@capacitor/status-bar';
+import { PushNotifications } from '@capacitor/push-notifications';
 
 @Component({
   selector: 'app-root',
@@ -40,7 +41,7 @@ export class AppComponent implements OnDestroy {
   }
 
   ngOnInit() {
-   this.storage.create();
+    this.storage.create();
   }
 
   private async updateStatusBarTheme(isDark: boolean) {
@@ -62,4 +63,31 @@ export class AppComponent implements OnDestroy {
       this.darkModeMediaQuery.removeEventListener('change', this.mediaQueryListener);
     }
   }
+
+
+  initializePush() {
+    PushNotifications.requestPermissions().then(result => {
+      if (result.receive === 'granted') {
+        PushNotifications.register();
+      }
+    });
+
+    PushNotifications.addListener('registration', token => {
+      console.log('Push registration success, token:', token.value);
+      // Gửi token lên server nếu cần
+    });
+
+    PushNotifications.addListener('registrationError', error => {
+      console.error('Push registration error:', error);
+    });
+
+    PushNotifications.addListener('pushNotificationReceived', notification => {
+      console.log('Push received: ', notification);
+    });
+
+    PushNotifications.addListener('pushNotificationActionPerformed', notification => {
+      console.log('Push action performed', notification);
+    });
+  }
+
 }
