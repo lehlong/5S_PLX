@@ -27,3 +27,13 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+subprojects {
+    afterEvaluate { project ->
+        project.tasks.matching { it.name.contains("KotlinCompile") }.all {
+            if (it.hasProperty("kotlinOptions")) {
+                it.kotlinOptions.jvmTarget = "17"
+            }
+        }
+    }
+}

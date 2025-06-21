@@ -34,6 +34,7 @@
     "@ionic-native/status-bar": "^5.36.0",
     "@ionic/angular": "^8.0.0",
     "@ionic/storage-angular": "^4.0.0",
+    "cordova-plugin-firebasex": "^18.0.7",
     "ionicons": "^7.0.0",
     "leaflet": "^1.9.4",
     "rxjs": "~7.8.0",

@@ -28,6 +28,46 @@ export class AppComponent implements OnDestroy {
           await StatusBar.setOverlaysWebView({ overlay: false });
           await this.updateStatusBarTheme(this.darkModeMediaQuery.matches);
 
+          // Đăng ký topic 'news' với FirebasePlugin (Firebasex)
+          if ((window as any).FirebasePlugin) {
+            (window as any).FirebasePlugin.subscribe('news', () => {
+              console.log('Đã subscribe topic news');
+            }, (error: any) => {
+              console.error('Lỗi subscribe topic:', error);
+            });
+          }
+
+          // Đăng ký push notification
+          PushNotifications.requestPermissions().then(result => {
+            if (result.receive === 'granted') {
+              PushNotifications.register();
+            }
+          });
+
+          // Lắng nghe đăng ký token thành công
+          PushNotifications.addListener('registration', token => {
+            console.log('Push registration success, token:', token.value);
+            // Gửi token lên server nếu cần
+          });
+
+          // Lắng nghe lỗi đăng ký
+          PushNotifications.addListener('registrationError', error => {
+            console.error('Push registration error:', error);
+          });
+
+          // Lắng nghe khi nhận thông báo
+          PushNotifications.addListener('pushNotificationReceived', notification => {
+            console.log('Push received: ', notification);
+            if (notification && notification.title && notification.body) {
+              alert(`${notification.title}\n${notification.body}`);
+            }
+          });
+
+          // Lắng nghe khi người dùng tương tác với thông báo
+          PushNotifications.addListener('pushNotificationActionPerformed', notification => {
+            console.log('Push action performed', notification);
+          });
+
           // Listen for theme changes
           this.mediaQueryListener = async (e: MediaQueryListEvent) => {
             await this.updateStatusBarTheme(e.matches);
@@ -62,32 +102,6 @@ export class AppComponent implements OnDestroy {
     if (this.mediaQueryListener) {
       this.darkModeMediaQuery.removeEventListener('change', this.mediaQueryListener);
     }
-  }
-
-
-  initializePush() {
-    PushNotifications.requestPermissions().then(result => {
-      if (result.receive === 'granted') {
-        PushNotifications.register();
-      }
-    });
-
-    PushNotifications.addListener('registration', token => {
-      console.log('Push registration success, token:', token.value);
-      // Gửi token lên server nếu cần
-    });
-
-    PushNotifications.addListener('registrationError', error => {
-      console.error('Push registration error:', error);
-    });
-
-    PushNotifications.addListener('pushNotificationReceived', notification => {
-      console.log('Push received: ', notification);
-    });
-
-    PushNotifications.addListener('pushNotificationActionPerformed', notification => {
-      console.log('Push action performed', notification);
-    });
   }
 
 }
