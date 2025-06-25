@@ -76,10 +76,10 @@ namespace PLX5S.API.Controllers.BU
 
 
         [HttpGet("BuildInputEvaluate")]
-        public async Task<IActionResult> BuildInputEvaluate([FromQuery] string kiKhaoSatId, string storeId)
+        public async Task<IActionResult> BuildInputEvaluate([FromQuery] string kiKhaoSatId, string storeId,string deviceId)
         {
             var transferObject = new TransferObject();
-            var result = await _service.BuildInputEvaluate(kiKhaoSatId, storeId);
+            var result = await _service.BuildInputEvaluate(kiKhaoSatId, storeId,deviceId);
             if (_service.Status)
             {
                 transferObject.Data = result;

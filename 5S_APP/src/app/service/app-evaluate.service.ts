@@ -19,8 +19,8 @@ export class AppEvaluateService {
     return this.commonService.get(`AppEvaluate/GetAllTieuChiLeaves?kiKhaoSatId=${kiKhaoSatId}&storeId=${storeId}`)
   }
 
-  BuildInputEvaluate(kiKhaoSatId: any, storeId: any): Observable<any> {
-    return this.commonService.get(`AppEvaluate/BuildInputEvaluate?kiKhaoSatId=${kiKhaoSatId}&storeId=${storeId}`)
+  BuildInputEvaluate(kiKhaoSatId: any, storeId: any,deviceID:string): Observable<any> {
+    return this.commonService.get(`AppEvaluate/BuildInputEvaluate?kiKhaoSatId=${kiKhaoSatId}&storeId=${storeId}&deviceID=${deviceID}`)
   }
 
   buildDataTreeForApp(kiKhaoSatId: any, storeId: any): Observable<any> {

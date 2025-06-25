@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from 'src/app/service/auth.service';
 import { KyKhaoSatService } from 'src/app/service/ky-khao-sat.service';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { AppReportService } from 'src/app/service/app-report.service';
 
 @Component({
   selector: 'app-thiet-bi-cham-diem',
@@ -59,8 +60,9 @@ export class ThietBiChamDiemComponent implements OnInit {
   user: any = {};
 
   constructor(
-    private _service: KyKhaoSatService,
+    private _KiKhaoSat: KyKhaoSatService,
     private _authService: AuthService,
+    private _service: AppReportService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
@@ -74,10 +76,11 @@ export class ThietBiChamDiemComponent implements OnInit {
         this.getAllKyKhaoSat();
       },
     });
+
   }
 
   getAllKyKhaoSat() {
-    this._service.search({ keyWord: this.surveyId }).subscribe({
+    this._KiKhaoSat.search({ keyWord: this.surveyId }).subscribe({
       next: (data) => {
         this.lstKiKhaoSat = data.data;
 
@@ -116,7 +119,7 @@ export class ThietBiChamDiemComponent implements OnInit {
 
   searchStore(kiKhaoSat: any) {
     this.inputSearchKiKhaoSat = kiKhaoSat;
-    this._service.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
+    this._KiKhaoSat.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
       next: (data) => {
         this.lstSearchStore = data.lstInputStore;
         this.lstSearchChamDiem = Array.from(
@@ -151,6 +154,21 @@ export class ThietBiChamDiemComponent implements OnInit {
     this.isOpen = false;
   }
 
+  getThietBiChamDiem() {
+    this._service
+      .ThietBiChamDiem({
+        kiKhaoSatId: this.filter.filterKiKhaoSat.id,
+        InstoreId: this.filter.filterStore.id,
+        AccountUserName: this.filter.filterNguoiCham,
+        SurveyId: this.filter.cuaHangToiCham
+      })
+      .subscribe({
+        next: (data) => {
+          this.lstData = data;
+          console.log(data);
+        },
+      });
+  }
   onFilter() {
     this.filter.filterKiKhaoSat = this.inputSearchKiKhaoSat;
     this.lstData = this.lstSearchStore
@@ -171,6 +189,7 @@ export class ThietBiChamDiemComponent implements OnInit {
           s.lstChamDiem?.some((x: any) => x == this.user.userName)
       );
     localStorage.setItem('filterLS', JSON.stringify(this.filter));
+    this.getThietBiChamDiem();
     this.closeFilterModal();
   }
 

@@ -23,7 +23,7 @@ namespace PLX5S.BUSINESS.Services.BU
     {
         Task<TieuChiDto> BuildDataTreeForApp(string kiKhaoSatId, string storeId);
         Task<List<TieuChiDto>> GetAllTieuChiLeaves(string kiKhaoSatId, string storeId);
-        Task<EvaluateModel> BuildInputEvaluate(string kiKhaoSatId, string storeId);
+        Task<EvaluateModel> BuildInputEvaluate(string kiKhaoSatId, string storeId,string deviceId);
         Task InsertEvaluate(EvaluateModel data);
         Task<TblBuEvaluateImage> HandelFile(TblBuEvaluateImage request);
         Task<EvaluateModel> GetResultEvaluate(string code);
@@ -180,7 +180,7 @@ namespace PLX5S.BUSINESS.Services.BU
         }
 
 
-        public async Task<EvaluateModel> BuildInputEvaluate(string kiKhaoSatId, string storeId)
+        public async Task<EvaluateModel> BuildInputEvaluate(string kiKhaoSatId, string storeId, string deviceId)
         {
             try
             {
@@ -199,6 +199,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         StoreId = storeId,
                         KiKhaoSatId = kiKhaoSatId,
                         CreateDate = DateTime.Now,
+                        DeviceId= deviceId
                     },
                     LstEvaluate = lstTieuChi.Select(x => new TblBuEvaluateValue
                     {
@@ -240,6 +241,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 data.Header.Name = "Lần chấm thứ " + (number).ToString();
                 data.Header.Order = number;
                 data.Header.UpdateDate = DateTime.Now;
+                
 
                 _dbContext.TblBuEvaluateHeader.Add(data.Header);
 

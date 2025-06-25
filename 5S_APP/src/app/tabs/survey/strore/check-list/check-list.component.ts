@@ -18,6 +18,7 @@ export class CheckListComponent implements OnInit {
   store: any = {}
   lstHisEvaluate: any = []
   inStoreId: any = ''
+  deviceID: string = '';
   account: any = {}
   evaluate: any =
     {
@@ -96,8 +97,10 @@ export class CheckListComponent implements OnInit {
 
   navigateTo() {
     this.lstHisEvaluate = []
+    let userInfo = JSON.parse(localStorage.getItem('UserInfo') ?? '');
+    this.deviceID = userInfo?.deviceId || '';
     if (this.mode == 'new') {
-      this._service.BuildInputEvaluate(this.kiKhaoSat.id, this.store.id).subscribe({
+      this._service.BuildInputEvaluate(this.kiKhaoSat.id, this.store.id,this.deviceID).subscribe({
         next: async (data) => {
           this._storageService.set(data.header.storeId, data)
           console.log('tạo mới');

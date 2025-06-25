@@ -14,6 +14,9 @@ export class AppReportService {
   ThoiGianChamDiem(params: any): Observable<any>{
     return this.commonService.get('AppReport/ThoiGianChamDiem', params)
   }
+  ThietBiChamDiem(params: any): Observable<any>{
+    return this.commonService.get('AppReport/ThietBiChamDiem', params)
+  }
   TheoKhungThoiGian(params: any): Observable<any>{
     return this.commonService.get('AppReport/TheoKhungThoiGian', params)
   }

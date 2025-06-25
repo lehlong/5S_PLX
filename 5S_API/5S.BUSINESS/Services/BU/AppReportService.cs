@@ -24,6 +24,7 @@ namespace PLX5S.BUSINESS.Services.BU
     {
         Task<List<KetQuaChamDiem>> KetQuaChamDiem(FilterReport filterReport);
         Task<List<ThoiGianChamDiem>> ThoiGianChamDiem(FilterReport filterReport);
+        Task<List<ThoiGianChamDiem>> ThietBiChamDiem(FilterReport filterReport);
         Task<List<TheoKhungThoiGian>> TheoKhungThoiGian(FilterReport filterReport);
         Task<List<TongHopYKienDeXuat>> TongHopYKienDeXuat(FilterReport filterReport);
     }
@@ -117,6 +118,48 @@ namespace PLX5S.BUSINESS.Services.BU
                 return null;
             }
         }
+        public async Task<List<ThoiGianChamDiem>> ThietBiChamDiem(FilterReport filterReport)
+        {
+            try
+            {
+                var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
+                var lstInStore = inputKy.Result.lstInputStore.ToList();
+                var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.IsActive == true && x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                var lstPoint = _dbContext.TblBuPointStore.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                var device = _dbContext.tblMdDevice.AsQueryable().ToList();
+
+                if (!string.IsNullOrWhiteSpace(filterReport.InstoreId))
+                {
+                    lstInStore = lstInStore.Where(x => x.Id == filterReport.InstoreId).ToList();
+                }
+
+                var result = new List<ThoiGianChamDiem>();
+
+
+                foreach (var item in lstInStore)
+                {
+                   
+                    var report = new ThoiGianChamDiem()
+                    {
+
+                        stt = item.StoreId,
+                        StoreName = item.Name,
+                        Cht = lstEvaHeader.Where(x => x.StoreId == item.Id && x.ChucVuId == "CHT").Select((x, index) => "L" + (index + 1) + " " +((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "") ).ToList(),
+                        Atvsv = lstEvaHeader.Where(x => x.StoreId == item.Id && x.ChucVuId == "ATVSV").Select((x, index) => "L" + (index + 1) + " " + ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "")).ToList(),
+                        ChuyenGia = lstEvaHeader.Where(x => x.StoreId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT").Select((x, index) => "L" + " " +(index + 1) + ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "")).ToList(),
+                        Point = lstPoint.FirstOrDefault(x => x.InStoreId == item.Id)?.Point ?? 0,
+                    };
+
+                    result.Add(report);
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
 
         public async Task<List<TheoKhungThoiGian>> TheoKhungThoiGian(FilterReport filterReport)
         {
@@ -158,6 +201,8 @@ namespace PLX5S.BUSINESS.Services.BU
                 return null;
             }
         }
+
+
 
 
         public async Task<List<TongHopYKienDeXuat>> TongHopYKienDeXuat(FilterReport filterReport)
