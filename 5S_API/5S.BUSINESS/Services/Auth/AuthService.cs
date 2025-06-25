@@ -109,6 +109,7 @@ namespace PLX5S.BUSINESS.Services.Auth
                     {
                         var token = GeneratenJwtToken(account.UserName, account.FullName);
                         await _dbContext.Database.CommitTransactionAsync();
+                        account.DeviceId = _dbContext.tblMdDevice.FirstOrDefault(x=>x.DeviceId==loginInfo.DeviceId && x.UserName==loginInfo.UserName).Id;
                         return new()
                         {
                             AccountInfo = account,

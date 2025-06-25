@@ -79,6 +79,7 @@ logDeviceInfo = async () => {
         localStorage.setItem('openSidebar', 'true')
         localStorage.setItem('companyCode', response?.accountInfo?.organizeCode)
         localStorage.setItem('warehouseCode', response?.accountInfo?.warehouseCode)
+        
         const userName = response?.accountInfo?.userName;
         if (userName) {
           this.globalService.setUserName(userName);

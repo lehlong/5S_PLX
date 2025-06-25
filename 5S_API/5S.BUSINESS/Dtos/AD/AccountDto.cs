@@ -75,6 +75,7 @@ namespace PLX5S.BUSINESS.Dtos.AD
 
         public string? OrganizeCode { get; set; }
         public string? UrlImage { get; set; }
+        public string DeviceId { get; set; }
 
 
 

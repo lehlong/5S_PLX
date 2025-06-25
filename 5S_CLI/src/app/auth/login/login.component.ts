@@ -36,6 +36,7 @@ export class LoginComponent {
         localStorage.setItem('openSidebar', 'true')
         localStorage.setItem('companyCode', response?.accountInfo?.organizeCode)
         localStorage.setItem('warehouseCode', response?.accountInfo?.warehouseCode)
+         localStorage.setItem('DeviceID', response?.accountInfo?.deviceId)
         const userName = response?.accountInfo?.userName;
         if (userName) {
           this.globalService.setUserName(userName);
