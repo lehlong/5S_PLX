@@ -47,6 +47,7 @@ export class ThoiGianChamDiemComponent implements OnInit {
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('UserInfo') ?? '');
+    this.getAllAccount();
     this.route.paramMap.subscribe({
       next: (params) => {
         const id = params.get('id');
@@ -54,6 +55,10 @@ export class ThoiGianChamDiemComponent implements OnInit {
         this.getAllKyKhaoSat();
       },
     });
+  }
+  getFullName(userName: string): string {
+    const account = this.lstAccout.find((acc: any) => acc.userName === userName);
+    return account?.fullName;
   }
 
   getThoiGianChamDiem() {
@@ -98,17 +103,16 @@ export class ThoiGianChamDiemComponent implements OnInit {
     });
   }
 
-  // getAllAccount() {
-  //   this._authService.(this.filter.filterKiKhaoSat.id).subscribe({
-  //     next: (data) => {
-  //       this.lstStore = data.lstInputStore;
-  //       this.lstSearchStore = data.lstInputStore;
-  //     },
-  //     error: (response) => {
-  //       console.log(response);
-  //     },
-  //   });
-  // }
+  getAllAccount() {
+    this._service.GetAllAccount().subscribe({
+      next: (data) => {
+       this.lstAccout=  data;
+      },
+      error: (response) => {
+        console.log(response);
+      },
+    });
+  }
 
   searchStore(kiKhaoSat: any) {
     this.inputSearchKiKhaoSat = kiKhaoSat;

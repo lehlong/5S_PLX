@@ -105,7 +105,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         StoreName = item.Name,
                         Cht = lstEvaHeader.Where(x => x.StoreId == item.Id && x.ChucVuId == "CHT").Select((x, index) => "L" + (index + 1) + " " + x.UpdateDate).ToList(),
                         Atvsv = lstEvaHeader.Where(x => x.StoreId == item.Id && x.ChucVuId == "ATVSV").Select((x, index) => "L" + (index + 1) + " "+ x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
-                        ChuyenGia = lstEvaHeader.Where(x => x.StoreId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT").Select((x, index) => "L" + (index + 1) + " "+ x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
+                        ChuyenGia = lstEvaHeader.Where(x => x.StoreId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT").Select((x, index) => "L" + (index + 1) + "  "+ x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
                         Point = lstPoint.FirstOrDefault(x => x.InStoreId == item.Id)?.Point ?? 0,
                     };
 

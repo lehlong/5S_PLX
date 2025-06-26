@@ -107,6 +107,7 @@
                 [readonly]="true"
                 placeholder="Chọn kỳ thời gian"
                 [(ngModel)]="inputSearchKiKhaoSat.name"
+              
               >
               </ion-input>
             </ion-label>
@@ -162,7 +163,8 @@
                 [clearInput]="true"
                 [readonly]="true"
                 placeholder="Chọn người chấm"
-                [(ngModel)]="filter.filterNguoiCham.userName"
+              
+                [value]="getFullName(filter.filterNguoiCham.userName)" 
               >
               </ion-input>
             </ion-label>
@@ -175,7 +177,7 @@
               *ngFor="let item of lstSearchChamDiem"
               (click)="selectSearchChamDiem(item)"
             >
-              <ion-label>{{ item.userName }}</ion-label>
+              <ion-label>{{ getFullName(item.userName) }}</ion-label>
             </ion-item>
           </div>
         </ion-accordion>

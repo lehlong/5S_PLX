@@ -43,7 +43,5 @@ export class AppEvaluateService {
     return this.commonService.get(`AppEvaluate/GetPointStore?kiKhaoSatId=${params.kiKhaoSatId}&surveyId=${params.surveyId}`)
   }
 
-  getInputKiKhaoSat(params: any): Observable<any> {
-    return this.commonService.get(`AppEvaluate/GetInputKiKhaoSat?idKi=${params}`)
-  }
+ 
 }

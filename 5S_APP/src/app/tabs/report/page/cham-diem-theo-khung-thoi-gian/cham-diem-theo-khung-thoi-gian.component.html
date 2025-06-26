@@ -228,13 +228,13 @@
           <ion-item slot="header" color="light">
             <ion-label>
               <ion-input label="Người chấm" labelPlacement="stacked" labelPlacement="floating" [clearInput]="true"
-                [readonly]="true" placeholder="Chọn người chấm" [(ngModel)]="filter.filterNguoiCham.userName">
+                [readonly]="true" placeholder="Chọn người chấm" [value]="getFullName(filter.filterNguoiCham.userName)">
               </ion-input>
             </ion-label>
           </ion-item>
           <div slot="content" style="max-height: 25vh; overflow-y: auto; padding: 5px">
             <ion-item *ngFor="let item of lstSearchChamDiem" (click)="selectSearchChamDiem(item)">
-              <ion-label>{{ item.userName }}</ion-label>
+              <ion-label>{{  getFullName(item.userName) }}</ion-label>
             </ion-item>
           </div>
         </ion-accordion>

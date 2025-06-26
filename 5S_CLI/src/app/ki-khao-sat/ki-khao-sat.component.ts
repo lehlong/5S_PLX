@@ -311,6 +311,19 @@ export class KiKhaoSatComponent {
       },
     });
   }
+   CheckTreeLeaves() {
+    this._treeTieuChiService.GetTreeLeaves(this.treeId, this.kiKhaoSatId).subscribe({
+      next: (data) => {
+        console.log(data.result);
+
+       return data.result.length > 0;
+
+      },
+      error: (response) => {
+        console.log(response);
+      },
+    });
+  }
   resetStore() {
     this.filterNguoiChamDiem = "";
     this.lstInputStoreSearch = this.inputKi.lstInputStore;
@@ -451,9 +464,13 @@ export class KiKhaoSatComponent {
     }, 200);
   }
 
-  nzEvent(event: NzFormatEmitEvent): void { }
+  nzEvent(event: NzFormatEmitEvent): void {
+    console.log('sự kiện', event);
+   }
 
-  onDrop(event: any) { }
+  onDrop(event: any) { 
+    console.log('sự kiện drop', event);
+  }
 
   onDragStart(event: any) { }
 

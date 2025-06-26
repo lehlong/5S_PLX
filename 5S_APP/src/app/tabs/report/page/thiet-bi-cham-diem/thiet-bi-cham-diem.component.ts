@@ -6,6 +6,7 @@ import { KyKhaoSatService } from 'src/app/service/ky-khao-sat.service';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { AppReportService } from 'src/app/service/app-report.service';
 
+
 @Component({
   selector: 'app-thiet-bi-cham-diem',
   templateUrl: './thiet-bi-cham-diem.component.html',
@@ -25,29 +26,7 @@ export class ThietBiChamDiemComponent implements OnInit {
   searchNguoiCham: any = '';
   inSearchStore: any = '';
   selectValue = '1';
-  lstData: any[] = [
-    {
-      store: 'PETROLIMEX-CỬA HÀNG 1',
-      CHT: '',
-      ATVSV: 0,
-      CGIA_5S: 0,
-      BQPoint: 0,
-    },
-    {
-      store: 'PETROLIMEX-CỬA HÀNG 2',
-      CHT: '',
-      ATVSV: 0,
-      CGIA_5S: 1,
-      BQPoint: 0,
-    },
-    {
-      store: 'PETROLIMEX-CỬA HÀNG 3',
-      CHT: '',
-      ATVSV: 0,
-      CGIA_5S: 2,
-      BQPoint: 0,
-    },
-  ];
+  lstData: any[] = [];
   lstAccout: any = [];
   lstSearchChamDiem: any = [];
   lstSearchStore: any = [];
@@ -69,6 +48,7 @@ export class ThietBiChamDiemComponent implements OnInit {
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('UserInfo') ?? '');
+    this.getAllAccount();
     this.route.paramMap.subscribe({
       next: (params) => {
         const id = params.get('id');
@@ -77,6 +57,10 @@ export class ThietBiChamDiemComponent implements OnInit {
       },
     });
 
+  }
+   getFullName(userName: string): string {
+    const account = this.lstAccout.find((acc: any) => acc.userName === userName);
+    return account?.fullName;
   }
 
   getAllKyKhaoSat() {
@@ -105,22 +89,22 @@ export class ThietBiChamDiemComponent implements OnInit {
     });
   }
 
-  // getAllAccount() {
-  //   this._authService.(this.filter.filterKiKhaoSat.id).subscribe({
-  //     next: (data) => {
-  //       this.lstStore = data.lstInputStore;
-  //       this.lstSearchStore = data.lstInputStore;
-  //     },
-  //     error: (response) => {
-  //       console.log(response);
-  //     },
-  //   });
-  // }
+  getAllAccount() {
+    this._service.GetAllAccount().subscribe({
+      next: (data) => {
+       this.lstAccout=  data;
+      },
+      error: (response) => {
+        console.log(response);
+      },
+    });
+  }
 
   searchStore(kiKhaoSat: any) {
     this.inputSearchKiKhaoSat = kiKhaoSat;
     this._KiKhaoSat.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
       next: (data) => {
+       console.log('kks', data);
         this.lstSearchStore = data.lstInputStore;
         this.lstSearchChamDiem = Array.from(
           new Map(
@@ -142,6 +126,7 @@ export class ThietBiChamDiemComponent implements OnInit {
   }
 
   selectSearchChamDiem(item: any) {
+    console.log('Selected cham diem:', item);
     this.filter.filterNguoiCham = item;
   }
 

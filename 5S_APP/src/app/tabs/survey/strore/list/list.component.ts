@@ -6,6 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { KyKhaoSatService } from 'src/app/service/ky-khao-sat.service';
 import { AuthService } from 'src/app/service/auth.service';
 import { AppEvaluateService } from 'src/app/service/app-evaluate.service';
+import { AppReportService } from 'src/app/service/app-report.service';
 
 @Component({
   selector: 'app-scoring-five-s',
@@ -45,6 +46,7 @@ export class ListComponent implements OnInit {
   constructor(
     private _service: KyKhaoSatService,
     private _appService: AppEvaluateService,
+    private _reportService: AppReportService,
     private _authService: AuthService,
     private router: Router,
     private route: ActivatedRoute
@@ -60,7 +62,21 @@ export class ListComponent implements OnInit {
       },
     });
   }
+ getAllAccount() {
+    this._reportService.GetAllAccount().subscribe({
+      next: (data) => {
+       this.lstAccout=  data;
+      },
+      error: (response) => {
+        console.log(response);
+      },
+    });
+  }
 
+  getFullName(userName: string): string {
+    const account = this.lstAccout.find((acc: any) => acc.userName === userName);
+    return account?.fullName;
+  }
   getAllKyKhaoSat() {
     this._service
       .search({ keyWord: this.surveyId })
@@ -136,6 +152,7 @@ export class ListComponent implements OnInit {
     this.inputSearchKiKhaoSat = kiKhaoSat;
     this._service.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
       next: (data) => {
+        console.log("searchStore", data);
         this.lstSearchStore = data.lstInputStore;
         this.lstSearchChamDiem = Array.from(
           new Map(
