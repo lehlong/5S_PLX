@@ -46,12 +46,13 @@
   </ion-item-group>
   <ion-item-group style="margin-top: 10px">
     <ng-container *ngFor="let store of lstData">
-      <ng-container *ngFor="let item of store.lstTieuChiDeXuat">
-        <div style="margin-bottom: 20px" class="grey-background">
-          <ion-row>
-            <ion-col style="font-weight: 600" size="4">Cửa hàng</ion-col>
-            <ion-col size="8">{{ store.storeName }}</ion-col>
-          </ion-row>
+      <div style="margin-bottom: 20px;" class="white-background"  >
+        <ion-row >
+          <ion-col style="font-weight: 600" size="4">Cửa hàng</ion-col>
+          <ion-col size="8" style="font-weight: 600">{{ store.storeName }}</ion-col>
+        </ion-row>
+        <ng-container *ngFor="let item of store.lstTieuChiDeXuat" >
+          <div style="margin-bottom: 20px;">
           <ion-row>
             <ion-col style="font-weight: 600" size="4">Tiêu chí</ion-col>
             <ion-col size="8">{{ item.tieuChi }}</ion-col>
@@ -72,8 +73,9 @@
             <ion-col style="font-weight: 600" size="4">Thời gian</ion-col>
             <ion-col size="8">{{ item.thoiGian }}</ion-col>
           </ion-row>
-        </div>
-      </ng-container>
+          </div>
+        </ng-container>
+      </div>
     </ng-container>
   </ion-item-group>
 </ion-content>

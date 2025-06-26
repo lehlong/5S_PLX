@@ -4,8 +4,8 @@ ion-col {
 .custom-modal {
   --height: 80vh;
 }
-.grey-background {
-  background-color: #fafafa;
+.white-background {
+  background-color: white;
 }
 ion-item-group ion-row:not([style*="background-color: #fafafa"]) {
   color: initial;
