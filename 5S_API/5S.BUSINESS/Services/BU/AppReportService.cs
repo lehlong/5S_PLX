@@ -1,6 +1,7 @@
 ﻿
 using AutoMapper;
 using Common;
+using DocumentFormat.OpenXml;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
@@ -211,10 +212,12 @@ namespace PLX5S.BUSINESS.Services.BU
             {
                 var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
                 var lstTieuChi = _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId && x.IsGroup == false).ToList();
-                var lstInStore = inputKy.Result.lstInputStore.ToList();
                 var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
                 var lstEvaValue = _dbContext.TblBuEvaluateValue.Where(x => x.FeedBack != "").ToList();
                 var lstPoint = _dbContext.TblBuPointStore.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                var lstInStore = inputKy.Result.lstInputStore.ToList();
+
+
 
                 if (!string.IsNullOrWhiteSpace(filterReport.InstoreId))
                 {
@@ -223,30 +226,36 @@ namespace PLX5S.BUSINESS.Services.BU
                 var result = new List<TongHopYKienDeXuat>();
 
 
-                foreach (var i in lstEvaHeader)
+                foreach (var i in lstPoint)
                 {
-                    var lstValue = lstEvaValue.Where(x => x.EvaluateHeaderCode == i.Code).ToList();
-                    foreach (var v in lstValue)
+                    var store = lstInStore.FirstOrDefault(x => x.Id == i.InStoreId);
+                    var lstHeader = lstEvaHeader.Where(x => x.StoreId == i.InStoreId).ToList();
+
+                    var lstDeXuat = new List<LstTieuChiDeXuat>(); 
+                    foreach (var item in lstHeader)
                     {
-                        var a = new TongHopYKienDeXuat()
+                        var ab = lstEvaValue.Where(x => x.EvaluateHeaderCode == item.Code).Select(x => new LstTieuChiDeXuat()
                         {
-                            stt = lstInStore.FirstOrDefault(x => x.Id == i.StoreId).Id,
-                            StoreName = lstInStore.FirstOrDefault(x => x.Id == i.StoreId).Name,
-                            lstTieuChiDeXuat = lstValue.Select(x => new LstTieuChiDeXuat()
-                            {
-                                TieuChi = lstTieuChi.FirstOrDefault(b => b.Code == x.TieuChiCode).Name,
-                                DeXuat = x.FeedBack,
-                                CanBo = i.AccountUserName,
-                                ChucVu = i.ChucVuId,
-                                ThoiGian = i.UpdateDate?.ToString("HH:mm dd/MM/yyyy")
-                            }).ToList() ?? null,
-                        };
-                        result.Add(a);
+                            TieuChi = lstTieuChi.FirstOrDefault(b => b.Code == x.TieuChiCode).Name,
+                            DeXuat = x.FeedBack,
+                            CanBo = item.AccountUserName,
+                            ChucVu = item.ChucVuId,
+                            ThoiGian = i.UpdateDate?.ToString("HH:mm dd/MM/yyyy")
+                        }).ToList();
+
+                        lstDeXuat.AddRange(ab);
                     }
+
+                    var a = new TongHopYKienDeXuat()
+                    {
+                        stt = store.StoreId,
+                        StoreName = store.Name,
+                        lstTieuChiDeXuat = lstDeXuat
+                    };
+                    result.Add(a);
                 }
 
                 return result;
-
             }
             catch (Exception ex)
             {

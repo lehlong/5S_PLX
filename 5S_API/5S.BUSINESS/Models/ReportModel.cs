@@ -54,7 +54,7 @@ namespace PLX5S.BUSINESS.Models
     {
         public string? stt { set; get; }
         public string? StoreName { set; get; }
-        public List<LstTieuChiDeXuat>? lstTieuChiDeXuat { set; get; } = new List<LstTieuChiDeXuat>();
+        public List<LstTieuChiDeXuat>? lstTieuChiDeXuat { set; get; }
     }
     public class LstTieuChiDeXuat
     {
