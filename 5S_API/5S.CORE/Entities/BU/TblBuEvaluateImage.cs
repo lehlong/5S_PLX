@@ -19,6 +19,12 @@ namespace PLX5S.CORE.Entities.BU
         [Column("FILE_PATH", TypeName = "NVARCHAR(5000)")]
         public string? FilePath { get; set; }
 
+        [Column("PATH_THUMBNAIL", TypeName = "NVARCHAR(5000)")]
+        public string? PathThumbnail { get; set; }
+
+        [Column("NAME_THUMBNAIL", TypeName = "NVARCHAR(500)")]
+        public string? NameThumbnail { get; set; }
+
         [Column("TIEU_CHI_CODE", TypeName = "NVARCHAR(150)")]
         public string? TieuChiCode { get; set; }
 

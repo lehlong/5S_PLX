@@ -29,43 +29,42 @@ import { HighlightSearchPipe } from '../../../../shared/pipes/highlight-search.p
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EvaluateComponent implements OnInit {
-  isSearchVisible: boolean = false
-  searchKeyword = '';
-  searchResults: { id: string; type: string }[] = [];
-  currentIndex = 0;
+  private map: L.Map | undefined;
+  private highlightClass = 'highlight-search';
+  private currentHighlights: HTMLElement[] = [];
   @ViewChild('accordionGroup', { static: true })
   accordionGroup!: IonAccordionGroup;
   @ViewChild('fileInput', { static: false })
   fileInput!: ElementRef<HTMLInputElement>;
-
-  private map: L.Map | undefined;
+  @Input() treeData: any = [];
+  @Input() lstTreeOpen!: string[];
+  isSearchVisible: boolean = false
+  searchKeyword = '';
+  searchResults: { id: string; type: string }[] = [];
+  currentIndex = 0;
   selectedAccordionId: string = '';
   currentSelect: string = '';
   lstAllTieuChi: any = [];
   store: any = {};
   kiKhaoSat: any = {};
   lstTieuChi: any = [];
-  @Input() treeData: any = [];
-  @Input() lstTreeOpen!: string[];
   previewImage: any = [];
+  data: any = {};
+  headerId: any = '';
+  count: any = 0;
+  isEdit: any = true;
+  account: any = {};
+  lstHisEvaluate: any = []
+  apiFile = (environment as any).apiFile;
   evaluate: any = {
     header: {},
     lstEvaluate: [],
     lstImages: [],
   };
-  data: any = {};
-  headerId: any = '';
-  count: any = 0;
-  isEdit: any = true;
-  apiFile = (environment as any).apiFile;
-  account: any = {};
   dataTree: any = {
     leaves: [],
     tree: [],
   };
-  private highlightClass = 'highlight-search';
-  private currentHighlights: HTMLElement[] = [];
-  lstHisEvaluate: any = []
 
 
   constructor(
@@ -78,6 +77,9 @@ export class EvaluateComponent implements OnInit {
     private renderer: Renderer2
   ) { }
   ngOnInit() {
+    this.apiFile = (environment as any).apiFile ?? "http://sso.d2s.com.vn:1347/";
+    console.log("api file", this.apiFile);
+
     this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
     this.route.paramMap.subscribe({
       next: async (params) => {
@@ -89,15 +91,15 @@ export class EvaluateComponent implements OnInit {
         this.kiKhaoSat = JSON.parse(nav ?? '').kiKhaoSat;
 
         if (mode == 'draft') {
-          this.evaluate = await this._storageService.get(this.store.id);
+          console.log(this.store.id + "_" + this.kiKhaoSat.code);
+
+          this.evaluate = await this._storageService.get(this.store.id + "_" + this.kiKhaoSat.code);
         } else {
           this.isEdit = false;
-          console.log(mode);
-
           this.getResultEvaluate();
         }
 
-        let data = localStorage.getItem(this.kiKhaoSat.name);
+        let data = localStorage.getItem(this.store.id + "_" + this.kiKhaoSat.code);
         if (data == null) {
           this.getAllTieuChi();
           this.getAllTieuChiLeaves();
@@ -108,6 +110,9 @@ export class EvaluateComponent implements OnInit {
           this.lstTieuChi = this.dataTree?.leaves;
           await this.cdr.detectChanges();
         }
+        console.log(this.treeData);
+        console.log(this.lstTieuChi);
+
       },
     });
   }
@@ -208,7 +213,7 @@ export class EvaluateComponent implements OnInit {
           this.dataTree.tree = this.treeData;
           console.log(this.dataTree);
           localStorage.setItem(
-            this.kiKhaoSat.name,
+            this.store.id + "_" + this.kiKhaoSat.code,
             JSON.stringify(this.dataTree)
           );
 
@@ -248,11 +253,11 @@ export class EvaluateComponent implements OnInit {
   }
 
   private initMap(): void {
-    // L.Icon.Default.mergeOptions({
-    //   iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
-    //   iconUrl: 'assets/leaflet/marker-icon.png',
-    //   shadowUrl: 'assets/leaflet/marker-shadow.png',
-    // });
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
+      iconUrl: 'assets/leaflet/marker-icon.png',
+      shadowUrl: 'assets/leaflet/marker-shadow.png',
+    });
     this.map = L.map('map').setView([21.0285, 105.8542], 13); // Hà Nội
 
     L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
@@ -319,11 +324,14 @@ export class EvaluateComponent implements OnInit {
     const type = this.detectFileType(file);
 
     const reader = new FileReader();
-    console.log(this.evaluate);
-
-    reader.onload = () => {
+    // console.log(this.evaluate);
+    reader.onload = async () => {
       const base64 = reader.result as string;
 
+      let thumbnail = "";
+      if (type === 'img') {
+        thumbnail = await this.generateThumbnail(base64, 100, 100);
+      }
       // Lưu vào localStorage
       this.evaluate.lstImages.push({
         code: '-1',
@@ -333,19 +341,18 @@ export class EvaluateComponent implements OnInit {
         type: type,
         kinhDo: 0,
         viDo: 0,
+        pathThumbnail: thumbnail,
         evaluateHeaderCode: this.headerId,
       });
       this.cdr.detectChanges();
       this._storageService.set(this.store.id, this.evaluate);
     };
     reader.readAsDataURL(file); // Chuyển sang base64
+    console.log(this.evaluate);
+
   }
 
-  generateThumbnail(
-    base64: string,
-    maxWidth: number,
-    maxHeight: number
-  ): Promise<string> {
+  generateThumbnail(base64: string, maxWidth: number, maxHeight: number): Promise<string> {
     return new Promise((resolve) => {
       const img = new Image();
       img.onload = () => {
@@ -375,6 +382,28 @@ export class EvaluateComponent implements OnInit {
       img.src = base64;
     });
   }
+
+  // generateVideoThumbnail(base64: string): Promise<string> {
+  //   return new Promise((resolve) => {
+  //     const video = document.createElement('video');
+  //     video.src = base64;
+  //     video.crossOrigin = 'anonymous';
+  //     video.muted = true;
+  //     video.playsInline = true;
+
+  //     video.addEventListener('loadeddata', () => {
+  //       const canvas = document.createElement('canvas');
+  //       canvas.width = video.videoWidth;
+  //       canvas.height = video.videoHeight;
+  //       const ctx = canvas.getContext('2d')!;
+  //       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  //       const thumbnail = canvas.toDataURL('image/jpeg');
+  //       resolve(thumbnail);
+  //     });
+
+  //     video.load(); // Kích hoạt load video
+  //   });
+  // }
 
   detectFileType(file: File): string {
     const mime = file.type;
@@ -529,7 +558,7 @@ export class EvaluateComponent implements OnInit {
       await alert.present();
       return;
     }
-        // this.tinhTongLanCham()
+    // this.tinhTongLanCham()
 
     // Trường hợp đủ
     this.evaluate.header.accountUserName = this.account.userName
@@ -541,8 +570,8 @@ export class EvaluateComponent implements OnInit {
         this.tinhTongLanCham()
 
         this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
-        this._storageService.remove(this.store.id);
-        localStorage.removeItem(this.kiKhaoSat.code)
+        this._storageService.remove(this.store.id + "_" + this.kiKhaoSat.code);
+        localStorage.removeItem(this.store.id + "_" + this.kiKhaoSat.code)
       },
 
       error: (ex) => {
@@ -558,12 +587,12 @@ export class EvaluateComponent implements OnInit {
         console.log(data.length);
 
         const total = data.reduce((sum: any, item: any) => {
-          let pointitem =  item.point
-          if(item.ChucVuId === "CHT" || item.ChucVuId === "ATVSV"){
-            pointitem =  item.point / 2
+          let pointitem = item.point
+          if (item.ChucVuId === "CHT" || item.ChucVuId === "ATVSV") {
+            pointitem = item.point / 2
             console.log(pointitem);
           }
-            console.log(pointitem);
+          console.log(pointitem);
 
           return sum + pointitem;
         }, 0);
@@ -608,6 +637,7 @@ export class EvaluateComponent implements OnInit {
 
   filePath(filePath: string) {
     if (this.isEdit) return filePath;
+
     return this.apiFile + filePath;
   }
 

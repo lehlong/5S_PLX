@@ -262,7 +262,6 @@ namespace PLX5S.BUSINESS.Services.BU
                 this.Status = false;
             }
         }
-
         public async Task<TblBuEvaluateImage> HandelFile(TblBuEvaluateImage request)
         {
             if (string.IsNullOrEmpty(request.FilePath))
@@ -279,17 +278,14 @@ namespace PLX5S.BUSINESS.Services.BU
                 var base64String = base64Parts[1];
                 var fileBytes = Convert.FromBase64String(base64String);
 
-                var mimeTypePart = base64Parts[0]; // "data:application/pdf;base64"
-
-                // Xác định extension dựa theo MIME
+                var mimeTypePart = base64Parts[0]; // ví dụ: data:image/jpeg;base64
                 string extension = GetExtensionFromMimeType(mimeTypePart);
                 if (string.IsNullOrEmpty(extension))
                     return null;
 
-                // Chọn folder phù hợp
                 string folder = GetFolderByExtension(extension);
 
-                // Tạo tên file
+                // Tạo file chính
                 var fileName = !string.IsNullOrEmpty(request.FileName)
                     ? Path.GetFileNameWithoutExtension(request.FileName) + extension
                     : $"{Guid.NewGuid()}{extension}";
@@ -299,8 +295,18 @@ namespace PLX5S.BUSINESS.Services.BU
                     Directory.CreateDirectory(uploadsFolder);
 
                 var filePath = Path.Combine(uploadsFolder, fileName);
-
                 await System.IO.File.WriteAllBytesAsync(filePath, fileBytes);
+
+                // Nếu là ảnh thì tạo thumbnail
+                string thumbPath = null;
+                string thumbName = null;
+                if (mimeTypePart.Contains("image"))
+                {
+                    var thumbBytes = GenerateThumbnailBytes(fileBytes, 100, 100); // <-- Tạo ảnh nhỏ
+                    thumbName = "thumb_" + fileName;
+                    thumbPath = Path.Combine(uploadsFolder, thumbName);
+                    await System.IO.File.WriteAllBytesAsync(thumbPath, thumbBytes);
+                }
 
                 return new TblBuEvaluateImage()
                 {
@@ -311,13 +317,48 @@ namespace PLX5S.BUSINESS.Services.BU
                     KinhDo = request.KinhDo,
                     ViDo = request.ViDo,
                     EvaluateHeaderCode = request.EvaluateHeaderCode,
-                    TieuChiCode = request.TieuChiCode
+                    TieuChiCode = request.TieuChiCode,
+                    PathThumbnail = thumbPath,
+                    NameThumbnail = thumbName
                 };
             }
             catch (Exception ex)
             {
                 this.Status = false;
                 return null;
+            }
+        }
+        public byte[] GenerateThumbnailBytes(byte[] originalBytes, int maxWidth, int maxHeight)
+        {
+            using (var inputStream = new MemoryStream(originalBytes))
+            using (var image = System.Drawing.Image.FromStream(inputStream))
+            {
+                int width = image.Width;
+                int height = image.Height;
+
+                if (width > height)
+                {
+                    if (width > maxWidth)
+                    {
+                        height = (int)(height * ((float)maxWidth / width));
+                        width = maxWidth;
+                    }
+                }
+                else
+                {
+                    if (height > maxHeight)
+                    {
+                        width = (int)(width * ((float)maxHeight / height));
+                        height = maxHeight;
+                    }
+                }
+
+                using (var thumbnail = new System.Drawing.Bitmap(image, width, height))
+                using (var outputStream = new MemoryStream())
+                {
+                    thumbnail.Save(outputStream, System.Drawing.Imaging.ImageFormat.Png);
+                    return outputStream.ToArray();
+                }
             }
         }
 

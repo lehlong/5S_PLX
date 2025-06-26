@@ -46,21 +46,15 @@ export class CheckListComponent implements OnInit {
         this.store = filter.store
 
         // await this._storageService.clear()
-        let eva = await this._storageService.get(this.store.id)
-        console.log(eva);
-
+        let eva = await this._storageService.get(this.store.id + "_" + this.kiKhaoSat.code)
         if (eva) {
           this.evaluate = eva
           if (this.evaluate.header.kiKhaoSatId == this.kiKhaoSat.id) {
             this.lstHisEvaluate = [this.evaluate.header]
           }
-          console.log(this.mode);
-
         } else {
           this.mode = 'new'
-          console.log(this.mode);
         }
-
         this.inStoreId = id
         this.getAllEvaluateHistory()
       },
@@ -73,7 +67,6 @@ export class CheckListComponent implements OnInit {
         if (data.data.length == 0) return;
 
         this.lstHisEvaluate.push(...data.data);
-        console.log(this.lstHisEvaluate);
       }
     })
   }
@@ -100,9 +93,9 @@ export class CheckListComponent implements OnInit {
     let userInfo = JSON.parse(localStorage.getItem('UserInfo') ?? '');
     this.deviceID = userInfo?.deviceId || '';
     if (this.mode == 'new') {
-      this._service.BuildInputEvaluate(this.kiKhaoSat.id, this.store.id,this.deviceID).subscribe({
+      this._service.BuildInputEvaluate(this.kiKhaoSat.id, this.store.id, this.deviceID).subscribe({
         next: async (data) => {
-          this._storageService.set(data.header.storeId, data)
+          this._storageService.set(data.header.storeId + "_" + this.kiKhaoSat.code, data)
           console.log('tạo mới');
           this.router.navigate([`survey/store/evaluate/draft/${data.header.code}`]);
         }
@@ -114,11 +107,8 @@ export class CheckListComponent implements OnInit {
   }
 
   async remove(code: any) {
-    await this._storageService.remove(this.store.id)
-    console.log(this.kiKhaoSat.code);
-
-    localStorage.removeItem(this.kiKhaoSat.code)
-
+    await this._storageService.remove(this.store.id + "_" + this.kiKhaoSat.code);
+    localStorage.removeItem(this.store.id + "_" + this.kiKhaoSat.code)
     this.lstHisEvaluate.shift();
   }
 
