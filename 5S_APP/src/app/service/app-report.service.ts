@@ -23,4 +23,7 @@ export class AppReportService {
    GetAllAccount(): Observable<any>{
     return this.commonService.get('Account/GetAll')
   }
+  TongHopYKienDeXuat(params: any): Observable<any>{
+    return this.commonService.get('AppReport/TongHopYKienDeXuat', params)
+  }
 }

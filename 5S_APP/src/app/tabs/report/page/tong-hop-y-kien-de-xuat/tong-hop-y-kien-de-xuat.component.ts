@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { AppReportService } from 'src/app/service/app-report.service';
 import { AuthService } from 'src/app/service/auth.service';
 import { KyKhaoSatService } from 'src/app/service/ky-khao-sat.service';
 import { SharedModule } from 'src/app/shared/shared.module';
@@ -24,32 +25,7 @@ export class TongHopYKienDeXuatComponent implements OnInit {
   searchNguoiCham: any = '';
   inSearchStore: any = '';
   selectValue = '1';
-  lstData: any[] = [
-    {
-      store: 'PETROLIMEX-CỬA HÀNG 1',
-      TieuChi: '',
-      DeXuat: '',
-      CanBo: '',
-      ChucVu: '',
-      ThoiGian: ''
-    },
-    {
-      store: 'PETROLIMEX-CỬA HÀNG 2',
-      TieuChi: '',
-      DeXuat: '',
-      CanBo: '',
-      ChucVu: '',
-      ThoiGian: ''
-    },
-    {
-      store: 'PETROLIMEX-CỬA HÀNG 3',
-      TieuChi: '',
-      DeXuat: '',
-      CanBo: '',
-      ChucVu: '',
-      ThoiGian: ''
-    },
-  ];
+  lstData: any[] = [];
   lstAccout: any = [];
   lstSearchChamDiem: any = [];
   lstSearchStore: any = [];
@@ -62,7 +38,8 @@ export class TongHopYKienDeXuatComponent implements OnInit {
   user: any = {};
 
   constructor(
-    private _service: KyKhaoSatService,
+    private _service: AppReportService,
+    private _kykhaosatservice: KyKhaoSatService,
     private _authService: AuthService,
     private router: Router,
     private route: ActivatedRoute
@@ -79,8 +56,24 @@ export class TongHopYKienDeXuatComponent implements OnInit {
     });
   }
 
+   getTongHopYKienDeXuat() {
+    this._service
+      .TongHopYKienDeXuat({
+        kiKhaoSatId: this.filter.filterKiKhaoSat.id,
+        InstoreId: this.filter.filterStore.id,
+        AccountUserName: this.filter.filterNguoiCham,
+        SurveyId: this.filter.cuaHangToiCham
+      })
+      .subscribe({
+        next: (data) => {
+          this.lstData = data;
+          console.log(data);
+        },
+      });
+  }
+
   getAllKyKhaoSat() {
-    this._service.search({ keyWord: this.surveyId }).subscribe({
+    this._kykhaosatservice.search({ keyWord: this.surveyId }).subscribe({
       next: (data) => {
         this.lstKiKhaoSat = data.data;
 
@@ -98,6 +91,7 @@ export class TongHopYKienDeXuatComponent implements OnInit {
         }
 
         this.inputSearchKiKhaoSat = this.filter.filterKiKhaoSat;
+        this.getTongHopYKienDeXuat()
       },
       error: (response) => {
         console.log(response);
@@ -119,7 +113,7 @@ export class TongHopYKienDeXuatComponent implements OnInit {
 
   searchStore(kiKhaoSat: any) {
     this.inputSearchKiKhaoSat = kiKhaoSat;
-    this._service.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
+    this._kykhaosatservice.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
       next: (data) => {
         this.lstSearchStore = data.lstInputStore;
         this.lstSearchChamDiem = Array.from(
@@ -175,6 +169,7 @@ export class TongHopYKienDeXuatComponent implements OnInit {
       );
     localStorage.setItem('filterLS', JSON.stringify(this.filter));
     this.closeFilterModal();
+    this.getTongHopYKienDeXuat()
   }
 
   resetFilters() {
