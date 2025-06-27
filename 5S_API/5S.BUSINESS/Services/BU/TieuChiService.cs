@@ -71,7 +71,7 @@ namespace PLX5S.BUSINESS.Services.BU
                     item.TieuChiCode = tieuChi.Code;
                     _dbContext.TblBuTinhDiemTieuChi.Add(item);
                 }
-                foreach (var item in data.TblBuCriteriaExcludedObject)
+                foreach (var item in data.LstCriteriaExcludedOject)
                 {
                     item.Code = Guid.NewGuid().ToString();
                     item.TieuChiCode = tieuChi.Code;
@@ -168,7 +168,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         KiKhaoSatId = item.KiKhaoSatId,
                         OrderNumber = item.OrderNumber,
                         DiemTieuChi = _dbContext.TblBuTinhDiemTieuChi.Where(x => x.TieuChiCode == item.Code && x.IsDeleted != true).ToList(),
-                        TblBuCriteriaExcludedObject = _dbContext.TblBuCriteriaExcludedObject.Where(x => x.TieuChiCode == item.Code && x.IsDeleted != true).ToList() ?? null
+                        LstCriteriaExcludedOject = _dbContext.TblBuCriteriaExcludedObject.Where(x => x.TieuChiCode == item.Code && x.IsDeleted != true).ToList() ?? null
 
                     };
                     lstTieuChiLeaves.Add(leaves);
@@ -215,7 +215,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         _dbContext.TblBuTinhDiemTieuChi.Add(diem);
                     }
                 }
-                foreach (var store in item.TblBuCriteriaExcludedObject)
+                foreach (var store in item.LstCriteriaExcludedOject)
                 {
                     if (store.Code != "-1")
                     {

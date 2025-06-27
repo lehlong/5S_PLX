@@ -74,7 +74,6 @@ namespace PLX5S.API.Controllers.BU
         [HttpGet("GetLeaves")]
         public async Task<IActionResult> GetLeaves([FromQuery] string pId, string kiKhaoSatId)
         {
-
             var transferObject = new TransferObject();
             var result = _service.getLeaves(pId, kiKhaoSatId);
             if (_service.Status)

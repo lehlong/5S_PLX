@@ -52,7 +52,7 @@ namespace PLX5S.BUSINESS.Dtos.BU
         
         public List<TblBuTinhDiemTieuChi>? DiemTieuChi { set; get; }
 
-        public List<TblBuCriteriaExcludedObject>? TblBuCriteriaExcludedObject { set; get; }
+        public List<TblBuCriteriaExcludedObject>? LstCriteriaExcludedOject { set; get; }
 
         public void Mapping(Profile profile)
         {
