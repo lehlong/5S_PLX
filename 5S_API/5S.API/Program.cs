@@ -9,6 +9,7 @@ using PLX5S.API.AppCode.Extensions;
 using NLog;
 using NLog.Extensions.Logging;
 using PLX5S.API.Middleware;
+using PLX5S.BUSINESS.Models;
 using Hangfire;
 using Hangfire.Oracle.Core;
 using PLX5S.BUSINESS.Services.AD;
@@ -37,6 +38,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddDIServices(builder.Configuration);
+
+builder.Services.Configure<FirebaseSettings>(builder.Configuration.GetSection("Firebase"));
 //builder.Services.AddDIXHTDServices(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();

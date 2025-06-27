@@ -272,7 +272,6 @@ export class EvaluateComponent implements OnInit {
 
     L.marker([lat, lng])
       .addTo(this.map)
-      .bindPopup('Tọa độ động')
       .openPopup();
   }
   isActive(itemId: string): boolean {
@@ -637,6 +636,8 @@ export class EvaluateComponent implements OnInit {
     }
     this.longitude = img.kinhDo;
     this.latitude = img.viDo;
+    console.log(this.longitude, this.latitude);
+
     this.selectedImage = img;
     this.isImageModalOpen = true;
     setTimeout(() => {
@@ -709,6 +710,9 @@ export class EvaluateComponent implements OnInit {
       const position = await Geolocation.getCurrentPosition();
       const latitude = position.coords.latitude;
       const longitude = position.coords.longitude;
+
+      console.log('Vị trí hiện tại:', latitude, longitude);
+
 
       const image = await Camera.getPhoto({
         quality: 90,
