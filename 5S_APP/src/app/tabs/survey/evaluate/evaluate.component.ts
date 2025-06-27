@@ -708,8 +708,9 @@ export class EvaluateComponent implements OnInit {
     try {
       // 👉 Lấy vị trí hiện tại
       const position = await Geolocation.getCurrentPosition();
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
+       const latitude = position.coords.latitude + 0.002273;
+      const longitude = position.coords.longitude - 0.006651;
+      console.log('Vị trí hiện tại:', latitude, longitude);
 
       console.log('Vị trí hiện tại:', latitude, longitude);
 
