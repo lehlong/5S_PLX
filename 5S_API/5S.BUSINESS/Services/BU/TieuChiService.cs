@@ -24,7 +24,8 @@ namespace PLX5S.BUSINESS.Services.BU
         Task updateLeaves(TieuChiDto item);
         Task updateTreeGroup(TieuChiDto item);
         Task UpdateOrderTree(TieuChiDto moduleDto);
-        Task UpdateOrderLeaves(List<TieuChiDto> lsrModule); 
+        Task UpdateOrderLeaves(List<TieuChiDto> lsrModule);
+        Task<bool> CheckLeaves(string pId, string kiKhaoSatId);
 
     }
 
@@ -182,6 +183,23 @@ namespace PLX5S.BUSINESS.Services.BU
                 return null;
             }
         }
+        public async Task<bool> CheckLeaves(string pId, string kiKhaoSatId)
+        {
+            try
+            {
+                var tieuChic = _dbContext.TblBuTieuChi.FirstOrDefault(x => x.IsDeleted != true && x.Code == pId);
+                var child =  await _dbContext.TblBuTieuChi.Where(x => x.PId == tieuChic.Id && x.IsGroup == false && x.IsDeleted==false).ToListAsync();
+                bool result = child.Count() > 0;
+
+
+                return  result;
+            }
+            catch (Exception ex)
+            {
+                Status = false;
+                return false;
+            }
+        }
 
         public async Task updateLeaves(TieuChiDto item)
         {
@@ -238,27 +256,37 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
-                _dbContext.TblBuTieuChi.Update(new TblBuTieuChi()
-                {
-                    Code = item.Code,
-                    Id = item.Id,
-                    PId = item.PId,
-                    Name = item.Name,
-                    IsImg = item.IsImg,
-                    Report = item.Report,
-                    IsGroup = item.IsGroup,
-                    NumberImg = item.NumberImg,
-                    KiKhaoSatId = item.KiKhaoSatId,
-                    OrderNumber = item.OrderNumber,
-                    IsDeleted = item.IsDeleted ?? false
-                });
-                
+               
+                await this.DeleteTree(item.Id, item.KiKhaoSatId);
                 await _dbContext.SaveChangesAsync();
             }
             catch (Exception ex)
             {
                 Status = false;
             }
+        }
+        public async Task DeleteTree(string Id, string Ki)
+        {
+            try
+            {
+                var nodetree = await _dbContext.TblBuTieuChi.FirstOrDefaultAsync(x => x.Id == Id && x.KiKhaoSatId == Ki && x.IsDeleted != true);
+
+                var child = await _dbContext.TblBuTieuChi.Where(x => x.PId == nodetree.Id && x.IsDeleted == false && x.KiKhaoSatId == Ki).ToListAsync();
+                foreach (var cl in child)
+                {
+                    await DeleteTree(cl.Id, Ki);
+                }
+
+                nodetree.IsDeleted = true;
+                _dbContext.TblBuTieuChi.Update(nodetree);
+            }
+            catch (Exception ex)
+            {
+              
+                Exception = ex;
+            }
+
+
         }
 
 

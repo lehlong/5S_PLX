@@ -89,6 +89,25 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
+        [HttpGet("CheckLeaves")]
+        public async Task<IActionResult> CheckLeaves([FromQuery] string pId, string kiKhaoSatId)
+        {
+
+            var transferObject = new TransferObject();
+            var result = await _service.CheckLeaves(pId, kiKhaoSatId);
+            if (_service.Status)
+            {
+                transferObject.Data = result;
+                transferObject.Status = true;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
 
         [HttpPut("UpdateLeaves")]
         public async Task<IActionResult> UpdateLeaves([FromBody] TieuChiDto data)

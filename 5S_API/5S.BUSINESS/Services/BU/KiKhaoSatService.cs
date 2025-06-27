@@ -31,6 +31,7 @@ namespace PLX5S.BUSINESS.Services.BU
         Task<KiKhaoSatModel> GetInput(string idKi);
         Task UpdateKhaoSatTrangThai(TblBuKiKhaoSat kiKhaoSat);
         Task<PagedResponseDto> SearchKiKhaoSat(FilterKiKhaoSat filter);
+       
 
     }
     public class KikhaosatService(AppDbContext dbContext, IMapper mapper) : GenericService<TblBuKiKhaoSat, KiKhaoSatDto>(dbContext, mapper), IKikhaosatService
@@ -344,6 +345,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 return null;
             }
         }
+  
 
         public async Task UpdateKhaoSatTrangThai(TblBuKiKhaoSat kiKhaoSat)
         {

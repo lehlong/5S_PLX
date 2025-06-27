@@ -21,6 +21,10 @@ export class TreeTieuChiService {
   GetTreeLeaves(param: any, kiKhaoSatId: any): Observable<any> {
     return this.commonService.get(`TieuChi/GetLeaves?pId=${param}&kiKhaoSatId=${kiKhaoSatId}`);
   }
+   CheckLeaves(param: any, kiKhaoSatId: any): Observable<any> {
+    return this.commonService.get(`TieuChi/CheckLeaves?pId=${param}&kiKhaoSatId=${kiKhaoSatId}`);
+  }
+
 
 
   UpdateLeaves(data: any) {

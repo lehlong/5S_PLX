@@ -48,6 +48,7 @@ export class KiKhaoSatComponent {
   DataKS: any = [];
   lstKho: any = [];
   kiKhaoSat: any = {};
+  checked: boolean = false;
   visibleKiKhaoSat: boolean = false;
   leavesNode: any = {
     Code: "-1",
@@ -312,11 +313,15 @@ export class KiKhaoSatComponent {
     });
   }
    CheckTreeLeaves() {
-    this._treeTieuChiService.GetTreeLeaves(this.treeId, this.kiKhaoSatId).subscribe({
+    this._treeTieuChiService.CheckLeaves(this.treeId, this.kiKhaoSatId).subscribe({
       next: (data) => {
-        console.log(data.result);
-
-       return data.result.length > 0;
+        console.log(data);
+         if (data) {
+     this.messageService.error(
+        `Không thể thả tiêu chí có con, vui lòng kiểm tra lại`,
+   )
+    this.BuildDataForTree();
+  }
 
       },
       error: (response) => {
@@ -469,7 +474,14 @@ export class KiKhaoSatComponent {
    }
 
   onDrop(event: any) {
-    console.log('sự kiện drop', event);
+   this.treeId = event.node.origin.code;
+   console.log("ss",event.node.parentNode.origin.code==event.dragNode.parentNode.origin.code);
+   if (event.node.parentNode.origin.code != event.dragNode.parentNode.origin.code) {
+    this.CheckTreeLeaves();
+   }
+   
+ 
+    
   }
 
   onDragStart(event: any) { }
