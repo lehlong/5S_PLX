@@ -49,7 +49,7 @@ namespace PLX5S.BUSINESS.Services.BU
             {
                 var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
                 var lstInStore = inputKy.Result.lstInputStore.ToList();
-                var lstPoint = _dbContext.TblBuPointStore.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
 
                 if (!string.IsNullOrWhiteSpace(filterReport.InstoreId))
                 {
@@ -64,8 +64,8 @@ namespace PLX5S.BUSINESS.Services.BU
                     {
                         stt = item.StoreId,
                         StoreName= item.Name,
-                        Length = lstPoint.FirstOrDefault(x => x.InStoreId == item.Id)?.Length ?? 0,
-                        point = lstPoint.FirstOrDefault(x => x.InStoreId == item.Id)?.Point ?? 0,
+                        Length = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Length ?? 0,
+                        point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
                     };
 
                     result.Add(report);
@@ -88,7 +88,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
                 var lstInStore = inputKy.Result.lstInputStore.ToList();
                 var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.IsActive == true && x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
-                var lstPoint = _dbContext.TblBuPointStore.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
 
                 if (!string.IsNullOrWhiteSpace(filterReport.InstoreId))
                 {
@@ -103,10 +103,10 @@ namespace PLX5S.BUSINESS.Services.BU
                     {
                         stt = item.StoreId,
                         StoreName = item.Name,
-                        Cht = lstEvaHeader.Where(x => x.StoreId == item.Id && x.ChucVuId == "CHT").Select((x, index) => "L" + (index + 1) + " " + x.UpdateDate).ToList(),
-                        Atvsv = lstEvaHeader.Where(x => x.StoreId == item.Id && x.ChucVuId == "ATVSV").Select((x, index) => "L" + (index + 1) + " "+ x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
-                        ChuyenGia = lstEvaHeader.Where(x => x.StoreId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT").Select((x, index) => "L" + (index + 1) + "  "+ x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
-                        Point = lstPoint.FirstOrDefault(x => x.InStoreId == item.Id)?.Point ?? 0,
+                        Cht = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "CHT").Select((x, index) => "L" + (index + 1) + " " + x.UpdateDate).ToList(),
+                        Atvsv = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV").Select((x, index) => "L" + (index + 1) + " "+ x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
+                        ChuyenGia = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT").Select((x, index) => "L" + (index + 1) + "  "+ x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
+                        Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
                     };
 
                     result.Add(report);
@@ -126,7 +126,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
                 var lstInStore = inputKy.Result.lstInputStore.ToList();
                 var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.IsActive == true && x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
-                var lstPoint = _dbContext.TblBuPointStore.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
                 var device = _dbContext.tblMdDevice.AsQueryable().ToList();
 
                 if (!string.IsNullOrWhiteSpace(filterReport.InstoreId))
@@ -145,10 +145,10 @@ namespace PLX5S.BUSINESS.Services.BU
 
                         stt = item.StoreId,
                         StoreName = item.Name,
-                        Cht = lstEvaHeader.Where(x => x.StoreId == item.Id && x.ChucVuId == "CHT").Select((x, index) => "L" + (index + 1) + " " +((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "") ).ToList(),
-                        Atvsv = lstEvaHeader.Where(x => x.StoreId == item.Id && x.ChucVuId == "ATVSV").Select((x, index) => "L" + (index + 1) + " " + ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "")).ToList(),
-                        ChuyenGia = lstEvaHeader.Where(x => x.StoreId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT").Select((x, index) => "L" + " " +(index + 1) + ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "")).ToList(),
-                        Point = lstPoint.FirstOrDefault(x => x.InStoreId == item.Id)?.Point ?? 0,
+                        Cht = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "CHT").Select((x, index) => "L" + (index + 1) + " " +((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "") ).ToList(),
+                        Atvsv = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV").Select((x, index) => "L" + (index + 1) + " " + ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "")).ToList(),
+                        ChuyenGia = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT").Select((x, index) => "L" + " " +(index + 1) + ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "")).ToList(),
+                        Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
                     };
 
                     result.Add(report);
@@ -169,7 +169,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
                 var lstInStore = inputKy.Result.lstInputStore.ToList();
                 var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
-                var lstPoint = _dbContext.TblBuPointStore.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
 
                 if (!string.IsNullOrWhiteSpace(filterReport.InstoreId))
                 {
@@ -183,12 +183,12 @@ namespace PLX5S.BUSINESS.Services.BU
                     {
                         stt = item.StoreId,
                         StoreName = item.Name,
-                        Cht_T = lstEvaHeader.Count(x => x.IsActive == true  && x.StoreId == item.Id && x.ChucVuId == "CHT"),
-                        Cht_N = lstEvaHeader.Count(x => x.IsActive == false && x.StoreId == item.Id && x.ChucVuId == "CHT"),
-                        Atvsv_T = lstEvaHeader.Count(x => x.IsActive == true && x.StoreId == item.Id && x.ChucVuId == "ATVSV"),
-                        Atvsv_N = lstEvaHeader.Count(x => x.IsActive == false && x.StoreId == item.Id && x.ChucVuId == "ATVSV"),
-                        ChuyenGia = lstEvaHeader.Count(x => x.StoreId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT"),
-                        Point = lstPoint.FirstOrDefault(x => x.InStoreId == item.Id)?.Point ?? 0,
+                        Cht_T = lstEvaHeader.Count(x => x.IsActive == true  && x.DoiTuongId == item.Id && x.ChucVuId == "CHT"),
+                        Cht_N = lstEvaHeader.Count(x => x.IsActive == false && x.DoiTuongId == item.Id && x.ChucVuId == "CHT"),
+                        Atvsv_T = lstEvaHeader.Count(x => x.IsActive == true && x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV"),
+                        Atvsv_N = lstEvaHeader.Count(x => x.IsActive == false && x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV"),
+                        ChuyenGia = lstEvaHeader.Count(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT"),
+                        Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
                     };
 
                     result.Add(report);
@@ -214,7 +214,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 var lstTieuChi = _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId && x.IsGroup == false).ToList();
                 var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
                 var lstEvaValue = _dbContext.TblBuEvaluateValue.Where(x => x.FeedBack != "").ToList();
-                var lstPoint = _dbContext.TblBuPointStore.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
                 var lstInStore = inputKy.Result.lstInputStore.ToList();
 
 
@@ -228,8 +228,8 @@ namespace PLX5S.BUSINESS.Services.BU
 
                 foreach (var i in lstPoint)
                 {
-                    var store = lstInStore.FirstOrDefault(x => x.Id == i.InStoreId);
-                    var lstHeader = lstEvaHeader.Where(x => x.StoreId == i.InStoreId).ToList();
+                    var store = lstInStore.FirstOrDefault(x => x.Id == i.DoiTuongId);
+                    var lstHeader = lstEvaHeader.Where(x => x.DoiTuongId == i.DoiTuongId).ToList();
 
                     var lstDeXuat = new List<LstTieuChiDeXuat>(); 
                     foreach (var item in lstHeader)

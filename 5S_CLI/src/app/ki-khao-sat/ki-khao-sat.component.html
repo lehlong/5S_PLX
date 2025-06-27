@@ -522,7 +522,7 @@
           [nzData]="inputKi.lstInputStore" [nzFrontPagination]="false" [nzScroll]="{ y: 'calc(100vh - 244px)' }">
           <thead>
             <tr>
-              <th nzWidth="60px" [(nzChecked)]="checkedAllStore" (nzCheckedChange)="onAllCheckedStore($event)"></th>
+              <th nzWidth="60px" [(nzChecked)]="checkedAllObject" (nzCheckedChange)="onAllCheckedObject($event)"></th>
               <th nzWidth="160px" [nzSortFn]="true" [nzAlign]="'left'">
                 Mã Kì
               </th>
@@ -547,8 +547,8 @@
             </tr>
 
             <tr *ngFor="let data of inputKi.lstInputStore; let i = index">
-              <td nzWidth="60px" [nzChecked]="isCheckedStore(data.id)"
-                (nzCheckedChange)="onItemCheckedStore(data, $event)"></td>
+              <td nzWidth="60px" [nzChecked]="isCheckedObject(data.id)"
+                (nzCheckedChange)="onItemCheckedObject(data, $event)"></td>
               <td nzAlign="center">
                 <a>{{ data.storeId }}</a>
               </td>
@@ -563,7 +563,7 @@
           [nzData]="inputKi.lstInputWareHouse" [nzFrontPagination]="false" [nzScroll]="{ y: 'calc(100vh - 244px)' }">
           <thead>
             <tr>
-              <th></th>
+              <th nzWidth="60px" [(nzChecked)]="checkedAllObject" (nzCheckedChange)="onAllCheckedObject($event)"></th>
               <th nzWidth="160px" [nzSortFn]="true" [nzAlign]="'left'">
                 Mã Kì
               </th>
@@ -580,8 +580,8 @@
           </thead>
           <tbody>
             <tr *ngFor="let data of inputKi.lstInputWareHouse; let i = index">
-
-              <td></td>
+              <td nzWidth="60px" [nzChecked]="isCheckedObject(data.id)"
+                (nzCheckedChange)="onItemCheckedObject(data, $event)"></td>
               <td nzAlign="center">
                 <a>{{ data.wareHouseId }}</a>
               </td>

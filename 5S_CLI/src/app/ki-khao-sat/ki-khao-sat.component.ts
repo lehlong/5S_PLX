@@ -286,7 +286,7 @@ export class KiKhaoSatComponent {
   }
 
   closeModal(): void {
-    this.lstCheckedStore = []
+    this.lstCheckedObject = []
     this.treeEditVisible = false;
     this.treeInsertVisible = false;
     this.leavesNode = {
@@ -400,7 +400,7 @@ export class KiKhaoSatComponent {
     this.leavesNode = data;
     this.leavesVisible = true;
     this.edit = true;
-    this.lstCheckedStore = data.lstCriteriaExcludedStores
+    this.lstCheckedObject = data.lstCriteriaExcludedOject;
     this.leavesNode.pId = this.treeId;
     this.calculationRows = data.diemTieuChi
   }
@@ -468,7 +468,7 @@ export class KiKhaoSatComponent {
     console.log('sự kiện', event);
    }
 
-  onDrop(event: any) { 
+  onDrop(event: any) {
     console.log('sự kiện drop', event);
   }
 
@@ -619,7 +619,7 @@ export class KiKhaoSatComponent {
     }
     this.leavesNode.diemTieuChi = this.calculationRows
     this.leavesNode.kiKhaoSatId = this.kiKhaoSatId
-    this.leavesNode.lstCriteriaExcludedStores = this.lstCheckedStore
+    this.leavesNode.lstCriteriaExcludedOject = this.lstCheckedObject
     console.log(this.leavesNode);
 
     this._treeTieuChiService.addLeaves(this.leavesNode).subscribe({
@@ -675,57 +675,57 @@ export class KiKhaoSatComponent {
   }
 
 
-  checkedAllStore: any = false
-  lstCheckedStore: any = []
+  checkedAllObject: any = false
+  lstCheckedObject: any = []
 
-  onAllCheckedStore(checked: boolean) {
-    this.checkedAllStore = checked;
+  onAllCheckedObject(checked: boolean) {
+    this.checkedAllObject = checked;
     this.inputKi.lstInputStore.forEach((store: any) => {
-      const idx = this.lstCheckedStore.findIndex(
+      const idx = this.lstCheckedObject.findIndex(
         (i: any) => i.storeId === store.id && i.tieuChiCode === this.leavesNode.code
       );
 
       if (idx !== -1) {
-        this.lstCheckedStore[idx].isDeleted = !checked && this.lstCheckedStore[idx].code !== '-1';
-        if (!checked && this.lstCheckedStore[idx].code === '-1') this.lstCheckedStore.splice(idx, 1);
+        this.lstCheckedObject[idx].isDeleted = !checked && this.lstCheckedObject[idx].code !== '-1';
+        if (!checked && this.lstCheckedObject[idx].code === '-1') this.lstCheckedObject.splice(idx, 1);
       } else if (checked) {
-        this.lstCheckedStore.push({
+        this.lstCheckedObject.push({
           code: "-1",
-          storeId: store.id,
+          doiTuongId: store.id,
           tieuChiCode: this.leavesNode.code,
           isDeleted: false
         });
       }
     });
-    console.log(this.lstCheckedStore);
+    console.log(this.lstCheckedObject);
 
   }
 
-  onItemCheckedStore(store: any, checked: boolean) {
-    const idx = this.lstCheckedStore.findIndex(
+  onItemCheckedObject(store: any, checked: boolean) {
+    const idx = this.lstCheckedObject.findIndex(
       (i: any) => i.storeId === store.id && i.tieuChiCode === this.leavesNode.code
     );
 
     if (idx !== -1) {
-      if (checked) this.lstCheckedStore[idx].isDeleted = false;
-      else this.lstCheckedStore[idx].code !== '-1'
-        ? this.lstCheckedStore[idx].isDeleted = true
-        : this.lstCheckedStore.splice(idx, 1);
+      if (checked) this.lstCheckedObject[idx].isDeleted = false;
+      else this.lstCheckedObject[idx].code !== '-1'
+        ? this.lstCheckedObject[idx].isDeleted = true
+        : this.lstCheckedObject.splice(idx, 1);
     } else if (checked) {
-      this.lstCheckedStore.push({
+      this.lstCheckedObject.push({
         code: "-1",
-        storeId: store.id,
+        doiTuongId: store.id,
         tieuChiCode: this.leavesNode.code,
         isDeleted: false
       });
     }
-    console.log(this.lstCheckedStore);
+    console.log(this.lstCheckedObject);
 
   }
 
-  isCheckedStore = (id: string) =>
-    this.lstCheckedStore.some(
-      (i: any) => i.storeId === id && i.tieuChiCode === this.leavesNode.code && !i.isDeleted
+  isCheckedObject = (id: string) =>
+    this.lstCheckedObject.some(
+      (i: any) => i.doiTuongId === id && i.tieuChiCode === this.leavesNode.code && !i.isDeleted
     );
 
 

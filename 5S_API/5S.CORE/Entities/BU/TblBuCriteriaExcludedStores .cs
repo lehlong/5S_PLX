@@ -9,15 +9,15 @@ using PLX5S.CORE.Common;
 
 namespace PLX5S.CORE.Entities.BU
 {
-    [Table("T_BU_CRITERIA_EXCLUDED_STORES")]
-    public class TblBuCriteriaExcludedStores : SoftDeleteEntity
+    [Table("T_BU_CRITERIA_EXCLUDED_Object")]
+    public class TblBuCriteriaExcludedObject : SoftDeleteEntity
     {
         [Key]
         [Column("CODE")]
         public string? Code { get; set; }
 
-        [Column("STORE_ID", TypeName = "NVARCHAR(255)")]
-        public string? StoreId { get; set; }
+        [Column("DOI_TUONG_ID", TypeName = "NVARCHAR(255)")]
+        public string? DoiTuongId { get; set; }
 
         [Column("TIEU_CHI_CODE")]
         public string? TieuChiCode { get; set; }

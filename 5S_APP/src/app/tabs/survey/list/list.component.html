@@ -23,7 +23,7 @@
       <ion-chip *ngIf="filter.filterKiKhaoSat.trangThaiKi === '2'" slot="end" color="success">Đang mở</ion-chip>
     </ion-item>
     <ion-item>
-      <ion-select justify="end" interface="popover" label="Sắp xếp theo:" placeholder="" [(ngModel)]="selectValue">
+      <ion-select justify="end" interface="popover" label="Sắp xếp theo:" placeholder="" [(ngModel)]="selectValue" (ionChange)="onFilter2()">
         <ion-select-option value="1">Tên cửa hàng</ion-select-option>
         <ion-select-option value="2">Điểm thấp đến cao</ion-select-option>
         <ion-select-option value="3">Điểm cao đến thấp</ion-select-option>
@@ -31,10 +31,10 @@
     </ion-item>
   </ion-item-group>
   <ion-item-group style="margin-top: 10px">
-    <ion-list *ngFor="let item of lstStore">
+    <ion-list *ngFor="let item of lstDoiTuong">
       <ion-item>
         <ion-label (click)="navigateTo(item)">{{ item?.name }}</ion-label>
-        <ion-label slot="end">{{ filterPoint(item.id) }} điểm</ion-label>
+        <ion-label slot="end">{{ item.point }} điểm</ion-label>
       </ion-item>
     </ion-list>
   </ion-item-group>
@@ -74,7 +74,7 @@
             </ion-label>
           </ion-item>
           <div slot="content" style="max-height: 25vh; overflow-y: auto; padding: 5px;">
-            <ion-item *ngFor="let item of lstSearchStore" (click)="selectSearchStore(item)">
+            <ion-item *ngFor="let item of lstSearchDoiTuong" (click)="selectSearchStore(item)">
               <ion-label>{{ item?.name }}</ion-label>
             </ion-item>
           </div>

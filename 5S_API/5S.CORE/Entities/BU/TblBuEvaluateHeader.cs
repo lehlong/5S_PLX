@@ -25,8 +25,8 @@ namespace PLX5S.CORE.Entities.BU
         [Column("ORDER_NUMBER", TypeName = "DECIMAL(18.0)")]
         public decimal? Order { get; set; }
 
-        [Column("STORE_ID", TypeName = "NVARCHAR(150)")]
-        public string? StoreId { get; set; }
+        [Column("DOI_TUONG_ID", TypeName = "NVARCHAR(150)")]
+        public string? DoiTuongId { get; set; }
 
         [Column("KI_KHAO_SAT_ID", TypeName = "NVARCHAR(150)")]
         public string? KiKhaoSatId { get; set; }

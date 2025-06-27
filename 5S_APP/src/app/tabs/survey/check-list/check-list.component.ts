@@ -15,9 +15,9 @@ export class CheckListComponent implements OnInit {
   [x: string]: any;
   kiKhaoSat: any = {}
   mode: 'draft' | 'new' = 'draft';
-  store: any = {}
+  doiTuong: any = {}
   lstHisEvaluate: any = []
-  inStoreId: any = ''
+  doiTuongId: any = ''
   deviceID: string = '';
   account: any = {}
   evaluate: any =
@@ -43,26 +43,29 @@ export class CheckListComponent implements OnInit {
 
         const filter = JSON.parse(localStorage.getItem('filterCS') ?? "")
         this.kiKhaoSat = filter.kiKhaoSat
-        this.store = filter.store
+        this.doiTuong = filter.doiTuong
 
         // await this._storageService.clear()
-        let eva = await this._storageService.get(this.store.id + "_" + this.kiKhaoSat.code)
+        let eva = await this._storageService.get(this.doiTuong.id + "_" + this.kiKhaoSat.code)
+        console.log('eva', eva);
+
         if (eva) {
           this.evaluate = eva
+
           if (this.evaluate.header.kiKhaoSatId == this.kiKhaoSat.id) {
             this.lstHisEvaluate = [this.evaluate.header]
           }
         } else {
           this.mode = 'new'
         }
-        this.inStoreId = id
+        this.doiTuongId = id
         this.getAllEvaluateHistory()
       },
     })
   }
 
   getAllEvaluateHistory() {
-    this._service.search({ keyWord: this.inStoreId, sortColumn: this.kiKhaoSat.id }).subscribe({
+    this._service.search({ keyWord: this.doiTuongId, sortColumn: this.kiKhaoSat.id }).subscribe({
       next: (data) => {
         if (data.data.length == 0) return;
 
@@ -73,7 +76,7 @@ export class CheckListComponent implements OnInit {
 
   checkRightEvaluate() {
     if (this.kiKhaoSat?.trangThaiKi !== '2') return false;
-    return this.store.lstChamDiem?.some(
+    return this.doiTuong.lstChamDiem?.some(
       (item: any) => item === this.account.userName
     ) ?? false;
   }
@@ -82,33 +85,35 @@ export class CheckListComponent implements OnInit {
     this.lstHisEvaluate = []
 
     if (data.name == "Bản nháp") {
-      this.router.navigate([`survey/store/evaluate/draft/${data.code}`]);
+      this.router.navigate([`survey/evaluate/draft/${data.code}`]);
     } else {
-      this.router.navigate([`survey/store/evaluate/view/${data.code}`]);
+      this.router.navigate([`survey/evaluate/view/${data.code}`]);
     }
   }
 
   navigateTo() {
+    console.log(this.doiTuong);
+
     this.lstHisEvaluate = []
     let userInfo = JSON.parse(localStorage.getItem('UserInfo') ?? '');
     this.deviceID = userInfo?.deviceId || '';
     if (this.mode == 'new') {
-      this._service.BuildInputEvaluate(this.kiKhaoSat.id, this.store.id, this.deviceID).subscribe({
+      this._service.BuildInputEvaluate(this.kiKhaoSat.id, this.doiTuong.id, this.deviceID).subscribe({
         next: async (data) => {
-          this._storageService.set(data.header.storeId + "_" + this.kiKhaoSat.code, data)
-          console.log('tạo mới');
-          this.router.navigate([`survey/store/evaluate/draft/${data.header.code}`]);
+          this._storageService.set(data.header.doiTuongId + "_" + this.kiKhaoSat.code, data)
+          console.log('tạo mới', data);
+          this.router.navigate([`survey/evaluate/draft/${data.header.code}`]);
         }
       })
     } else {
       console.log('chỉnh sửa');
-      this.router.navigate([`survey/store/evaluate/draft/${this.evaluate.header.code}`]);
+      this.router.navigate([`survey/evaluate/draft/${this.evaluate.header.code}`]);
     }
   }
 
   async remove(code: any) {
-    await this._storageService.remove(this.store.id + "_" + this.kiKhaoSat.code);
-    localStorage.removeItem(this.store.id + "_" + this.kiKhaoSat.code)
+    await this._storageService.remove(this.doiTuong.id + "_" + this.kiKhaoSat.code);
+    localStorage.removeItem(this.doiTuong.id + "_" + this.kiKhaoSat.code)
     this.lstHisEvaluate.shift();
   }
 

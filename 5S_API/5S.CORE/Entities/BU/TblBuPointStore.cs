@@ -10,15 +10,15 @@ using System.Threading.Tasks;
 
 namespace PLX5S.CORE.Entities.BU
 {
-    [Table("T_BU_POINT_STORE")]
-    public class TblBuPointStore : SoftDeleteEntity
+    [Table("T_BU_POINT")]
+    public class TblBuPoint : SoftDeleteEntity
     {
         [Key]
         [Column("CODE", TypeName = "NVARCHAR(50)")]
         public string? Code { get; set; }
 
-        [Column("INPUT_STORE_ID", TypeName = "NVARCHAR(50)")]
-        public string? InStoreId { get; set; }
+        [Column("DOI_TUONG_ID", TypeName = "NVARCHAR(50)")]
+        public string? DoiTuongId { get; set; }
 
         [Column("SURVEY_ID", TypeName = "NVARCHAR(50)")]
         public string? SurveyId { get; set; }

@@ -32,12 +32,7 @@ export class HomeComponent implements OnInit {
   navigateTo(item: any) {
     const { doiTuongId, id } = item
     localStorage.setItem('surveyId', id);
-
-    if (doiTuongId === 'DT1') {
-      this.router.navigate([`/survey/store/list/${id}`]);
-    } else if (doiTuongId === 'DT2') {
-      this.router.navigate([`/survey/ware-house/list/${id}`]);
-    }
+      this.router.navigate([`/survey/list/${id}`]);
   }
 
   getSurveyMgmt() {

@@ -65,10 +65,7 @@
                       border: 1px solid black;
                       margin-top: 10px;
                     ">
-                    <ng-container *ngFor="
-                        let i of evaluate.lstEvaluate;
-                        trackBy: trackByKey
-                      ">
+                    <ng-container *ngFor="let i of evaluate?.lstEvaluate; trackBy: trackByKey">
                       <ion-textarea *ngIf="i.tieuChiCode == node.code" placeholder="Ý kiến đề xuất" autoGrow="true"
                         [(ngModel)]="i.feedBack" class="textarea">
                       </ion-textarea>
@@ -143,7 +140,7 @@
                             text-align: center;
                             margin: 0 10px;
                           ">
-                      {{ doc.createDate | date: 'dd/MM/yyyy' }}
+                          {{ doc.createDate | date: 'dd/MM/yyyy' }}
                         </div>
                       </ion-chip>
                     </div>

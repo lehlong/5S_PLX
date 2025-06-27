@@ -15,16 +15,16 @@ export class AppEvaluateService {
   filterLstChamDiem(params: any): Observable<any> {
     return this.commonService.get('AppEvaluate/FilterLstChamDiem', params)
   }
-  GetAllTieuChiLeaves(kiKhaoSatId: any, storeId: any): Observable<any> {
-    return this.commonService.get(`AppEvaluate/GetAllTieuChiLeaves?kiKhaoSatId=${kiKhaoSatId}&storeId=${storeId}`)
+  GetAllTieuChiLeaves(kiKhaoSatId: any, doiTuongId: any): Observable<any> {
+    return this.commonService.get(`AppEvaluate/GetAllTieuChiLeaves?kiKhaoSatId=${kiKhaoSatId}&doiTuongId=${doiTuongId}`)
   }
 
-  BuildInputEvaluate(kiKhaoSatId: any, storeId: any,deviceID:string): Observable<any> {
-    return this.commonService.get(`AppEvaluate/BuildInputEvaluate?kiKhaoSatId=${kiKhaoSatId}&storeId=${storeId}&deviceID=${deviceID}`)
+  BuildInputEvaluate(kiKhaoSatId: any, doiTuongId: any,deviceID:string): Observable<any> {
+    return this.commonService.get(`AppEvaluate/BuildInputEvaluate?kiKhaoSatId=${kiKhaoSatId}&doiTuongId=${doiTuongId}&deviceID=${deviceID}`)
   }
 
-  buildDataTreeForApp(kiKhaoSatId: any, storeId: any): Observable<any> {
-    return this.commonService.get(`AppEvaluate/BuildDataTreeForApp?kiKhaoSatId=${kiKhaoSatId}&storeId=${storeId}`)
+  buildDataTreeForApp(kiKhaoSatId: any, doiTuongId: any): Observable<any> {
+    return this.commonService.get(`AppEvaluate/BuildDataTreeForApp?kiKhaoSatId=${kiKhaoSatId}&doiTuongId=${doiTuongId}`)
   }
 
   insertEvaluate(params: any): Observable<any> {
@@ -43,5 +43,5 @@ export class AppEvaluateService {
     return this.commonService.get(`AppEvaluate/GetPointStore?kiKhaoSatId=${params.kiKhaoSatId}&surveyId=${params.surveyId}`)
   }
 
- 
+
 }

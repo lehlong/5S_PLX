@@ -6,7 +6,7 @@ import {
   Renderer2,
   ViewChild,
 } from '@angular/core';
-import { SharedModule } from '../../../../shared/shared.module';
+import { SharedModule } from '../../../shared/shared.module';
 import { Geolocation } from '@capacitor/geolocation';
 import { Storage } from '@ionic/storage-angular';
 import { AlertController } from '@ionic/angular';
@@ -19,10 +19,11 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Input, ChangeDetectionStrategy } from '@angular/core';
 import { MessageService } from 'src/app/service/message.service';
 import * as L from 'leaflet';
-import { HighlightSearchPipe } from '../../../../shared/pipes/highlight-search.pipe';
+import { HighlightSearchPipe } from '../../../shared/pipes/highlight-search.pipe';
+import { IonHeader } from "@ionic/angular/standalone";
 
 @Component({
-  imports: [SharedModule, HighlightSearchPipe],
+  imports: [IonHeader, SharedModule, HighlightSearchPipe],
   selector: 'app-evaluate',
   templateUrl: './evaluate.component.html',
   styleUrls: ['./evaluate.component.scss'],
@@ -45,7 +46,7 @@ export class EvaluateComponent implements OnInit {
   selectedAccordionId: string = '';
   currentSelect: string = '';
   lstAllTieuChi: any = [];
-  store: any = {};
+  doiTuong: any = {};
   kiKhaoSat: any = {};
   lstTieuChi: any = [];
   previewImage: any = [];
@@ -54,6 +55,8 @@ export class EvaluateComponent implements OnInit {
   count: any = 0;
   isEdit: any = true;
   account: any = {};
+  longitude: number = 106.6297;
+  latitude: number = 10.8231;
   lstHisEvaluate: any = []
   apiFile = (environment as any).apiFile;
   evaluate: any = {
@@ -76,6 +79,7 @@ export class EvaluateComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private renderer: Renderer2
   ) { }
+
   ngOnInit() {
     this.apiFile = (environment as any).apiFile ?? "http://sso.d2s.com.vn:1347/";
     console.log("api file", this.apiFile);
@@ -87,19 +91,19 @@ export class EvaluateComponent implements OnInit {
         const mode = params.get('mode') ?? '';
 
         let nav = localStorage.getItem('filterCS');
-        this.store = JSON.parse(nav ?? '').store;
+        this.doiTuong = JSON.parse(nav ?? '').doiTuong;
         this.kiKhaoSat = JSON.parse(nav ?? '').kiKhaoSat;
 
         if (mode == 'draft') {
-          console.log(this.store.id + "_" + this.kiKhaoSat.code);
+          console.log(this.doiTuong.id + "_" + this.kiKhaoSat.code);
 
-          this.evaluate = await this._storageService.get(this.store.id + "_" + this.kiKhaoSat.code);
+          this.evaluate = await this._storageService.get(this.doiTuong.id + "_" + this.kiKhaoSat.code);
         } else {
           this.isEdit = false;
           this.getResultEvaluate();
         }
 
-        let data = localStorage.getItem(this.store.id + "_" + this.kiKhaoSat.code);
+        let data = localStorage.getItem(this.doiTuong.id + "_" + this.kiKhaoSat.code);
         if (data == null) {
           this.getAllTieuChi();
           this.getAllTieuChiLeaves();
@@ -203,8 +207,7 @@ export class EvaluateComponent implements OnInit {
   }
 
   getAllTieuChi() {
-    this._service
-      .buildDataTreeForApp(this.kiKhaoSat.id, this.store.id)
+    this._service.buildDataTreeForApp(this.kiKhaoSat.id, this.doiTuong.id)
       .subscribe({
         next: (data) => {
           this.treeData = [data];
@@ -213,7 +216,7 @@ export class EvaluateComponent implements OnInit {
           this.dataTree.tree = this.treeData;
           console.log(this.dataTree);
           localStorage.setItem(
-            this.store.id + "_" + this.kiKhaoSat.code,
+            this.doiTuong.id + "_" + this.kiKhaoSat.code,
             JSON.stringify(this.dataTree)
           );
 
@@ -224,7 +227,7 @@ export class EvaluateComponent implements OnInit {
 
   getAllTieuChiLeaves() {
     this._service
-      .GetAllTieuChiLeaves(this.kiKhaoSat.id, this.store.id)
+      .GetAllTieuChiLeaves(this.kiKhaoSat.id, this.doiTuong.id)
       .subscribe({
         next: (data) => {
           this.lstTieuChi = data;
@@ -251,25 +254,27 @@ export class EvaluateComponent implements OnInit {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
-
   private initMap(): void {
     L.Icon.Default.mergeOptions({
       iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
       iconUrl: 'assets/leaflet/marker-icon.png',
       shadowUrl: 'assets/leaflet/marker-shadow.png',
     });
-    this.map = L.map('map').setView([21.0285, 105.8542], 13); // Hà Nội
+
+    const lat = this.latitude; // Vĩ độ động
+    const lng = this.longitude; // Kinh độ động
+
+    this.map = L.map('map').setView([lat, lng], 13);
 
     L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap France',
     }).addTo(this.map);
 
-    L.marker([21.0285, 105.8542])
+    L.marker([lat, lng])
       .addTo(this.map)
-      .bindPopup('Chưa có tọa độ')
+      .bindPopup('Tọa độ động')
       .openPopup();
   }
-
   isActive(itemId: string): boolean {
     return this.currentSelect === itemId;
   }
@@ -286,7 +291,7 @@ export class EvaluateComponent implements OnInit {
     const hasPoint = !!evaluateItem && !!evaluateItem.pointId;
     if (data.isImg) {
       const numberImgRequired = data?.numberImg || 0;
-      const hasImage = this.evaluate.lstImages.filter(
+      const hasImage = this.evaluate?.lstImages.filter(
         (img: any) => img.tieuChiCode === data.code
       ).length;
       hasEnoughImages = hasImage >= numberImgRequired;
@@ -295,7 +300,7 @@ export class EvaluateComponent implements OnInit {
   }
 
   hasEnoughImages(code: any, requiredNumber: any): boolean {
-    const imagesSelecting = this.evaluate.lstImages.filter(
+    const imagesSelecting = this.evaluate?.lstImages.filter(
       (img: any) => img.tieuChiCode === code
     ).length;
     return imagesSelecting < requiredNumber;
@@ -345,7 +350,7 @@ export class EvaluateComponent implements OnInit {
         evaluateHeaderCode: this.headerId,
       });
       this.cdr.detectChanges();
-      this._storageService.set(this.store.id, this.evaluate);
+      this._storageService.set(this.doiTuong.id + "_" + this.kiKhaoSat.code, this.evaluate);
     };
     reader.readAsDataURL(file); // Chuyển sang base64
     console.log(this.evaluate);
@@ -444,7 +449,7 @@ export class EvaluateComponent implements OnInit {
     if (node.isGroup == true) return;
 
     const data = Array.isArray(this.evaluate?.lstImages)
-      ? this.evaluate.lstImages.filter((x: any) => x.tieuChiCode === node.code)
+      ? this.evaluate?.lstImages.filter((x: any) => x.tieuChiCode === node.code)
       : null;
     if (!data) return;
 
@@ -488,6 +493,8 @@ export class EvaluateComponent implements OnInit {
       (i: any) => i.id == selected
     )[0].diem;
     this.evaluate.lstEvaluate[idx].pointId = selected;
+    console.log(this.evaluate);
+
     this.tinhTong();
   }
 
@@ -503,7 +510,7 @@ export class EvaluateComponent implements OnInit {
       0) / tongDiem) * 100
     ).toFixed(2);
 
-    this._storageService.set(this.store.id, this.evaluate);
+    this._storageService.set(this.doiTuong.id + "_" + this.kiKhaoSat.code, this.evaluate);
   }
 
   setFeedBack(data: any, event: any) {
@@ -516,7 +523,7 @@ export class EvaluateComponent implements OnInit {
     if (idx === -1) return;
 
     this.evaluate.lstEvaluate[idx].pointId = selected;
-    this._storageService.set(this.store.id, this.evaluate);
+    this._storageService.set(this.doiTuong.id, this.evaluate);
   }
 
   async onSubmit() {
@@ -539,7 +546,7 @@ export class EvaluateComponent implements OnInit {
       // Kiểm tra có đủ ảnh không
       if (tieuChi.isImg) {
         const numberImgRequired = tieuChi.numberImg || 0;
-        const imagesSelecting = this.evaluate.lstImages.filter(
+        const imagesSelecting = this.evaluate?.lstIImages?.filter(
           (img: any) => img.tieuChiCode === tieuChi.code
         ).length;
         if (imagesSelecting < numberImgRequired) {
@@ -570,8 +577,8 @@ export class EvaluateComponent implements OnInit {
         this.tinhTongLanCham()
 
         this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
-        this._storageService.remove(this.store.id + "_" + this.kiKhaoSat.code);
-        localStorage.removeItem(this.store.id + "_" + this.kiKhaoSat.code)
+        this._storageService.remove(this.doiTuong.id + "_" + this.kiKhaoSat.code);
+        localStorage.removeItem(this.doiTuong.id + "_" + this.kiKhaoSat.code)
       },
 
       error: (ex) => {
@@ -582,7 +589,7 @@ export class EvaluateComponent implements OnInit {
 
 
   tinhTongLanCham() {
-    this._service.filterLstChamDiem({ sortColumn: this.store.id, keyWord: this.kiKhaoSat.id }).subscribe({
+    this._service.filterLstChamDiem({ sortColumn: this.doiTuong.id, keyWord: this.kiKhaoSat.id }).subscribe({
       next: (data) => {
         console.log(data.length);
 
@@ -600,7 +607,7 @@ export class EvaluateComponent implements OnInit {
 
         const point = {
           code: '',
-          inStoreId: this.store.id,
+          doiTuongId: this.doiTuong.id,
           surveyId: localStorage.getItem('surveyId'),
           kiKhaoSatId: this.kiKhaoSat.id,
           point: avg,
@@ -628,6 +635,8 @@ export class EvaluateComponent implements OnInit {
     if (this.isEdit == false) {
       img.filePath = this.apiFile + img.filePath;
     }
+    this.longitude = img.kinhDo;
+    this.latitude = img.viDo;
     this.selectedImage = img;
     this.isImageModalOpen = true;
     setTimeout(() => {
@@ -648,13 +657,13 @@ export class EvaluateComponent implements OnInit {
   deleteImage() {
     if (!this.isEdit) return;
 
-    const index = this.evaluate.lstImages.findIndex(
+    const index = this.evaluate?.lstImages.findIndex(
       (img: any) => img.filePath === this.selectedImage.filePath
     );
     if (index > -1) {
-      this.evaluate.lstImages.splice(index, 1);
+      this.evaluate?.lstImages.splice(index, 1);
     }
-    this._storageService.set(this.store.id, this.evaluate);
+    this._storageService.set(this.doiTuong.id + "_" + this.kiKhaoSat.code, this.evaluate);
     this.cdr.detectChanges();
 
     this.closeFullScreen();
@@ -709,11 +718,13 @@ export class EvaluateComponent implements OnInit {
       });
 
       const base64Image = `data:image/jpeg;base64,${image.base64String}`;
+      let thumbnail = await this.generateThumbnail(base64Image, 100, 100);
 
       this.evaluate.lstImages.push({
         code: '-1',
         fileName: '',
         filePath: base64Image,
+        pathThumbnail: thumbnail,
         tieuChiCode: code,
         viDo: latitude,
         kinhDo: longitude,
@@ -721,7 +732,7 @@ export class EvaluateComponent implements OnInit {
       });
       this.cdr.detectChanges();
 
-      this._storageService.set(this.store.id, this.evaluate);
+      this._storageService.set(this.doiTuong.id + "_" + this.kiKhaoSat.code, this.evaluate);
     } catch (err) {
       console.error('Camera error:', err);
     }

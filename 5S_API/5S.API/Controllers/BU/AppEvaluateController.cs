@@ -36,10 +36,10 @@ namespace PLX5S.API.Controllers.BU
 
 
         [HttpGet("BuildDataTreeForApp")]
-        public async Task<IActionResult> BuildDataTreeForApp([FromQuery] string kiKhaoSatId, string storeId)
+        public async Task<IActionResult> BuildDataTreeForApp([FromQuery] string kiKhaoSatId, string doiTuongId)
         {
             var transferObject = new TransferObject();
-            var result = await _service.BuildDataTreeForApp(kiKhaoSatId, storeId);
+            var result = await _service.BuildDataTreeForApp(kiKhaoSatId, doiTuongId);
             if (_service.Status)
             {
                 transferObject.Data = result;
@@ -56,10 +56,10 @@ namespace PLX5S.API.Controllers.BU
 
 
         [HttpGet("GetAllTieuChiLeaves")]
-        public async Task<IActionResult> GetAllTieuChiLeaves([FromQuery] string kiKhaoSatId, string storeId)
+        public async Task<IActionResult> GetAllTieuChiLeaves([FromQuery] string kiKhaoSatId, string doiTuongId)
         {
             var transferObject = new TransferObject();
-            var result = await _service.GetAllTieuChiLeaves(kiKhaoSatId, storeId);
+            var result = await _service.GetAllTieuChiLeaves(kiKhaoSatId, doiTuongId);
             if (_service.Status)
             {
                 transferObject.Data = result;
@@ -76,10 +76,10 @@ namespace PLX5S.API.Controllers.BU
 
 
         [HttpGet("BuildInputEvaluate")]
-        public async Task<IActionResult> BuildInputEvaluate([FromQuery] string kiKhaoSatId, string storeId,string deviceId)
+        public async Task<IActionResult> BuildInputEvaluate([FromQuery] string kiKhaoSatId, string doiTuongId, string deviceId)
         {
             var transferObject = new TransferObject();
-            var result = await _service.BuildInputEvaluate(kiKhaoSatId, storeId,deviceId);
+            var result = await _service.BuildInputEvaluate(kiKhaoSatId, doiTuongId, deviceId);
             if (_service.Status)
             {
                 transferObject.Data = result;
@@ -156,7 +156,7 @@ namespace PLX5S.API.Controllers.BU
         }
 
         [HttpPost("TinhTongLanCham")]
-        public async Task<IActionResult> TinhTongLanCham([FromBody] TblBuPointStore data)
+        public async Task<IActionResult> TinhTongLanCham([FromBody] TblBuPoint data)
         {
             var transferObject = new TransferObject();
             await _service.TinhTongLanCham(data);

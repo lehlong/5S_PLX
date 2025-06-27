@@ -220,7 +220,7 @@ namespace PLX5S.BUSINESS.Services.BU
 
             var newTieuChiList = new List<TblBuTieuChi>();
             var newDiemTieuChiList = new List<TblBuTinhDiemTieuChi>();
-            var newExcludedStoresList = new List<TblBuCriteriaExcludedStores>();
+            var newExcludedStoresList = new List<TblBuCriteriaExcludedObject>();
 
             foreach (var item in lstTieuTri)
             {
@@ -228,7 +228,7 @@ namespace PLX5S.BUSINESS.Services.BU
 
                 var lstDiemTieuChi = _dbContext.TblBuTinhDiemTieuChi.Where(x => x.TieuChiCode == item.Code).ToList();
 
-                var lstBack = _dbContext.TblBuCriteriaExcludedStores.Where(x => x.TieuChiCode == item.Code).ToList();
+                var lstBack = _dbContext.TblBuCriteriaExcludedObject.Where(x => x.TieuChiCode == item.Code).ToList();
 
                 var newItem = new TblBuTieuChi
                 {
@@ -260,11 +260,11 @@ namespace PLX5S.BUSINESS.Services.BU
 
                 if (lstBack.Any())
                 {
-                    newExcludedStoresList.AddRange(lstBack.Select(x => new TblBuCriteriaExcludedStores
+                    newExcludedStoresList.AddRange(lstBack.Select(x => new TblBuCriteriaExcludedObject
                     {
                         Code = Guid.NewGuid().ToString(),
                         TieuChiCode = newCode,
-                        StoreId = x.StoreId,
+                        DoiTuongId = x.DoiTuongId,
                         IsActive = x.IsActive,
                         IsDeleted = x.IsDeleted,
                     }));
@@ -273,7 +273,7 @@ namespace PLX5S.BUSINESS.Services.BU
 
             _dbContext.TblBuTieuChi.AddRange(newTieuChiList);
             _dbContext.TblBuTinhDiemTieuChi.AddRange(newDiemTieuChiList);
-            _dbContext.TblBuCriteriaExcludedStores.AddRange(newExcludedStoresList);
+            _dbContext.TblBuCriteriaExcludedObject.AddRange(newExcludedStoresList);
         }
 
         public async Task<KiKhaoSatModel> GetInput(string idKi)
@@ -285,6 +285,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 var ki = _dbContext.TblBuKiKhaoSat.Where(x => x.IsDeleted != true && x.Id == idKi).FirstOrDefault();
                 var lstMdStore = _dbContext.tblMdStore.ToList();
                 var lstMdWareHouse = _dbContext.TblMdWareHouse.ToList();
+                var lstPointstore = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == idKi).ToList();
                 var lstChamDiem = _dbContext.TblBuInputChamDiem.Where(x => x.IsDeleted != true && x.KiKhaoSatId == idKi).ToList();
                 var lstInStore = _dbContext.TblBuInputStore.Where(x => x.IsDeleted != true && x.SurveyMgmtId == ki.SurveyMgmtId && x.IsActive == true).ToList();
                 var lstInWareHouse = _dbContext.TblBuInputWareHouse.Where(x => x.IsDeleted != true && x.SurveyMgmtId == ki.SurveyMgmtId && x.IsActive == true).ToList();
@@ -306,6 +307,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         StoreId = store.Id,
                         SurveyMgmtId = ki.SurveyMgmtId,
                         LstInChamDiem = lstChamDiem2,
+                        Point = lstPointstore.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
                         LstChamDiem = lstChamDiem2.Select(x => x.UserName).ToList()
                     };
                     lstInputStore.Add(inStore);
@@ -324,6 +326,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         WareHouseId = WareHouse.Id,
                         SurveyMgmtId = ki.SurveyMgmtId,
                         LstInChamDiem = lstChamDiem2,
+                        Point = lstPointstore.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
                         LstChamDiem = lstChamDiem2.Select(x => x.UserName).ToList()
                     };
                     lstInputWareHouse.Add(inWareHousee);

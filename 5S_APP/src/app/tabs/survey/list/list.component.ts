@@ -4,8 +4,6 @@ import { IonButton } from '@ionic/angular/standalone';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { KyKhaoSatService } from 'src/app/service/ky-khao-sat.service';
-import { AuthService } from 'src/app/service/auth.service';
-import { AppEvaluateService } from 'src/app/service/app-evaluate.service';
 import { AppReportService } from 'src/app/service/app-report.service';
 
 @Component({
@@ -25,29 +23,24 @@ export class ListComponent implements OnInit {
 
   }
   inputSearchKiKhaoSat: any = {};
-
   searchNguoiCham: any = '';
   inSearchStore: any = '';
   selectValue = '1';
-
   lstAccout: any = [];
   lstSearchChamDiem: any = [];
-  lstSearchStore: any = [];
-  lstStore: any = [];
+  lstSearchDoiTuong: any = [];
+  lstDoiTuong: any = [];
   lstKiKhaoSat: any = [];
   surveyId: any;
   filterForm!: FormGroup;
   isOpen = false;
   lstAccount: any = []
   lstPointStore: any = []
-
   user: any = {}
 
   constructor(
     private _service: KyKhaoSatService,
-    private _appService: AppEvaluateService,
     private _reportService: AppReportService,
-    private _authService: AuthService,
     private router: Router,
     private route: ActivatedRoute
   ) { }
@@ -62,10 +55,10 @@ export class ListComponent implements OnInit {
       },
     });
   }
- getAllAccount() {
+  getAllAccount() {
     this._reportService.GetAllAccount().subscribe({
       next: (data) => {
-       this.lstAccout=  data;
+        this.lstAccout = data;
       },
       error: (response) => {
         console.log(response);
@@ -98,7 +91,6 @@ export class ListComponent implements OnInit {
           }
 
           this.getAllStore();
-          this.getPointStore();
 
           this.inputSearchKiKhaoSat = this.filter.filterKiKhaoSat;
         },
@@ -111,8 +103,14 @@ export class ListComponent implements OnInit {
   getAllStore() {
     this._service.getInputKiKhaoSat(this.filter.filterKiKhaoSat.id).subscribe({
       next: (data) => {
-        this.lstStore = data.lstInputStore;
-        this.lstSearchStore = data.lstInputStore;
+        if (data.lstInputStore.length != 0) {
+          this.lstDoiTuong = data.lstInputStore;
+          this.lstSearchDoiTuong = data.lstInputStore;
+          return;
+        }else if(data.lstInputWareHouse.length != 0) {
+          this.lstDoiTuong = data.lstInputWareHouse;
+          this.lstSearchDoiTuong = data.lstInputWareHouse;
+        }
       },
       error: (response) => {
         console.log(response);
@@ -120,17 +118,8 @@ export class ListComponent implements OnInit {
     });
   }
 
-  getPointStore() {
-    this._appService.getPointStore({ kiKhaoSatId: this.filter.filterKiKhaoSat.id, surveyId: this.surveyId }).subscribe({
-      next: (data) => {
-        console.log(data);
 
-        this.lstPointStore = data
-      }
-    })
-  }
-
-  filterPoint(inStoreId: any){
+  filterPoint(inStoreId: any) {
     const record = this.lstPointStore.find((x: any) => x.inStoreId === inStoreId);
 
     return record?.point ?? 0;
@@ -139,8 +128,8 @@ export class ListComponent implements OnInit {
   // getAllAccount() {
   //   this._authService.(this.filter.filterKiKhaoSat.id).subscribe({
   //     next: (data) => {
-  //       this.lstStore = data.lstInputStore;
-  //       this.lstSearchStore = data.lstInputStore;
+  //       this.lstDoiTuong = data.lstInputStore;
+  //       this.lstSearchDoiTuong = data.lstInputStore;
   //     },
   //     error: (response) => {
   //       console.log(response);
@@ -148,15 +137,27 @@ export class ListComponent implements OnInit {
   //   });
   // }
 
+  onFilter2() {
+    if (this.selectValue === '1') {
+      this.lstDoiTuong = this.lstDoiTuong.sort((a: any, b: any) => a.name.localeCompare(b.name));
+    } else if (this.selectValue === '2') {
+      this.lstDoiTuong = this.lstDoiTuong.sort((a: any, b: any) => (b.point ?? 0) - (a.point ?? 0));
+    } else if (this.selectValue === '3') {
+      this.lstDoiTuong = this.lstDoiTuong.sort((a: any, b: any) => (a.point ?? 0) - (b.point ?? 0));
+    }
+  }
+
+
+
   searchStore(kiKhaoSat: any) {
     this.inputSearchKiKhaoSat = kiKhaoSat;
     this._service.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
       next: (data) => {
         console.log("searchStore", data);
-        this.lstSearchStore = data.lstInputStore;
+        this.lstSearchDoiTuong = data.lstInputStore;
         this.lstSearchChamDiem = Array.from(
           new Map(
-            this.lstSearchStore
+            this.lstSearchDoiTuong
               .flatMap((store: any) => store.lstInChamDiem || [])
               .map((item: any) => [item.userName, item])
           ).values()
@@ -177,7 +178,6 @@ export class ListComponent implements OnInit {
     this.filter.filterNguoiCham = item
   }
 
-
   openFilterModal() {
     this.searchStore(this.filter.filterKiKhaoSat);
     this.isOpen = true;
@@ -189,7 +189,7 @@ export class ListComponent implements OnInit {
 
   onFilter() {
     this.filter.filterKiKhaoSat = this.inputSearchKiKhaoSat
-    this.lstStore = this.lstSearchStore
+    this.lstDoiTuong = this.lstSearchDoiTuong
       .filter((s: any) => !this.filter.filterStore?.id || s.id == this.filter.filterStore?.id)
       .filter((s: any) => !this.filter.filterNguoiCham?.userName ||
         s.lstChamDiem?.some((x: any) => x == this.filter.filterNguoiCham.userName))
@@ -200,8 +200,8 @@ export class ListComponent implements OnInit {
 
 
   navigateTo(item: any) {
-    localStorage.setItem('filterCS', JSON.stringify({ kiKhaoSat: this.filter.filterKiKhaoSat, store: item }))
-    this.router.navigate([`/survey/store/check-list/${item.id}`]);
+    localStorage.setItem('filterCS', JSON.stringify({ kiKhaoSat: this.filter.filterKiKhaoSat, doiTuong: item }))
+    this.router.navigate([`/survey/check-list/${item.id}`]);
   }
 
   resetFilters() {

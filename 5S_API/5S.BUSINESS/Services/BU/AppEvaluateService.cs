@@ -22,13 +22,13 @@ namespace PLX5S.BUSINESS.Services.BU
     public interface IAppEvaluateService : IGenericService<TblBuEvaluateHeader, EvaluateHeaderDto>
     {
         Task<TieuChiDto> BuildDataTreeForApp(string kiKhaoSatId, string storeId);
-        Task<List<TieuChiDto>> GetAllTieuChiLeaves(string kiKhaoSatId, string storeId);
-        Task<EvaluateModel> BuildInputEvaluate(string kiKhaoSatId, string storeId,string deviceId);
+        Task<List<TieuChiDto>> GetAllTieuChiLeaves(string kiKhaoSatId, string doiTuongId);
+        Task<EvaluateModel> BuildInputEvaluate(string kiKhaoSatId, string doiTuongId, string deviceId);
         Task InsertEvaluate(EvaluateModel data);
         Task<TblBuEvaluateImage> HandelFile(TblBuEvaluateImage request);
         Task<EvaluateModel> GetResultEvaluate(string code);
-        Task TinhTongLanCham(TblBuPointStore point);
-        Task<List<TblBuPointStore>> GetPointStore(string kiKhaoSatid, string surveyId);
+        Task TinhTongLanCham(TblBuPoint point);
+        Task<List<TblBuPoint>> GetPointStore(string kiKhaoSatid, string surveyId);
         Task<List<TblBuEvaluateHeader>> FilterLstChamDiem(BaseFilter filter);
     }
 
@@ -48,7 +48,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 var query = _dbContext.TblBuEvaluateHeader.AsQueryable();
                 if (!string.IsNullOrWhiteSpace(filter.KeyWord))
                 {
-                    query = query.Where(x => x.StoreId.Contains(filter.KeyWord));
+                    query = query.Where(x => x.DoiTuongId.Contains(filter.KeyWord));
                 }
                 if (!string.IsNullOrWhiteSpace(filter.SortColumn))
                 {
@@ -69,11 +69,11 @@ namespace PLX5S.BUSINESS.Services.BU
         }
 
 
-        public async Task<TieuChiDto> BuildDataTreeForApp(string kiKhaoSatId, string storeId)
+        public async Task<TieuChiDto> BuildDataTreeForApp(string kiKhaoSatId, string doiTuongId)
         {
             var lstNode = new List<TieuChiDto>();
             var node = _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == kiKhaoSatId && x.PId == "-1" && x.IsDeleted != true).FirstOrDefault();
-            var lstBlack = _dbContext.TblBuCriteriaExcludedStores.Where(x => x.IsDeleted != true).ToList();
+            var lstBlack = _dbContext.TblBuCriteriaExcludedObject.Where(x => x.IsDeleted != true).ToList();
             var lstAllTieuChi = await _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == kiKhaoSatId && x.PId != "-1" && x.IsDeleted != true).OrderBy(x => x.OrderNumber).ToListAsync();
 
             var rootNode = new TieuChiDto()
@@ -97,7 +97,7 @@ namespace PLX5S.BUSINESS.Services.BU
             lstNode.Add(rootNode);
             foreach (var menu in lstAllTieuChi)
             {
-                var checkBack = lstBlack.FirstOrDefault(x => x.TieuChiCode == menu.Code && x.StoreId == storeId);
+                var checkBack = lstBlack.FirstOrDefault(x => x.TieuChiCode == menu.Code && x.DoiTuongId == doiTuongId);
                 if (checkBack == null)
                 {
                     var node1 = new TieuChiDto()
@@ -137,17 +137,17 @@ namespace PLX5S.BUSINESS.Services.BU
 
         }
 
-        public async Task<List<TieuChiDto>> GetAllTieuChiLeaves(string kiKhaoSatId, string storeId)
+        public async Task<List<TieuChiDto>> GetAllTieuChiLeaves(string kiKhaoSatId, string doiTuongId)
         {
             try
             {
                 var tieuChi = _dbContext.TblBuTieuChi.Where(x => x.IsDeleted != true && x.KiKhaoSatId == kiKhaoSatId && x.IsGroup == false).OrderBy(x => x.Id).ToList();
-                var lstBlack = _dbContext.TblBuCriteriaExcludedStores.Where(x => x.IsDeleted != true).ToList();
+                var lstBlack = _dbContext.TblBuCriteriaExcludedObject.Where(x => x.IsDeleted != true).ToList();
                 var lstDiem = _dbContext.TblBuTinhDiemTieuChi.OrderBy(x => x.MoTa).ToList();
                 var lstTieuChiLeaves = new List<TieuChiDto>();
                 foreach (var item in tieuChi)
                 {
-                    var checkBack = lstBlack.FirstOrDefault(x => x.TieuChiCode == item.Code && x.StoreId == storeId);
+                    var checkBack = lstBlack.FirstOrDefault(x => x.TieuChiCode == item.Code && x.DoiTuongId == doiTuongId);
                     if (checkBack == null)
                     {
                         var leaves = new TieuChiDto()
@@ -180,13 +180,11 @@ namespace PLX5S.BUSINESS.Services.BU
         }
 
 
-        public async Task<EvaluateModel> BuildInputEvaluate(string kiKhaoSatId, string storeId, string deviceId)
+        public async Task<EvaluateModel> BuildInputEvaluate(string kiKhaoSatId, string doiTuongId, string deviceId)
         {
             try
             {
-                var idStore = _dbContext.TblBuInputStore.FirstOrDefault(x => x.Id == storeId).StoreId;
-                var nameStore = _dbContext.tblMdStore.FirstOrDefault(x => x.Id == idStore).Name;
-                var lstTieuChi = await GetAllTieuChiLeaves(kiKhaoSatId, storeId);
+                var lstTieuChi = await GetAllTieuChiLeaves(kiKhaoSatId, doiTuongId);
                 var idHeader = Guid.NewGuid().ToString();
                 return new EvaluateModel()
                 {
@@ -196,7 +194,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         Name = "Bản nháp",
                         Point = 0,
                         Order = 0,
-                        StoreId = storeId,
+                        DoiTuongId = doiTuongId,
                         KiKhaoSatId = kiKhaoSatId,
                         CreateDate = DateTime.Now,
                         DeviceId= deviceId
@@ -225,7 +223,7 @@ namespace PLX5S.BUSINESS.Services.BU
             {
                 var lstImage = new List<TblBuEvaluateImage>();
 
-                var header = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == data.Header.KiKhaoSatId && x.StoreId == data.Header.StoreId).OrderByDescending(x => x.Order).FirstOrDefault();
+                var header = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == data.Header.KiKhaoSatId && x.DoiTuongId == data.Header.DoiTuongId).OrderByDescending(x => x.Order).FirstOrDefault();
                 var number = header != null ? header.Order + 1 : 1;
 
                 var dateNow = DateTime.Now;
@@ -410,15 +408,15 @@ namespace PLX5S.BUSINESS.Services.BU
         }
 
 
-        public async Task TinhTongLanCham(TblBuPointStore point)
+        public async Task TinhTongLanCham(TblBuPoint point)
         {
             try
             {
-                var diem = _dbContext.TblBuPointStore.FirstOrDefault(x => x.InStoreId == point.InStoreId && x.KiKhaoSatId == point.KiKhaoSatId && x.SurveyId == point.SurveyId);
+                var diem = _dbContext.TblBuPoint.FirstOrDefault(x => x.DoiTuongId == point.DoiTuongId && x.KiKhaoSatId == point.KiKhaoSatId && x.SurveyId == point.SurveyId);
                 if(diem == null)
                 {
                     point.Code = Guid.NewGuid().ToString();
-                    _dbContext.TblBuPointStore.Add(point);
+                    _dbContext.TblBuPoint.Add(point);
                 }
                 else
                 {
@@ -440,7 +438,7 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
-                var lstEvaHeader = await _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filter.KeyWord && x.StoreId == filter.SortColumn).ToListAsync();
+                var lstEvaHeader = await _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filter.KeyWord && x.DoiTuongId == filter.SortColumn).ToListAsync();
                 var filterLst = lstEvaHeader.Where(x => x.IsActive == false).ToList();
 
                 foreach (var item in filterLst)
@@ -456,12 +454,12 @@ namespace PLX5S.BUSINESS.Services.BU
             }
         }
 
-        public  async Task<List<TblBuPointStore>> GetPointStore(string kiKhaoSatid, string surveyId)
+        public  async Task<List<TblBuPoint>> GetPointStore(string kiKhaoSatid, string surveyId)
         {
             try
             {
-                var lstPointStore = new List<TblBuPointStore>();
-                lstPointStore = await _dbContext.TblBuPointStore.Where(x => x.KiKhaoSatId == kiKhaoSatid && x.SurveyId == surveyId).ToListAsync();
+                var lstPointStore = new List<TblBuPoint>();
+                lstPointStore = await _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == kiKhaoSatid && x.SurveyId == surveyId).ToListAsync();
                 return lstPointStore;
             }
             catch(Exception ex)
