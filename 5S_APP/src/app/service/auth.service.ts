@@ -23,6 +23,9 @@ export class AuthService {
       false
     );
   }
+  GetAllAccount(): Observable<any>{
+    return this.commonService.get('Account/GetAll')
+  }
 
   getRightOfUser(params: any): Observable<any> {
     return this.commonService.get(this.authEndpoints.getRightOfUser, params);

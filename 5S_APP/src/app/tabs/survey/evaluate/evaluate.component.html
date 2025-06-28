@@ -13,11 +13,12 @@
       <ion-icon name="search-outline" style="font-size: 25px"></ion-icon>
     </ion-button>
     <ion-buttons slot="end">
-      <ion-menu-button>
+      <ion-menu-button (click)="openMenu()" >
         <ion-icon name="list-outline" style="font-size: 25px"></ion-icon></ion-menu-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
+
 <div *ngIf="isSearchVisible" style="margin: 10px; display: flex; flex-direction: column; gap: 5px">
   <ion-input label="Tìm kiếm" fill="outline" placeholder="Nhập từ tìm kiếm" [(ngModel)]="searchKeyword"
     (ionInput)="onSearchChange()"></ion-input>
@@ -158,6 +159,7 @@
   </ion-accordion-group>
 </ion-content>
 
+<!-- <ion-progress-bar type="indeterminate" color="tertiary"></ion-progress-bar> -->
 <ion-footer class="d-flex" style="height: 60px; justify-content: space-around" *ngIf="isEdit">
   <ion-button fill="clear" color="dark" expand="full" style="width: auto; font-weight: 700">
     <p style="margin-right: 5px">Save</p>
@@ -176,12 +178,12 @@
       <ion-title>
         <ion-grid>
           <ion-row>
-            <ion-col size="6" style="display: flex; align-items: center"><span style="background-color: blue"
-                class="circle"></span><span class="font-12">Đã trả lời</span></ion-col>
-            <ion-col size="6" style="display: flex; align-items: center"><span style="background-color: grey"
-                class="circle"></span><span class="font-12">Chưa trả lời</span></ion-col>
             <ion-col size="6" style="display: flex; align-items: center"><span style="background-color: green"
                 class="circle"></span><span class="font-12">Đang chọn</span></ion-col>
+            <ion-col size="6" style="display: flex; align-items: center"><span style="background-color: grey"
+              class="circle"></span><span class="font-12">Chưa trả lời</span></ion-col>
+              <ion-col size="6" style="display: flex; align-items: center"><span style="background-color: blue"
+                  class="circle"></span><span class="font-12">Đã trả lời</span></ion-col>
             <ion-col size="6" style="display: flex; align-items: center"><span style="background-color: red"
                 class="circle"></span><span class="font-12">Không đạt</span></ion-col>
           </ion-row>
@@ -190,9 +192,9 @@
     </ion-toolbar>
   </ion-header>
   <ion-content class="ion-padding">
-    <div style="gap: 10px; display: flex; flex-wrap: wrap">
-      <a style="padding-left: 5px; width: 35px; height: 35px" *ngFor="let item of lstTieuChi; let i = index"
-        class="custom-button" [ngClass]="{ 'active-link': isActive(item.id), 'answered': isAnswered(item), }"
+    <div style="gap: 10px; display: flex; flex-wrap: wrap" class="div-dem">
+      <a style="padding-left: 5px; width: 35px; height: 35px" *ngFor="let item of lstTieuChi; trackBy: trackByKey ; let i = index"
+        class="custom-button" [ngClass]="{ 'active-link': isActive(item.id),  }" [class]="isAnswered(item)"
         (click)="setItem(item.id)">
         {{ i + 1 }}
       </a>
@@ -201,25 +203,25 @@
   <ion-footer>
     <!-- <ion-item> -->
     <ion-list>
-      <ion-item style="height: 36px">
+      <ion-item >
         <ion-label style="margin: 0; display: block; line-height: 1.2">Người chấm</ion-label>
-        <ion-label style="margin: 0; display: block; line-height: 1.2">Nguyễn Thị Lân</ion-label>
+        <ion-label style="margin: 0; display: block; line-height: 1.2">{{ isEdit ? account.fullName : getFullName(evaluate.header.accoutUserName) }}</ion-label>
       </ion-item>
-      <ion-item style="height: 40px">
+      <ion-item >
         <ion-label>Lần chấm thứ 2</ion-label>
-        <ion-label>07/08/2002</ion-label>
+        <ion-label>{{ isEdit ? (dateNow | date: 'HH:mm dd/MM/yyyy') : (evaluate.header.updateDate | date: 'HH:mm dd/MM/yyyy') }}</ion-label>
       </ion-item>
       <ion-item>
         <ion-label>Tổng</ion-label>
-        <ion-label>53</ion-label>
+        <ion-label>{{lstTieuChi.length}}</ion-label>
       </ion-item>
       <ion-item>
         <ion-label>Đã chấm</ion-label>
-        <ion-label>53</ion-label>
+        <ion-label>{{ daCham }}</ion-label>
       </ion-item>
       <ion-item>
         <ion-label>Chưa chấm</ion-label>
-        <ion-label>53</ion-label>
+        <ion-label>{{ chuaCham }}</ion-label>
       </ion-item>
     </ion-list>
     <!-- </ion-item> -->

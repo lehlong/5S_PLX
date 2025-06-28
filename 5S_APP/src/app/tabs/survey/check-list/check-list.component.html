@@ -32,7 +32,7 @@
           <ion-item lines="none" [button]="true" style="display: flex; width: 100%; padding: 0; justify-content: space-between;"   (click)="openEditEvaluate(item)">
             <div class="">
               <h5 class="mg-0">{{ item?.name }}</h5>
-              <span class="text-italic">{{ item.accountUserName ?? account.fullName }}</span>
+              <span class="text-italic">{{ getFullName(item.accountUserName) }}</span>
             </div>
             <div slot="end">
               <p class="mg-0">{{ item.point ?? '0' }} điểm</p>

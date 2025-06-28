@@ -21,6 +21,7 @@ import { MessageService } from 'src/app/service/message.service';
 import * as L from 'leaflet';
 import { HighlightSearchPipe } from '../../../shared/pipes/highlight-search.pipe';
 import { IonHeader } from "@ionic/angular/standalone";
+import { AuthService } from 'src/app/service/auth.service';
 
 @Component({
   imports: [IonHeader, SharedModule, HighlightSearchPipe],
@@ -54,11 +55,15 @@ export class EvaluateComponent implements OnInit {
   headerId: any = '';
   count: any = 0;
   isEdit: any = true;
+  dateNow: Date = new Date();
   account: any = {};
   longitude: number = 106.6297;
   latitude: number = 10.8231;
+  daCham: any = 0
+  chuaCham: any = 0
   lstHisEvaluate: any = []
   apiFile = (environment as any).apiFile;
+  lstAccout: any = [];
   evaluate: any = {
     header: {},
     lstEvaluate: [],
@@ -75,6 +80,7 @@ export class EvaluateComponent implements OnInit {
     private alertController: AlertController,
     private _storageService: StorageService,
     private _service: AppEvaluateService,
+    private _authService: AuthService,
     private messageService: MessageService,
     private cdr: ChangeDetectorRef,
     private renderer: Renderer2
@@ -101,6 +107,7 @@ export class EvaluateComponent implements OnInit {
         } else {
           this.isEdit = false;
           this.getResultEvaluate();
+          this.getAllAccount()
         }
 
         let data = localStorage.getItem(this.doiTuong.id + "_" + this.kiKhaoSat.code);
@@ -125,11 +132,24 @@ export class EvaluateComponent implements OnInit {
   openSearchInput() {
     this.isSearchVisible = !this.isSearchVisible;
   }
+
   private removeHighlights() {
     this.currentHighlights.forEach((el) => {
       this.renderer.removeClass(el, this.highlightClass);
     });
     this.currentHighlights = [];
+  }
+
+
+  getAllAccount() {
+    this._authService.GetAllAccount().subscribe({
+      next: (data) => {
+        this.lstAccout = data;
+      },
+      error: (response) => {
+        console.log(response);
+      },
+    });
   }
 
   onSearchChange() {
@@ -195,7 +215,7 @@ export class EvaluateComponent implements OnInit {
       this.currentHighlights.push(el);
     }
   }
-  //--------------------------
+
   getResultEvaluate() {
     this._service.getResultEvaluate(this.headerId).subscribe({
       next: async (data) => {
@@ -244,8 +264,6 @@ export class EvaluateComponent implements OnInit {
 
   //Active
   setItem(itemId: string) {
-    if (!this.isEdit) return;
-
     this.currentSelect = itemId;
     console.log(itemId);
     this.selectedAccordionId = itemId;
@@ -287,7 +305,10 @@ export class EvaluateComponent implements OnInit {
     const evaluateItem = this.evaluate.lstEvaluate.find(
       (i: any) => i.tieuChiId === data.code || i.tieuChiCode === data.code
     );
-    const hasPoint = !!evaluateItem && !!evaluateItem.pointId;
+    const diem = this.lstTieuChi
+      .flatMap((t: any) => t.diemTieuChi || [])
+      .find((d: any) => d.id === evaluateItem?.pointId)?.diem ?? '';
+
     if (data.isImg) {
       const numberImgRequired = data?.numberImg || 0;
       const hasImage = this.evaluate?.lstImages.filter(
@@ -295,7 +316,9 @@ export class EvaluateComponent implements OnInit {
       ).length;
       hasEnoughImages = hasImage >= numberImgRequired;
     }
-    return hasPoint && hasEnoughImages;
+    if(diem === '' || !hasEnoughImages) return '';
+
+    return diem > 0 ? "answered" : "red-false";
   }
 
   hasEnoughImages(code: any, requiredNumber: any): boolean {
@@ -387,28 +410,6 @@ export class EvaluateComponent implements OnInit {
     });
   }
 
-  // generateVideoThumbnail(base64: string): Promise<string> {
-  //   return new Promise((resolve) => {
-  //     const video = document.createElement('video');
-  //     video.src = base64;
-  //     video.crossOrigin = 'anonymous';
-  //     video.muted = true;
-  //     video.playsInline = true;
-
-  //     video.addEventListener('loadeddata', () => {
-  //       const canvas = document.createElement('canvas');
-  //       canvas.width = video.videoWidth;
-  //       canvas.height = video.videoHeight;
-  //       const ctx = canvas.getContext('2d')!;
-  //       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  //       const thumbnail = canvas.toDataURL('image/jpeg');
-  //       resolve(thumbnail);
-  //     });
-
-  //     video.load(); // Kích hoạt load video
-  //   });
-  // }
-
   detectFileType(file: File): string {
     const mime = file.type;
 
@@ -498,6 +499,8 @@ export class EvaluateComponent implements OnInit {
   }
 
   tinhTong() {
+    console.log(this.lstTieuChi);
+
     const tongDiem = this.lstTieuChi.reduce((sum: number, leaf: any) => {
       const diemMax = (leaf.diemTieuChi || []).reduce((max: number, d: any) => {
         return Math.max(max, d.diem || 0);
@@ -708,7 +711,7 @@ export class EvaluateComponent implements OnInit {
     try {
       // 👉 Lấy vị trí hiện tại
       const position = await Geolocation.getCurrentPosition();
-       const latitude = position.coords.latitude + 0.002273;
+      const latitude = position.coords.latitude + 0.002273;
       const longitude = position.coords.longitude - 0.006651;
       console.log('Vị trí hiện tại:', latitude, longitude);
 
@@ -742,6 +745,17 @@ export class EvaluateComponent implements OnInit {
       console.error('Camera error:', err);
     }
   }
+
+  openMenu() {
+    this.daCham = document.querySelectorAll('.div-dem .answered').length + document.querySelectorAll('.div-dem .red-false').length;
+    this.chuaCham = this.lstTieuChi.length - this.daCham;
+  }
+
+  getFullName(userName: string): string {
+    const account = this.lstAccout.find((acc: any) => acc.userName === userName);
+    return account?.fullName ?? this.account?.fullName;
+  }
+
 
   trackByKey(index: number, item: any): string {
     return item.key; // hoặc item.id nếu bạn dùng id

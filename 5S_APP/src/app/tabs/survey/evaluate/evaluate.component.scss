@@ -59,8 +59,9 @@
 }
 
 .custom-button {
-  background-color: grey;
-  color: white;
+  border: gray solid 1px;
+  // background-color: grey;
+  color: gray;
   text-decoration: none;
   padding: 5px;
   display: flex;
@@ -73,12 +74,20 @@
 }
 
 .active-link {
+  border: rgb(0, 100, 0) solid 2px;
   background-color: green !important;
   color: white;
 }
 
 .answered {
+  border: rgb(0, 10, 100) solid 2px;
   background-color: blue;
+  color: white;
+}
+
+.red-false{
+  border: rgb(100, 0, 0) solid 2px;
+  background-color: red;
   color: white;
 }
 

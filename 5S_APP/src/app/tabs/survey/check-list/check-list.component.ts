@@ -4,6 +4,7 @@ import { IonButton } from '@ionic/angular/standalone';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppEvaluateService } from 'src/app/service/app-evaluate.service';
 import { StorageService } from 'src/app/service/storage.service';
+import { AuthService } from 'src/app/service/auth.service';
 
 @Component({
   selector: 'app-check-list',
@@ -20,6 +21,7 @@ export class CheckListComponent implements OnInit {
   doiTuongId: any = ''
   deviceID: string = '';
   account: any = {}
+  lstAccout: any = []
   evaluate: any =
     {
       header: {},
@@ -30,6 +32,7 @@ export class CheckListComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
+    private _authService: AuthService,
     private _storageService: StorageService,
     private _service: AppEvaluateService
   ) { }
@@ -60,6 +63,7 @@ export class CheckListComponent implements OnInit {
         }
         this.doiTuongId = id
         this.getAllEvaluateHistory()
+        this.getAllAccount()
       },
     })
   }
@@ -74,6 +78,16 @@ export class CheckListComponent implements OnInit {
     })
   }
 
+  getAllAccount() {
+    this._authService.GetAllAccount().subscribe({
+      next: (data) => {
+        this.lstAccout = data;
+      },
+      error: (response) => {
+        console.log(response);
+      },
+    });
+  }
   checkRightEvaluate() {
     if (this.kiKhaoSat?.trangThaiKi !== '2') return false;
     return this.doiTuong.lstChamDiem?.some(
@@ -111,10 +125,16 @@ export class CheckListComponent implements OnInit {
     }
   }
 
+  getFullName(userName: string): string {
+    const account = this.lstAccout.find((acc: any) => acc.userName === userName);
+    return account?.fullName ?? this.account?.fullName;
+  }
+
   async remove(code: any) {
     await this._storageService.remove(this.doiTuong.id + "_" + this.kiKhaoSat.code);
     localStorage.removeItem(this.doiTuong.id + "_" + this.kiKhaoSat.code)
     this.lstHisEvaluate.shift();
   }
+
 
 }

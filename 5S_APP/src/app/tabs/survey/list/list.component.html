@@ -3,7 +3,7 @@
     <ion-button fill="" slot="start">
       <ion-back-button></ion-back-button>
     </ion-button>
-    <ion-title class="t-center"> Chấm điểm 5S cửa hàng </ion-title>
+    <ion-title class="t-center"> Chấm điểm 5S {{ doiTuong }} </ion-title>
     <ion-button (click)="openFilterModal()" id="open-modal" fill="clear" slot="end" color="dark">
       <ion-icon name="filter-outline" fill="clear"></ion-icon>
     </ion-button>
@@ -59,8 +59,8 @@
             </ion-label>
           </ion-item>
           <div slot="content" style="max-height: 25vh; overflow-y: auto; padding: 5px;">
-            <ion-item *ngFor="let item of lstKiKhaoSat" (click)="searchStore(item)">
-              <ion-label>{{ item.name }}</ion-label>
+            <ion-item *ngFor="let item of lstKiKhaoSat" (click)="searchDoiTuong(item)">
+              <ion-label>{{ item?.name }}</ion-label>
             </ion-item>
           </div>
         </ion-accordion>
@@ -68,8 +68,8 @@
         <ion-accordion value="second">
           <ion-item slot="header" color="light">
             <ion-label>
-              <ion-input label="Cửa hàng" labelPlacement="stacked" labelPlacement="floating" [clearInput]="true"
-                [readonly]="true" placeholder="Chọn cửa hàng" [(ngModel)]="filter.filterStore.name">
+              <ion-input [label]="doiTuong" labelPlacement="stacked" labelPlacement="floating" [clearInput]="true"
+                [readonly]="true" [placeholder]="'Chọn ' + doiTuong" [(ngModel)]="filter.filterDoiTuong.name">
               </ion-input>
             </ion-label>
           </ion-item>
@@ -106,7 +106,7 @@
 
         <ion-item>
           <ion-label>
-            <ion-checkbox labelPlacement="end">Cửa hàng chưa chấm</ion-checkbox>
+            <ion-checkbox [(ngModel)]="filter.chuaCham"  labelPlacement="end">Cửa hàng chưa chấm</ion-checkbox>
           </ion-label>
         </ion-item>
       </div>
