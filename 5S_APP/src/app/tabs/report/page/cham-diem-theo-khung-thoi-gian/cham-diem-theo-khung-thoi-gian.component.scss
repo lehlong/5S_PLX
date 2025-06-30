@@ -1,12 +1,12 @@
-.custom-border {
-  border: 0.5px solid rgba(0, 0, 0, 0.06);
+.custom-table {
+  width: 100%;
 }
 .custom-modal {
   --height: 80vh;
 }
-
-ion-item-group.md.item-group-md.item {
-  background: #fff;
+ion-col {
+  // border: 0.5px solid rgba(0, 0, 0, 0.06);
+  padding: 10px 0;
 }
 .grey-background {
   background-color: #fafafa;
@@ -26,15 +26,13 @@ ion-item-group ion-row:not([style*="background-color: #fafafa"]) {
     color: var(--ion-text-color, #ffffff);
 
     .custom-border {
-      border: 1px solid #363636;
+      border-color: var(--ion-border-color, rgba(255, 255, 255, 0.1));
     }
-  }
-  ion-item-group.md.item-group-md.item {
-     background: none
   }
 
   ion-col {
     color: var(--ion-text-color, #ffffff);
+    // border-bottom: 0.5px solid #363636;
   }
 
   ion-chip {

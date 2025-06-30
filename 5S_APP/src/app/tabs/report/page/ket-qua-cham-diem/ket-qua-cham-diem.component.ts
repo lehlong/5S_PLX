@@ -17,19 +17,19 @@ import { AppReportService } from 'src/app/service/app-report.service';
 export class KetQuaChamDiemComponent implements OnInit {
   filter: any = {
     filterKiKhaoSat: {},
-    filterStore: {},
+    filterDoiTuong: {},
     filterNguoiCham: {},
     cuaHangToiCham: false,
   };
   inputSearchKiKhaoSat: any = {};
 
   searchNguoiCham: any = '';
-  inSearchStore: any = '';
+  inSearchDoiTuong: any = '';
   selectValue = '1';
   lstData: any = [  ]
   lstAccout: any = [];
   lstSearchChamDiem: any = [];
-  lstSearchStore: any = [];
+  lstSearchDoiTuong: any = [];
   lstKiKhaoSat: any = [];
   surveyId: any;
   filterForm!: FormGroup;
@@ -97,7 +97,7 @@ export class KetQuaChamDiemComponent implements OnInit {
   //   this._authService.(this.filter.filterKiKhaoSat.id).subscribe({
   //     next: (data) => {
   //       this.lstStore = data.lstInputStore;
-  //       this.lstSearchStore = data.lstInputStore;
+  //       this.lstSearchDoiTuong = data.lstInputStore;
   //     },
   //     error: (response) => {
   //       console.log(response);
@@ -105,26 +105,37 @@ export class KetQuaChamDiemComponent implements OnInit {
   //   });
   // }
 
-  searchStore(kiKhaoSat: any) {
+  searchDoiTuong(kiKhaoSat: any) {
     this.inputSearchKiKhaoSat = kiKhaoSat;
     this._kyKhaoSatService.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
       next: (data) => {
-        this.lstSearchStore = data.lstInputStore;
-        this.lstSearchChamDiem = Array.from(
-          new Map(
-            this.lstSearchStore
-              .flatMap((store: any) => store.lstInChamDiem || [])
-              .map((item: any) => [item.userName, item])
-          ).values()
-        );
+        if (data.lstInputStore.length != 0) {
+          this.lstSearchDoiTuong = data.lstInputStore;
+          this.lstSearchChamDiem = Array.from(
+            new Map(
+              this.lstSearchDoiTuong
+                .flatMap((store: any) => store.lstInChamDiem || [])
+                .map((item: any) => [item.userName, item])
+            ).values()
+          );
+        } else if (data.lstInputWareHouse.length != 0) {
+            this.lstSearchDoiTuong = data.lstInputWareHouse;
+            this.lstSearchChamDiem = Array.from(
+              new Map(
+                this.lstSearchDoiTuong
+                  .flatMap((wareHouse: any) => wareHouse.lstInChamDiem || [])
+                  .map((item: any) => [item.userName, item])
+              ).values()
+            );
+        }
       },
       error: (response) => {
         console.log(response);
       },
     });
   }
-  selectSearchStore(item: any) {
-    this.filter.filterStore = item;
+  selectSearchDoiTuong(item: any) {
+    this.filter.filterDoiTuong = item;
     console.log('Selected store:', this.filter.filterStore);
     this.lstSearchChamDiem = item.lstInChamDiem;
   }
@@ -134,7 +145,7 @@ export class KetQuaChamDiemComponent implements OnInit {
   }
 
   openFilterModal() {
-    this.searchStore(this.filter.filterKiKhaoSat);
+    this.searchDoiTuong(this.filter.filterKiKhaoSat);
     this.isOpen = true;
   }
 
@@ -144,7 +155,7 @@ export class KetQuaChamDiemComponent implements OnInit {
 
   onFilter() {
     this.filter.filterKiKhaoSat = this.inputSearchKiKhaoSat
-    this.lstData = this.lstSearchStore
+    this.lstData = this.lstSearchDoiTuong
       .filter((s: any) => !this.filter.filterStore?.id || s.id == this.filter.filterStore?.id)
       .filter((s: any) => !this.filter.filterNguoiCham?.userName ||
         s.lstChamDiem?.some((x: any) => x == this.filter.filterNguoiCham.userName))
@@ -161,7 +172,7 @@ export class KetQuaChamDiemComponent implements OnInit {
     this.filter.filterStore = {};
     this.inputSearchKiKhaoSat = this.filter.filterKiKhaoSat;
     this.filter.filterNguoiCham = {};
-    this.filter.inSearchStore = '';
+    this.filter.inSearchDoiTuong = '';
     this.filter.searchNguoiCham = '';
     this.filter.cuaHangToiCham = false;
     localStorage.setItem('filterLS', JSON.stringify(this.filter));

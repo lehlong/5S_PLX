@@ -90,7 +90,7 @@ export class ThietBiChamDiemComponent implements OnInit {
   }
 
   getAllAccount() {
-    this._service.GetAllAccount().subscribe({
+    this._authService.GetAllAccount().subscribe({
       next: (data) => {
        this.lstAccout=  data;
       },

@@ -62,7 +62,7 @@ export class ChamDiemTheoKhungThoiGianComponent implements OnInit {
     this._service
       .TheoKhungThoiGian({
         kiKhaoSatId: this.filter.filterKiKhaoSat.id,
-        InstoreId: this.filter.filterStore.id,
+        InstoreId: this.filter.filterDoiTuong.id,
         AccountUserName: this.filter.filterNguoiCham,
         SurveyId: this.filter.cuaHangToiCham
       })
@@ -104,7 +104,7 @@ export class ChamDiemTheoKhungThoiGianComponent implements OnInit {
     });
   }
    getAllAccount() {
-    this._service.GetAllAccount().subscribe({
+    this._authService.GetAllAccount().subscribe({
       next: (data) => {
        this.lstAccout=  data;
       },
