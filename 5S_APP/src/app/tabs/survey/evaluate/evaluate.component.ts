@@ -731,6 +731,7 @@ export class EvaluateComponent implements OnInit {
       this.evaluate.lstImages.push({
         code: '-1',
         fileName: '',
+        evaluateHeaderCode: this.headerId,
         filePath: base64Image,
         pathThumbnail: thumbnail,
         tieuChiCode: code,

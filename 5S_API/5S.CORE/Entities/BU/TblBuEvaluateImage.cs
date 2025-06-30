@@ -31,10 +31,10 @@ namespace PLX5S.CORE.Entities.BU
         [Column("EVALUATE_HEADER_CODE", TypeName = "NVARCHAR(150)")]
         public string? EvaluateHeaderCode { get; set; }
 
-        [Column("KINH_DO", TypeName = "DECIMAL(30.0)")]
+        [Column("KINH_DO", TypeName = "DECIMAL(18.10)")]
         public decimal? KinhDo { get; set; }
 
-        [Column("VI_DO", TypeName = "DECIMAL(30.0)")]
+        [Column("VI_DO", TypeName = "DECIMAL(18.10)")]
         public decimal? ViDo { get; set; }
 
         [Column("TYPE", TypeName = "NVARCHAR(150)")]

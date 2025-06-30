@@ -97,29 +97,29 @@ namespace PLX5S.API.Controllers.AD
             return Ok(transferObject);
         }
 
-        [HttpPost("SendSampleFromServer")]
-        public async Task<IActionResult> SendSampleFromServer()
-        {
-            // Gửi thông báo đến topic "news"
-            var result = await _firebaseService.SendToTopicAsync(
-                "news", // topic
-                "Thông báo từ server .NET Core", // title
-                "Đây là nội dung gửi từ code C#" // body
-            );
+        //[HttpPost("SendSampleFromServer")]
+        //public async Task<IActionResult> SendSampleFromServer()
+        //{
+        //    // Gửi thông báo đến topic "news"
+        //    var result = await _firebaseService.SendToTopicAsync(
+        //        "news", // topic
+        //        "Thông báo từ server .NET Core", // title
+        //        "Đây là nội dung gửi từ code C#" // body
+        //    );
 
-            var transferObject = new TransferObject();
-            if (result.Success)
-            {
-                transferObject.Data = result;
-            }
-            else
-            {
-                transferObject.Status = false;
-                transferObject.MessageObject.MessageType = MessageType.Error;
-                transferObject.MessageObject.Message = result.Message;
-            }
-            return Ok(transferObject);
-        }
+        //    var transferObject = new TransferObject();
+        //    if (result.Success)
+        //    {
+        //        transferObject.Data = result;
+        //    }
+        //    else
+        //    {
+        //        transferObject.Status = false;
+        //        transferObject.MessageObject.MessageType = MessageType.Error;
+        //        transferObject.MessageObject.Message = result.Message;
+        //    }
+        //    return Ok(transferObject);
+        //}
         [HttpPost("SendToTopicTest")]
         public async Task<IActionResult> SendToTopicTest([FromBody] SendToTopicTestRequest request)
         {

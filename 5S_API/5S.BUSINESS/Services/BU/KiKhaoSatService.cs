@@ -16,6 +16,9 @@ using DocumentFormat.OpenXml.Office.CustomUI;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using PLX5S.BUSINESS.Models;
 using NPOI.SS.Formula.Functions;
+using Microsoft.AspNetCore.Hosting;
+using Services.AD;
+using Dtos.AD;
 
 
 namespace PLX5S.BUSINESS.Services.BU
@@ -31,11 +34,16 @@ namespace PLX5S.BUSINESS.Services.BU
         Task<KiKhaoSatModel> GetInput(string idKi);
         Task UpdateKhaoSatTrangThai(TblBuKiKhaoSat kiKhaoSat);
         Task<PagedResponseDto> SearchKiKhaoSat(FilterKiKhaoSat filter);
-       
-
     }
-    public class KikhaosatService(AppDbContext dbContext, IMapper mapper) : GenericService<TblBuKiKhaoSat, KiKhaoSatDto>(dbContext, mapper), IKikhaosatService
+    public class KikhaosatService : GenericService<TblBuKiKhaoSat, KiKhaoSatDto>, IKikhaosatService
     {
+        private readonly IFirebaseNotificationService _firebaseNotificationService;
+
+        public KikhaosatService(AppDbContext dbContext, IMapper mapper, IFirebaseNotificationService firebaseNotificationService) : base(dbContext, mapper)
+        {
+            _firebaseNotificationService = firebaseNotificationService;
+        }
+
         public class FilterKiKhaoSat : BaseFilter
         {
             public string headerId { get; set; }
@@ -352,7 +360,23 @@ namespace PLX5S.BUSINESS.Services.BU
             try
             {
                 _dbContext.TblBuKiKhaoSat.Update(kiKhaoSat);
-                _dbContext.SaveChanges();
+                if (kiKhaoSat.TrangThaiKi == "2")
+                {
+                    _dbContext.TblBuNotification.Add(new TblBuNotification
+                    {
+                        Code = Guid.NewGuid().ToString(),
+                        Title = "Kỳ khảo sát Mở",
+                        Body = $"Kỳ khảo sát {kiKhaoSat.Name} đã được mở",
+                        SurveyId = kiKhaoSat.SurveyMgmtId,
+                        KiKhaoSatId = kiKhaoSat.Id,
+                        Link = "",
+                    });
+                    await _firebaseNotificationService.SendToTopicAsync("PLX5S_NOTI", "Có kỳ khảo sát mới", $"Kỳ khảo sát {kiKhaoSat.Name} đã được mở", new DataFireBase());
+                }
+
+
+
+                await _dbContext.SaveChangesAsync();
             }
             catch (Exception ex)
             {

@@ -140,6 +140,7 @@ namespace PLX5S.CORE
         public DbSet<TblBuTinhDiemTieuChi> TblBuTinhDiemTieuChi { get; set; }
         public DbSet<TblBuPoint> TblBuPoint { get; set; }
         public DbSet<TblBuEvaluateHeader> TblBuEvaluateHeader { get; set; }
+        public DbSet<TblBuNotification> TblBuNotification { get; set; }
         public DbSet<TblBuEvaluateImage> TblBuEvaluateImage { get; set; }
         public DbSet<TblBuEvaluateValue> TblBuEvaluateValue { get; set; }
         public DbSet<TblBuCriteriaExcludedObject> TblBuCriteriaExcludedObject { get; set; }

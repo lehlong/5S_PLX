@@ -21,7 +21,7 @@ namespace Services.AD
     public interface IFirebaseNotificationService
     {
         Task<FirebaseNotificationResponseDto> SendNotificationAsync(FirebaseNotificationDto notification);
-        Task<FirebaseNotificationResponseDto> SendToTopicAsync(string topic, string title, string body);
+        //Task<FirebaseNotificationResponseDto> SendToTopicAsync(string topic, string title, string body);
         Task<FirebaseNotificationResponseDto> SendToTopicAsync(string topic, string title, string body, object? data);
         Task<FirebaseNotificationResponseDto> SendToTokenAsync(string token, string title, string body);
         Task<FirebaseNotificationResponseDto> TestConnectionAsync();
@@ -178,16 +178,16 @@ namespace Services.AD
             }
         }
 
-        public async Task<FirebaseNotificationResponseDto> SendToTopicAsync(string topic, string title, string body)
-        {
-            var notification = new FirebaseNotificationDto
-            {
-                Topic = topic,
-                Title = title,
-                Body = body
-            };
-            return await SendNotificationAsync(notification);
-        }
+        //public async Task<FirebaseNotificationResponseDto> SendToTopicAsync(string topic, string title, string body)
+        //{
+        //    var notification = new FirebaseNotificationDto
+        //    {
+        //        Topic = topic,
+        //        Title = title,
+        //        Body = body
+        //    };
+        //    return await SendNotificationAsync(notification);
+        //}
 
         public async Task<FirebaseNotificationResponseDto> SendToTopicAsync(string topic, string title, string body, object? data)
         {

@@ -22,6 +22,8 @@
     <PackageReference Include="Hangfire" Version="1.8.14" />
     <PackageReference Include="Hangfire.Oracle.Core" Version="1.2.17" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.6" />
+	<PackageReference Include="FirebaseAdmin" Version="3.2.0" />
+	<PackageReference Include="Google.Apis.Auth" Version="1.70.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -31,8 +33,6 @@
     <PackageReference Include="NLog.Extensions.Logging" Version="5.3.11" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
     
-    <PackageReference Include="FirebaseAdmin" Version="2.4.0" />
-    <PackageReference Include="Google.Cloud.Firestore" Version="3.4.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -45,4 +45,9 @@
     <ProjectReference Include="..\5S.BUSINESS\5S.BUSINESS.csproj" />
   </ItemGroup>
 
+
+	<PropertyGroup>
+		<PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	</PropertyGroup>
 </Project>

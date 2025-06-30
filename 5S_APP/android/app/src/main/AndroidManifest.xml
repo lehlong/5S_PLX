@@ -13,14 +13,13 @@
     android:usesCleartextTraffic="true"
     android:theme="@style/AppTheme">
 
-    <!-- ✅ Đặt ở đây -->
     <meta-data
       android:name="com.google.firebase.messaging.default_notification_channel_id"
       android:value="default_channel_id" />
 
     <activity
       android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation"
-      android:name="com.plx5s.app.MainActivity"
+      android:name=".MainActivity"
       android:label="@string/title_activity_main"
       android:theme="@style/AppTheme.NoActionBarLaunch"
       android:launchMode="singleTask"
