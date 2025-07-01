@@ -130,6 +130,4 @@ export class KetQuaChamDiemComponent {
       }
     })
   }
-
-
 }

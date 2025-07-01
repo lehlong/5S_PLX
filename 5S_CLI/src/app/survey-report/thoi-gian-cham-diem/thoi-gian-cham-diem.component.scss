@@ -1,0 +1,21 @@
+.table-scroll-x {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.auto-scroll-table th,
+.auto-scroll-table td {
+  white-space: nowrap;
+  text-align: center;
+}
+
+/* Cố định độ rộng các cột */
+.auto-scroll-table .col-fixed {
+  width: 200px;
+  min-width: 200px;
+}
+
+.auto-scroll-table .col-small {
+  width: 50px;
+  min-width: 50px;
+}
