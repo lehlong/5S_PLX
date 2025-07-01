@@ -1,11 +1,10 @@
 import { IonButton } from '@ionic/angular/standalone';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
-import { AuthService } from 'src/app/service/auth.service';
 import { KyKhaoSatService } from 'src/app/service/ky-khao-sat.service';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { AppReportService } from 'src/app/service/app-report.service';
+import { SurveyService } from 'src/app/service/survey.service';
 
 @Component({
   selector: 'app-ket-qua-cham-diem',
@@ -18,74 +17,43 @@ export class KetQuaChamDiemComponent implements OnInit {
   filter: any = {
     filterKiKhaoSat: {},
     filterDoiTuong: {},
-    filterNguoiCham: {},
-    cuaHangToiCham: false,
+    filterSurvey: {},
   };
-  inputSearchKiKhaoSat: any = {};
-
-  searchNguoiCham: any = '';
-  inSearchDoiTuong: any = '';
-  selectValue = '1';
-  lstData: any = [  ]
-  lstAccout: any = [];
-  lstSearchChamDiem: any = [];
+  lstData: any = []
+  lstSearchKiKhaoSat: any = [];
   lstSearchDoiTuong: any = [];
   lstKiKhaoSat: any = [];
-  surveyId: any;
-  filterForm!: FormGroup;
   isOpen = false;
-  lstAccount: any = [];
+  lstSurvey: any = [];
 
   user: any = {};
 
   constructor(
     private _kyKhaoSatService: KyKhaoSatService,
-    private _service : AppReportService,
-    private _authService: AuthService,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {}
+    private _service: AppReportService,
+    private _surveyService: SurveyService,
+  ) { }
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('UserInfo') ?? '');
-    this.route.paramMap.subscribe({
-      next: (params) => {
-        const id = params.get('id');
-        this.surveyId = id;
-        this.getAllKyKhaoSat();
-      },
-    });
+    this.getAllKyKhaoSat();
+    this.getAllSurvey();
   }
 
-  getReport(){
-    this._service.KetQuaChamDiem({kiKhaoSatId: this.filter.filterKiKhaoSat.id}).subscribe({
-      next: (data)=> {
+  getReport() {
+    this._service.KetQuaChamDiem({ surveyId: this.filter.filterSurvey.doiTuongId, kiKhaoSatId: this.filter.filterKiKhaoSat.id, doiTuongId: this.filter.filterDoiTuong.id }).subscribe({
+      next: (data) => {
         console.log(data);
         this.lstData = data
+        this.isOpen = false;
       }
     })
   }
 
-  getAllKyKhaoSat() {
-    this._kyKhaoSatService.search({ keyWord: this.surveyId }).subscribe({
+  getAllSurvey() {
+    this._surveyService.getAllSurveyMgmt({}).subscribe({
       next: (data) => {
-        this.lstKiKhaoSat = data.data;
-
-        const filter = localStorage.getItem('filterLS') ?? '';
-        const filter2 = data.data.reduce((a: any, b: any) =>
-          new Date(a.endDate) > new Date(b.endDate) ? a : b
-        );
-        if (filter != '') {
-          this.filter = JSON.parse(filter);
-          if (this.filter.filterKiKhaoSat.surveyMgmtId != this.surveyId) {
-            this.filter.filterKiKhaoSat = filter2;
-          }
-        } else {
-          this.filter.filterKiKhaoSat = filter2;
-        }
-
-        this.inputSearchKiKhaoSat = this.filter.filterKiKhaoSat;
-        this.getReport()
+        this.lstSurvey = data.data;
       },
       error: (response) => {
         console.log(response);
@@ -93,59 +61,49 @@ export class KetQuaChamDiemComponent implements OnInit {
     });
   }
 
-  // getAllAccount() {
-  //   this._authService.(this.filter.filterKiKhaoSat.id).subscribe({
-  //     next: (data) => {
-  //       this.lstStore = data.lstInputStore;
-  //       this.lstSearchDoiTuong = data.lstInputStore;
-  //     },
-  //     error: (response) => {
-  //       console.log(response);
-  //     },
-  //   });
-  // }
+  getAllKyKhaoSat() {
+    this._kyKhaoSatService.search({ }).subscribe({
+      next: (data) => {
+        this.lstKiKhaoSat = data.data;
+      },
+      error: (response) => {
+        console.log(response);
+      },
+    });
+  }
+
+  selectSearchKyKhaoSat(item: any) {
+    this.filter.filterSurvey = item;
+    this.lstSearchKiKhaoSat = this.lstKiKhaoSat.filter((x: any) => x.surveyMgmtId == item.id);
+    this.filter.filterKiKhaoSat = this.lstSearchKiKhaoSat.reduce((a: any, b: any) =>
+      new Date(a.endDate) > new Date(b.endDate) ? a : b
+    )
+    this.filter.filterDoiTuong = {};
+    console.log(this.filter.filterKiKhaoSat);
+  }
 
   searchDoiTuong(kiKhaoSat: any) {
-    this.inputSearchKiKhaoSat = kiKhaoSat;
+    this.filter.filterKiKhaoSat = kiKhaoSat;
     this._kyKhaoSatService.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
       next: (data) => {
         if (data.lstInputStore.length != 0) {
           this.lstSearchDoiTuong = data.lstInputStore;
-          this.lstSearchChamDiem = Array.from(
-            new Map(
-              this.lstSearchDoiTuong
-                .flatMap((store: any) => store.lstInChamDiem || [])
-                .map((item: any) => [item.userName, item])
-            ).values()
-          );
         } else if (data.lstInputWareHouse.length != 0) {
-            this.lstSearchDoiTuong = data.lstInputWareHouse;
-            this.lstSearchChamDiem = Array.from(
-              new Map(
-                this.lstSearchDoiTuong
-                  .flatMap((wareHouse: any) => wareHouse.lstInChamDiem || [])
-                  .map((item: any) => [item.userName, item])
-              ).values()
-            );
+          this.lstSearchDoiTuong = data.lstInputWareHouse;
         }
+        this.filter.filterDoiTuong = {};
       },
       error: (response) => {
         console.log(response);
       },
     });
   }
+
   selectSearchDoiTuong(item: any) {
     this.filter.filterDoiTuong = item;
-    console.log('Selected store:', this.filter.filterStore);
-    this.lstSearchChamDiem = item.lstInChamDiem;
-  }
-
-  selectSearchChamDiem(item: any) {
-    this.filter.filterNguoiCham = item;
   }
 
   openFilterModal() {
-    this.searchDoiTuong(this.filter.filterKiKhaoSat);
     this.isOpen = true;
   }
 
@@ -153,28 +111,10 @@ export class KetQuaChamDiemComponent implements OnInit {
     this.isOpen = false;
   }
 
-  onFilter() {
-    this.filter.filterKiKhaoSat = this.inputSearchKiKhaoSat
-    this.lstData = this.lstSearchDoiTuong
-      .filter((s: any) => !this.filter.filterStore?.id || s.id == this.filter.filterStore?.id)
-      .filter((s: any) => !this.filter.filterNguoiCham?.userName ||
-        s.lstChamDiem?.some((x: any) => x == this.filter.filterNguoiCham.userName))
-      .filter((s: any) => this.filter.cuaHangToiCham !== true || s.lstChamDiem?.some((x: any) => x == this.user.userName))
-    localStorage.setItem('filterLS', JSON.stringify(this.filter))
-    this.getReport()
-    this.closeFilterModal();
-  }
-
   resetFilters() {
-    this.filter.filterKiKhaoSat = this.lstKiKhaoSat.reduce((a: any, b: any) =>
-      new Date(a.endDate) > new Date(b.endDate) ? a : b
-    );
-    this.filter.filterStore = {};
-    this.inputSearchKiKhaoSat = this.filter.filterKiKhaoSat;
-    this.filter.filterNguoiCham = {};
-    this.filter.inSearchDoiTuong = '';
-    this.filter.searchNguoiCham = '';
-    this.filter.cuaHangToiCham = false;
-    localStorage.setItem('filterLS', JSON.stringify(this.filter));
+    this.filter.filterSurvey = {};
+    this.filter.filterDoiTuong = {};
+    this.filter.filterKiKhaoSat = {};
+    // localStorage.setItem('filterLS', JSON.stringify(this.filter));
   }
 }

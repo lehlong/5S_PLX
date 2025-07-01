@@ -48,30 +48,54 @@ namespace PLX5S.BUSINESS.Services.BU
             try
             {
                 var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
-                var lstInStore = inputKy.Result.lstInputStore.ToList();
-                var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
-
-                if (!string.IsNullOrWhiteSpace(filterReport.InstoreId))
-                {
-                    lstInStore = lstInStore.Where(x => x.Id == filterReport.InstoreId).ToList();
-                }
-
                 var result = new List<KetQuaChamDiem>();
-
-                foreach (var item in lstInStore)
+                var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                if(filterReport.SurveyId == "DT1")
                 {
-                    var report = new KetQuaChamDiem()
+                    var lstDoiTuong = inputKy.Result.lstInputStore.ToList();
+
+                    if (!string.IsNullOrWhiteSpace(filterReport.DoiTuongId))
                     {
-                        stt = item.StoreId,
-                        StoreName= item.Name,
-                        Length = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Length ?? 0,
-                        point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
-                    };
+                        lstDoiTuong = lstDoiTuong.Where(x => x.Id == filterReport.DoiTuongId).ToList();
+                    }
 
-                    result.Add(report);
+                    foreach (var item in lstDoiTuong)
+                    {
+                        var report = new KetQuaChamDiem()
+                        {
+                            stt = item.StoreId,
+                            Name= item.Name,
+                            Length = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Length ?? 0,
+                            point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
+                        };
+
+                        result.Add(report);
+                    }
                 }
+                else if (filterReport.SurveyId == "DT2")
+                {
+                    var lstDoiTuong = inputKy.Result.lstInputWareHouse.ToList();
 
-                return result;
+                    if (!string.IsNullOrWhiteSpace(filterReport.DoiTuongId))
+                    {
+                        lstDoiTuong = lstDoiTuong.Where(x => x.Id == filterReport.DoiTuongId).ToList();
+                    }
+
+                    foreach (var item in lstDoiTuong)
+                    {
+                        var report = new KetQuaChamDiem()
+                        {
+                            stt = item.Id,
+                            Name = item.Name,
+                            Length = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Length ?? 0,
+                            point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
+                        };
+
+                        result.Add(report);
+                    }
+
+                }
+                    return result;
             }
             catch (Exception ex) 
             {
@@ -86,32 +110,56 @@ namespace PLX5S.BUSINESS.Services.BU
             try
             {
                 var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
-                var lstInStore = inputKy.Result.lstInputStore.ToList();
                 var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.IsActive == true && x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
                 var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
-
-                if (!string.IsNullOrWhiteSpace(filterReport.InstoreId))
-                {
-                    lstInStore = lstInStore.Where(x => x.Id == filterReport.InstoreId).ToList();
-                }
-
                 var result = new List<ThoiGianChamDiem>();
-
-                foreach (var item in lstInStore)
+                if (filterReport.SurveyId == "DT1")
                 {
-                    var report = new ThoiGianChamDiem()
+                    var lstDoiTuong = inputKy.Result.lstInputStore.ToList();
+
+                    if (!string.IsNullOrWhiteSpace(filterReport.DoiTuongId))
                     {
-                        stt = item.StoreId,
-                        StoreName = item.Name,
-                        Cht = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "CHT").Select((x, index) => "L" + (index + 1) + " " + x.UpdateDate).ToList(),
-                        Atvsv = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV").Select((x, index) => "L" + (index + 1) + " "+ x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
-                        ChuyenGia = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT").Select((x, index) => "L" + (index + 1) + "  "+ x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
-                        Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
-                    };
+                        lstDoiTuong = lstDoiTuong.Where(x => x.Id == filterReport.DoiTuongId).ToList();
+                    }
 
-                    result.Add(report);
+                    foreach (var item in lstDoiTuong)
+                    {
+                        var report = new ThoiGianChamDiem()
+                        {
+                            stt = item.StoreId,
+                            Name = item.Name,
+                            Cht = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "CHT").Select((x, index) => "L" + (index + 1) + " " + x.UpdateDate).ToList(),
+                            Atvsv = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV").Select((x, index) => "L" + (index + 1) + " " + x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
+                            ChuyenGia = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT").Select((x, index) => "L" + (index + 1) + "  " + x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
+                            Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
+                        };
+
+                        result.Add(report);
+                    }
                 }
+                else if (filterReport.SurveyId == "DT2")
+                {
+                    var lstDoiTuong = inputKy.Result.lstInputWareHouse.ToList();
+                    if (!string.IsNullOrWhiteSpace(filterReport.DoiTuongId))
+                    {
+                        lstDoiTuong = lstDoiTuong.Where(x => x.Id == filterReport.DoiTuongId).ToList();
+                    }
 
+                    foreach (var item in lstDoiTuong)
+                    {
+                        var report = new ThoiGianChamDiem()
+                        {
+                            stt = item.WareHouseId,
+                            Name = item.Name,
+                            Cht = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "CHT").Select((x, index) => "L" + (index + 1) + " " + x.UpdateDate).ToList(),
+                            Atvsv = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV").Select((x, index) => "L" + (index + 1) + " " + x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
+                            ChuyenGia = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT").Select((x, index) => "L" + (index + 1) + "  " + x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
+                            Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
+                        };
+
+                        result.Add(report);
+                    }
+                }
                 return result;
             }
             catch (Exception ex)
@@ -124,36 +172,61 @@ namespace PLX5S.BUSINESS.Services.BU
             try
             {
                 var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
-                var lstInStore = inputKy.Result.lstInputStore.ToList();
                 var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.IsActive == true && x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
                 var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
                 var device = _dbContext.tblMdDevice.AsQueryable().ToList();
-
-                if (!string.IsNullOrWhiteSpace(filterReport.InstoreId))
-                {
-                    lstInStore = lstInStore.Where(x => x.Id == filterReport.InstoreId).ToList();
-                }
-
                 var result = new List<ThoiGianChamDiem>();
-
-
-                foreach (var item in lstInStore)
+                if (filterReport.SurveyId == "DT1")
                 {
-                   
-                    var report = new ThoiGianChamDiem()
+                    var lstDoiTuong = inputKy.Result.lstInputStore.ToList();
+
+                    if (!string.IsNullOrWhiteSpace(filterReport.DoiTuongId))
                     {
-                        stt = item.StoreId,
-                        StoreName = item.Name,
-                        Cht = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "CHT").Select((x, index) => "L" + (index + 1) + " " +((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "Khác") ).ToList(),
-                        Atvsv = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV").Select((x, index) => "L" + (index + 1) + " " + ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "Khác")).ToList(),
-                        ChuyenGia = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT").Select((x, index) => "L" +(index + 1) + " " +  ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "Khác")).ToList(),
-                        Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
-                    };
+                        lstDoiTuong = lstDoiTuong.Where(x => x.Id == filterReport.DoiTuongId).ToList();
+                    }
 
-                    result.Add(report);
+
+                    foreach (var item in lstDoiTuong)
+                    {
+                        var report = new ThoiGianChamDiem()
+                        {
+                            stt = item.StoreId,
+                            Name = item.Name,
+                            Cht = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "CHT").Select((x, index) => "L" + (index + 1) + " " + ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "Khác")).ToList(),
+                            Atvsv = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV").Select((x, index) => "L" + (index + 1) + " " + ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "Khác")).ToList(),
+                            ChuyenGia = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT").Select((x, index) => "L" + (index + 1) + " " + ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "Khác")).ToList(),
+                            Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
+                        };
+
+                        result.Add(report);
+                    }
                 }
+                else if (filterReport.SurveyId == "DT2")
+                {
+                    var lstDoiTuong = inputKy.Result.lstInputWareHouse.ToList();
 
-                return result;
+                    if (!string.IsNullOrWhiteSpace(filterReport.DoiTuongId))
+                    {
+                        lstDoiTuong = lstDoiTuong.Where(x => x.Id == filterReport.DoiTuongId).ToList();
+                    }
+
+
+                    foreach (var item in lstDoiTuong)
+                    {
+                        var report = new ThoiGianChamDiem()
+                        {
+                            stt = item.WareHouseId,
+                            Name = item.Name,
+                            Cht = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "CHT").Select((x, index) => "L" + (index + 1) + " " + ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "Khác")).ToList(),
+                            Atvsv = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV").Select((x, index) => "L" + (index + 1) + " " + ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "Khác")).ToList(),
+                            ChuyenGia = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT").Select((x, index) => "L" + (index + 1) + " " + ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "Khác")).ToList(),
+                            Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
+                        };
+
+                        result.Add(report);
+                    }
+                }
+                    return result;
             }
             catch (Exception ex)
             {
@@ -166,31 +239,60 @@ namespace PLX5S.BUSINESS.Services.BU
             try
             {
                 var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
-                var lstInStore = inputKy.Result.lstInputStore.ToList();
                 var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
                 var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
-
-                if (!string.IsNullOrWhiteSpace(filterReport.InstoreId))
+                    var result = new List<TheoKhungThoiGian>();
+                if (filterReport.SurveyId == "DT1")
                 {
-                    lstInStore = lstInStore.Where(x => x.Id == filterReport.InstoreId).ToList();
-                }
-                var result = new List<TheoKhungThoiGian>();
+                    var lstDoiTuong = inputKy.Result.lstInputStore.ToList();
 
-                foreach (var item in lstInStore)
-                {
-                    var report = new TheoKhungThoiGian()
+                    if (!string.IsNullOrWhiteSpace(filterReport.DoiTuongId))
                     {
-                        stt = item.StoreId,
-                        StoreName = item.Name,
-                        Cht_T = lstEvaHeader.Count(x => x.IsActive == true  && x.DoiTuongId == item.Id && x.ChucVuId == "CHT"),
-                        Cht_N = lstEvaHeader.Count(x => x.IsActive == false && x.DoiTuongId == item.Id && x.ChucVuId == "CHT"),
-                        Atvsv_T = lstEvaHeader.Count(x => x.IsActive == true && x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV"),
-                        Atvsv_N = lstEvaHeader.Count(x => x.IsActive == false && x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV"),
-                        ChuyenGia = lstEvaHeader.Count(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT"),
-                        Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
-                    };
+                        lstDoiTuong = lstDoiTuong.Where(x => x.Id == filterReport.DoiTuongId).ToList();
+                    }
 
-                    result.Add(report);
+                    foreach (var item in lstDoiTuong)
+                    {
+                        var report = new TheoKhungThoiGian()
+                        {
+                            stt = item.StoreId,
+                            Name = item.Name,
+                            Cht_T = lstEvaHeader.Count(x => x.IsActive == true && x.DoiTuongId == item.Id && x.ChucVuId == "CHT"),
+                            Cht_N = lstEvaHeader.Count(x => x.IsActive == false && x.DoiTuongId == item.Id && x.ChucVuId == "CHT"),
+                            Atvsv_T = lstEvaHeader.Count(x => x.IsActive == true && x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV"),
+                            Atvsv_N = lstEvaHeader.Count(x => x.IsActive == false && x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV"),
+                            ChuyenGia = lstEvaHeader.Count(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT"),
+                            Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
+                        };
+
+                        result.Add(report);
+                    }
+                }
+                else if (filterReport.SurveyId == "DT2")
+                {
+                    var lstDoiTuong = inputKy.Result.lstInputWareHouse.ToList();
+
+                    if (!string.IsNullOrWhiteSpace(filterReport.DoiTuongId))
+                    {
+                        lstDoiTuong = lstDoiTuong.Where(x => x.Id == filterReport.DoiTuongId).ToList();
+                    }
+
+                    foreach (var item in lstDoiTuong)
+                    {
+                        var report = new TheoKhungThoiGian()
+                        {
+                            stt = item.WareHouseId,
+                            Name = item.Name,
+                            Cht_T = lstEvaHeader.Count(x => x.IsActive == true && x.DoiTuongId == item.Id && x.ChucVuId == "CHT"),
+                            Cht_N = lstEvaHeader.Count(x => x.IsActive == false && x.DoiTuongId == item.Id && x.ChucVuId == "CHT"),
+                            Atvsv_T = lstEvaHeader.Count(x => x.IsActive == true && x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV"),
+                            Atvsv_N = lstEvaHeader.Count(x => x.IsActive == false && x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV"),
+                            ChuyenGia = lstEvaHeader.Count(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT"),
+                            Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
+                        };
+
+                        result.Add(report);
+                    }
                 }
                 return result;
 
@@ -214,47 +316,85 @@ namespace PLX5S.BUSINESS.Services.BU
                 var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
                 var lstEvaValue = _dbContext.TblBuEvaluateValue.Where(x => x.FeedBack != "").ToList();
                 var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
-                var lstInStore = inputKy.Result.lstInputStore.ToList();
+                    var result = new List<TongHopYKienDeXuat>();
 
-
-
-                if (!string.IsNullOrWhiteSpace(filterReport.InstoreId))
+                if (filterReport.SurveyId == "DT1")
                 {
-                    lstInStore = lstInStore.Where(x => x.Id == filterReport.InstoreId).ToList();
-                }
-                var result = new List<TongHopYKienDeXuat>();
+                    var lstDoiTuong = inputKy.Result.lstInputStore.ToList();
 
-
-                foreach (var i in lstPoint)
-                {
-                    var store = lstInStore.FirstOrDefault(x => x.Id == i.DoiTuongId);
-                    var lstHeader = lstEvaHeader.Where(x => x.DoiTuongId == i.DoiTuongId).ToList();
-
-                    var lstDeXuat = new List<LstTieuChiDeXuat>(); 
-                    foreach (var item in lstHeader)
+                    if (!string.IsNullOrWhiteSpace(filterReport.DoiTuongId))
                     {
-                        var ab = lstEvaValue.Where(x => x.EvaluateHeaderCode == item.Code).Select(x => new LstTieuChiDeXuat()
-                        {
-                            TieuChi = lstTieuChi.FirstOrDefault(b => b.Code == x.TieuChiCode).Name,
-                            DeXuat = x.FeedBack,
-                            CanBo = item.AccountUserName,
-                            ChucVu = item.ChucVuId,
-                            ThoiGian = i.UpdateDate?.ToString("HH:mm dd/MM/yyyy")
-                        }).ToList();
-
-                        lstDeXuat.AddRange(ab);
+                        lstDoiTuong = lstDoiTuong.Where(x => x.Id == filterReport.DoiTuongId).ToList();
                     }
 
-                    var a = new TongHopYKienDeXuat()
+                    foreach (var i in lstPoint)
                     {
-                        stt = store.StoreId,
-                        StoreName = store.Name,
-                        lstTieuChiDeXuat = lstDeXuat
-                    };
-                    result.Add(a);
-                }
+                        var store = lstDoiTuong.FirstOrDefault(x => x.Id == i.DoiTuongId);
+                        var lstHeader = lstEvaHeader.Where(x => x.DoiTuongId == i.DoiTuongId).ToList();
 
-                return result;
+                        var lstDeXuat = new List<LstTieuChiDeXuat>();
+                        foreach (var item in lstHeader)
+                        {
+                            var ab = lstEvaValue.Where(x => x.EvaluateHeaderCode == item.Code).Select(x => new LstTieuChiDeXuat()
+                            {
+                                TieuChi = lstTieuChi.FirstOrDefault(b => b.Code == x.TieuChiCode).Name,
+                                DeXuat = x.FeedBack,
+                                CanBo = item.AccountUserName,
+                                ChucVu = item.ChucVuId,
+                                ThoiGian = i.UpdateDate?.ToString("HH:mm dd/MM/yyyy")
+                            }).ToList();
+
+                            lstDeXuat.AddRange(ab);
+                        }
+
+                        var a = new TongHopYKienDeXuat()
+                        {
+                            stt = store.StoreId,
+                            Name = store.Name,
+                            lstTieuChiDeXuat = lstDeXuat
+                        };
+                        result.Add(a);
+                    }
+                }
+                else if (filterReport.SurveyId == "DT2")
+                {
+                    var lstDoiTuong = inputKy.Result.lstInputWareHouse.ToList();
+
+                    if (!string.IsNullOrWhiteSpace(filterReport.DoiTuongId))
+                    {
+                        lstDoiTuong = lstDoiTuong.Where(x => x.Id == filterReport.DoiTuongId).ToList();
+                    }
+
+                    foreach (var i in lstPoint)
+                    {
+                        var store = lstDoiTuong.FirstOrDefault(x => x.Id == i.DoiTuongId);
+                        var lstHeader = lstEvaHeader.Where(x => x.DoiTuongId == i.DoiTuongId).ToList();
+
+                        var lstDeXuat = new List<LstTieuChiDeXuat>();
+                        foreach (var item in lstHeader)
+                        {
+                            var ab = lstEvaValue.Where(x => x.EvaluateHeaderCode == item.Code).Select(x => new LstTieuChiDeXuat()
+                            {
+                                TieuChi = lstTieuChi.FirstOrDefault(b => b.Code == x.TieuChiCode).Name,
+                                DeXuat = x.FeedBack,
+                                CanBo = item.AccountUserName,
+                                ChucVu = item.ChucVuId,
+                                ThoiGian = i.UpdateDate?.ToString("HH:mm dd/MM/yyyy")
+                            }).ToList();
+
+                            lstDeXuat.AddRange(ab);
+                        }
+
+                        var a = new TongHopYKienDeXuat()
+                        {
+                            stt = store.WareHouseId,
+                            Name = store.Name,
+                            lstTieuChiDeXuat = lstDeXuat
+                        };
+                        result.Add(a);
+                    }
+                }
+                    return result;
             }
             catch (Exception ex)
             {

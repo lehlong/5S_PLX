@@ -14,7 +14,7 @@ namespace PLX5S.BUSINESS.Models
         public string? KiKhaoSatId { set; get; }
         public string? SurveyId { set; get; }
         public string? AccountUserName { set; get; }
-        public string? InstoreId { set; get; }
+        public string? DoiTuongId { set; get; }
 
     }
 
@@ -22,7 +22,7 @@ namespace PLX5S.BUSINESS.Models
     public class KetQuaChamDiem
     {
         public string stt { set; get; }
-        public string StoreName { set; get; }
+        public string Name { set; get; }
         public decimal? Length { set; get; }
         public decimal? point { set; get; }
     }
@@ -30,7 +30,7 @@ namespace PLX5S.BUSINESS.Models
     public class ThoiGianChamDiem
     {
         public string stt { set; get; }
-        public string StoreName { set; get; }
+        public string Name { set; get; }
         public decimal? Point { set; get; }
         public List<string>? Cht { set; get; }
         public List<string>? Atvsv { set; get; }
@@ -41,7 +41,7 @@ namespace PLX5S.BUSINESS.Models
     public class TheoKhungThoiGian
     {
         public string stt { set; get; }
-        public string StoreName { set; get; }
+        public string Name { set; get; }
         public decimal? Cht_T { set; get; }
         public decimal? Cht_N { set; get; }
         public decimal? Atvsv_T { set; get; }
@@ -53,7 +53,7 @@ namespace PLX5S.BUSINESS.Models
     public class TongHopYKienDeXuat
     {
         public string? stt { set; get; }
-        public string? StoreName { set; get; }
+        public string? Name { set; get; }
         public List<LstTieuChiDeXuat>? lstTieuChiDeXuat { set; get; }
     }
     public class LstTieuChiDeXuat

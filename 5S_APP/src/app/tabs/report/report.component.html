@@ -1,6 +1,14 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-button fill="" slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-button>
+    <ion-title class="t-center"> Báo cáo</ion-title>
+  </ion-toolbar>
+</ion-header>
+
 <ion-content>
   <div class="main-report">
-    <h4><ion-icon name="list-outline"></ion-icon>Danh sách báo cáo</h4>
     <div (click)="navigateTo('report/ket-qua-cham-diem')" class="item-report">
       <p>Báo cáo kết quả chấm điểm 5S</p>
     </div>
