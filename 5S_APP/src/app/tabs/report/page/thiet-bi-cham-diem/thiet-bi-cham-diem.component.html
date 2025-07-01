@@ -49,20 +49,28 @@
       <div style="margin-bottom: 20px" class="white-background">
         <ion-row>
           <ion-col style="font-weight: 600" size="4">Cửa hàng</ion-col>
-          <ion-col style="font-weight: 600" size="8">{{ data.storeName }}</ion-col>
+          <ion-col style="font-weight: 600" size="8">{{
+            data.name
+          }}</ion-col>
         </ion-row>
         <ion-row>
           <ion-col style="font-weight: 600" size="4">CHT</ion-col>
-          <ion-col size="8"><div  *ngFor="let cq of data.cht">{{ cq }}</div> </ion-col>
+          <ion-col size="8"
+            ><div *ngFor="let cq of data.cht">{{ cq }}</div>
+          </ion-col>
         </ion-row>
         <ion-row>
           <ion-col style="font-weight: 600" size="4">ATVSV</ion-col>
-          <ion-col size="8"><div  *ngFor="let cq of data.atvsv">{{ cq }}</div> </ion-col>
+          <ion-col size="8"
+            ><div *ngFor="let cq of data.atvsv">{{ cq }}</div>
+          </ion-col>
         </ion-row>
         <ion-row>
           <ion-col style="font-weight: 600" size="4">C.GIA 5S</ion-col>
 
-          <ion-col size="8"><div  *ngFor="let cq of data.chuyenGia">{{ cq }}</div> </ion-col>
+          <ion-col size="8"
+            ><div *ngFor="let cq of data.chuyenGia">{{ cq }}</div>
+          </ion-col>
         </ion-row>
         <ion-row>
           <ion-col style="font-weight: 600" size="4">Điểm B.Q</ion-col>
@@ -89,6 +97,34 @@
     </ion-header>
     <ion-content class="ion-padding">
       <ion-accordion-group>
+        <ion-accordion value="third">
+          <ion-item slot="header" color="light">
+            <ion-label>
+              <ion-input
+                label="Cuộc khảo sát"
+                labelPlacement="stacked"
+                labelPlacement="floating"
+                [clearInput]="true"
+                [readonly]="true"
+                placeholder="Chọn cuộc khảo sát"
+                [(ngModel)]="filter.filterSurvey.name"
+              >
+              </ion-input>
+            </ion-label>
+          </ion-item>
+          <div
+            slot="content"
+            style="max-height: 25vh; overflow-y: auto; padding: 5px"
+          >
+            <ion-item
+              *ngFor="let item of lstSurvey"
+              (click)="selectSearchKyKhaoSat(item)"
+            >
+              <ion-label>{{ item.name }}</ion-label>
+            </ion-item>
+          </div>
+        </ion-accordion>
+
         <ion-accordion value="first">
           <ion-item slot="header" color="light">
             <ion-label>
@@ -99,7 +135,7 @@
                 [clearInput]="true"
                 [readonly]="true"
                 placeholder="Chọn kỳ thời gian"
-                [(ngModel)]="inputSearchKiKhaoSat.name"
+                [(ngModel)]="filter.filterKiKhaoSat.name"
               >
               </ion-input>
             </ion-label>
@@ -109,8 +145,8 @@
             style="max-height: 25vh; overflow-y: auto; padding: 5px"
           >
             <ion-item
-              *ngFor="let item of lstKiKhaoSat"
-              (click)="searchStore(item)"
+              *ngFor="let item of lstSearchKiKhaoSat"
+              (click)="searchDoiTuong(item)"
             >
               <ion-label>{{ item.name }}</ion-label>
             </ion-item>
@@ -127,8 +163,7 @@
                 [clearInput]="true"
                 [readonly]="true"
                 placeholder="Chọn cửa hàng"
-                [(ngModel)]="filter.filterStore.name"
-
+                [(ngModel)]="filter.filterDoiTuong.name"
               >
               </ion-input>
             </ion-label>
@@ -138,62 +173,29 @@
             style="max-height: 25vh; overflow-y: auto; padding: 5px"
           >
             <ion-item
-              *ngFor="let item of lstSearchStore"
-              (click)="selectSearchStore(item)"
+              *ngFor="let item of lstSearchDoiTuong"
+              (click)="selectSearchDoiTuong(item)"
             >
               <ion-label>{{ item?.name }}</ion-label>
             </ion-item>
           </div>
         </ion-accordion>
-
-        <ion-accordion value="third">
-          <ion-item slot="header" color="light">
-            <ion-label>
-              <ion-input
-                label="Người chấm "
-                labelPlacement="stacked"
-                labelPlacement="floating"
-                [clearInput]="true"
-                [readonly]="true"
-                placeholder="Chọn người chấm"
-               
-                [value]="getFullName(filter.filterNguoiCham.userName)"
-              >
-              </ion-input>
-            </ion-label>
-          </ion-item>
-          <div
-            slot="content"
-            style="max-height: 25vh; overflow-y: auto; padding: 5px"
-          >
-            <ion-item
-              *ngFor="let item of lstSearchChamDiem"
-              (click)="selectSearchChamDiem(item)"
-            >
-              <ion-label>{{getFullName(item.userName)}}</ion-label>
-            </ion-item>
-          </div>
-        </ion-accordion>
       </ion-accordion-group>
 
-      <div style="margin-top: 5px">
+      <!-- <div style="margin-top: 5px">
         <ion-item>
           <ion-label>
-            <ion-checkbox
-              [(ngModel)]="filter.cuaHangToiCham"
-              labelPlacement="end"
-              >Cửa hàng tôi chấm</ion-checkbox
-            >
+            <ion-checkbox [(ngModel)]="filter.cuaHangToiCham" labelPlacement="end">Cửa hàng tôi chấm</ion-checkbox>
           </ion-label>
         </ion-item>
-      </div>
+      </div> -->
     </ion-content>
     <div style="display: flex; height: 60px; gap: 15px; margin: 15px">
       <ion-button
         expand="full"
-        (click)="onFilter()"
+        (click)="getReport()"
         style="width: 70vh; font-weight: 700"
-        >Xác nhận</ion-button
+        >Xem báo cáo</ion-button
       >
       <ion-button fill="outline" slot="end" (click)="resetFilters()">
         <ion-icon name="sync-outline"></ion-icon>

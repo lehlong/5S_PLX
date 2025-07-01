@@ -5,7 +5,7 @@ import { AuthService } from 'src/app/service/auth.service';
 import { KyKhaoSatService } from 'src/app/service/ky-khao-sat.service';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { AppReportService } from 'src/app/service/app-report.service';
-
+import { SurveyService } from 'src/app/service/survey.service';
 
 @Component({
   selector: 'app-thiet-bi-cham-diem',
@@ -17,9 +17,8 @@ import { AppReportService } from 'src/app/service/app-report.service';
 export class ThietBiChamDiemComponent implements OnInit {
   filter: any = {
     filterKiKhaoSat: {},
-    filterStore: {},
-    filterNguoiCham: {},
-    cuaHangToiCham: false,
+    filterDoiTuong: {},
+    filterSurvey: {},
   };
   inputSearchKiKhaoSat: any = {};
 
@@ -35,15 +34,20 @@ export class ThietBiChamDiemComponent implements OnInit {
   filterForm!: FormGroup;
   isOpen = false;
   lstAccount: any = [];
+  lstSurvey: any = [];
+  lstSearchKiKhaoSat: any = [];
+  lstSearchDoiTuong: any = [];
+  
 
   user: any = {};
 
   constructor(
-    private _KiKhaoSat: KyKhaoSatService,
+    private _kyKhaoSatService: KyKhaoSatService,
     private _authService: AuthService,
     private _service: AppReportService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private _surveyService: SurveyService
   ) {}
 
   ngOnInit() {
@@ -54,45 +58,70 @@ export class ThietBiChamDiemComponent implements OnInit {
         const id = params.get('id');
         this.surveyId = id;
         this.getAllKyKhaoSat();
+        this.getAllSurvey();
       },
     });
-
   }
-   getFullName(userName: string): string {
-    const account = this.lstAccout.find((acc: any) => acc.userName === userName);
+  getFullName(userName: string): string {
+    const account = this.lstAccout.find(
+      (acc: any) => acc.userName === userName
+    );
     return account?.fullName;
   }
 
+  getReport() {
+    this._service
+      .ThietBiChamDiem({
+        surveyId: this.filter.filterSurvey.doiTuongId,
+        kiKhaoSatId: this.filter.filterKiKhaoSat.id,
+        doiTuongId: this.filter.filterDoiTuong.id,
+      })
+      .subscribe({
+        next: (data) => {
+          console.log(data);
+          this.lstData = data;
+          this.isOpen = false;
+        },
+      });
+  }
   getAllKyKhaoSat() {
-    this._KiKhaoSat.search({ keyWord: this.surveyId }).subscribe({
+    this._kyKhaoSatService.search({}).subscribe({
       next: (data) => {
         this.lstKiKhaoSat = data.data;
-
-        const filter = localStorage.getItem('filterLS') ?? '';
-        const filter2 = data.data.reduce((a: any, b: any) =>
-          new Date(a.endDate) > new Date(b.endDate) ? a : b
-        );
-        if (filter != '') {
-          this.filter = JSON.parse(filter);
-          if (this.filter.filterKiKhaoSat.surveyMgmtId != this.surveyId) {
-            this.filter.filterKiKhaoSat = filter2;
-          }
-        } else {
-          this.filter.filterKiKhaoSat = filter2;
-        }
-
-        this.inputSearchKiKhaoSat = this.filter.filterKiKhaoSat;
       },
       error: (response) => {
         console.log(response);
       },
     });
+    // this._KiKhaoSat.search({ keyWord: this.surveyId }).subscribe({
+    //   next: (data) => {
+    //     this.lstKiKhaoSat = data.data;
+
+    //     const filter = localStorage.getItem('filterLS') ?? '';
+    //     const filter2 = data.data.reduce((a: any, b: any) =>
+    //       new Date(a.endDate) > new Date(b.endDate) ? a : b
+    //     );
+    //     if (filter != '') {
+    //       this.filter = JSON.parse(filter);
+    //       if (this.filter.filterKiKhaoSat.surveyMgmtId != this.surveyId) {
+    //         this.filter.filterKiKhaoSat = filter2;
+    //       }
+    //     } else {
+    //       this.filter.filterKiKhaoSat = filter2;
+    //     }
+
+    //     this.inputSearchKiKhaoSat = this.filter.filterKiKhaoSat;
+    //   },
+    //   error: (response) => {
+    //     console.log(response);
+    //   },
+    // });
   }
 
   getAllAccount() {
     this._authService.GetAllAccount().subscribe({
       next: (data) => {
-       this.lstAccout=  data;
+        this.lstAccout = data;
       },
       error: (response) => {
         console.log(response);
@@ -102,9 +131,9 @@ export class ThietBiChamDiemComponent implements OnInit {
 
   searchStore(kiKhaoSat: any) {
     this.inputSearchKiKhaoSat = kiKhaoSat;
-    this._KiKhaoSat.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
+    this._kyKhaoSatService.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
       next: (data) => {
-       console.log('kks', data);
+        console.log('kks', data);
         this.lstSearchStore = data.lstInputStore;
         this.lstSearchChamDiem = Array.from(
           new Map(
@@ -139,21 +168,21 @@ export class ThietBiChamDiemComponent implements OnInit {
     this.isOpen = false;
   }
 
-  getThietBiChamDiem() {
-    this._service
-      .ThietBiChamDiem({
-        kiKhaoSatId: this.filter.filterKiKhaoSat.id,
-        InstoreId: this.filter.filterStore.id,
-        AccountUserName: this.filter.filterNguoiCham,
-        SurveyId: this.filter.cuaHangToiCham
-      })
-      .subscribe({
-        next: (data) => {
-          this.lstData = data;
-          console.log(data);
-        },
-      });
-  }
+  // getThietBiChamDiem() {
+  //   this._service
+  //     .ThietBiChamDiem({
+  //       kiKhaoSatId: this.filter.filterKiKhaoSat.id,
+  //       InstoreId: this.filter.filterStore.id,
+  //       AccountUserName: this.filter.filterNguoiCham,
+  //       SurveyId: this.filter.cuaHangToiCham
+  //     })
+  //     .subscribe({
+  //       next: (data) => {
+  //         this.lstData = data;
+  //         console.log(data);
+  //       },
+  //     });
+  // }
   onFilter() {
     this.filter.filterKiKhaoSat = this.inputSearchKiKhaoSat;
     this.lstData = this.lstSearchStore
@@ -174,20 +203,67 @@ export class ThietBiChamDiemComponent implements OnInit {
           s.lstChamDiem?.some((x: any) => x == this.user.userName)
       );
     localStorage.setItem('filterLS', JSON.stringify(this.filter));
-    this.getThietBiChamDiem();
+    // this.getThietBiChamDiem();
     this.closeFilterModal();
   }
 
   resetFilters() {
-    this.filter.filterKiKhaoSat = this.lstKiKhaoSat.reduce((a: any, b: any) =>
-      new Date(a.endDate) > new Date(b.endDate) ? a : b
+    this.filter.filterSurvey = {};
+    this.filter.filterDoiTuong = {};
+    this.filter.filterKiKhaoSat = {};
+    // localStorage.setItem('filterLS', JSON.stringify(this.filter));
+    // this.filter.filterKiKhaoSat = this.lstKiKhaoSat.reduce((a: any, b: any) =>
+    //   new Date(a.endDate) > new Date(b.endDate) ? a : b
+    // );
+    // this.filter.filterStore = {};
+    // this.inputSearchKiKhaoSat = this.filter.filterKiKhaoSat;
+    // this.filter.filterNguoiCham = {};
+    // this.filter.inSearchStore = '';
+    // this.filter.searchNguoiCham = '';
+    // this.filter.cuaHangToiCham = false;
+    // localStorage.setItem('filterLS', JSON.stringify(this.filter));
+  }
+  searchDoiTuong(kiKhaoSat: any) {
+    this.filter.filterKiKhaoSat = kiKhaoSat;
+    this._kyKhaoSatService.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
+      next: (data) => {
+        if (data.lstInputStore.length != 0) {
+          this.lstSearchDoiTuong = data.lstInputStore;
+        } else if (data.lstInputWareHouse.length != 0) {
+          this.lstSearchDoiTuong = data.lstInputWareHouse;
+        }
+        this.filter.filterDoiTuong = {};
+      },
+      error: (response) => {
+        console.log(response);
+      },
+    });
+  }
+
+  selectSearchDoiTuong(item: any) {
+    this.filter.filterDoiTuong = item;
+  }
+
+  selectSearchKyKhaoSat(item: any) {
+    this.filter.filterSurvey = item;
+    this.lstSearchKiKhaoSat = this.lstKiKhaoSat.filter(
+      (x: any) => x.surveyMgmtId == item.id
     );
-    this.filter.filterStore = {};
-    this.inputSearchKiKhaoSat = this.filter.filterKiKhaoSat;
-    this.filter.filterNguoiCham = {};
-    this.filter.inSearchStore = '';
-    this.filter.searchNguoiCham = '';
-    this.filter.cuaHangToiCham = false;
-    localStorage.setItem('filterLS', JSON.stringify(this.filter));
+    this.filter.filterKiKhaoSat = this.lstSearchKiKhaoSat.reduce(
+      (a: any, b: any) => (new Date(a.endDate) > new Date(b.endDate) ? a : b)
+    );
+    this.filter.filterDoiTuong = {};
+    console.log(this.filter.filterKiKhaoSat);
+  }
+
+  getAllSurvey() {
+    this._surveyService.getAllSurveyMgmt({}).subscribe({
+      next: (data) => {
+        this.lstSurvey = data.data;
+      },
+      error: (response) => {
+        console.log(response);
+      },
+    });
   }
 }
