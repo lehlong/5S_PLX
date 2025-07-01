@@ -99,6 +99,28 @@ export class CommonService {
       finalize(() => this.globalService.decrementApiCallCount()), // Giảm bộ đếm khi hoàn thành
     )
   }
+  postNoMess<T>(
+    endpoint: string,
+    data: any,
+    showSuccess: boolean = true,
+    showLoading: boolean = true,
+  ): Observable<T> {
+    if (showLoading) {
+      this.globalService.incrementApiCallCount() // Tăng bộ đếm
+    }
+    return this.http.post<any>(`${this.baseUrl}/${endpoint}`, data).pipe(
+      map(this.handleApiResponse),
+      tap(() => {
+      
+      }),
+      catchError((error) =>
+        this.handleError(error, () =>
+          this.post<T>(endpoint, data, showSuccess, showLoading),
+        ),
+      ),
+      finalize(() => this.globalService.decrementApiCallCount()), // Giảm bộ đếm khi hoàn thành
+    )
+  }
 
   put<T>(
     endpoint: string,

@@ -6,6 +6,8 @@ import { PaginationResult } from '../../models/base.model'
 import { StoreService } from '../../service/master-data/store.service'
 import { AccountService } from '../../service/system-manager/account.service'
 import { GlobalService } from '../../service/global.service'
+import { AppReportService } from '../../service/business/app-report.service';
+import { environment } from '../../../environments/environment';
 import { NzMessageService } from 'ng-zorro-antd/message'
 
 
@@ -35,6 +37,7 @@ export class ChamDiemTheoKhungThoiGianComponent {
     private globalService: GlobalService,
     private message: NzMessageService,
     private accountService: AccountService,
+    private _appReportService: AppReportService,
   ) {
     this.validateForm = this.fb.group({
       id: ['', [Validators.required]],
@@ -144,6 +147,24 @@ export class ChamDiemTheoKhungThoiGianComponent {
       })
     }
   }
+  exportExcel() { 
+      this._appReportService.ExportExcel("ChamTheoKhungThoiGian", { surveyId: this.survey.doiTuongId, kiKhaoSatId: this.kiKhaosatId, doiTuongId: this.doiTuongId })
+      .subscribe({
+        next: (data) => { 
+          console.log(data);
+          if (data) {
+            const downloadUrl = `${environment.urlFiles}/${data}`; // hoặc cấu hình phù hợp với backend của bạn
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = `KetQuaChamDiem_${this.survey.name}_${this.kiKhaosatId}.xlsx`;
+            a.target = '_blank'; // mở tab mới (tùy chọn)
+            a.click();
+             this.message.error('Không có dữ liệu để xuất');
+          } else {
+            this.message.error('Không có dữ liệu để xuất');
+          }
+        }
+    })}
 
   close() {
     this.visible = false

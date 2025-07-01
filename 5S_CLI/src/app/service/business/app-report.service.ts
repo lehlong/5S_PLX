@@ -23,4 +23,7 @@ export class AppReportService {
   TongHopYKienDeXuat(params: any): Observable<any>{
     return this.commonService.get('AppReport/TongHopYKienDeXuat', params)
   }
+    ExportExcel(NameReport:string, params: any): Observable<any>{
+    return this.commonService.postNoMess(`AppReport/ExportExcel?ReportName=${NameReport}`, params)
+  }
 }
