@@ -46,13 +46,13 @@
   </ion-item-group>
   <ion-item-group style="margin-top: 10px">
     <ng-container *ngFor="let store of lstData">
-      <div style="margin-bottom: 20px;" class="white-background"  >
-        <ion-row >
+      <div style="margin-bottom: 20px;" class=""  >
+        <ion-row style="margin-bottom: 5px;">
           <ion-col style="font-weight: 600" size="4">Cửa hàng</ion-col>
           <ion-col size="8" style="font-weight: 600">{{ store.name }}</ion-col>
         </ion-row>
         <ng-container *ngFor="let item of store.lstTieuChiDeXuat" >
-          <div style="margin-bottom: 20px;">
+          <div style="margin-bottom: 5px;">
           <ion-row>
             <ion-col style="font-weight: 600" size="4">Tiêu chí</ion-col>
             <ion-col size="8">{{ item.tieuChi }}</ion-col>

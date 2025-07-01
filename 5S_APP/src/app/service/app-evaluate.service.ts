@@ -6,7 +6,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class AppEvaluateService {
-  constructor(private commonService: CommonService) {}
+  constructor(private commonService: CommonService) { }
 
   search(params: any): Observable<any> {
     return this.commonService.get('AppEvaluate/Search', params)
@@ -19,10 +19,12 @@ export class AppEvaluateService {
     return this.commonService.get(`AppEvaluate/GetAllTieuChiLeaves?kiKhaoSatId=${kiKhaoSatId}&doiTuongId=${doiTuongId}`)
   }
 
-  BuildInputEvaluate(kiKhaoSatId: any, doiTuongId: any,deviceID:string): Observable<any> {
+  BuildInputEvaluate(kiKhaoSatId: any, doiTuongId: any, deviceID: string): Observable<any> {
     return this.commonService.get(`AppEvaluate/BuildInputEvaluate?kiKhaoSatId=${kiKhaoSatId}&doiTuongId=${doiTuongId}&deviceID=${deviceID}`)
   }
-
+  getNotifications(): Observable<any> {
+    return this.commonService.get('AppEvaluate/GetNotification')
+  }
   buildDataTreeForApp(kiKhaoSatId: any, doiTuongId: any): Observable<any> {
     return this.commonService.get(`AppEvaluate/BuildDataTreeForApp?kiKhaoSatId=${kiKhaoSatId}&doiTuongId=${doiTuongId}`)
   }

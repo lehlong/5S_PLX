@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AppEvaluateService } from 'src/app/service/app-evaluate.service';
 import { SharedModule } from 'src/app/shared/shared.module';
 
 @Component({
@@ -8,10 +9,31 @@ import { SharedModule } from 'src/app/shared/shared.module';
   imports: [SharedModule],
   standalone: true
 })
-export class NotificationsComponent  implements OnInit {
+export class NotificationsComponent implements OnInit {
 
-  constructor() { }
+  lstData: any = [];
 
-  ngOnInit() {}
+  constructor(
+    private _service: AppEvaluateService,
+
+  ) { }
+
+  ngOnInit() {
+    this.getNotifications();
+   }
+
+
+  getNotifications() {
+    this._service.getNotifications().subscribe({
+      next: (data) => {
+
+        console.log(data);
+        this.lstData = data;
+      }
+    }
+    );
+    // Logic to fetch notifications
+    console.log('Fetching notifications...');
+  }
 
 }

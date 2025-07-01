@@ -8,37 +8,12 @@
 </ion-header>
 
 <ion-content>
-  <div class="main-notifications">
+  <div class="main-notifications"  >
 
-    <div class="noti-item">
-      <div class="noti-title">Thông báo</div>
-      <div class="noti-content">Kỳ thời gian tháng 5 năm 2024 đã được mở</div>
-      <div class="noti-time">13:22 07-05-2024</div>
-    </div>
-    <div class="noti-item">
-      <div class="noti-title">Thông báo</div>
-      <div class="noti-content">Kỳ thời gian tháng 5 năm 2024 đã được mở</div>
-      <div class="noti-time">13:22 07-05-2024</div>
-    </div>
-    <div class="noti-item">
-      <div class="noti-title">Thông báo</div>
-      <div class="noti-content">Kỳ thời gian tháng 5 năm 2024 đã được mở</div>
-      <div class="noti-time">13:22 07-05-2024</div>
-    </div>
-    <div class="noti-item">
-      <div class="noti-title">Thông báo</div>
-      <div class="noti-content">Kỳ thời gian tháng 5 năm 2024 đã được mở</div>
-      <div class="noti-time">13:22 07-05-2024</div>
-    </div>
-    <div class="noti-item">
-      <div class="noti-title">Thông báo</div>
-      <div class="noti-content">Kỳ thời gian tháng 5 năm 2024 đã được mở</div>
-      <div class="noti-time">13:22 07-05-2024</div>
-    </div>
-    <div class="noti-item">
-      <div class="noti-title">Thông báo</div>
-      <div class="noti-content">Kỳ thời gian tháng 5 năm 2024 đã được mở</div>
-      <div class="noti-time">13:22 07-05-2024</div>
+    <div class="noti-item" *ngFor="let noti of lstData">
+      <div class="noti-title">{{ noti.title }}</div>
+      <div class="noti-content">{{ noti.body }}</div>
+      <div class="noti-time">{{ noti.createDate | date : "HH:mm dd/MM/yyyy"}}</div>
     </div>
   </div>
 </ion-content>

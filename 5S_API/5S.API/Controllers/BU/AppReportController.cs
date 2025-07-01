@@ -122,5 +122,24 @@ namespace PLX5S.API.Controllers.BU
         }
 
 
+        [HttpPost("ExportExcel")]
+        public async Task<IActionResult> ExportExcel([FromQuery] string ReportName, [FromBody] FilterReport filterReport)
+        {
+            var transferObject = new TransferObject();
+            var result = await _service.ExportExcel(ReportName, filterReport);
+
+            if (_service.Status)
+            {
+                transferObject.Data = result;
+                transferObject.Status = true;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
     }
 }

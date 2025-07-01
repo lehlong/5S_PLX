@@ -75,6 +75,25 @@ namespace PLX5S.API.Controllers.BU
         }
 
 
+        [HttpGet("GetNotification")]
+        public async Task<IActionResult> GetNotification()
+        {
+            var transferObject = new TransferObject();
+            var result = await _service.GetNotification();
+            if (_service.Status)
+            {
+                transferObject.Data = result;
+                transferObject.Status = true;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
+
         [HttpGet("BuildInputEvaluate")]
         public async Task<IActionResult> BuildInputEvaluate([FromQuery] string kiKhaoSatId, string doiTuongId, string deviceId)
         {

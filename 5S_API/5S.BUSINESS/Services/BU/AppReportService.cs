@@ -8,8 +8,11 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using NPOI.HPSF;
 using NPOI.SS.Formula.Functions;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 using PLX5S.BUSINESS.Common;
 using PLX5S.BUSINESS.Dtos.BU;
+using PLX5S.BUSINESS.Extentions;
 using PLX5S.BUSINESS.Models;
 using PLX5S.CORE;
 using PLX5S.CORE.Entities.BU;
@@ -28,6 +31,7 @@ namespace PLX5S.BUSINESS.Services.BU
         Task<List<ThoiGianChamDiem>> ThietBiChamDiem(FilterReport filterReport);
         Task<List<TheoKhungThoiGian>> TheoKhungThoiGian(FilterReport filterReport);
         Task<List<TongHopYKienDeXuat>> TongHopYKienDeXuat(FilterReport filterReport);
+        Task<string> ExportExcel(string ReportName, FilterReport filterReport);
     }
 
     public class AppReportService : GenericService<TblBuEvaluateHeader, EvaluateHeaderDto>, IAppReportService
@@ -103,8 +107,6 @@ namespace PLX5S.BUSINESS.Services.BU
             }
         }
 
-
-
         public async Task<List<ThoiGianChamDiem>> ThoiGianChamDiem(FilterReport filterReport)
         {
             try
@@ -167,6 +169,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 return null;
             }
         }
+
         public async Task<List<ThoiGianChamDiem>> ThietBiChamDiem(FilterReport filterReport)
         {
             try
@@ -304,9 +307,6 @@ namespace PLX5S.BUSINESS.Services.BU
             }
         }
 
-
-
-
         public async Task<List<TongHopYKienDeXuat>> TongHopYKienDeXuat(FilterReport filterReport)
         {
             try
@@ -337,10 +337,10 @@ namespace PLX5S.BUSINESS.Services.BU
                         {
                             var ab = lstEvaValue.Where(x => x.EvaluateHeaderCode == item.Code).Select(x => new LstTieuChiDeXuat()
                             {
-                                TieuChi = lstTieuChi.FirstOrDefault(b => b.Code == x.TieuChiCode).Name,
+                                TieuChi = lstTieuChi.FirstOrDefault(b => b.Code == x.TieuChiCode)?.Name,
                                 DeXuat = x.FeedBack,
                                 CanBo = item.AccountUserName,
-                                ChucVu = item.ChucVuId,
+                                ChucVu = item?.ChucVuId,
                                 ThoiGian = i.UpdateDate?.ToString("HH:mm dd/MM/yyyy")
                             }).ToList();
 
@@ -402,5 +402,101 @@ namespace PLX5S.BUSINESS.Services.BU
                 return null;
             }
         }
+
+        public async Task<string> ExportExcel(string ReportName, FilterReport filterReport)
+        {
+            try
+            {
+                var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Template", "Report5S.xlsx");
+
+                if (!File.Exists(templatePath))
+                {
+                    throw new FileNotFoundException("Không tìm thấy template Excel.", templatePath);
+                }
+
+
+                using var file = new FileStream(templatePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                IWorkbook workbook = new XSSFWorkbook(file);
+
+                var styles = new
+                {
+                    //FreeText = ExcelNPOIExtention.SetCellFreeStyle(workbook, true, HorizontalAlignment.Center, true, 16),
+                    Text = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Left, true),
+                    TextRight = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Right, true),
+                    TextBold = ExcelNPOIExtention.SetCellStyleText(workbook, true, HorizontalAlignment.Left, true),
+                    TextCenter = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Center, false),
+                    TextCenterBold = ExcelNPOIExtention.SetCellStyleText(workbook, true, HorizontalAlignment.Center, false),
+                    Number = ExcelNPOIExtention.SetCellStyleNumber(workbook, false, HorizontalAlignment.Right, true),
+                    NumberBold = ExcelNPOIExtention.SetCellStyleNumber(workbook, true, HorizontalAlignment.Right, true),
+                };
+
+                if (ReportName == "KetQuaChamDiem")
+                {
+                    var data = await KetQuaChamDiem(filterReport);
+                    var sheet = workbook.GetSheetAt(0);
+
+                    ExcelNPOIExtention.SetCellValue(sheet.GetRow(0) ?? sheet.CreateRow(0), 0, $"STT", styles.Text);
+                    ExcelNPOIExtention.SetCellValue(sheet.GetRow(0) ?? sheet.CreateRow(0), 1, $"Tên đơn vị", styles.Text);
+                    ExcelNPOIExtention.SetCellValue(sheet.GetRow(0) ?? sheet.CreateRow(0), 2, $"Số lần chấm điểm", styles.Text);
+                    ExcelNPOIExtention.SetCellValue(sheet.GetRow(0) ?? sheet.CreateRow(0), 3, $"Điểm bình quân", styles.Text);
+                    ExcelNPOIExtention.SetCellValue(sheet.GetRow(0) ?? sheet.CreateRow(0), 4, $"Xếp loại", styles.Text);
+                    ExcelNPOIExtention.SetCellValue(sheet.GetRow(0) ?? sheet.CreateRow(0), 5, $"Ghi chú", styles.Text);
+
+                    var startIndex = 1;
+                    foreach (var i in data)
+                    {
+                        var row = sheet.GetRow(startIndex) ?? sheet.CreateRow(startIndex);
+
+                        ExcelNPOIExtention.SetCellValueText(row, 0, i.stt, styles.Text);
+                        ExcelNPOIExtention.SetCellValueText(row, 1, i.Name, styles.Text);
+                        ExcelNPOIExtention.SetCellValueNumber(row, 2, i.Length ?? 0, styles.Number);
+                        ExcelNPOIExtention.SetCellValueNumber(row, 3, i.point ?? 0, styles.Number);
+                        ExcelNPOIExtention.SetCellValueText(row, 4, "", styles.Text);
+                        ExcelNPOIExtention.SetCellValueText(row, 5, "", styles.Text);
+
+                        startIndex++;
+                    }
+
+
+                }
+                else if (ReportName == "ChamTheoKhungThoiGian")
+                {
+
+                }
+
+
+
+                var folderPath = Path.Combine($"Uploads/Excel");
+                if (!Directory.Exists(folderPath))
+                    Directory.CreateDirectory(folderPath);
+                var fileName = $"{ReportName}_{DateTime.Now:ddMMyyyy_HHmmss}.xlsx";
+                var outputPath = Path.Combine(Directory.GetCurrentDirectory(), folderPath, fileName);
+
+                using var outFile = new FileStream(outputPath, FileMode.Create, FileAccess.Write);
+                workbook.Write(outFile);
+
+                //_dbContext.TblBuHistoryDownload.Add(new TblBuHistoryDownload
+                //{
+                //    Code = Guid.NewGuid().ToString(),
+                //    HeaderCode = headerId,
+                //    Name = fileName,
+                //    Type = "xlsx",
+                //    Path = $"{folderPath}/{fileName}",
+                //});
+                //await _dbContext.SaveChangesAsync();
+
+                return $"{folderPath}/{fileName}";
+            }
+            catch (Exception ex)
+            {
+                {
+                    this.Status = false;
+                    return null;
+                }
+            }
+        }
+
+
+
     }
 }

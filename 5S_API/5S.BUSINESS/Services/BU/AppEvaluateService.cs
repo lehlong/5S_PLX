@@ -30,6 +30,7 @@ namespace PLX5S.BUSINESS.Services.BU
         Task TinhTongLanCham(TblBuPoint point);
         Task<List<TblBuPoint>> GetPointStore(string kiKhaoSatid, string surveyId);
         Task<List<TblBuEvaluateHeader>> FilterLstChamDiem(BaseFilter filter);
+        Task <List<TblBuNotification>> GetNotification();
     }
 
     public class AppEvaluateService : GenericService<TblBuEvaluateHeader, EvaluateHeaderDto>, IAppEvaluateService
@@ -213,6 +214,19 @@ namespace PLX5S.BUSINESS.Services.BU
             catch (Exception ex)
             {
 
+                return null;
+            }
+        }
+
+        public async Task<List<TblBuNotification>> GetNotification()
+        {
+            try
+            {
+                return _dbContext.TblBuNotification.OrderBy(x => x.CreateDate).ToList();
+            }
+            catch (Exception ex)
+            {
+                this.Status = false;
                 return null;
             }
         }
