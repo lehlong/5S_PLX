@@ -130,7 +130,7 @@ export class KetQuaChamDiemComponent {
           a.download = `KetQuaChamDiem_${this.survey.name}_${this.kiKhaosatId}.xlsx`;
           a.target = '_blank'; // mở tab mới (tùy chọn)
           a.click();
-           this.message.error('Không có dữ liệu để xuất');
+           this.message.success('Xuất dữ liệu thành công');
         } else {
           this.message.error('Không có dữ liệu để xuất');
         }
