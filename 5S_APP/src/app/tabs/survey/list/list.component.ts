@@ -110,12 +110,14 @@ export class ListComponent implements OnInit {
     this._service.getInputKiKhaoSat(this.filter.filterKiKhaoSat.id).subscribe({
       next: (data) => {
         if (data.lstInputStore.length != 0) {
-          this.doiTuong = 'cửa hàng'
+          this.filter.filterKiKhaoSat.doiTuong = "Cửa hàng";
+          this.doiTuong = "Cửa hàng";
           this.lstDoiTuong = data.lstInputStore;
           this.lstSearchDoiTuong = data.lstInputStore;
           return;
         } else if (data.lstInputWareHouse.length != 0) {
-          this.doiTuong = 'kho xăng dầu'
+          this.filter.filterKiKhaoSat.doiTuong = 'Kho xăng dầu';
+          this.doiTuong = 'Kho xăng dầu';
           this.lstDoiTuong = data.lstInputWareHouse;
           this.lstSearchDoiTuong = data.lstInputWareHouse;
         }
@@ -159,6 +161,7 @@ export class ListComponent implements OnInit {
 
   searchDoiTuong(kiKhaoSat: any) {
     this.inputSearchKiKhaoSat = kiKhaoSat;
+    this.inputSearchKiKhaoSat.doiTuong = this.doiTuong;
     this._service.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
       next: (data) => {
         if (data.lstInputStore.length != 0) {
@@ -223,6 +226,8 @@ export class ListComponent implements OnInit {
 
 
   navigateTo(item: any) {
+    console.log(this.filter.filterKiKhaoSat);
+
     localStorage.setItem('filterCS', JSON.stringify({ kiKhaoSat: this.filter.filterKiKhaoSat, doiTuong: item }))
     this.router.navigate([`/survey/check-list/${item.id}`]);
   }
@@ -231,6 +236,7 @@ export class ListComponent implements OnInit {
     this.filter.filterKiKhaoSat = this.lstKiKhaoSat.reduce((a: any, b: any) =>
       new Date(a.endDate) > new Date(b.endDate) ? a : b
     );
+    this.filter.filterDoiTuong.doiTuong = this.doiTuong
     this.filter.filterDoiTuong = {}
     this.inputSearchKiKhaoSat = this.filter.filterKiKhaoSat
     this.filter.filterNguoiCham = {}

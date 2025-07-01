@@ -3,7 +3,7 @@
     <ion-button fill="" slot="start">
       <ion-back-button></ion-back-button>
     </ion-button>
-    <ion-title class="t-center"> Thông báo</ion-title>
+    <h4 class="t-center"><ion-icon name="notifications-outline"></ion-icon> Thông báo</h4>
   </ion-toolbar>
 </ion-header>
 
@@ -12,8 +12,8 @@
 
     <div class="noti-item" *ngFor="let noti of lstData">
       <div class="noti-title">{{ noti.title }}</div>
-      <div class="noti-content">{{ noti.body }}</div>
-      <div class="noti-time">{{ noti.createDate | date : "HH:mm dd/MM/yyyy"}}</div>
+      <i class="noti-content">{{ noti.body }}</i>
+      <i class="noti-time">{{ noti.createDate | date : "HH:mm dd/MM/yyyy"}}</i>
     </div>
   </div>
 </ion-content>

@@ -371,7 +371,20 @@ namespace PLX5S.BUSINESS.Services.BU
                         KiKhaoSatId = kiKhaoSat.Id,
                         Link = "",
                     });
-                    await _firebaseNotificationService.SendToTopicAsync("PLX5S_NOTI", "Có kỳ khảo sát mới", $"Kỳ khảo sát {kiKhaoSat.Name} đã được mở", new DataFireBase());
+                    await _firebaseNotificationService.SendToTopicAsync("PLX5S_NOTI", "Có kỳ khảo sát mới", $"Kỳ khảo sát {kiKhaoSat.Name} đã được Mở", new DataFireBase());
+                }
+                else if (kiKhaoSat.TrangThaiKi == "0")
+                {
+                    _dbContext.TblBuNotification.Add(new TblBuNotification
+                    {
+                        Code = Guid.NewGuid().ToString(),
+                        Title = "Kỳ khảo sát Đóng",
+                        Body = $"Kỳ khảo sát {kiKhaoSat.Name} đã Đóng",
+                        SurveyId = kiKhaoSat.SurveyMgmtId,
+                        KiKhaoSatId = kiKhaoSat.Id,
+                        Link = "",
+                    });
+                    await _firebaseNotificationService.SendToTopicAsync("PLX5S_NOTI", "Đóng kỳ khảo sát", $"Kỳ khảo sát {kiKhaoSat.Name} đã được Đóng", new DataFireBase());
                 }
 
 

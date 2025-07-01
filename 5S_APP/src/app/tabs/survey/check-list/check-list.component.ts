@@ -46,15 +46,14 @@ export class CheckListComponent implements OnInit {
 
         const filter = JSON.parse(localStorage.getItem('filterCS') ?? "")
         this.kiKhaoSat = filter.kiKhaoSat
+        console.log('kiKhaoSat', this.kiKhaoSat);
+
         this.doiTuong = filter.doiTuong
 
         // await this._storageService.clear()
         let eva = await this._storageService.get(this.doiTuong.id + "_" + this.kiKhaoSat.code)
-        console.log('eva', eva);
-
         if (eva) {
           this.evaluate = eva
-
           if (this.evaluate.header.kiKhaoSatId == this.kiKhaoSat.id) {
             this.lstHisEvaluate = [this.evaluate.header]
           }
@@ -72,8 +71,7 @@ export class CheckListComponent implements OnInit {
     this._service.search({ keyWord: this.doiTuongId, sortColumn: this.kiKhaoSat.id }).subscribe({
       next: (data) => {
         if (data.data.length == 0) return;
-
-        this.lstHisEvaluate.push(...data.data);
+        this.lstHisEvaluate.push(...data.data.sort((a: any, b: any) => b.order - a.order));
       }
     })
   }

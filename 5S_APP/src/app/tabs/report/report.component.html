@@ -3,30 +3,38 @@
     <ion-button fill="" slot="start">
       <ion-back-button></ion-back-button>
     </ion-button>
-    <ion-title class="t-center"> Báo cáo</ion-title>
+    <h4 class="t-center">
+      <ion-icon name="checkbox-outline"></ion-icon>
+      Báo cáo
+    </h4>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   <div class="main-report">
-    <div (click)="navigateTo('report/ket-qua-cham-diem')" class="item-report">
-      <p>Báo cáo kết quả chấm điểm 5S</p>
+    <div (click)="navigateTo('report/ket-qua-cham-diem')" class="item-report d-flex">
+      <ion-icon slot="start" name="create-outline" style="margin: 16px 4px; width: 20px; height: 20px;"></ion-icon>
+      <p style="margin: 18px 5px;">Báo cáo kết quả chấm điểm 5S</p>
     </div>
 
-    <div (click)="navigateTo('report/cham-diem-theo-khung-thoi-gian')" class="item-report">
-      <p>Báo cáo lần chấm điểm theo khung thời gian</p>
+    <div (click)="navigateTo('report/cham-diem-theo-khung-thoi-gian')" class="item-report d-flex">
+      <ion-icon slot="start" name="create-outline" style="margin: 16px 4px; width: 20px; height: 20px;"></ion-icon>
+      <p style="margin: 18px 5px;">Báo cáo lần chấm điểm theo khung thời gian</p>
     </div>
 
-    <div (click)="navigateTo('report/thoi-gian-cham-diem')" class="item-report">
-      <p>Báo cáo thời gian chấm điểm</p>
+    <div (click)="navigateTo('report/thoi-gian-cham-diem')" class="item-report d-flex">
+      <ion-icon slot="start" name="create-outline" style="margin: 16px 4px; width: 20px; height: 20px;"></ion-icon>
+      <p style="margin: 18px 5px;">Báo cáo thời gian chấm điểm</p>
     </div>
 
-    <div (click)="navigateTo('report/thiet-bi-cham-diem')" class="item-report">
-      <p>Báo cáo thiết bị chấm điểm</p>
+    <div (click)="navigateTo('report/thiet-bi-cham-diem')" class="item-report d-flex">
+      <ion-icon slot="start" name="create-outline" style="margin: 16px 4px; width: 20px; height: 20px;"></ion-icon>
+      <p style="margin: 18px 5px;">Báo cáo thiết bị chấm điểm</p>
     </div>
 
-    <div (click)="navigateTo('report/tong-hop-y-kien')" class="item-report">
-      <p>Báo cáo tổng hợp ý kiến đề xuất</p>
+    <div (click)="navigateTo('report/tong-hop-y-kien')" class="item-report d-flex">
+      <ion-icon slot="start" name="create-outline" style="margin: 16px 4px; width: 20px; height: 20px;"></ion-icon>
+      <p style="margin: 18px 5px;">Báo cáo tổng hợp ý kiến đề xuất</p>
     </div>
   </div>
 </ion-content>

@@ -548,7 +548,7 @@ export class EvaluateComponent implements OnInit {
       // Kiểm tra có đủ ảnh không
       if (tieuChi.isImg) {
         const numberImgRequired = tieuChi.numberImg || 0;
-        const imagesSelecting = this.evaluate?.lstIImages?.filter(
+        const imagesSelecting = this.evaluate?.lstImages?.filter(
           (img: any) => img.tieuChiCode === tieuChi.code
         ).length;
         if (imagesSelecting < numberImgRequired) {

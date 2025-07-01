@@ -4,10 +4,9 @@ export const environment = {
 
   // baseApiUrl: 'http://sso.d2s.com.vn:1347/api',
 
-   apiUrl: 'http://localhost:5203/api',
-   urlFiles: 'http://localhost:5203',
+  //  apiUrl: 'http://localhost:5203/api',
+  //  urlFiles: 'http://localhost:5203',
 
-  //  apiUrl: 'http://sso.d2s.com.vn:1347/api',
-  //  urlFiles: 'http://sso.d2s.com.vn:1347',
+   apiUrl: 'http://sso.d2s.com.vn:1347/api',
+   urlFiles: 'http://sso.d2s.com.vn:1347',
 };
-eqwe

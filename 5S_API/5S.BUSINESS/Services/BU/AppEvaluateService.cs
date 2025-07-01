@@ -222,7 +222,7 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
-                return _dbContext.TblBuNotification.OrderBy(x => x.CreateDate).ToList();
+                return _dbContext.TblBuNotification.OrderByDescending(x => x.CreateDate).ToList();
             }
             catch (Exception ex)
             {
