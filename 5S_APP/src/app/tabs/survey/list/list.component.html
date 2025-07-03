@@ -32,8 +32,8 @@
   </ion-item-group>
   <ion-item-group style="margin-top: 10px">
     <ion-list *ngFor="let item of lstDoiTuong">
-      <ion-item>
-        <ion-label (click)="navigateTo(item)">{{ item?.name }}</ion-label>
+      <ion-item (click)="navigateTo(item)">
+        <ion-label>{{ item?.name }}</ion-label>
         <ion-label slot="end">{{ item.point }} điểm</ion-label>
       </ion-item>
     </ion-list>

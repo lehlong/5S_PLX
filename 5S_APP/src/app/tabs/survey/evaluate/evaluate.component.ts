@@ -279,9 +279,9 @@ export class EvaluateComponent implements OnInit {
 
   private initMap(): void {
     L.Icon.Default.mergeOptions({
-      iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
-      iconUrl: 'assets/leaflet/marker-icon.png',
-      shadowUrl: 'assets/leaflet/marker-shadow.png',
+      // iconRetinaUrl: 'media/marker-icon-2V3QKKVC.png',
+      iconUrl: 'media/marker-icon-2V3QKKVC.png',
+      // shadowUrl: 'media/marker-icon-2V3QKKVC.png',
     });
 
     const lat = this.latitude; // Vĩ độ động
