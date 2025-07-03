@@ -30,13 +30,13 @@ namespace PLX5S.BUSINESS.Extentions
 
             if (value is null)
             {
-                cell.SetCellValue("");
+                cell.SetCellValue("0");
             }
             else if (double.TryParse(value.ToString(), out double number))
             {
                 if (number == 0)
                 {
-                    cell.SetCellValue("");
+                    cell.SetCellValue("0");
                 }
                 else
                 {
@@ -45,7 +45,7 @@ namespace PLX5S.BUSINESS.Extentions
             }
             else
             {
-                cell.SetCellValue("");
+                cell.SetCellValue("0");
             }
         }
         public static void SetCellValue(IRow row, int columnIndex, object value, ICellStyle style)
@@ -109,6 +109,25 @@ namespace PLX5S.BUSINESS.Extentions
                 style.BorderRight = BorderStyle.Thin;
             }
             style.DataFormat = workbook.CreateDataFormat().GetFormat("#,##0");
+            return style;
+        }
+        public static ICellStyle SetCellStyleDecimalNumber(IWorkbook workbook, bool isBold, HorizontalAlignment align, bool isBorder)
+        {
+            ICellStyle style = workbook.CreateCellStyle();
+            IFont font = workbook.CreateFont();
+            font.FontName = "Times New Roman";
+            font.FontHeightInPoints = 12;
+            font.IsBold = isBold;
+            style.SetFont(font);
+            style.Alignment = align;
+            if (isBorder)
+            {
+                style.BorderTop = BorderStyle.Thin;
+                style.BorderBottom = BorderStyle.Thin;
+                style.BorderLeft = BorderStyle.Thin;
+                style.BorderRight = BorderStyle.Thin;
+            }
+            style.DataFormat = workbook.CreateDataFormat().GetFormat("#,##0.#0");
             return style;
         }
     }

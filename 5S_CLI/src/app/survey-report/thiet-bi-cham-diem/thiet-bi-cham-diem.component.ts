@@ -316,6 +316,12 @@ export class ThietBiChamDiemComponent {
   }
 
  exportExcel() { 
+  console.log(this.survey.doiTuongId, this.kiKhaosatId, this.doiTuongId);
+  if( !this.survey.doiTuongId && !this.kiKhaosatId ) {
+        this.message.error('Vui lòng chọn đầy đủ thông tin trước khi xuất file');
+        return;
+
+  }else{
       this._appReportService.ExportExcel("ChamTheoThietBi", { surveyId: this.survey.doiTuongId, kiKhaoSatId: this.kiKhaosatId, doiTuongId: this.doiTuongId })
       .subscribe({
         next: (data) => { 
@@ -333,6 +339,7 @@ export class ThietBiChamDiemComponent {
           }
         }
     })}
+    }
   getRange(n: number): number[] {
     return Array.from({ length: n > 0 ? n : 1 }, (_, i) => i);
   }
