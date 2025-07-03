@@ -20,7 +20,6 @@ import { Input, ChangeDetectionStrategy } from '@angular/core';
 import { MessageService } from 'src/app/service/message.service';
 import * as L from 'leaflet';
 import { HighlightSearchPipe } from '../../../shared/pipes/highlight-search.pipe';
-import { IonHeader } from "@ionic/angular/standalone";
 import { AuthService } from 'src/app/service/auth.service';
 
 @Component({
