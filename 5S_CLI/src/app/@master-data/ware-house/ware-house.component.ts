@@ -41,6 +41,9 @@ export class WareHouseComponent {
       id: [''],
       name: ['', [Validators.required]],
       isActive: [true, [Validators.required]],
+      trangThaiKho: [true, [Validators.required]],
+      phoneNumber: [''],
+      address: [''],
       truongKho: ['', [Validators.required]],
       atvsv: [[], [Validators.required]],
       nguoiPhuTrach: ['', [Validators.required]],
@@ -63,7 +66,7 @@ export class WareHouseComponent {
   }
 
   ngOnInit(): void {
-  
+
     this.search();
     this.getAllAccount();
     this.getAllATVSV();
@@ -106,7 +109,7 @@ export class WareHouseComponent {
     this.atvsvService.getAll().subscribe({
       next: (data) => {
         this.ATVSVList = data;
-        
+
       },
       error: (response) => {
         console.log(response);
@@ -122,7 +125,7 @@ export class WareHouseComponent {
 
   submitForm(): void {
     console.log(this.validateForm.getRawValue());
-    
+
     this.isSubmit = true;
     if (this.validateForm.valid) {
       if (this.edit) {
@@ -136,7 +139,7 @@ export class WareHouseComponent {
         });
       } else {
 
-     
+
         this._service.create(this.validateForm.getRawValue()).subscribe({
           next: (data) => {
             this.search();
@@ -193,18 +196,21 @@ export class WareHouseComponent {
   getATVSV(dataKho: any) {
     this._service.getATVSV(dataKho.id).subscribe({
       next: (data) => {
-      
+
         this.ATVSVList = data;
-      this.validateForm.patchValue({
-      id: dataKho.id,
-      name: dataKho.name,
-      isActive: dataKho.isActive,
-      truongKho: dataKho.truongKho,
-      atvsv: this.ATVSVList,
-      nguoiPhuTrach: dataKho.nguoiPhuTrach || '',
-      kinhDo: dataKho.kinhDo || '',
-      viDo: dataKho.viDo || '',
-    });
+        this.validateForm.patchValue({
+          id: dataKho.id,
+          name: dataKho.name,
+          phoneNumber: dataKho.phoneNumber,
+          address: dataKho.address,
+          isActive: dataKho.isActive,
+          trangThaiKho: dataKho.trangThaiKho,
+          truongKho: dataKho.truongKho,
+          atvsv: this.ATVSVList,
+          nguoiPhuTrach: dataKho.nguoiPhuTrach || '',
+          kinhDo: dataKho.kinhDo || '',
+          viDo: dataKho.viDo || '',
+        });
       },
       error: (response) => {
         console.log(response);

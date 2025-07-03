@@ -27,10 +27,6 @@
             [control]="$any(validateForm).controls['fullName']"></app-input-clear>
         </div>
         <div nz-col [nzXs]="24" [nzMd]="12">
-          <app-input-clear placeholder="Nhập địa chỉ" label="Địa chỉ"
-            [control]="$any(validateForm).controls['address']"></app-input-clear>
-        </div>
-        <div nz-col [nzXs]="24" [nzMd]="12">
           <app-input-clear placeholder="Nhập số điện thoại" label="Số điện thoại"
             [control]="$any(validateForm).controls['phoneNumber']"></app-input-clear>
         </div>
@@ -38,28 +34,6 @@
           <app-input-clear placeholder="Nhập email" label="Email"
             [control]="$any(validateForm).controls['email']"></app-input-clear>
         </div>
-        <!-- <div nz-col [nzXs]="24" [nzMd]="12">
-          <nz-form-item>
-            <nz-form-label>Kiểu người dùng</nz-form-label>
-            <nz-form-control nzErrorTip="Không được để trống">
-              <nz-select
-                nzShowSearch
-                nzAllowClear
-                placeholder="Chọn kiểu người dùng"
-                formControlName="accountType"
-              >
-                <nz-option
-                  cdkScrollable
-                  *ngFor="let item of accountType"
-                  [nzLabel]="item.name"
-                  [nzValue]="item.id"
-                >
-                </nz-option>
-              </nz-select>
-            </nz-form-control>
-          </nz-form-item>
-        </div> -->
-
         <div nz-col [nzXs]="24" [nzMd]="12">
           <nz-form-item>
             <nz-form-label>Chức vụ</nz-form-label>
@@ -71,62 +45,12 @@
             </nz-form-control>
           </nz-form-item>
         </div>
-        <!-- <div nz-col [nzXs]="24" [nzMd]="12">
-          <nz-form-item>
-            <nz-form-label>Đơn vị</nz-form-label>
-            <nz-form-control nzErrorTip="Không được để trống">
-              <nz-select
-                nzShowSearch
-                nzAllowClear
-                placeholder="Chọn đơn vị"
-                formControlName="organizeCode"
-                [(ngModel)]="selectedOrg"
-              >
-                <nz-option
-                  cdkScrollable
-                  *ngFor="let item of orgList"
-                  [nzLabel]="item.name"
-                  [nzValue]="item.id"
-                >
-                </nz-option>
-              </nz-select>
-            </nz-form-control>
-          </nz-form-item>
-        </div> -->
-        <!-- <div nz-col [nzXs]="24" [nzMd]="12">
-          <nz-form-item>
-            <nz-form-label>Kho hàng</nz-form-label>
-            <nz-form-control nzErrorTip="Không được để trống">
-              <nz-select
-                nzShowSearch
-                nzAllowClear
-                placeholder="Chọn kho hàng"
-                formControlName="warehouseCode"
-              >
-                <nz-option
-                  cdkScrollable
-                  *ngFor="let item of warehouseList"
-                  [nzLabel]="item.name"
-                  [nzValue]="item.code"
-                >
-                </nz-option>
-              </nz-select>
-            </nz-form-control>
-          </nz-form-item>
-        </div> -->
-        <!-- <div nz-col [nzXs]="24" [nzMd]="12" *ngIf="isShowSelectPartner">
-          <nz-form-item>
-            <nz-form-label>Chọn đối tác</nz-form-label>
-            <nz-form-control nzErrorTip="Không được để trống">
-              <nz-select nzShowSearch nzAllowClear placeholder="Chọn kiểu người dùng" formControlName="partnerId">
-                <nz-option cdkScrollable *ngFor="let item of listPartnerCustomer" [nzLabel]="item.name"
-                  [nzValue]="item.id">
-                </nz-option>
-              </nz-select>
-            </nz-form-control>
-          </nz-form-item>
-        </div> -->
-        <div nz-col [nzXs]="24">
+        <div nz-col [nzXs]="24" [nzMd]="24">
+          <app-input-clear placeholder="Nhập địa chỉ" label="Địa chỉ"
+            [control]="$any(validateForm).controls['address']"></app-input-clear>
+        </div>
+
+        <div nz-col [nzXs]="12">
           <nz-form-item>
             <nz-form-label>Trạng thái</nz-form-label>
             <nz-form-control>
@@ -137,7 +61,7 @@
             </nz-form-control>
           </nz-form-item>
         </div>
-        <div nz-col [nzXs]="24">
+        <div nz-col [nzXs]="12">
           <nz-form-item>
             <nz-form-label>Chấm tất cả các cửa hàng</nz-form-label>
             <nz-form-control>
@@ -151,19 +75,6 @@
       </div>
     </form>
 
-
-    <!-- <label>Chọn ảnh</label>
-    <div class="main-upload">
-      <div class="upload-avatar" (click)="fileInput.click()">
-        <nz-icon nzType="cloud-upload" nzTheme="outline" style="font-size: 24px;"/>
-        <div>Chọn ảnh</div>
-      </div>
-      <div class="avatar-preview" *ngIf="avatarBase64 != null && avatarBase64 != ''">
-        <img [src]="avatarBase64" width="128" height="128"/>
-      </div>
-    </div> -->
-    <!-- <input type="file" #fileInput accept="image/*" (change)="onFileSelected($event)" style="display: none;" />
-     -->
   </ng-container>
 </nz-drawer>
 <ng-template #extra>

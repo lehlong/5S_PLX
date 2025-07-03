@@ -78,11 +78,11 @@
     </div>
     <nz-dropdown-menu #setting="nzDropdownMenu">
       <ul nz-menu nzSelectable>
-        <li nz-menu-item [routerLink]="'system-manager/organize'">Cấu trúc tổ chức</li>
         <li nz-menu-item [routerLink]="'master-data/chuc-vu'">Chức vụ</li>
-         <li nz-menu-item [routerLink]="'system-manager/account'">Danh sách người dùng</li>
-        <li nz-menu-item [routerLink]="'system-manager/account-group'">Nhóm người dùng</li>
+        <li nz-menu-item [routerLink]="'system-manager/organize'">Cấu trúc tổ chức</li>
         <li nz-menu-item [routerLink]="'system-manager/role'">Danh sách quyền</li>
+        <li nz-menu-item [routerLink]="'system-manager/account-group'">Nhóm người dùng</li>
+        <li nz-menu-item [routerLink]="'system-manager/account'">Danh sách người dùng</li>
       </ul>
     </nz-dropdown-menu>
 
@@ -101,7 +101,7 @@
 
     <div [routerLink]="'/survey-mgmt'"><nz-icon nzType="container" nzTheme="outline" /> Quản lý khảo sát </div>
 
-    <div><nz-icon nzType="form" nzTheme="outline" /> Quản lý tin tức </div>
+    <!-- <div><nz-icon nzType="form" nzTheme="outline" /> Quản lý tin tức </div> -->
 
     <div nz-dropdown [nzDropdownMenu]="report">
       <nz-icon nzType="pie-chart" nzTheme="outline" />

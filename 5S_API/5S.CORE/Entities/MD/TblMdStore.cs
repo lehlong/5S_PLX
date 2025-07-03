@@ -34,8 +34,11 @@ namespace PLX5S.CORE.Entities.MD
         [Column("VI_DO")]
         public string? ViDo { get; set; }
 
+        [Column("ADDRESS")]
+        public string? Address { get; set; }
+
         [Column("TRANG_THAI_CUA_HANG", TypeName = "BIT")]
-        public bool TrangThaiCuaHang { get; set; }
+        public bool? TrangThaiCuaHang { get; set; }
 
     }
 }

@@ -45,7 +45,7 @@
   </ion-accordion-group>
 
   <div style="display: flex; height: 60px; gap: 15px; margin: 15px">
-    <ion-button expand="full" (click)="processLogin()" style="width: 100vh; font-weight: 700">Đăng nhập</ion-button>
+    <ion-button expand="full" [disabled]="isLogin" (click)="processLogin()" style="width: 100vh; font-weight: 700">Đăng nhập</ion-button>
   </div>
 
   <ion-footer class="" style="text-align: center; bottom: 10px; position: absolute;">

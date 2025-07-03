@@ -35,10 +35,14 @@
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('NguoiPhuTrach', $event)">
             Người Phụ trách
           </th>
+          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('NguoiPhuTrach', $event)">
+            Số điện thoại
+          </th>
 
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('isActive', $event)" nzAlign="center">
             Trạng thái
           </th>
+
         </tr>
       </thead>
       <tbody>
@@ -51,9 +55,10 @@
             }}
           </td>
 
-            <td nzAlign="center"><a (click)="openEdit(data)">{{ data.name }}</a></td>
-          <td nzAlign="center">{{ getNameByCodeAccount(data.truongKho) }}</td>
-          <td nzAlign="center">{{ getNameByCodeAccount(data.nguoiPhuTrach) }}</td>
+            <td nzAlign="left"><a (click)="openEdit(data)">{{ data.name }}</a></td>
+          <td nzAlign="left">{{ getNameByCodeAccount(data.truongKho) }}</td>
+          <td nzAlign="left">{{ getNameByCodeAccount(data.nguoiPhuTrach) }}</td>
+          <td nzAlign="left">{{ getNameByCodeAccount(data.phoneNumber) }}</td>
           <td nzAlign="center">
             <nz-tag nzColor="success" *ngIf="data.isActive">
               <nz-icon nzType="check-circle" />
@@ -64,6 +69,16 @@
               <span>Không hoạt động</span>
             </nz-tag>
           </td>
+
+          <!-- <td nzAlign="center">
+             <button (click)="openEdit(data)" style="margin-right: 10px;" nz-button nzType="default">
+              <span nz-icon nzType="edit"></span> Sửa
+            </button> -->
+
+            <!-- <button nz-popconfirm nzPopconfirmTitle="Bạn chắc chắn muốn xóa!!" class="!flex !items-center"
+               nzType="default" nz-button (nzOnConfirm)="deleteItem(data.id)">
+              <span nz-icon nzType="delete" nzTheme="outline" style="cursor:pointer;"></span>
+            </button> -->
         </tr>
       </tbody>
     </nz-table>
@@ -100,6 +115,28 @@
           <app-input-clear  placeholder="Nhập vĩ độ" label="Vĩ độ"
             [control]="$any(validateForm).controls['viDo']" [required]="false"></app-input-clear>
         </div>
+
+        <div nz-col [nzXs]="24" [nzMd]="12">
+          <nz-form-item>
+            <nz-form-label>* Trạng thái kho</nz-form-label>
+            <nz-form-control nzErrorTip="Không được để trống">
+              <nz-select nzShowSearch nzAllowClear placeholder="Chọn trạng thái cửa hàng"
+                formControlName="trangThaiKho">
+                <nz-option [nzLabel]="'Không hoạt động'" [nzValue]="false"></nz-option>
+                <nz-option [nzLabel]="'Hoạt động'" [nzValue]="true"></nz-option>
+
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzXs]="24" [nzMd]="24">
+          <app-input-clear  placeholder="Nhập địa chỉ" label="Địa chỉ"
+            [control]="$any(validateForm).controls['address']" [required]="false"></app-input-clear>
+        </div>
+        <!-- <div nz-col [nzXs]="24" [nzMd]="12">
+          <app-input-clear  placeholder="Nhập vĩ độ" label=""
+            [control]="$any(validateForm).controls['viDo']" [required]="false"></app-input-clear>
+        </div> -->
         <div nz-col [nzXs]="24" [nzMd]="12">
           <nz-form-item>
             <nz-form-label [nzRequired]="true">Chọn trưởng kho</nz-form-label>
@@ -123,6 +160,11 @@
               </nz-select>
             </nz-form-control>
           </nz-form-item>
+        </div>
+
+        <div nz-col [nzXs]="24" [nzMd]="12">
+          <app-input-clear placeholder="Nhập số điện thoại" label="Số điện thoại"
+            [control]="$any(validateForm).controls['phoneNumber']"></app-input-clear>
         </div>
         <div nz-col [nzXs]="24" [nzMd]="12">
           <nz-form-item>

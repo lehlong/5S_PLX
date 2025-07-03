@@ -19,15 +19,25 @@ public class TblMdWareHouse : SoftDeleteEntity
     [Column("NAME", TypeName = "NVARCHAR(255)")]
     public string Name { get; set; }
 
+    [Column("PHONE_NUMBER")]
+    public string? PhoneNumber { get; set; }
+
     [Column("TRUONG_KHO")]
     public string TruongKho { get; set; }
 
     [Column("NGUOI_PHU_TRACH")]
     public string NguoiPhuTrach { get; set; }
+
     [Column("KINH_DO")]
     public string? KinhDo { get; set; }
+
+    [Column("ADDRESS")]
+    public string? Address { get; set; }
+
     [Column("VI_DO")]
     public string? ViDo { get; set; }
 
+    [Column("TRANG_THAI_KHO", TypeName = "BIT")]
+    public bool? TrangThaiKho { get; set; }
     }
 }

@@ -30,6 +30,9 @@ namespace PLX5S.BUSINESS.Dtos.MD
         [Description("Người phụ trách")]
         public string NguoiPhuTrach { get; set; }
 
+        [Description("Địa chỉ")]
+        public string? Address { get; set; }
+
         [Description("Kinh độ")]
         public string? KinhDo { get; set; }
 
@@ -38,8 +41,9 @@ namespace PLX5S.BUSINESS.Dtos.MD
 
         [Description("Trạng Thái cửa hàng")]
         public bool TrangThaiCuaHang { get; set; }
+
         public List<string> ATVSV { get; set; }
-       
+
         [Description("Trạng thái")]
         public string State { get => this.IsActive == true ? "Đang hoạt động" : "Khóa"; }
         public void Mapping(Profile profile)

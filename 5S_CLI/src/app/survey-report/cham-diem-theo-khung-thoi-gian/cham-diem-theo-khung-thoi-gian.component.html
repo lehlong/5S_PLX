@@ -6,14 +6,13 @@
   <nz-page-header-content class="main-content">
     <ng-container>
       <div nz-row [nzGutter]="12">
-
         <div nz-col [nzXs]="24" [nzMd]="6">
-          <nz-form-item style="display: block;">
+          <nz-form-item style="display: block">
             <h4>Cuộc Khảo Sát</h4>
             <nz-form-control nzErrorTip="Không được để trống">
-              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Chọn cuộc khảo sát" formControlName="CuaHangTruong">
-                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.fullName"
-                  [nzValue]="item.userName">
+              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Chọn cuộc khảo sát" [(ngModel)]="survey"
+                (ngModelChange)="searchKiKhaoSat()">
+                <nz-option cdkScrollable *ngFor="let item of lstSurvey" [nzLabel]="item?.name" [nzValue]="item">
                 </nz-option>
               </nz-select>
             </nz-form-control>
@@ -21,12 +20,12 @@
         </div>
 
         <div nz-col [nzXs]="24" [nzMd]="6">
-          <nz-form-item style="display: block;">
+          <nz-form-item style="display: block">
             <h4>Kỳ Chấm Điểm</h4>
             <nz-form-control nzErrorTip="Không được để trống">
-              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Chọn kỳ chấm điểm" formControlName="CuaHangTruong">
-                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.fullName"
-                  [nzValue]="item.userName">
+              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Chọn kỳ chấm điểm" [(ngModel)]="kiKhaosatId"
+                (ngModelChange)="searchDoiTuong()">
+                <nz-option cdkScrollable *ngFor="let item of lstKiKhaoSat" [nzLabel]="item?.name" [nzValue]="item?.id">
                 </nz-option>
               </nz-select>
             </nz-form-control>
@@ -34,12 +33,11 @@
         </div>
 
         <div nz-col [nzXs]="24" [nzMd]="6">
-          <nz-form-item style="display: block;">
-            <h4>Cửa Hàng</h4>
+          <nz-form-item style="display: block">
+            <h4>Đối tượng</h4>
             <nz-form-control nzErrorTip="Không được để trống">
-              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Chọn cửa hàng" formControlName="CuaHangTruong">
-                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.fullName"
-                  [nzValue]="item.userName">
+              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Chọn cửa hàng" [(ngModel)]="doiTuongId">
+                <nz-option cdkScrollable *ngFor="let item of lstDoiTuong" [nzLabel]="item.name" [nzValue]="item.id">
                 </nz-option>
               </nz-select>
             </nz-form-control>
@@ -49,15 +47,14 @@
         <div nz-col [nzXs]="24" [nzMd]="6">
           <h4>'</h4>
           <div class="">
-            <button (click)="openCreate()" class="!flex !items-center space-btn" nzType="primary" nz-button>
+            <button (click)="getReport()" class="!flex !items-center space-btn" nzType="primary" nz-button>
               <span nz-icon nzType="snippets"></span> Xem Báo Cáo
             </button>
-            <button (click)="openCreate()" class="!flex !items-center space-btn btn-excel"  nz-button>
+            <button (click)="exportExcel()" class="!flex !items-center space-btn btn-excel" nz-button>
               <span nz-icon nzType="file-excel"></span> Xuất Excel
             </button>
           </div>
         </div>
-
       </div>
     </ng-container>
 
@@ -66,10 +63,10 @@
       <thead>
         <tr>
           <th nzWidth="60px" rowspan="3" >STT</th>
-          <th nzWidth=""  rowspan="3" >TÊN ĐƠN VỊ</th>
+          <th nzWidth="250px"  rowspan="3" >TÊN ĐƠN VỊ</th>
           <th nzWidth=""colSpan="5">SỐ LẦN CHẤM ĐIỂM TRONG KỲ</th>
           <th nzWidth="" rowspan="3" >TỔNG <br> LẦN CHẤM</th>
-          <th nzWidth="" rowspan="3" >ĐIỂM BÌNH QUÂN</th>
+          <th nzWidth="" rowspan="3" >ĐIỂM <br> BÌNH QUÂN</th>
           <th nzWidth="" rowspan="3" >XẾP LOẠI</th>
         </tr>
         <tr>
@@ -78,23 +75,38 @@
           <th nzWidth="" rowspan="2" >TỔ CHUYÊN GIA,<br> BAN 5S</th>
         </tr>
         <tr>
-          <th nzWidth="60px" rowspan="1">TRONG KHUNG THỜI GIAN</th>
-          <th nzWidth="" rowspan="1" >NGOÀI KHUNG THỜI GIAN</th>
-          <th nzWidth="60px" rowspan="1" >TRONG KHUNG THỜI GIAN</th>
-          <th nzWidth="" rowspan="1" >NGOÀI KHUNG THỜI GIAN</th>
+          <th nzWidth="60px" rowspan="1">TRONG KHUNG <br> THỜI GIAN</th>
+          <th nzWidth="" rowspan="1" >NGOÀI KHUNG <br> THỜI GIAN</th>
+          <th nzWidth="60px" rowspan="1" >TRONG KHUNG <br> THỜI GIAN</th>
+          <th nzWidth="" rowspan="1" >NGOÀI KHUNG <br> THỜI GIAN</th>
         </tr>
 
       </thead>
       <tbody>
-
+        <tr *ngFor="let data of lstData; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td >{{ data.name }}</td>
+          <td nzAlign="right">{{ data.cht_T }}</td>
+          <td nzAlign="right">{{ data.cht_N }}</td>
+          <td nzAlign="right">{{ data.atvsv_T }}</td>
+          <td nzAlign="right">{{ data.atvsv_N }}</td>
+          <td nzAlign="right">{{ data.chuyenGia }}</td>
+          <td nzAlign="right">{{ data.cht_T + data.cht_N + data.atvsv_T + data.atvsv_N + data.chuyenGia  }}</td>
+          <td nzAlign="right">{{ data.point }}</td>
+          <td nzAlign="center">
+            <nz-tag *ngIf="data.point > 80" nzColor="blue">Tốt</nz-tag>
+            <nz-tag *ngIf="data.point <= 30" nzColor="red">Kém</nz-tag>
+            <nz-tag *ngIf="data.point > 30 && data.point <= 80" nzColor="orange">Khá</nz-tag>
+          </td>
+        </tr>
       </tbody>
     </nz-table>
   </nz-page-header-content>
   <nz-page-header-content class="footer-content">
-    <div *ngIf="paginationResult?.data" class="flex justify-end p-[10px] border-t border-custom-gray border-solid">
+    <!-- <div *ngIf="paginationResult?.data" class="flex justify-end p-[10px] border-t border-custom-gray border-solid">
       <nz-pagination nzShowSizeChanger [nzPageIndex]="filter.currentPage" [nzTotal]="paginationResult.totalRecord"
         [nzPageSize]="filter.pageSize" (nzPageIndexChange)="pageIndexChange($event)"
         (nzPageSizeChange)="pageSizeChange($event)"></nz-pagination>
-    </div>
+    </div> -->
   </nz-page-header-content>
 </nz-page-header>

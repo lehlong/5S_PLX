@@ -30,12 +30,21 @@ namespace PLX5S.BUSINESS.Dtos.MD
         [Description("Trạng Thái cửa hàng")]
         public bool TrangThaiCuaHang { get; set; }
 
+        [Description("Số điện thoại")]
+        public string? PhoneNumber { get; set; }
+
+        [Description("Địa chỉ")]
+        public string? Address { get; set; }
+
+        [Description("Trạng Thái Kho")]
+        public bool TrangThaiKho { get; set; }
+
         public List<string> ATVSV { get; set; }
         [Description("Kinh do")]
         public string? KinhDo { get; set; }
+        
         [Description("Vi do")]
         public string? ViDo { get; set; }
-
 
         [Description("Trạng thái")]
         public string State { get => this.IsActive == true ? "Đang hoạt động" : "Khóa"; }

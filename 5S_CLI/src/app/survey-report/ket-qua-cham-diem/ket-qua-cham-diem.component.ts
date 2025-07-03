@@ -90,6 +90,7 @@ export class KetQuaChamDiemComponent {
     this._kiKhaoSatService.getInputKiKhaoSat(this.kiKhaosatId).subscribe({
       next: (data) => {
         console.log(data);
+
         if (data.lstInputStore?.length != 0) {
           this.lstDoiTuong = data.lstInputStore
         } else {
@@ -118,10 +119,10 @@ export class KetQuaChamDiemComponent {
     this.filter = new AccountTypeFilter()
   }
 
-  exportExcel() { 
+  exportExcel() {
     this._appReportService.ExportExcel("KetQuaChamDiem", { surveyId: this.survey.doiTuongId, kiKhaoSatId: this.kiKhaosatId, doiTuongId: this.doiTuongId })
     .subscribe({
-      next: (data) => { 
+      next: (data) => {
         console.log(data);
         if (data) {
           const downloadUrl = `${environment.urlFiles}/${data}`; // hoặc cấu hình phù hợp với backend của bạn

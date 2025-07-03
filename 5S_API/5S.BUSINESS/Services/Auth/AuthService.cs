@@ -146,7 +146,7 @@ namespace PLX5S.BUSINESS.Services.Auth
             {
                 var Mess = "";
                 var device = _dbContext.tblMdDevice.FirstOrDefault(x => x.DeviceId == loginInfo.DeviceId && x.UserName == loginInfo.UserName);
-                var devicewrongip = _dbContext.tblMdDevice.FirstOrDefault(x => x.DeviceName==loginInfo.DeviceName && x.OsVersion==loginInfo.osVersion && x.Manufacturer==loginInfo.Manufacturer &&x.OperatingSystem==loginInfo.OperatingSystem);
+                var devicewrongip = _dbContext.tblMdDevice.FirstOrDefault(x => x.DeviceName == loginInfo.DeviceName && x.OsVersion == loginInfo.osVersion && x.Manufacturer == loginInfo.Manufacturer && x.OperatingSystem == loginInfo.OperatingSystem && x.UserName == loginInfo.UserName);
                 if (device?.Id!=null)
                 {
                     if (device.EnableLogin == true)

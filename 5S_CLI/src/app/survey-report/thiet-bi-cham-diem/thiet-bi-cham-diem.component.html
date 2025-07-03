@@ -139,20 +139,20 @@
         </thead>
 
         <tbody>
-          <tr *ngFor="let data of lstData">
-            <td class="col-small">{{ data.stt }}</td>
+          <tr *ngFor="let data of lstData; let i = index">
+            <td class="col-small">{{ i + 1 }}</td>
             <td class="col-fixed">{{ data.name }}</td>
 
             <ng-container *ngFor="let i of getRange(maxCht)">
-              <td class="col-small">{{ data.cht[i] | removePrefix }}</td>
+              <td class="col-small">{{ data.cht[i] ? 'Thiết bị' + (data.cht[i] | removePrefix) : '-' }}</td>
             </ng-container>
 
             <ng-container *ngFor="let i of getRange(maxAtvsv)">
-              <td class="col-small">{{ data.atvsv[i] | removePrefix }}</td>
+              <td class="col-small">{{ data.atvsv[i] ? 'Thiết bị ' + (data.atvsv[i] | removePrefix) : '-' }}</td>
             </ng-container>
 
             <ng-container *ngFor="let i of getRange(maxChuyenGia)">
-              <td class="col-small">{{ data.chuyenGia[i] | removePrefix }}</td>
+              <td class="col-small">{{ data.chuyenGia[i]  ? 'Thiết bị ' + (data.chuyenGia[i] | removePrefix) : '-' }}</td>
             </ng-container>
 
             <td class="col-small">
