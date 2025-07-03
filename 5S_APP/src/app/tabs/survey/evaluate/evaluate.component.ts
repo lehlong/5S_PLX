@@ -25,7 +25,7 @@ import { AuthService } from 'src/app/service/auth.service';
 import { Capacitor } from '@capacitor/core';
 
 @Component({
-  imports: [IonHeader, SharedModule, HighlightSearchPipe],
+  imports: [SharedModule, HighlightSearchPipe],
   selector: 'app-evaluate',
   templateUrl: './evaluate.component.html',
   styleUrls: ['./evaluate.component.scss'],
@@ -775,18 +775,6 @@ export class EvaluateComponent implements OnInit {
       // 👉 Xử lý khác nhau theo platform
       const platform = Capacitor.getPlatform();
       console.log('📱 Nền tảng:', platform);
-
-      if (platform === 'android') {
-        latitude += 0.002273;
-        longitude -= 0.006651;
-        console.log(
-          '🛠️ Tọa độ sau khi cộng trừ (Android)',
-          latitude,
-          longitude
-        );
-      } else {
-        console.log('🍎 Tọa độ giữ nguyên (iOS)');
-      }
 
       console.log('🎯 Trước khi gọi Camera');
       const image = await Camera.getPhoto({

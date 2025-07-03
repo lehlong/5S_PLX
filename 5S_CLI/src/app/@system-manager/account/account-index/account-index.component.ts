@@ -10,6 +10,7 @@ import { AccountEditComponent } from '../account-edit/account-edit.component'
 import { AccountGroupEditComponent } from '../../account-group/account-group-edit/account-group-edit.component'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ADMIN_RIGHTS } from '../../../shared/constants'
+import { ChucVuService } from '../../../service/master-data/chuc-vu.service'
 
 @Component({
   selector: 'app-account-index',
@@ -29,30 +30,28 @@ export class AccountIndexComponent {
   showCreate: boolean = false
   showEdit: boolean = false
   userName: string = ''
-  isVisibleModal= false;
-
+  isVisibleModal = false;
   listAccountGroup: any[] = []
-    listDevice: any[] = []
-  //listPartner: any[] = []
+  lstChucVu: any[] = []
+  lstAllAccount: any[] = []
+  listDevice: any[] = []
   accountType: any[] = []
   positionList: any[] = []
   listStatus: any[] = [
     { id: 'true', name: 'Kích hoạt' },
     { id: 'false', name: 'Khoá' },
   ]
-
   showEditAcg: boolean = false
   idDetail: number | string = 0
-  // UserTypeCodes = UserTypeCodes
-
   @ViewChild(AccountEditComponent) accountEditComponent!: AccountEditComponent
   @ViewChild(AccountGroupEditComponent)
   accountGroupEditComponent!: AccountGroupEditComponent
- ADMIN_RIGHTS = ADMIN_RIGHTS
+  ADMIN_RIGHTS = ADMIN_RIGHTS
+
   constructor(
     private dropdownService: DropdownService,
-    // private _service: PartnerManagementService,
     private _as: AccountService,
+    private chucVuService: ChucVuService,
     private globalService: GlobalService,
     private route: ActivatedRoute,
     private router: Router,
@@ -81,13 +80,13 @@ export class AccountIndexComponent {
       if (params['create_nmtv']) {
         this.openCreate()
       }
-      
+
     })
   }
-//   trackByDeviceId(index: number, device: any): string {
-    
-//   return device.id; 
-// }
+  //   trackByDeviceId(index: number, device: any): string {
+
+  //   return device.id;
+  // }
 
   onSortChange(key: string, value: string | null) {
     this.filter = {
@@ -100,6 +99,7 @@ export class AccountIndexComponent {
 
   loadInit() {
     this.getAllAccountGroup()
+    this.getAllChucVu()
     // this.getAllAccountType()
     this.search()
   }
@@ -142,13 +142,25 @@ export class AccountIndexComponent {
       .subscribe({
         next: (data) => {
           this.paginationResult = data
+          this.lstAllAccount = data
         },
         error: (response) => {
           console.log(response)
         },
       })
   }
-  
+
+  getAllChucVu() {
+    this.chucVuService.getAll().subscribe({
+      next: (data) => {
+        this.lstChucVu = data
+      },
+      error: (response) => {
+        console.log(response)
+      },
+    })
+  }
+
   getAllAccountGroup() {
     this.dropdownService.getAllAccountGroup().subscribe({
       next: (data) => {
@@ -216,54 +228,54 @@ export class AccountIndexComponent {
   getDviceByID(id: string) {
     this.dropdownService.getDeviceByUser(id).subscribe({
       next: (data) => {
-       
+
         this.listDevice = data
-    
-      
-       
-         console.log(this.listDevice )
-           
+
+
+
+        console.log(this.listDevice)
+
       },
       error: (response) => {
         console.log(response)
       },
     })
   }
-   showModal(id:string): void {
-      this.getDviceByID(id);
-     this.isVisibleModal = true;
-  
+  showModal(id: string): void {
+    this.getDviceByID(id);
+    this.isVisibleModal = true;
+
 
   }
 
   handleOk(): void {
- 
+
     this.isVisibleModal = false;
   }
 
   handleCancel(): void {
-  
+
     this.isVisibleModal = false;
   }
-  enableDevice(id: string,Username: string) {
-    
+  enableDevice(id: string, Username: string) {
+
     this.dropdownService.enableDevice(id).subscribe({
       next: (data) => {
         this.getDviceByID(Username)
       },
       error: (response) => {
-        
+
         console.log(response)
       },
     })
   }
-  mainDevice(id: string,Username: string) {
+  mainDevice(id: string, Username: string) {
     this.dropdownService.mainDevice(id).subscribe({
       next: (data) => {
         this.getDviceByID(Username)
       },
       error: (response) => {
-       
+
         console.log(response)
       },
     })

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PLX5S.BUSINESS.Common;
 using PLX5S.BUSINESS.Dtos.MD;
 using PLX5S.CORE;
+using PLX5S.CORE.Entities.AD;
 using PLX5S.CORE.Entities.BU;
 using PLX5S.CORE.Entities.MD;
 using System;
@@ -116,6 +117,18 @@ namespace PLX5S.BUSINESS.Services.MD
         {
             try
             {
+                var lstUpdateAccount = new List<TblAdAccount>();
+
+                var lstAccount = _dbContext.TblAdAccount.OrderBy(x => x.UserName).ToList();
+                
+                var CHT = lstAccount.FirstOrDefault(x => x.UserName == data.CuaHangTruong);
+                CHT.ChucVuId = "CHT";
+                lstUpdateAccount.Add(CHT);
+                
+                var nguoiPhuTrach = lstAccount.FirstOrDefault(x => x.UserName == data.NguoiPhuTrach);
+                nguoiPhuTrach.ChucVuId = "717cae63-83e6-40af-a324-6fc41eb0f121";
+                lstAccount.Add(nguoiPhuTrach);
+
                 var store = new TblMdStore()
                 {
                     Id = data.Id,
@@ -138,15 +151,22 @@ namespace PLX5S.BUSINESS.Services.MD
                 
                 foreach (var item in data.ATVSV)
                 {
-                    var atvsv = new TblMdAtvsv();
-                    atvsv.Id = Guid.NewGuid().ToString();
-                    atvsv.Name = item;
-                    atvsv.StoreId = data.Id;
-                    atvsv.IsActive = true;
+                    var atvsv = new TblMdAtvsv
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = item,
+                        StoreId = data.Id,
+                        IsActive = true,
+                    };
                     lst.Add(atvsv);
-                }
-                _dbContext.tblMdAtvsv.AddRange(lst);
 
+                    var vsv = lstAccount.FirstOrDefault(x => x.UserName == item);
+                    vsv.ChucVuId = "ATVSV";
+                    lstUpdateAccount.Add(vsv);
+                }
+
+                _dbContext.TblAdAccount.UpdateRange(lstUpdateAccount.Distinct());
+                _dbContext.tblMdAtvsv.AddRange(lst);
 
                 await _dbContext.SaveChangesAsync();
             }

@@ -2,6 +2,7 @@ import {BaseFilter} from '../base.model';
 
 export class AccountFilter extends BaseFilter {
   GroupId : string = '';
+  chucVuId : string = '';
   IsDescending: boolean = true;
   SortColumn: string = 'name';
   PartnerId! : number ;

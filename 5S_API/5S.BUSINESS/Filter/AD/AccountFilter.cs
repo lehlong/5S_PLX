@@ -5,7 +5,7 @@ namespace PLX5S.BUSINESS.Filter.AD
     public class AccountFilter : BaseFilter
     {
         public Guid? GroupId { get; set; }
-
+        public string? ChucVuId { get; set; }
         public string? RoleCode { get; set; }
 
         public string? AccountType { get; set; }

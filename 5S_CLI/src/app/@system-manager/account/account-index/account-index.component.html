@@ -4,9 +4,9 @@
   <nz-page-header-extra>
     <div class="flex-grow-2 flex">
       <nz-space>
-        <nz-select class="flex-grow" nzShowSearch nzAllowClear nzPlaceHolder="Nhóm tài khoản"
-          [(ngModel)]="filter.GroupId">
-          <nz-option *ngFor="let item of listAccountGroup" [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
+        <nz-select class="flex-grow" nzShowSearch nzAllowClear nzPlaceHolder="Chức vụ"
+          [(ngModel)]="filter.chucVuId">
+          <nz-option *ngFor="let item of lstChucVu" [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
         </nz-select>
         <!-- <nz-select class="flex-grow" nzShowSearch nzAllowClear nzPlaceHolder="Kiểu người dùng"
         [(ngModel)]="filter.AccountType">

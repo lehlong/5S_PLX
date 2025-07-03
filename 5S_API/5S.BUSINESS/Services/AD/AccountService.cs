@@ -70,9 +70,13 @@ namespace PLX5S.BUSINESS.Services.AD
                     query = query.Where(x => x.IsActive == filter.IsActive);
                 }
 
-                  if (filter.GroupId.HasValue)
+                if (filter.GroupId.HasValue)
                 {
                     query = query.Where(x => x.Account_AccountGroups.Any(x => x.GroupId == filter.GroupId));
+                }
+                if (!string.IsNullOrWhiteSpace(filter.ChucVuId))
+                {
+                    query = query.Where(x => x.ChucVuId == filter.ChucVuId);
                 }
 
                 return await Paging(query, filter);
