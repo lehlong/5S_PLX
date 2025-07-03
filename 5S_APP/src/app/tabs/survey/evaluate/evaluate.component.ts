@@ -20,7 +20,9 @@ import { Input, ChangeDetectionStrategy } from '@angular/core';
 import { MessageService } from 'src/app/service/message.service';
 import * as L from 'leaflet';
 import { HighlightSearchPipe } from '../../../shared/pipes/highlight-search.pipe';
+import { IonHeader } from '@ionic/angular/standalone';
 import { AuthService } from 'src/app/service/auth.service';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   imports: [IonHeader, SharedModule, HighlightSearchPipe],
@@ -39,7 +41,7 @@ export class EvaluateComponent implements OnInit {
   fileInput!: ElementRef<HTMLInputElement>;
   @Input() treeData: any = [];
   @Input() lstTreeOpen!: string[];
-  isSearchVisible: boolean = false
+  isSearchVisible: boolean = false;
   searchKeyword = '';
   searchResults: { id: string; type: string }[] = [];
   currentIndex = 0;
@@ -58,9 +60,9 @@ export class EvaluateComponent implements OnInit {
   account: any = {};
   longitude: number = 106.6297;
   latitude: number = 10.8231;
-  daCham: any = 0
-  chuaCham: any = 0
-  lstHisEvaluate: any = []
+  daCham: any = 0;
+  chuaCham: any = 0;
+  lstHisEvaluate: any = [];
   apiFile = (environment as any).apiFile;
   lstAccout: any = [];
   evaluate: any = {
@@ -73,7 +75,6 @@ export class EvaluateComponent implements OnInit {
     tree: [],
   };
 
-
   constructor(
     private route: ActivatedRoute,
     private alertController: AlertController,
@@ -83,11 +84,12 @@ export class EvaluateComponent implements OnInit {
     private messageService: MessageService,
     private cdr: ChangeDetectorRef,
     private renderer: Renderer2
-  ) { }
+  ) {}
 
   ngOnInit() {
-    this.apiFile = (environment as any).apiFile ?? "http://sso.d2s.com.vn:1347/";
-    console.log("api file", this.apiFile);
+    this.apiFile =
+      (environment as any).apiFile ?? 'http://sso.d2s.com.vn:1347/';
+    console.log('api file', this.apiFile);
 
     this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
     this.route.paramMap.subscribe({
@@ -100,16 +102,20 @@ export class EvaluateComponent implements OnInit {
         this.kiKhaoSat = JSON.parse(nav ?? '').kiKhaoSat;
 
         if (mode == 'draft') {
-          console.log(this.doiTuong.id + "_" + this.kiKhaoSat.code);
+          console.log(this.doiTuong.id + '_' + this.kiKhaoSat.code);
 
-          this.evaluate = await this._storageService.get(this.doiTuong.id + "_" + this.kiKhaoSat.code);
+          this.evaluate = await this._storageService.get(
+            this.doiTuong.id + '_' + this.kiKhaoSat.code
+          );
         } else {
           this.isEdit = false;
           this.getResultEvaluate();
-          this.getAllAccount()
+          this.getAllAccount();
         }
 
-        let data = localStorage.getItem(this.doiTuong.id + "_" + this.kiKhaoSat.code);
+        let data = localStorage.getItem(
+          this.doiTuong.id + '_' + this.kiKhaoSat.code
+        );
         if (data == null) {
           this.getAllTieuChi();
           this.getAllTieuChiLeaves();
@@ -122,7 +128,6 @@ export class EvaluateComponent implements OnInit {
         }
         console.log(this.treeData);
         console.log(this.lstTieuChi);
-
       },
     });
   }
@@ -138,7 +143,6 @@ export class EvaluateComponent implements OnInit {
     });
     this.currentHighlights = [];
   }
-
 
   getAllAccount() {
     this._authService.GetAllAccount().subscribe({
@@ -226,7 +230,8 @@ export class EvaluateComponent implements OnInit {
   }
 
   getAllTieuChi() {
-    this._service.buildDataTreeForApp(this.kiKhaoSat.id, this.doiTuong.id)
+    this._service
+      .buildDataTreeForApp(this.kiKhaoSat.id, this.doiTuong.id)
       .subscribe({
         next: (data) => {
           this.treeData = [data];
@@ -235,7 +240,7 @@ export class EvaluateComponent implements OnInit {
           this.dataTree.tree = this.treeData;
           console.log(this.dataTree);
           localStorage.setItem(
-            this.doiTuong.id + "_" + this.kiKhaoSat.code,
+            this.doiTuong.id + '_' + this.kiKhaoSat.code,
             JSON.stringify(this.dataTree)
           );
 
@@ -271,6 +276,7 @@ export class EvaluateComponent implements OnInit {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
+
   private initMap(): void {
     L.Icon.Default.mergeOptions({
       iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
@@ -281,16 +287,34 @@ export class EvaluateComponent implements OnInit {
     const lat = this.latitude; // Vĩ độ động
     const lng = this.longitude; // Kinh độ động
 
-    this.map = L.map('map').setView([lat, lng], 13);
+    this.map = L.map('map').setView([lat, lng], 17);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap France',
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19,
     }).addTo(this.map);
 
-    L.marker([lat, lng])
-      .addTo(this.map)
-      .openPopup();
+    L.marker([lat, lng]).addTo(this.map).openPopup();
   }
+
+  // private initMap(): void {
+  //   L.Icon.Default.mergeOptions({
+  //     iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
+  //     iconUrl: 'assets/leaflet/marker-icon.png',
+  //     shadowUrl: 'assets/leaflet/marker-shadow.png',
+  //   });
+
+  //   const lat = this.latitude; // Vĩ độ động
+  //   const lng = this.longitude; // Kinh độ động
+
+  //   this.map = L.map('map').setView([lat, lng], 13);
+
+  //   L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
+  //     attribution: '© OpenStreetMap France',
+  //   }).addTo(this.map);
+
+  //   L.marker([lat, lng]).addTo(this.map).openPopup();
+  // }
   isActive(itemId: string): boolean {
     return this.currentSelect === itemId;
   }
@@ -304,9 +328,10 @@ export class EvaluateComponent implements OnInit {
     const evaluateItem = this.evaluate.lstEvaluate.find(
       (i: any) => i.tieuChiId === data.code || i.tieuChiCode === data.code
     );
-    const diem = this.lstTieuChi
-      .flatMap((t: any) => t.diemTieuChi || [])
-      .find((d: any) => d.id === evaluateItem?.pointId)?.diem ?? '';
+    const diem =
+      this.lstTieuChi
+        .flatMap((t: any) => t.diemTieuChi || [])
+        .find((d: any) => d.id === evaluateItem?.pointId)?.diem ?? '';
 
     if (data.isImg) {
       const numberImgRequired = data?.numberImg || 0;
@@ -315,9 +340,9 @@ export class EvaluateComponent implements OnInit {
       ).length;
       hasEnoughImages = hasImage >= numberImgRequired;
     }
-    if(diem === '' || !hasEnoughImages) return '';
+    if (diem === '' || !hasEnoughImages) return '';
 
-    return diem > 0 ? "answered" : "red-false";
+    return diem > 0 ? 'answered' : 'red-false';
   }
 
   hasEnoughImages(code: any, requiredNumber: any): boolean {
@@ -354,7 +379,7 @@ export class EvaluateComponent implements OnInit {
     reader.onload = async () => {
       const base64 = reader.result as string;
 
-      let thumbnail = "";
+      let thumbnail = '';
       if (type === 'img') {
         thumbnail = await this.generateThumbnail(base64, 100, 100);
       }
@@ -371,14 +396,20 @@ export class EvaluateComponent implements OnInit {
         evaluateHeaderCode: this.headerId,
       });
       this.cdr.detectChanges();
-      this._storageService.set(this.doiTuong.id + "_" + this.kiKhaoSat.code, this.evaluate);
+      this._storageService.set(
+        this.doiTuong.id + '_' + this.kiKhaoSat.code,
+        this.evaluate
+      );
     };
     reader.readAsDataURL(file); // Chuyển sang base64
     console.log(this.evaluate);
-
   }
 
-  generateThumbnail(base64: string, maxWidth: number, maxHeight: number): Promise<string> {
+  generateThumbnail(
+    base64: string,
+    maxWidth: number,
+    maxHeight: number
+  ): Promise<string> {
     return new Promise((resolve) => {
       const img = new Image();
       img.onload = () => {
@@ -506,12 +537,19 @@ export class EvaluateComponent implements OnInit {
       }, 0);
       return sum + diemMax;
     }, 0);
-    this.evaluate.header.point = ((this.evaluate.lstEvaluate.reduce(
-      (sum: any, item: any) => sum + (item.point || 0),
-      0) / tongDiem) * 100
+    this.evaluate.header.point = (
+      (this.evaluate.lstEvaluate.reduce(
+        (sum: any, item: any) => sum + (item.point || 0),
+        0
+      ) /
+        tongDiem) *
+      100
     ).toFixed(2);
 
-    this._storageService.set(this.doiTuong.id + "_" + this.kiKhaoSat.code, this.evaluate);
+    this._storageService.set(
+      this.doiTuong.id + '_' + this.kiKhaoSat.code,
+      this.evaluate
+    );
   }
 
   setFeedBack(data: any, event: any) {
@@ -569,17 +607,19 @@ export class EvaluateComponent implements OnInit {
     // this.tinhTongLanCham()
 
     // Trường hợp đủ
-    this.evaluate.header.accountUserName = this.account.userName
+    this.evaluate.header.accountUserName = this.account.userName;
     this.evaluate.header.chucVuId = this.account.chucVuId;
 
     this._service.insertEvaluate(this.evaluate).subscribe({
       next: () => {
         console.log('Chấm điểm thành công');
-        this.tinhTongLanCham()
+        this.tinhTongLanCham();
 
         this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
-        this._storageService.remove(this.doiTuong.id + "_" + this.kiKhaoSat.code);
-        localStorage.removeItem(this.doiTuong.id + "_" + this.kiKhaoSat.code)
+        this._storageService.remove(
+          this.doiTuong.id + '_' + this.kiKhaoSat.code
+        );
+        localStorage.removeItem(this.doiTuong.id + '_' + this.kiKhaoSat.code);
       },
 
       error: (ex) => {
@@ -588,40 +628,43 @@ export class EvaluateComponent implements OnInit {
     });
   }
 
-
   tinhTongLanCham() {
-    this._service.filterLstChamDiem({ sortColumn: this.doiTuong.id, keyWord: this.kiKhaoSat.id }).subscribe({
-      next: (data) => {
-        console.log(data.length);
+    this._service
+      .filterLstChamDiem({
+        sortColumn: this.doiTuong.id,
+        keyWord: this.kiKhaoSat.id,
+      })
+      .subscribe({
+        next: (data) => {
+          console.log(data.length);
 
-        const total = data.reduce((sum: any, item: any) => {
-          let pointitem = item.point
-          if (item.ChucVuId === "CHT" || item.ChucVuId === "ATVSV") {
-            pointitem = item.point / 2
+          const total = data.reduce((sum: any, item: any) => {
+            let pointitem = item.point;
+            if (item.ChucVuId === 'CHT' || item.ChucVuId === 'ATVSV') {
+              pointitem = item.point / 2;
+              console.log(pointitem);
+            }
             console.log(pointitem);
-          }
-          console.log(pointitem);
 
-          return sum + pointitem;
-        }, 0);
-        const avg = data.length >= 0 ? total / data.length : 0;
+            return sum + pointitem;
+          }, 0);
+          const avg = data.length >= 0 ? total / data.length : 0;
 
-        const point = {
-          code: '',
-          doiTuongId: this.doiTuong.id,
-          surveyId: localStorage.getItem('surveyId'),
-          kiKhaoSatId: this.kiKhaoSat.id,
-          point: avg,
-          length: data.length
-        }
-        this._service.tinhTongLanCham(point).subscribe({
-          next: (data) => {
-            console.log("tính tổng điểm thành công");
-
-          }
-        })
-      }
-    })
+          const point = {
+            code: '',
+            doiTuongId: this.doiTuong.id,
+            surveyId: localStorage.getItem('surveyId'),
+            kiKhaoSatId: this.kiKhaoSat.id,
+            point: avg,
+            length: data.length,
+          };
+          this._service.tinhTongLanCham(point).subscribe({
+            next: (data) => {
+              console.log('tính tổng điểm thành công');
+            },
+          });
+        },
+      });
   }
 
   navigateTo(itemId: string) {
@@ -666,7 +709,10 @@ export class EvaluateComponent implements OnInit {
     if (index > -1) {
       this.evaluate?.lstImages.splice(index, 1);
     }
-    this._storageService.set(this.doiTuong.id + "_" + this.kiKhaoSat.code, this.evaluate);
+    this._storageService.set(
+      this.doiTuong.id + '_' + this.kiKhaoSat.code,
+      this.evaluate
+    );
     this.cdr.detectChanges();
 
     this.closeFullScreen();
@@ -705,27 +751,53 @@ export class EvaluateComponent implements OnInit {
   feedback: string = '';
 
   async openCamera(code: any) {
-    if (!this.isEdit) return;
+    console.log('🚀 Đã gọi openCamera()');
+    console.log('✳️ isEdit:', this.isEdit);
+
+    if (!this.isEdit) {
+      console.warn('⚠️ isEdit = false, không mở camera');
+      return;
+    }
 
     try {
-      // 👉 Lấy vị trí hiện tại
-      const position = await Geolocation.getCurrentPosition();
-      const latitude = position.coords.latitude + 0.002273;
-      const longitude = position.coords.longitude - 0.006651;
-      console.log('Vị trí hiện tại:', latitude, longitude);
+      const perm = await Geolocation.requestPermissions();
+      console.log('🔐 Quyền vị trí:', perm);
 
-      console.log('Vị trí hiện tại:', latitude, longitude);
+      const position = await Geolocation.getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 10000,
+      });
+      console.log('📍 Vị trí gốc:', position.coords);
 
+      let latitude = position.coords.latitude;
+      let longitude = position.coords.longitude;
 
+      // 👉 Xử lý khác nhau theo platform
+      const platform = Capacitor.getPlatform();
+      console.log('📱 Nền tảng:', platform);
+
+      if (platform === 'android') {
+        latitude += 0.002273;
+        longitude -= 0.006651;
+        console.log(
+          '🛠️ Tọa độ sau khi cộng trừ (Android)',
+          latitude,
+          longitude
+        );
+      } else {
+        console.log('🍎 Tọa độ giữ nguyên (iOS)');
+      }
+
+      console.log('🎯 Trước khi gọi Camera');
       const image = await Camera.getPhoto({
         quality: 90,
-        allowEditing: false,
         resultType: CameraResultType.Base64,
         source: CameraSource.Camera,
       });
+      console.log('📷 Ảnh đã chụp');
 
       const base64Image = `data:image/jpeg;base64,${image.base64String}`;
-      let thumbnail = await this.generateThumbnail(base64Image, 100, 100);
+      const thumbnail = await this.generateThumbnail(base64Image, 100, 100);
 
       this.evaluate.lstImages.push({
         code: '-1',
@@ -738,24 +810,74 @@ export class EvaluateComponent implements OnInit {
         kinhDo: longitude,
         type: 'img',
       });
-      this.cdr.detectChanges();
 
-      this._storageService.set(this.doiTuong.id + "_" + this.kiKhaoSat.code, this.evaluate);
+      console.log('✅ Ảnh và vị trí đã lưu');
+
+      this.cdr.detectChanges();
+      this._storageService.set(
+        this.doiTuong.id + '_' + this.kiKhaoSat.code,
+        this.evaluate
+      );
     } catch (err) {
-      console.error('Camera error:', err);
+      console.error('❌ Lỗi openCamera:', err);
     }
   }
 
+  // async openCamera(code: any) {
+  //   if (!this.isEdit) return;
+
+  //   try {
+  //     // 👉 Lấy vị trí hiện tại
+  //     const position = await Geolocation.getCurrentPosition();
+  //     console.log(position)
+  //     const latitude = position.coords.latitude + 0.002273;
+  //     const longitude = position.coords.longitude - 0.006651;
+  //     console.log('Vị trí hiện tại:', latitude, longitude);
+
+  //     console.log('Vị trí hiện tại:', latitude, longitude);
+
+  //     const image = await Camera.getPhoto({
+  //       quality: 90,
+  //       allowEditing: false,
+  //       resultType: CameraResultType.Base64,
+  //       source: CameraSource.Camera,
+  //     });
+
+  //     const base64Image = `data:image/jpeg;base64,${image.base64String}`;
+  //     let thumbnail = await this.generateThumbnail(base64Image, 100, 100);
+
+  //     this.evaluate.lstImages.push({
+  //       code: '-1',
+  //       fileName: '',
+  //       evaluateHeaderCode: this.headerId,
+  //       filePath: base64Image,
+  //       pathThumbnail: thumbnail,
+  //       tieuChiCode: code,
+  //       viDo: latitude,
+  //       kinhDo: longitude,
+  //       type: 'img',
+  //     });
+  //     this.cdr.detectChanges();
+
+  //     this._storageService.set(this.doiTuong.id + "_" + this.kiKhaoSat.code, this.evaluate);
+  //   } catch (err) {
+  //     console.error('Camera error:', err);
+  //   }
+  // }
+
   openMenu() {
-    this.daCham = document.querySelectorAll('.div-dem .answered').length + document.querySelectorAll('.div-dem .red-false').length;
+    this.daCham =
+      document.querySelectorAll('.div-dem .answered').length +
+      document.querySelectorAll('.div-dem .red-false').length;
     this.chuaCham = this.lstTieuChi.length - this.daCham;
   }
 
   getFullName(userName: string): string {
-    const account = this.lstAccout.find((acc: any) => acc.userName === userName);
+    const account = this.lstAccout.find(
+      (acc: any) => acc.userName === userName
+    );
     return account?.fullName ?? this.account?.fullName;
   }
-
 
   trackByKey(index: number, item: any): string {
     return item.key; // hoặc item.id nếu bạn dùng id
