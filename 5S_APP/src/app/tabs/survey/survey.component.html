@@ -8,9 +8,9 @@
 </ion-header>
 <ion-content>
   <ion-list>
-    <div class="item" *ngFor="let item of data">
-      <div class="item-survey" (click)="navigateTo(item)">
-      <ion-icon slot="start" name="create-outline"></ion-icon>
+    <div class="item" *ngFor="let item of data" >
+      <div class="item-survey" (click)="navigateTo(item)" style="font-size: 14px;">
+        <ion-icon slot="start" name="create-outline"></ion-icon>
         <p style="margin-left: 10px;">{{ item.name }}</p>
       </div>
     </div>

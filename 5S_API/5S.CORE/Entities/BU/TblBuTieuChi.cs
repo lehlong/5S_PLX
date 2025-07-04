@@ -31,7 +31,7 @@ public class TblBuTieuChi : SoftDeleteEntity
         public string? KiKhaoSatId { get; set; }
 
         [Column ("IS_GROUP")]
-        public bool? IsGroup { get; set; }
+        public bool IsGroup { get; set; }
 
         [Column("IS_IMG")]
         public bool? IsImg { get; set; }
@@ -46,7 +46,7 @@ public class TblBuTieuChi : SoftDeleteEntity
         public string? Report { get; set; }
         
         [Column("CHI_CHT_ATVSV")]
-        public bool? ChiChtAtvsv { get; set; }
+        public bool ChiChtAtvsv { get; set; }
 
     }
 }

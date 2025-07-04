@@ -62,7 +62,7 @@ namespace PLX5S.BUSINESS.Services.BU
                     PId = data.PId,
                     Report = data.Report,
                     IsImg = data.IsImg ?? false,
-                    ChiChtAtvsv = data.ChiChtAtvsv ?? false,
+                    ChiChtAtvsv = data.ChiChtAtvsv,
                     NumberImg = data.NumberImg ?? 0
                 };
                 _dbContext.TblBuTieuChi.Add(tieuChi);
@@ -167,6 +167,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         IsGroup = item.IsGroup,
                         NumberImg = item.NumberImg,
                         KiKhaoSatId = item.KiKhaoSatId,
+                        ChiChtAtvsv = item.ChiChtAtvsv,
                         OrderNumber = item.OrderNumber,
                         DiemTieuChi = _dbContext.TblBuTinhDiemTieuChi.Where(x => x.TieuChiCode == item.Code && x.IsDeleted != true).ToList(),
                         LstCriteriaExcludedOject = _dbContext.TblBuCriteriaExcludedObject.Where(x => x.TieuChiCode == item.Code && x.IsDeleted != true).ToList() ?? null
@@ -218,6 +219,7 @@ namespace PLX5S.BUSINESS.Services.BU
                     IsGroup = item.IsGroup,
                     NumberImg = item.NumberImg,
                     KiKhaoSatId = item.KiKhaoSatId,
+                    ChiChtAtvsv = item.ChiChtAtvsv,
                     OrderNumber = item.OrderNumber,
                     IsDeleted = item.IsDeleted ?? false
                 }); 

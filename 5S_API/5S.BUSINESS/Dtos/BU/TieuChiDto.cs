@@ -36,7 +36,7 @@ namespace PLX5S.BUSINESS.Dtos.BU
         
         public decimal? OrderNumber { get; set; }
         
-        public bool? IsGroup { get; set; }
+        public bool IsGroup { get; set; }
         
         public bool? IsImg { get; set; }
 
@@ -46,7 +46,7 @@ namespace PLX5S.BUSINESS.Dtos.BU
 
         public string? Report { get; set; }
 
-        public bool? ChiChtAtvsv { get; set; }
+        public bool ChiChtAtvsv { get; set; }
 
         public List<TieuChiDto>? Children { set; get; }
         

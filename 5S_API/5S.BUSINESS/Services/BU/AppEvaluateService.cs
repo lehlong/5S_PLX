@@ -76,7 +76,7 @@ namespace PLX5S.BUSINESS.Services.BU
             var node = _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == kiKhaoSatId && x.PId == "-1" && x.IsDeleted != true).FirstOrDefault();
             var lstBlack = _dbContext.TblBuCriteriaExcludedObject.Where(x => x.IsDeleted != true).ToList();
             var lstAllTieuChi = await _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == kiKhaoSatId && x.PId != "-1" && x.IsDeleted != true).OrderBy(x => x.OrderNumber).ToListAsync();
-
+            var indexTC = 0;
             var rootNode = new TieuChiDto()
             {
                 Code = node.Code,
@@ -87,6 +87,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 PId = node.PId,
                 IsGroup = node.IsGroup,
                 KiKhaoSatId = node.KiKhaoSatId,
+                ChiChtAtvsv = node.ChiChtAtvsv,
                 OrderNumber = 0,
                 IsImg = node.IsImg,
                 Report = node.Report,
@@ -113,6 +114,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         KiKhaoSatId = menu.KiKhaoSatId,
                         OrderNumber = menu.OrderNumber,
                         IsImg = menu.IsImg,
+                        ChiChtAtvsv = menu.ChiChtAtvsv,
                         Report = menu.Report,
                         NumberImg = menu.NumberImg ?? 0,
                         Expanded = true,
@@ -142,7 +144,7 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
-                var tieuChi = _dbContext.TblBuTieuChi.Where(x => x.IsDeleted != true && x.KiKhaoSatId == kiKhaoSatId && x.IsGroup == false).OrderBy(x => x.Id).ToList();
+                var tieuChi = _dbContext.TblBuTieuChi.Where(x => x.IsDeleted != true && x.KiKhaoSatId == kiKhaoSatId && x.IsGroup == false).OrderBy(x => x.CreateDate).ToList();
                 var lstBlack = _dbContext.TblBuCriteriaExcludedObject.Where(x => x.IsDeleted != true).ToList();
                 var lstDiem = _dbContext.TblBuTinhDiemTieuChi.OrderBy(x => x.MoTa).ToList();
                 var lstTieuChiLeaves = new List<TieuChiDto>();
@@ -163,6 +165,7 @@ namespace PLX5S.BUSINESS.Services.BU
                             IsGroup = item.IsGroup,
                             NumberImg = item.NumberImg,
                             KiKhaoSatId = item.KiKhaoSatId,
+                            ChiChtAtvsv = item.ChiChtAtvsv,
                             OrderNumber = item.OrderNumber,
                             DiemTieuChi = lstDiem.Where(x => x.TieuChiCode == item.Code).ToList(),
                         };

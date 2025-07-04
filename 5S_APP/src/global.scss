@@ -23,6 +23,10 @@ ion-header{
 .d-flex{
   display: flex;
 }
+.d-block{
+  display: block;
+}
+
 :root {
   --safe-top: env(safe-area-inset-top);
 }

@@ -88,6 +88,7 @@ export class CheckListComponent implements OnInit {
   }
   checkRightEvaluate() {
     if (this.kiKhaoSat?.trangThaiKi !== '2') return false;
+    if(this.account.allowScoring) return true;
     return this.doiTuong.lstChamDiem?.some(
       (item: any) => item === this.account.userName
     ) ?? false;

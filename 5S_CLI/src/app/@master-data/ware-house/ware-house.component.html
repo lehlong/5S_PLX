@@ -60,11 +60,11 @@
           <td nzAlign="left">{{ getNameByCodeAccount(data.nguoiPhuTrach) }}</td>
           <td nzAlign="left">{{ getNameByCodeAccount(data.phoneNumber) }}</td>
           <td nzAlign="center">
-            <nz-tag nzColor="success" *ngIf="data.isActive">
+            <nz-tag nzColor="success" *ngIf="data.trangThaiKho">
               <nz-icon nzType="check-circle" />
               <span>Hoạt động</span>
             </nz-tag>
-            <nz-tag nzColor="error" *ngIf="!data.isActive">
+            <nz-tag nzColor="error" *ngIf="!data.trangThaiKho">
               <nz-icon nzType="close-circle" />
               <span>Không hoạt động</span>
             </nz-tag>
@@ -117,6 +117,10 @@
         </div>
 
         <div nz-col [nzXs]="24" [nzMd]="12">
+          <app-input-clear placeholder="Nhập số điện thoại" label="Số điện thoại"
+            [control]="$any(validateForm).controls['phoneNumber']"></app-input-clear>
+        </div>
+        <div nz-col [nzXs]="24" [nzMd]="12">
           <nz-form-item>
             <nz-form-label>* Trạng thái kho</nz-form-label>
             <nz-form-control nzErrorTip="Không được để trống">
@@ -162,11 +166,7 @@
           </nz-form-item>
         </div>
 
-        <div nz-col [nzXs]="24" [nzMd]="12">
-          <app-input-clear placeholder="Nhập số điện thoại" label="Số điện thoại"
-            [control]="$any(validateForm).controls['phoneNumber']"></app-input-clear>
-        </div>
-        <div nz-col [nzXs]="24" [nzMd]="12">
+        <div nz-col [nzXs]="24" [nzMd]="24">
           <nz-form-item>
             <nz-form-label>ATVSV</nz-form-label>
             <nz-form-control nzErrorTip="Không được để trống">

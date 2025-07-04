@@ -53,11 +53,11 @@
             <ng-template #Child>
               <div class="ion-padding" slot="content">
                 <p style="color: red; margin: 0">
-                  <ion-radio-group [value]="filterDiem(node.code)" (ionChange)="setDiem(node, $event)">
+                  <ion-radio-group [value]="filterDiem(node.code)" (ionChange)="setDiem(node, $event)" >
                     <ng-container *ngFor="let diem of node.diemTieuChi; trackBy: trackByKey">
                       <ion-item>
                         <ion-label>{{ diem.moTa }}</ion-label>
-                        <ion-radio slot="end" [value]="diem.id"></ion-radio>
+                        <ion-radio slot="end" [value]="diem.id"  [disabled]="!isEdit" ></ion-radio>
                       </ion-item>
                     </ng-container>
                   </ion-radio-group>
@@ -67,19 +67,19 @@
                       margin-top: 10px;
                     ">
                     <ng-container *ngFor="let i of evaluate?.lstEvaluate; trackBy: trackByKey">
-                      <ion-textarea *ngIf="i.tieuChiCode == node.code" placeholder="Ý kiến đề xuất" autoGrow="true"
+                      <ion-textarea *ngIf="i.tieuChiCode == node.code" [disabled]="!isEdit" placeholder="Ý kiến đề xuất" autoGrow="true"
                         [(ngModel)]="i.feedBack" class="textarea">
                       </ion-textarea>
                     </ng-container>
 
                     <ion-buttons slot="end">
-                      <input class="file" #fileInput type="file" (change)="onImageSelected($event, node.code)"
+                      <input [disabled]="!isEdit"  class="file" #fileInput type="file" (change)="onImageSelected($event, node.code)"
                         accept="image/*,video/*,.pdf,.doc,.docx,.xlsx,.txt" />
-                      <ion-button fill="clear">
+                      <ion-button fill="clear"  [disabled]="!isEdit" >
                         <ion-icon name="document-outline" slot="icon-only"></ion-icon>
                       </ion-button>
 
-                      <ion-button fill="clear" style="z-index: 1000000;" (click)="openCamera(node.code)">
+                      <ion-button fill="clear"  [disabled]="!isEdit"  style="z-index: 1000000;" (click)="openCamera(node.code)">
                         <ion-icon slot="icon-only" name="camera-outline"></ion-icon>
                       </ion-button>
                     </ion-buttons>
@@ -88,7 +88,7 @@
 
                 <div *ngIf="node.isImg" style="margin-top: 10px">
                   <label style="color: orange">[Chú ý: Tối thiểu {{ node.numberImg }} ảnh]</label>
-                  <p *ngIf="hasEnoughImages(node.code, node.numberImg)" style="color: red">
+                  <p *ngIf="hasEnoughImages(node.code, node)" style="color: red">
                     (*) Tiêu chí này bắt buộc chọn {{ node.numberImg }} hình ảnh
                   </p>
                 </div>
@@ -104,11 +104,11 @@
                     <video *ngIf="img.type == 'mp4'" [src]="filePath(img.filePath)" class="image-preview"
                       (click)="openFullScreen(img)" controls style="max-width: 100%"></video>
 
-                    <div style="opacity: 0.5; text-align: center">
-                      {{ img.createDate | date: 'dd/MM/yyyy' }}
+                    <div style="opacity: 0.5; text-align: center; font-size: 13px;">
+                      {{ img.createDate | date: 'HH:mm dd/MM/yyyy' }}
                     </div>
 
-                    <ion-button fill="clear" class="delete-btn" size="small" (click)="deleteImage2(img)">
+                    <ion-button *ngIf="isEdit" fill="clear" class="delete-btn" size="small" (click)="deleteImage2(img)">
                       <ion-icon name="close-circle" slot="icon-only"></ion-icon>
                     </ion-button>
                   </div>
@@ -232,7 +232,7 @@
 <ion-modal [isOpen]="isImageModalOpen" (didDismiss)="isImageModalOpen = false">
   <ng-template>
     <ion-content class="full-image-content" (click)="closeFullScreen()">
-      <ion-button class="delete-button" fill="clear" color="danger" (click)="confirmDeleteImage()">
+      <ion-button class="delete-button" fill="clear" color="danger" *ngIf="isEdit" (click)="confirmDeleteImage()">
         <ion-icon name="trash-outline" slot="end"></ion-icon>
       </ion-button>
       <div *ngIf="selectedImage.type == 'img'">

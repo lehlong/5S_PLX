@@ -38,10 +38,11 @@ export class KiKhaoSatComponent {
   filterNguoiChamDiem: string = '';
   treeData: any = [];
   filter = new KiKhaoSatFilter();
-  lstInputStoreSearch: any = [];
+  lstInputDoiTuongSearch: any = [];
   paginationResult = new PaginationResult();
   loading: boolean = false;
   lstAccount: any = [];
+  lstAllDoiTuong: any = []
   headerId: any = '';
   kiKhaoSatId: any = '';
   calculationRows: any = [];
@@ -117,14 +118,14 @@ export class KiKhaoSatComponent {
     this.search();
   }
   searchNguoiChamDiem() {
-    console.log(this.inputKi.lstInputStore);
-    this.lstInputStoreSearch = this.inputKi.lstInputStore?.filter((item: any) =>
-      item.storeId.toLowerCase().includes(this.filterNguoiChamDiem.toLowerCase()) ||
+    this.lstInputDoiTuongSearch = this.lstAllDoiTuong.filter((item: any) =>
+      item?.storeId?.toLowerCase().includes(this.filterNguoiChamDiem.toLowerCase()) ||
+      item?.wareHouseId?.toLowerCase().includes(this.filterNguoiChamDiem.toLowerCase()) ||
+      item.name.toLowerCase().includes(this.filterNguoiChamDiem.toLowerCase()) ||
       item.cuaHangTruong.toLowerCase().includes(this.filterNguoiChamDiem.toLowerCase()) ||
       item.nguoiPhuTrach.toLowerCase().includes(this.filterNguoiChamDiem.toLowerCase())
-
     );
-    console.log(this.lstInputStoreSearch)
+    // console.log(this.lstInputStoreSearch)
   }
 
   setInSearchKKS() {
@@ -312,16 +313,16 @@ export class KiKhaoSatComponent {
       },
     });
   }
-   CheckTreeLeaves() {
+  CheckTreeLeaves() {
     this._treeTieuChiService.CheckLeaves(this.treeId, this.kiKhaoSatId).subscribe({
       next: (data) => {
         console.log(data);
-         if (data) {
-     this.messageService.error(
-        `Không thể thả tiêu chí có con, vui lòng kiểm tra lại`,
-   )
-    this.BuildDataForTree();
-  }
+        if (data) {
+          this.messageService.error(
+            `Không thể thả tiêu chí có con, vui lòng kiểm tra lại`,
+          )
+          this.BuildDataForTree();
+        }
 
       },
       error: (response) => {
@@ -331,7 +332,17 @@ export class KiKhaoSatComponent {
   }
   resetStore() {
     this.filterNguoiChamDiem = "";
-    this.lstInputStoreSearch = this.inputKi.lstInputStore;
+    this.setDataKy()
+    // this.lstInputDoiTuongSearch = this.inputKi.lstInputStore.length > 0 ? this.inputKi.lstInputStore : this.inputKi.lstInputWarehouse.length > 0 ? this.inputKi.lstInputWareHouse : [];
+  }
+  setDataKy() {
+
+    this.lstAllDoiTuong =
+      this.inputKi.lstInputStore.length > 0
+        ? this.inputKi.lstInputStore : this.inputKi.lstInputWareHouse.length > 0
+          ? this.inputKi.lstInputWareHouse : [];
+    this.lstInputDoiTuongSearch = this.lstAllDoiTuong;
+
   }
 
   onClick(node: any) {
@@ -414,8 +425,10 @@ export class KiKhaoSatComponent {
     this._service.buildObjCreate(this.headerId).subscribe({
       next: (data) => {
         this.inputKi = data
+        console.log(data);
+
         // this.search();
-        this.lstInputStoreSearch = this.inputKi.lstInputStore;
+        this.setDataKy()
       },
       error: (response) => {
         console.log(response);
@@ -433,7 +446,11 @@ export class KiKhaoSatComponent {
 
     this._service.getInputCopyKy(this.inputKi.kyCopyId).subscribe({
       next: (data) => {
+        console.log(data);
+
         this.inputKi = data
+
+        this.setDataKy()
         // this.search();
       },
       error: (response) => {
@@ -459,7 +476,7 @@ export class KiKhaoSatComponent {
     this._service.getInputKiKhaoSat(data.id).subscribe({
       next: (data) => {
         this.inputKi = data
-        this.lstInputStoreSearch = this.inputKi.lstInputStore;
+        this.setDataKy()
       }
     })
     console.log(this.kiKhaoSat)
@@ -471,17 +488,17 @@ export class KiKhaoSatComponent {
 
   nzEvent(event: NzFormatEmitEvent): void {
     console.log('sự kiện', event);
-   }
+  }
 
   onDrop(event: any) {
-   this.treeId = event.node.origin.code;
-   console.log("ss",event.node.parentNode.origin.code==event.dragNode.parentNode.origin.code);
-   if (event.node.parentNode.origin.code != event.dragNode.parentNode.origin.code) {
-    this.CheckTreeLeaves();
-   }
-   
- 
-    
+    this.treeId = event.node.origin.code;
+    console.log("ss", event.node.parentNode.origin.code == event.dragNode.parentNode.origin.code);
+    if (event.node.parentNode.origin.code != event.dragNode.parentNode.origin.code) {
+      this.CheckTreeLeaves();
+    }
+
+
+
   }
 
   onDragStart(event: any) { }
@@ -740,5 +757,8 @@ export class KiKhaoSatComponent {
       (i: any) => i.doiTuongId === id && i.tieuChiCode === this.leavesNode.code && !i.isDeleted
     );
 
+  trackByKey(index: number, item: any): string {
+    return item.key; // hoặc item.id nếu bạn dùng id
+  }
 
 }

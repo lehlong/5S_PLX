@@ -11,6 +11,7 @@ using PLX5S.BUSINESS.Dtos.MD;
 using PLX5S.CORE.Entities.MD;
 using PLX5S.CORE;
 using PLX5S.CORE.Entities.BU;
+using PLX5S.CORE.Entities.AD;
 
 namespace PLX5S.BUSINESS.Services.MD
 {
@@ -51,6 +52,17 @@ namespace PLX5S.BUSINESS.Services.MD
         {
             try
             {
+                var lstUpdateAccount = new List<TblAdAccount>();
+
+                var lstAccount = _dbContext.TblAdAccount.OrderBy(x => x.UserName).ToList();
+
+                var CHT = lstAccount.FirstOrDefault(x => x.UserName == data.TruongKho);
+                CHT.ChucVuId = "TK";
+                lstUpdateAccount.Add(CHT);
+
+                var nguoiPhuTrach = lstAccount.FirstOrDefault(x => x.UserName == data.NguoiPhuTrach);
+                nguoiPhuTrach.ChucVuId = "717cae63-83e6-40af-a324-6fc41eb0f121";
+                lstAccount.Add(nguoiPhuTrach);
 
                 var store = new TblMdWareHouse()
                 {
@@ -58,22 +70,31 @@ namespace PLX5S.BUSINESS.Services.MD
                     Name = data.Name,
                     TruongKho = data.TruongKho,
                     NguoiPhuTrach = data.NguoiPhuTrach,
+                    TrangThaiKho = data.TrangThaiKho,
                     IsActive = data.IsActive,
                     KinhDo = data.KinhDo,
                     ViDo = data.ViDo
                 };
                 _dbContext.TblMdWareHouse.Add(store);
 
+                var lstAtvs = new List<TblBuInputAtvsv>();
                 foreach (var item in data.ATVSV)
                 {
-                    var atvsv = new TblBuInputAtvsv();
-                    atvsv.Id = Guid.NewGuid().ToString();
-                    atvsv.Name = item;
-                    atvsv.InputStoreId = data.Id;
-                    atvsv.IsActive = true;
-                    atvsv.Type = "DT2";
-                    _dbContext.TblBuInputAtvsv.AddRange(atvsv);
+                    var atvsv = new TblBuInputAtvsv
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = item,
+                        InputStoreId = data.Id,
+                        IsActive = true,
+                        Type = "DT2",
+                    };
+                    lstAtvs.Add(atvsv);
+                    var vsv = lstAccount.FirstOrDefault(x => x.UserName == item);
+                    vsv.ChucVuId = "ATVSV";
+                    lstUpdateAccount.Add(vsv);
                 }
+                _dbContext.TblAdAccount.UpdateRange(lstUpdateAccount.Distinct());
+                _dbContext.TblBuInputAtvsv.AddRange(lstAtvs);
 
                 await _dbContext.SaveChangesAsync();
             }
@@ -89,6 +110,17 @@ namespace PLX5S.BUSINESS.Services.MD
         {
             try
             {
+                var lstUpdateAccount = new List<TblAdAccount>();
+
+                var lstAccount = _dbContext.TblAdAccount.OrderBy(x => x.UserName).ToList();
+
+                var CHT = lstAccount.FirstOrDefault(x => x.UserName == data.TruongKho);
+                CHT.ChucVuId = "TK";
+                lstUpdateAccount.Add(CHT);
+
+                var nguoiPhuTrach = lstAccount.FirstOrDefault(x => x.UserName == data.NguoiPhuTrach);
+                nguoiPhuTrach.ChucVuId = "717cae63-83e6-40af-a324-6fc41eb0f121";
+                lstAccount.Add(nguoiPhuTrach);
 
                 var store = new TblMdWareHouse()
                 {
@@ -96,6 +128,7 @@ namespace PLX5S.BUSINESS.Services.MD
                     Name = data.Name,
                     TruongKho = data.TruongKho,
                     NguoiPhuTrach = data.NguoiPhuTrach,
+                    TrangThaiKho = data.TrangThaiKho,
                     IsActive = data.IsActive,
                     KinhDo = data.KinhDo,
                     ViDo = data.ViDo
@@ -104,16 +137,25 @@ namespace PLX5S.BUSINESS.Services.MD
                 _dbContext.TblMdWareHouse.Update(store);
                 var lstdel = _dbContext.TblBuInputAtvsv.Where(x => x.InputStoreId == data.Id);
                 _dbContext.TblBuInputAtvsv.RemoveRange(lstdel);
+                
+                var lstAtvs = new List<TblBuInputAtvsv>();
                 foreach (var item in data.ATVSV)
                 {
-                    var atvsv = new TblBuInputAtvsv();
-                    atvsv.Id = Guid.NewGuid().ToString();
-                    atvsv.Name = item;
-                    atvsv.InputStoreId = data.Id;
-                    atvsv.IsActive = true;
-                    atvsv.Type = "DT2";
-                    _dbContext.TblBuInputAtvsv.AddRange(atvsv);
+                    var atvsv = new TblBuInputAtvsv
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = item,
+                        InputStoreId = data.Id,
+                        IsActive = true,
+                        Type = "DT2",
+                    };
+                    lstAtvs.Add(atvsv);
+                    var vsv = lstAccount.FirstOrDefault(x => x.UserName == item);
+                    vsv.ChucVuId = "ATVSV";
+                    lstUpdateAccount.Add(vsv);
                 }
+                _dbContext.TblAdAccount.UpdateRange(lstUpdateAccount.Distinct());
+                _dbContext.TblBuInputAtvsv.AddRange(lstAtvs);
 
                 await _dbContext.SaveChangesAsync();
             }

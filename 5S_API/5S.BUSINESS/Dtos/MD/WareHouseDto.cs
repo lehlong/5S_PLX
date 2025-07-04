@@ -27,9 +27,6 @@ namespace PLX5S.BUSINESS.Dtos.MD
         [Description("Người phụ trách")]
         public string NguoiPhuTrach { get; set; }
 
-        [Description("Trạng Thái cửa hàng")]
-        public bool TrangThaiCuaHang { get; set; }
-
         [Description("Số điện thoại")]
         public string? PhoneNumber { get; set; }
 
@@ -40,6 +37,7 @@ namespace PLX5S.BUSINESS.Dtos.MD
         public bool TrangThaiKho { get; set; }
 
         public List<string> ATVSV { get; set; }
+        
         [Description("Kinh do")]
         public string? KinhDo { get; set; }
         

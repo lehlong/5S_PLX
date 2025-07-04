@@ -75,6 +75,17 @@ namespace PLX5S.BUSINESS.Services.MD
         {
             try
             {
+                var lstUpdateAccount = new List<TblAdAccount>();
+
+                var lstAccount = _dbContext.TblAdAccount.OrderBy(x => x.UserName).ToList();
+
+                var CHT = lstAccount.FirstOrDefault(x => x.UserName == data.CuaHangTruong);
+                CHT.ChucVuId = "CHT";
+                lstUpdateAccount.Add(CHT);
+
+                var nguoiPhuTrach = lstAccount.FirstOrDefault(x => x.UserName == data.NguoiPhuTrach);
+                nguoiPhuTrach.ChucVuId = "717cae63-83e6-40af-a324-6fc41eb0f121";
+                lstAccount.Add(nguoiPhuTrach);
 
                 var store = new TblMdStore()
                 {
@@ -99,7 +110,13 @@ namespace PLX5S.BUSINESS.Services.MD
                     atvsv.InputStoreId = data.Id;
                     atvsv.IsActive = true;
                     atvsv.Type = "DT1";
+
+                    _dbContext.TblAdAccount.UpdateRange(lstUpdateAccount.Distinct());
                     _dbContext.TblBuInputAtvsv.AddRange(atvsv);
+
+                    var vsv = lstAccount.FirstOrDefault(x => x.UserName == item);
+                    vsv.ChucVuId = "ATVSV";
+                    lstUpdateAccount.Add(vsv);
                 }
 
                 await _dbContext.SaveChangesAsync();

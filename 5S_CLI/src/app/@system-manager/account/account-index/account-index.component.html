@@ -4,7 +4,7 @@
   <nz-page-header-extra>
     <div class="flex-grow-2 flex">
       <nz-space>
-        <nz-select class="flex-grow" nzShowSearch nzAllowClear nzPlaceHolder="Chức vụ"
+        <nz-select class="flex-grow" nzShowSearch nzAllowClear nzPlaceHolder="Chức vụ"style="width: 200px;"
           [(ngModel)]="filter.chucVuId">
           <nz-option *ngFor="let item of lstChucVu" [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
         </nz-select>

@@ -103,58 +103,72 @@ namespace PLX5S.BUSINESS.Services.BU
                 return null;
             }
         }
-
         public async Task<KiKhaoSatModel> BuilObjCreate(string surveyMgmtId)
         {
-            var lstInStore = _dbContext.TblBuInputStore.Where(x => x.IsActive == true && x.SurveyMgmtId == surveyMgmtId).ToList();
-            var lstMdStore = _dbContext.tblMdStore.Where(x => x.IsActive == true).OrderBy(x => x.Id).ToList();
-            var lstMdWareHouse = _dbContext.TblMdWareHouse.Where(x => x.IsDeleted != true).ToList();
-            var lstInWareHouse = _dbContext.TblBuInputWareHouse.Where(x => x.IsActive == true && x.SurveyMgmtId == surveyMgmtId).ToList();
-            var kiKhaoSatModel = new KiKhaoSatModel();
-           
+            // Lấy danh sách ID trước để tránh .Select(...).Contains(...) nhiều lần
+            var lstInStore = await _dbContext.TblBuInputStore
+                .Where(x => x.IsActive == true && x.SurveyMgmtId == surveyMgmtId)
+                .ToListAsync();
+            var storeIds = lstInStore.Select(x => x.StoreId).ToHashSet();
 
-            return new KiKhaoSatModel()
+            var lstMdStore = await _dbContext.tblMdStore
+                .Where(x => x.IsActive == true && storeIds.Contains(x.Id))
+                .OrderBy(x => x.Id)
+                .ToListAsync();
+
+            var lstInWareHouse = await _dbContext.TblBuInputWareHouse
+                .Where(x => x.IsActive == true && x.SurveyMgmtId == surveyMgmtId)
+                .ToListAsync();
+            var wareHouseIds = lstInWareHouse.Select(x => x.WareHouseId).ToHashSet();
+
+            var lstMdWareHouse = await _dbContext.TblMdWareHouse
+                .Where(x => wareHouseIds.Contains(x.Id))
+                .ToListAsync();
+
+            var kiKhaoSat = new TblBuKiKhaoSat
             {
-                KiKhaoSat = new TblBuKiKhaoSat()
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Code = "",
-                    Name = "",
-                    Des = "",
-                    StartDate = DateTime.Now,
-                    EndDate = DateTime.Now,
-                    SurveyMgmtId = surveyMgmtId,
-                    IsActive = true,
-                    IsDeleted = false
-                },
-                lstInputStore = lstMdStore.Where(x => lstInStore.Select(x => x.StoreId).Contains(x.Id)).Select(x => new InputStore
-                {
-                    Id = x.Id,
-                    PhoneNumber = x.PhoneNumber,
-                    Name = x.Name,
-                    CuaHangTruong = x.CuaHangTruong,
-                    NguoiPhuTrach = x.NguoiPhuTrach,
-                    ViDo = x.ViDo,
-                    KinhDo = x.KinhDo,
-                    TrangThaiCuaHang = x.TrangThaiCuaHang,
-                    StoreId = x.Id,
-                    SurveyMgmtId = surveyMgmtId,
-                }).ToList(),
-
-                lstInputWareHouse = lstMdWareHouse.Where(x => lstInWareHouse.Select(x => x.WareHouseId).Contains(x.Id)).Select(x => new InputWarehouse
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    TruongKho = x.TruongKho,
-                    NguoiPhuTrach = x.NguoiPhuTrach,
-                    WareHouseId = x.Id,
-                    SurveyMgmtId = surveyMgmtId,
-                }).ToList(),
+                Id = Guid.NewGuid().ToString(),
+                Code = "",
+                Name = "",
+                Des = "",
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now,
+                SurveyMgmtId = surveyMgmtId,
+                IsActive = true,
+                IsDeleted = false
             };
 
+            var lstInputStore = lstMdStore.Select(x => new InputStore
+            {
+                Id = x.Id,
+                PhoneNumber = x.PhoneNumber,
+                Name = x.Name,
+                CuaHangTruong = x.CuaHangTruong,
+                NguoiPhuTrach = x.NguoiPhuTrach,
+                ViDo = x.ViDo,
+                KinhDo = x.KinhDo,
+                TrangThaiCuaHang = x.TrangThaiCuaHang,
+                StoreId = x.Id,
+                SurveyMgmtId = surveyMgmtId,
+            }).ToList();
+
+            var lstInputWareHouse = lstMdWareHouse.Select(x => new InputWarehouse
+            {
+                Id = x.Id,
+                Name = x.Name,
+                TruongKho = x.TruongKho,
+                NguoiPhuTrach = x.NguoiPhuTrach,
+                WareHouseId = x.Id,
+                SurveyMgmtId = surveyMgmtId,
+            }).ToList();
+
+            return new KiKhaoSatModel
+            {
+                KiKhaoSat = kiKhaoSat,
+                lstInputStore = lstInputStore,
+                lstInputWareHouse = lstInputWareHouse
+            };
         }
-
-
         public async Task Insert(KiKhaoSatModel data)
         {
             try
@@ -402,6 +416,8 @@ namespace PLX5S.BUSINESS.Services.BU
             try
             {
                 _dbContext.TblBuKiKhaoSat.Update(data.KiKhaoSat);
+
+
 
                 foreach (var item in data.lstInputStore)
                 {

@@ -45,6 +45,7 @@ export class EvaluateComponent implements OnInit {
   searchKeyword = '';
   searchResults: { id: string; type: string }[] = [];
   currentIndex = 0;
+  tieuChiIndex = 0
   selectedAccordionId: string = '';
   currentSelect: string = '';
   lstAllTieuChi: any = [];
@@ -84,7 +85,7 @@ export class EvaluateComponent implements OnInit {
     private messageService: MessageService,
     private cdr: ChangeDetectorRef,
     private renderer: Renderer2
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.apiFile =
@@ -118,7 +119,9 @@ export class EvaluateComponent implements OnInit {
         );
         if (data == null) {
           this.getAllTieuChi();
-          this.getAllTieuChiLeaves();
+          console.log(this.dataTree);
+
+          // this.getAllTieuChiLeaves();
         } else {
           this.dataTree = JSON.parse(data);
           this.treeData = this.dataTree?.tree;
@@ -233,12 +236,14 @@ export class EvaluateComponent implements OnInit {
     this._service
       .buildDataTreeForApp(this.kiKhaoSat.id, this.doiTuong.id)
       .subscribe({
-        next: (data) => {
+        next: async (data) => {
           this.treeData = [data];
           this.lstTreeOpen = [...this.extractAllKeys([data])];
+          this.lstTieuChi = await this.filterTieuChiLeaves(this.treeData)
 
+          this.dataTree.leaves = this.lstTieuChi
           this.dataTree.tree = this.treeData;
-          console.log(this.dataTree);
+
           localStorage.setItem(
             this.doiTuong.id + '_' + this.kiKhaoSat.code,
             JSON.stringify(this.dataTree)
@@ -249,27 +254,37 @@ export class EvaluateComponent implements OnInit {
       });
   }
 
-  getAllTieuChiLeaves() {
-    this._service
-      .GetAllTieuChiLeaves(this.kiKhaoSat.id, this.doiTuong.id)
-      .subscribe({
-        next: (data) => {
-          this.lstTieuChi = data;
+  filterTieuChiLeaves(tree: any[]) {
+    let result: any[] = [];
 
-          this.dataTree.leaves = this.lstTieuChi;
-          console.log(this.dataTree);
-        },
-      });
+    for (const node of tree) {
+      if (node.isGroup === false) {
+        result.push(node);
+      }
+
+      if (Array.isArray(node.children) && node.children.length > 0) {
+        result = result.concat(this.filterTieuChiLeaves(node.children));
+      }
+    }
+    return result;
   }
 
   isValidChildren(children: any): boolean {
     return Array.isArray(children) && children.length > 0;
   }
 
+  // renderTitle(node: any) {
+
+  //   if(node.isGroup) return node.title;
+
+
+  //   console.log(node);
+  //   return (this.tieuChiIndex = this.tieuChiIndex + 1) + '- ' + node.title
+  // }
+
   //Active
   setItem(itemId: string) {
     this.currentSelect = itemId;
-    console.log(itemId);
     this.selectedAccordionId = itemId;
     const element = document.getElementById(itemId);
     if (element) {
@@ -334,22 +349,29 @@ export class EvaluateComponent implements OnInit {
         .find((d: any) => d.id === evaluateItem?.pointId)?.diem ?? '';
 
     if (data.isImg) {
-      const numberImgRequired = data?.numberImg || 0;
-      const hasImage = this.evaluate?.lstImages.filter(
-        (img: any) => img.tieuChiCode === data.code
-      ).length;
-      hasEnoughImages = hasImage >= numberImgRequired;
+      if (data.chiChtAtvsv && !(this.account.chucVuId === 'CHT' || this.account.chucVuId === 'ATVSV')) {
+        hasEnoughImages = true;
+      } else {
+        const numberImgRequired = data?.numberImg || 0;
+        const hasImage = this.evaluate?.lstImages.filter(
+          (img: any) => img.tieuChiCode === data.code
+        ).length;
+        hasEnoughImages = hasImage >= numberImgRequired;
+      }
     }
     if (diem === '' || !hasEnoughImages) return '';
 
     return diem > 0 ? 'answered' : 'red-false';
   }
 
-  hasEnoughImages(code: any, requiredNumber: any): boolean {
+  hasEnoughImages(code: any, node: any): boolean {
+    if (node.chiChtAtvsv) {
+      if (this.account.chucVuId != 'CHT' || this.account.chucVuId != 'ATVSV') return false
+    }
     const imagesSelecting = this.evaluate?.lstImages.filter(
       (img: any) => img.tieuChiCode === code
     ).length;
-    return imagesSelecting < requiredNumber;
+    return imagesSelecting < node.numberImg;
   }
 
   extractAllKeys(tree: any[]): string[] {
@@ -584,10 +606,16 @@ export class EvaluateComponent implements OnInit {
 
       // Kiểm tra có đủ ảnh không
       if (tieuChi.isImg) {
+
+        if (tieuChi.chiChtAtvsv && !(this.account.chucVuId === 'CHT' || this.account.chucVuId === 'ATVSV')) {
+          continue;
+        }
+
         const numberImgRequired = tieuChi.numberImg || 0;
         const imagesSelecting = this.evaluate?.lstImages?.filter(
           (img: any) => img.tieuChiCode === tieuChi.code
         ).length;
+
         if (imagesSelecting < numberImgRequired) {
           errorMessage += `- Tiêu chí "${tieuChi.name}" thiếu ảnh. `;
           allChecksPassed = false;
@@ -604,11 +632,11 @@ export class EvaluateComponent implements OnInit {
       await alert.present();
       return;
     }
-    // this.tinhTongLanCham()
 
     // Trường hợp đủ
     this.evaluate.header.accountUserName = this.account.userName;
     this.evaluate.header.chucVuId = this.account.chucVuId;
+    this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
 
     this._service.insertEvaluate(this.evaluate).subscribe({
       next: () => {
@@ -854,10 +882,14 @@ export class EvaluateComponent implements OnInit {
   // }
 
   openMenu() {
+    if (this.lstTieuChi.length == 0) {
+      // this.filterTieuChiLeaves(this.treeData)
+    }
     this.daCham =
       document.querySelectorAll('.div-dem .answered').length +
       document.querySelectorAll('.div-dem .red-false').length;
     this.chuaCham = this.lstTieuChi.length - this.daCham;
+
   }
 
   getFullName(userName: string): string {

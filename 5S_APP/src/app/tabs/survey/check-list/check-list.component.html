@@ -29,14 +29,19 @@
     <ion-item *ngFor="let item of lstHisEvaluate" style="--padding-start: 0px;  --inner-padding-end: 0px; ">
       <ion-grid>
         <ion-item-sliding lines="none" style="padding: 0;">
-          <ion-item lines="none" [button]="true" style="display: flex; width: 100%; padding: 0; justify-content: space-between;"   (click)="openEditEvaluate(item)">
+          <ion-item lines="none" [button]="true" style="display: flex; width: 100%; padding-bottom: 4px; justify-content: space-between;"   (click)="openEditEvaluate(item)">
             <div class="">
-              <h5 class="mg-0">{{ item?.name }}</h5>
-              <span class="text-italic">{{ getFullName(item.accountUserName) }}</span>
+              <h5 class="mg-0" style="margin: 9px 0;">{{ item?.name }}</h5>
+              <span class="text-italic" style="font-size: 14px;">{{ getFullName(item.accountUserName) }}</span>
             </div>
             <div slot="end">
-              <p class="mg-0">{{ item.point ?? '0' }} điểm</p>
-              <span class="text-italic">{{ item.updateDate | date: 'HH:mm dd/MM/yyyy' }}</span>
+              <p class="mg-0" style="padding-left: 70px;">
+                <ion-chip slot="end" color="primary">
+                  {{ item.point ?? '0' }}
+
+                </ion-chip>
+              </p>
+              <span class="text-italic" style="font-size: 14px;">{{ item.updateDate | date: 'HH:mm dd/MM/yyyy' }}</span>
             </div>
           </ion-item>
           <ion-item-options *ngIf="item.name == 'Bản nháp'" slot="end">
