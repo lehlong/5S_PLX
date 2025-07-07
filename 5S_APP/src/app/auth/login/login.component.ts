@@ -57,11 +57,11 @@ export class LoginComponent implements OnInit {
 
   processLogin() {
     this.isLogin = true;
-    // this.model.deviceId = this.deviceId;
+    this.model.deviceId = this.deviceId;
     // this.model.deviceId = 'faf599b6-41d0-4156-b34d-ad6b16d69282';
-    this.model.deviceId = "47d6a7ca58006a50";
-    // this.model.deviceName = this.info.name ;
-    this.model.deviceName = 'iphone';
+    // this.model.deviceId = "47d6a7ca58006a50";
+    this.model.deviceName = this.info.name ;
+    // this.model.deviceName = 'iphone';
     this.model.model = this.info.model;
     this.model.operatingSystem = this.info.operatingSystem;
     this.model.osVersion = this.info.osVersion;
@@ -130,21 +130,21 @@ export class LoginComponent implements OnInit {
 
   async registerPushNotifications() {
     let permStatus = await PushNotifications.checkPermissions();
-    alert('permStatus: ' + permStatus);
+    // alert('permStatus: ' + permStatus);
 
     if (permStatus.receive === 'prompt') {
       permStatus = await PushNotifications.requestPermissions();
     }
     if(permStatus.receive !== 'granted') {
-      alert('Push notifications permission denied');
+      // alert('Push notifications permission denied');
     }
     if (permStatus.receive === 'granted') {
       try {
         await PushNotifications.register();
-        alert('Push notifications registered successfully');
+        // alert('Push notifications registered successfully');
       } catch (error) {
         console.error('Error registering push notifications:', error);
-        alert('Error registering push notifications: ' + error);
+        // alert('Error registering push notifications: ' + error);
       }
     }
 

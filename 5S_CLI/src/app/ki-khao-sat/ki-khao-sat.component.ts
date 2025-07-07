@@ -335,8 +335,8 @@ export class KiKhaoSatComponent {
     this.setDataKy()
     // this.lstInputDoiTuongSearch = this.inputKi.lstInputStore.length > 0 ? this.inputKi.lstInputStore : this.inputKi.lstInputWarehouse.length > 0 ? this.inputKi.lstInputWareHouse : [];
   }
-  setDataKy() {
 
+  setDataKy() {
     this.lstAllDoiTuong =
       this.inputKi.lstInputStore.length > 0
         ? this.inputKi.lstInputStore : this.inputKi.lstInputWareHouse.length > 0
@@ -426,8 +426,6 @@ export class KiKhaoSatComponent {
       next: (data) => {
         this.inputKi = data
         console.log(data);
-
-        // this.search();
         this.setDataKy()
       },
       error: (response) => {

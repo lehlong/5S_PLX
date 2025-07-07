@@ -105,7 +105,6 @@ namespace PLX5S.BUSINESS.Services.BU
         }
         public async Task<KiKhaoSatModel> BuilObjCreate(string surveyMgmtId)
         {
-            // Lấy danh sách ID trước để tránh .Select(...).Contains(...) nhiều lần
             var lstInStore = await _dbContext.TblBuInputStore
                 .Where(x => x.IsActive == true && x.SurveyMgmtId == surveyMgmtId)
                 .ToListAsync();
