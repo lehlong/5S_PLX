@@ -55,10 +55,30 @@ namespace PLX5S.BUSINESS.Models
         public string? Name { set; get; }
         public List<LstTieuChiDeXuat>? lstTieuChiDeXuat { set; get; }
     }
+
+    //Báo cáo hình ảnh
+    public class BaoCaoHinhAnh
+    {
+        public string? stt { set; get; }
+        public string? Name { set; get; }
+        public List<LstHinhAnhBaoCao>? lstHinhAnhBaoCao { set; get; }
+    }
+
+    public class LstHinhAnhBaoCao
+    {
+        public string? TieuChi { set; get; }
+        public string? HinhAnh { set; get; }
+        public string? Thumbnail { set; get; }
+        public string? CanBo { set; get; }
+        public string? ChucVu { set; get; }
+        public string? ThoiGian { set; get; }
+    }
     public class LstTieuChiDeXuat
     {
         public string? TieuChi { set; get; }
+
         public string? DeXuat { set; get; }
+
         public string? CanBo { set; get; }
         public string? ChucVu { set; get; }
         public string? ThoiGian { set; get; }

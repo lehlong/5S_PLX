@@ -33,6 +33,8 @@ namespace PLX5S.BUSINESS.Services.BU
         Task<List<ThoiGianChamDiem>> ThietBiChamDiem(FilterReport filterReport);
         Task<List<TheoKhungThoiGian>> TheoKhungThoiGian(FilterReport filterReport);
         Task<List<TongHopYKienDeXuat>> TongHopYKienDeXuat(FilterReport filterReport);
+
+        Task<List<BaoCaoHinhAnh>> BaoCaoHinhAnh(FilterReport filterReport);
         Task<string> ExportExcel(string ReportName, FilterReport filterReport);
     }
 
@@ -56,7 +58,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
                 var result = new List<KetQuaChamDiem>();
                 var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
-                if(filterReport.SurveyId == "DT1")
+                if (filterReport.SurveyId == "DT1")
                 {
                     var lstDoiTuong = inputKy.Result.lstInputStore.ToList();
 
@@ -70,7 +72,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         var report = new KetQuaChamDiem()
                         {
                             stt = item.StoreId,
-                            Name= item.Name,
+                            Name = item.Name,
                             Length = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Length ?? 0,
                             point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
                         };
@@ -101,9 +103,9 @@ namespace PLX5S.BUSINESS.Services.BU
                     }
 
                 }
-                    return result;
+                return result;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 return null;
             }
@@ -231,7 +233,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         result.Add(report);
                     }
                 }
-                    return result;
+                return result;
             }
             catch (Exception ex)
             {
@@ -246,7 +248,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
                 var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
                 var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
-                    var result = new List<TheoKhungThoiGian>();
+                var result = new List<TheoKhungThoiGian>();
                 if (filterReport.SurveyId == "DT1")
                 {
                     var lstDoiTuong = inputKy.Result.lstInputStore.ToList();
@@ -318,7 +320,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
                 var lstEvaValue = _dbContext.TblBuEvaluateValue.Where(x => x.FeedBack != "").ToList();
                 var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
-                    var result = new List<TongHopYKienDeXuat>();
+                var result = new List<TongHopYKienDeXuat>();
 
                 if (filterReport.SurveyId == "DT1")
                 {
@@ -396,7 +398,106 @@ namespace PLX5S.BUSINESS.Services.BU
                         result.Add(a);
                     }
                 }
-                    return result;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                this.Status = false;
+                return null;
+            }
+        }
+
+        //Báo cáo hình ảnh
+        public async Task<List<BaoCaoHinhAnh>> BaoCaoHinhAnh(FilterReport filterReport)
+        {
+            try
+            {
+                var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
+                var lstTieuChi = _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId && x.IsGroup == false).ToList();
+                var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                var lstEvaValue = _dbContext.TblBuEvaluateImage.Where(x => x.FilePath != "").ToList();
+                var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                var result = new List<BaoCaoHinhAnh>();
+
+                if (filterReport.SurveyId == "DT1")
+                {
+                    var lstDoiTuong = inputKy.Result.lstInputStore.ToList();
+
+                    if (!string.IsNullOrWhiteSpace(filterReport.DoiTuongId))
+                    {
+                        lstDoiTuong = lstDoiTuong.Where(x => x.Id == filterReport.DoiTuongId).ToList();
+                    }
+
+                    foreach (var i in lstPoint)
+                    {
+                        var store = lstDoiTuong.FirstOrDefault(x => x.Id == i.DoiTuongId);
+                        var lstHeader = lstEvaHeader.Where(x => x.DoiTuongId == i.DoiTuongId).ToList();
+
+                        var lstHinhAnh = new List<LstHinhAnhBaoCao>();
+                        foreach (var item in lstHeader)
+                        {
+                            var ab = lstEvaValue.Where(x => x.EvaluateHeaderCode == item.Code).Select(x => new LstHinhAnhBaoCao()
+                            {
+                                TieuChi = lstTieuChi.FirstOrDefault(b => b.Code == x.TieuChiCode)?.Name,
+                                HinhAnh = x.FilePath,
+                                Thumbnail = x.PathThumbnail,
+                                CanBo = item.AccountUserName,
+                                ChucVu = item?.ChucVuId,
+                                ThoiGian = i.UpdateDate?.ToString("HH:mm dd/MM/yyyy")
+                            }).ToList();
+
+                            lstHinhAnh.AddRange(ab);
+                        }
+
+                        var a = new BaoCaoHinhAnh()
+                        {
+                            stt = store.StoreId,
+                            Name = store.Name,
+                            lstHinhAnhBaoCao = lstHinhAnh
+                        };
+                        result.Add(a);
+                    }
+                }
+                else if (filterReport.SurveyId == "DT2")
+                {
+                    var lstDoiTuong = inputKy.Result.lstInputWareHouse.ToList();
+
+                    if (!string.IsNullOrWhiteSpace(filterReport.DoiTuongId))
+                    {
+                        lstDoiTuong = lstDoiTuong.Where(x => x.Id == filterReport.DoiTuongId).ToList();
+                    }
+
+                    foreach (var i in lstPoint)
+                    {
+                        var store = lstDoiTuong.FirstOrDefault(x => x.Id == i.DoiTuongId);
+                        var lstHeader = lstEvaHeader.Where(x => x.DoiTuongId == i.DoiTuongId).ToList();
+
+                        var lstHinhAnh = new List<LstHinhAnhBaoCao>();
+                        foreach (var item in lstHeader)
+                        {
+                            var ab = lstEvaValue.Where(x => x.EvaluateHeaderCode == item.Code).Select(x => new LstHinhAnhBaoCao()
+                            {
+                                TieuChi = lstTieuChi.FirstOrDefault(b => b.Code == x.TieuChiCode).Name,
+                                HinhAnh = x.FilePath,
+                                Thumbnail = x.PathThumbnail,
+                                CanBo = item.AccountUserName,
+                                ChucVu = item.ChucVuId,
+                                ThoiGian = i.UpdateDate?.ToString("HH:mm dd/MM/yyyy")
+                            }).ToList();
+
+                            lstHinhAnh.AddRange(ab);
+                        }
+
+                        var a = new BaoCaoHinhAnh()
+                        {
+                            stt = store.WareHouseId,
+                            Name = store.Name,
+                            lstHinhAnhBaoCao = lstHinhAnh
+                        };
+                        result.Add(a);
+                    }
+                }
+                return result;
             }
             catch (Exception ex)
             {
@@ -479,7 +580,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         ExcelNPOIExtention.SetCellValueText(row, 0, i.stt, styles.Text);
                         ExcelNPOIExtention.SetCellValueText(row, 1, i.Name, styles.Text);
                         ExcelNPOIExtention.SetCellValueNumber(row, 2, i.Length, styles.Number);
-                        ExcelNPOIExtention.SetCellValueNumber(row, 3, i.point , styles.Number);
+                        ExcelNPOIExtention.SetCellValueNumber(row, 3, i.point, styles.Number);
                         ExcelNPOIExtention.SetCellValueText(row, 4, "", styles.Text);
                         ExcelNPOIExtention.SetCellValueText(row, 5, "", styles.Text);
 
@@ -511,7 +612,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         TextCenterBold = ExcelNPOIExtention.SetCellStyleText(workbook, true, HorizontalAlignment.Center, true),
                         Number = ExcelNPOIExtention.SetCellStyleNumber(workbook, false, HorizontalAlignment.Right, true),
                         NumberBold = ExcelNPOIExtention.SetCellStyleNumber(workbook, true, HorizontalAlignment.Right, true),
-                       
+
                     };
                     var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
                     var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.IsActive == true && x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
@@ -568,17 +669,17 @@ namespace PLX5S.BUSINESS.Services.BU
                             result.Add(report);
                         }
                     }
-                   
+
                     var sheet = workbook.GetSheetAt(0);
                     var row1 = sheet.GetRow(0) ?? sheet.CreateRow(0);
                     var row2 = sheet.GetRow(1) ?? sheet.CreateRow(1);
                     var row3 = sheet.GetRow(2) ?? sheet.CreateRow(2);
-                    var maxCellCHt = result.MaxBy(x => x.Cht?.Count ?? 0).Cht.Count() == 0 ? 1:result.MaxBy(x => x.Cht?.Count ?? 0).Cht.Count();
-                    var maxCellATVSV = result.MaxBy(x => x.Atvsv?.Count ?? 0).Atvsv.Count()==0? 1: result.MaxBy(x => x.Atvsv?.Count ?? 0).Atvsv.Count();
+                    var maxCellCHt = result.MaxBy(x => x.Cht?.Count ?? 0).Cht.Count() == 0 ? 1 : result.MaxBy(x => x.Cht?.Count ?? 0).Cht.Count();
+                    var maxCellATVSV = result.MaxBy(x => x.Atvsv?.Count ?? 0).Atvsv.Count() == 0 ? 1 : result.MaxBy(x => x.Atvsv?.Count ?? 0).Atvsv.Count();
                     var maxCellTCG5s = result.MaxBy(x => x.ChuyenGia?.Count ?? 0).ChuyenGia.Count() == 0 ? 1 : result.MaxBy(x => x.ChuyenGia?.Count ?? 0).ChuyenGia.Count();
 
-                  
-                  
+
+
                     //header
                     ExcelNPOIExtention.SetCellValueText(row1, 0, "STT", styles.Text);
                     ExcelNPOIExtention.SetCellValueText(row1, 1, "TÊN ĐƠN VỊ", styles.Text);
@@ -588,7 +689,7 @@ namespace PLX5S.BUSINESS.Services.BU
                     ExcelNPOIExtention.SetCellValueText(row1, maxCellCHt + maxCellATVSV + maxCellTCG5s + 4, "XẾP LOẠI", styles.Text);
                     //
                     ExcelNPOIExtention.SetCellValueText(row2, 2, "CHT", styles.TextCenterBold);
-                    ExcelNPOIExtention.SetCellValueText(row2, maxCellCHt+2, "ATVSV", styles.TextCenterBold);
+                    ExcelNPOIExtention.SetCellValueText(row2, maxCellCHt + 2, "ATVSV", styles.TextCenterBold);
                     ExcelNPOIExtention.SetCellValueText(row2, maxCellATVSV + maxCellCHt + 2, "TỔ CHUYÊN GIA, BAN 5S", styles.TextCenterBold);
 
                     // meage
@@ -601,7 +702,7 @@ namespace PLX5S.BUSINESS.Services.BU
                     //
 
                     // row rowend cot so cot
-                 
+
 
                     // Áp dụng cho các vùng merge
                     SetStyleForMergedRegion(sheet, 0, 2, 0, 0, styles.TextCenterBold);
@@ -609,7 +710,7 @@ namespace PLX5S.BUSINESS.Services.BU
                     SetStyleForMergedRegion(sheet, 0, 0, 2, maxCellCHt + maxCellATVSV + maxCellTCG5s + 1, styles.TextCenterBold);
                     SetStyleForMergedRegion(sheet, 0, 2, maxCellCHt + maxCellATVSV + maxCellTCG5s + 2, maxCellCHt + maxCellATVSV + maxCellTCG5s + 2, styles.TextCenterBold);
                     SetStyleForMergedRegion(sheet, 0, 2, maxCellCHt + maxCellATVSV + maxCellTCG5s + 3, maxCellCHt + maxCellATVSV + maxCellTCG5s + 3, styles.TextCenterBold);
-                    SetStyleForMergedRegion(sheet, 0, 2, maxCellCHt + maxCellATVSV + maxCellTCG5s + 4, maxCellCHt + maxCellATVSV  + maxCellTCG5s + 4, styles.TextCenterBold);
+                    SetStyleForMergedRegion(sheet, 0, 2, maxCellCHt + maxCellATVSV + maxCellTCG5s + 4, maxCellCHt + maxCellATVSV + maxCellTCG5s + 4, styles.TextCenterBold);
 
                     if (maxCellCHt > 1)
                     {
@@ -627,15 +728,15 @@ namespace PLX5S.BUSINESS.Services.BU
                         SetStyleForMergedRegion(sheet, 1, 1, maxCellCHt + maxCellATVSV + 2, maxCellCHt + maxCellATVSV + maxCellTCG5s + 1, styles.TextCenterBold);
                     }
 
-                        //
-                        for (int i = 0; i < maxCellCHt; i++)
+                    //
+                    for (int i = 0; i < maxCellCHt; i++)
                     {
-                        
-                        ExcelNPOIExtention.SetCellValueText(row3, 2+i, $"Lần {i + 1}", styles.TextCenterBold);
+
+                        ExcelNPOIExtention.SetCellValueText(row3, 2 + i, $"Lần {i + 1}", styles.TextCenterBold);
                     }
                     for (int i = 0; i < maxCellATVSV; i++)
                     {
-                        
+
                         ExcelNPOIExtention.SetCellValueText(row3, 2 + maxCellCHt + i, $"Lần {i + 1}", styles.TextCenterBold);
                     }
                     for (int i = 0; i < maxCellTCG5s; i++)
@@ -653,31 +754,31 @@ namespace PLX5S.BUSINESS.Services.BU
 
                         ExcelNPOIExtention.SetCellValueText(row, 0, i.stt, styles.Text);
                         ExcelNPOIExtention.SetCellValueText(row, 1, i.Name, styles.Text);
-                        for (int e= 0; e < maxCellCHt;e++)
+                        for (int e = 0; e < maxCellCHt; e++)
                         {
                             string value = e < i.Cht.Count() ? i.Cht[e] : "";
-                            ExcelNPOIExtention.SetCellValueText(row, 2+e, value, styles.Number);
+                            ExcelNPOIExtention.SetCellValueText(row, 2 + e, value, styles.Number);
                         }
                         for (int f = 0; f < maxCellATVSV; f++)
                         {
                             string value = f < i.Atvsv.Count() ? i.Atvsv[f] : "";
-                            ExcelNPOIExtention.SetCellValueText(row, maxCellCHt+2+f, value, styles.Number);
+                            ExcelNPOIExtention.SetCellValueText(row, maxCellCHt + 2 + f, value, styles.Number);
                         }
                         for (int f = 0; f < maxCellTCG5s; f++)
                         {
                             string value = f < i.ChuyenGia.Count() ? i.ChuyenGia[f] : "";
-                            ExcelNPOIExtention.SetCellValueText(row, maxCellCHt + maxCellATVSV + 2+ f, value, styles.Number);
+                            ExcelNPOIExtention.SetCellValueText(row, maxCellCHt + maxCellATVSV + 2 + f, value, styles.Number);
                         }
-                        ExcelNPOIExtention.SetCellValueNumber(row, maxCellCHt+ maxCellATVSV+maxCellTCG5s+2, i.Point, styles.Number);
-                        ExcelNPOIExtention.SetCellValueText(row, maxCellCHt + maxCellATVSV + maxCellTCG5s + 3, i.Cht.Count()+i.Atvsv.Count()+i.ChuyenGia.Count(), styles.Text);
-                        ExcelNPOIExtention.SetCellValueText(row, maxCellCHt + maxCellATVSV + maxCellTCG5s + 4, i.Cht.Count() + i.Atvsv.Count() + i.ChuyenGia.Count()>80?"Tốt" : i.Cht.Count() + i.Atvsv.Count() + i.ChuyenGia.Count()<=30? "Kém":"Khá", styles.Text);
+                        ExcelNPOIExtention.SetCellValueNumber(row, maxCellCHt + maxCellATVSV + maxCellTCG5s + 2, i.Point, styles.Number);
+                        ExcelNPOIExtention.SetCellValueText(row, maxCellCHt + maxCellATVSV + maxCellTCG5s + 3, i.Cht.Count() + i.Atvsv.Count() + i.ChuyenGia.Count(), styles.Text);
+                        ExcelNPOIExtention.SetCellValueText(row, maxCellCHt + maxCellATVSV + maxCellTCG5s + 4, i.Cht.Count() + i.Atvsv.Count() + i.ChuyenGia.Count() > 80 ? "Tốt" : i.Cht.Count() + i.Atvsv.Count() + i.ChuyenGia.Count() <= 30 ? "Kém" : "Khá", styles.Text);
 
                         startIndex++;
                     }
 
 
                 }
-                else if(ReportName == "ChamTheokhungThoiGian")
+                else if (ReportName == "ChamTheokhungThoiGian")
                 {
                     var data = await TheoKhungThoiGian(filterReport);
                     var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Template", "Chamdiemtheokhungthoigian.xlsx");
@@ -704,9 +805,9 @@ namespace PLX5S.BUSINESS.Services.BU
                         TextCenterBold = SetCellStyleTextCenter(workbook, true, HorizontalAlignment.Center, VerticalAlignment.Center, false),
                         Number = ExcelNPOIExtention.SetCellStyleNumber(workbook, false, HorizontalAlignment.Right, true),
                         NumberBold = ExcelNPOIExtention.SetCellStyleNumber(workbook, true, HorizontalAlignment.Right, true),
-                        DecimalNumber= ExcelNPOIExtention.SetCellStyleDecimalNumber(workbook, false, HorizontalAlignment.Right, true)
+                        DecimalNumber = ExcelNPOIExtention.SetCellStyleDecimalNumber(workbook, false, HorizontalAlignment.Right, true)
                     };
-                   
+
                     var sheet = workbook.GetSheetAt(0);
                     var startIndex = 3;
                     foreach (var i in data)
@@ -715,14 +816,14 @@ namespace PLX5S.BUSINESS.Services.BU
 
                         ExcelNPOIExtention.SetCellValueText(row, 0, i.stt, styles.Text);
                         ExcelNPOIExtention.SetCellValueText(row, 1, i.Name, styles.Text);
-                        ExcelNPOIExtention.SetCellValueNumber(row, 2, i.Cht_T??0, styles.DecimalNumber);
-                        ExcelNPOIExtention.SetCellValueNumber(row, 3, i.Cht_N??0, styles.DecimalNumber);
+                        ExcelNPOIExtention.SetCellValueNumber(row, 2, i.Cht_T ?? 0, styles.DecimalNumber);
+                        ExcelNPOIExtention.SetCellValueNumber(row, 3, i.Cht_N ?? 0, styles.DecimalNumber);
                         ExcelNPOIExtention.SetCellValueNumber(row, 4, i.Atvsv_T, styles.DecimalNumber);
                         ExcelNPOIExtention.SetCellValueNumber(row, 5, i.Atvsv_N, styles.DecimalNumber);
                         ExcelNPOIExtention.SetCellValueNumber(row, 6, i.ChuyenGia, styles.DecimalNumber);
-                        ExcelNPOIExtention.SetCellValueNumber(row, 7, i.Cht_T+i.Cht_N+i.Atvsv_N+i.Atvsv_T+i.ChuyenGia, styles.DecimalNumber);
+                        ExcelNPOIExtention.SetCellValueNumber(row, 7, i.Cht_T + i.Cht_N + i.Atvsv_N + i.Atvsv_T + i.ChuyenGia, styles.DecimalNumber);
                         ExcelNPOIExtention.SetCellValueNumber(row, 8, i.Point, styles.DecimalNumber);
-                        ExcelNPOIExtention.SetCellValueText(row, 9, i.Point>80 ? "Tốt":i.Point<=30? "kém":"Khá" , styles.Text);
+                        ExcelNPOIExtention.SetCellValueText(row, 9, i.Point > 80 ? "Tốt" : i.Point <= 30 ? "kém" : "Khá", styles.Text);
 
                         startIndex++;
                     }
@@ -766,16 +867,16 @@ namespace PLX5S.BUSINESS.Services.BU
                     {
                         var row = sheet.GetRow(startIndex) ?? sheet.CreateRow(startIndex);
                         ExcelNPOIExtention.SetCellValueText(row, 0, i.stt, styles.Text);
-                        sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(startIndex, startIndex + i.lstTieuChiDeXuat.Count()-1,0,0));
-                        SetStyleForMergedRegion(sheet, startIndex, startIndex + i.lstTieuChiDeXuat.Count()-1, 0, 0, styles.Text);
+                        sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(startIndex, startIndex + i.lstTieuChiDeXuat.Count() - 1, 0, 0));
+                        SetStyleForMergedRegion(sheet, startIndex, startIndex + i.lstTieuChiDeXuat.Count() - 1, 0, 0, styles.Text);
                         ExcelNPOIExtention.SetCellValueText(row, 1, i.Name, styles.Text);
-                        sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(startIndex, startIndex + i.lstTieuChiDeXuat.Count()-1, 1, 1));
-                        SetStyleForMergedRegion(sheet, startIndex , startIndex + i.lstTieuChiDeXuat.Count()-1, 1, 1, styles.Text);
+                        sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(startIndex, startIndex + i.lstTieuChiDeXuat.Count() - 1, 1, 1));
+                        SetStyleForMergedRegion(sheet, startIndex, startIndex + i.lstTieuChiDeXuat.Count() - 1, 1, 1, styles.Text);
 
                         var startrow = startIndex;
                         foreach (var item in i.lstTieuChiDeXuat)
                         {
-                      
+
                             var rowitem = sheet.GetRow(startrow) ?? sheet.CreateRow(startrow);
                             ExcelNPOIExtention.SetCellValueText(rowitem, 2, item.TieuChi, styles.Text);
                             ExcelNPOIExtention.SetCellValueText(rowitem, 3, item.DeXuat, styles.Text);
@@ -839,7 +940,7 @@ namespace PLX5S.BUSINESS.Services.BU
                             {
                                 stt = item.StoreId,
                                 Name = item.Name,
-                   
+
                                 Cht = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "CHT")
                                 .Select((x, index) => (x.UpdateDate?.ToString("HH:mm dd/MM/yyyy") ?? ""))
                                 .ToList(),
@@ -850,7 +951,7 @@ namespace PLX5S.BUSINESS.Services.BU
                             .Select((x, index) => (x.UpdateDate?.ToString("HH:mm dd/MM/yyyy") ?? ""))
                          .ToList(),
                                 Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0
-                             
+
                             };
 
                             result.Add(report);
@@ -1011,7 +1112,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 using var outFile = new FileStream(outputPath, FileMode.Create, FileAccess.Write);
                 workbook.Write(outFile);
 
-             
+
 
                 return $"{folderPath}/{fileName}";
             }

@@ -16,7 +16,7 @@ namespace PLX5S.API.Controllers.BU
     public class AppReportController(IAppReportService service) : ControllerBase
     {
         public readonly IAppReportService _service = service;
-        
+
         [HttpGet("KetQuaChamDiem")]
         public async Task<IActionResult> KetQuaChamDiem([FromQuery] FilterReport filterReport)
         {
@@ -106,6 +106,27 @@ namespace PLX5S.API.Controllers.BU
         {
             var transferObject = new TransferObject();
             var result = await _service.TongHopYKienDeXuat(filterReport);
+
+            if (_service.Status)
+            {
+                transferObject.Data = result;
+                transferObject.Status = true;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
+
+
+        [HttpGet("BaoCaoHinhAnh")]
+        public async Task<IActionResult> BaoCaoHinhAnh([FromQuery] FilterReport filterReport)
+        {
+            var transferObject = new TransferObject();
+            var result = await _service.BaoCaoHinhAnh(filterReport);
 
             if (_service.Status)
             {
