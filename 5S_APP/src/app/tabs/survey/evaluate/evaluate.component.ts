@@ -45,7 +45,7 @@ export class EvaluateComponent implements OnInit {
   searchKeyword = '';
   searchResults: { id: string; type: string }[] = [];
   currentIndex = 0;
-  tieuChiIndex = 0
+  tieuChiIndex = 0;
   selectedAccordionId: string = '';
   currentSelect: string = '';
   lstAllTieuChi: any = [];
@@ -85,7 +85,7 @@ export class EvaluateComponent implements OnInit {
     private messageService: MessageService,
     private cdr: ChangeDetectorRef,
     private renderer: Renderer2
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.apiFile =
@@ -250,9 +250,9 @@ export class EvaluateComponent implements OnInit {
         next: async (data) => {
           this.treeData = [data];
           this.lstTreeOpen = [...this.extractAllKeys([data])];
-          this.lstTieuChi = await this.filterTieuChiLeaves(this.treeData)
+          this.lstTieuChi = await this.filterTieuChiLeaves(this.treeData);
 
-          this.dataTree.leaves = this.lstTieuChi
+          this.dataTree.leaves = this.lstTieuChi;
           this.dataTree.tree = this.treeData;
 
           localStorage.setItem(
@@ -287,7 +287,6 @@ export class EvaluateComponent implements OnInit {
   // renderTitle(node: any) {
 
   //   if(node.isGroup) return node.title;
-
 
   //   console.log(node);
   //   return (this.tieuChiIndex = this.tieuChiIndex + 1) + '- ' + node.title
@@ -360,7 +359,10 @@ export class EvaluateComponent implements OnInit {
         .find((d: any) => d.id === evaluateItem?.pointId)?.diem ?? '';
 
     if (data.isImg) {
-      if (data.chiChtAtvsv && !(this.account.chucVuId === 'CHT' || this.account.chucVuId === 'ATVSV')) {
+      if (
+        data.chiChtAtvsv &&
+        !(this.account.chucVuId === 'CHT' || this.account.chucVuId === 'ATVSV')
+      ) {
         hasEnoughImages = true;
       } else {
         const numberImgRequired = data?.numberImg || 0;
@@ -377,7 +379,8 @@ export class EvaluateComponent implements OnInit {
 
   hasEnoughImages(code: any, node: any): boolean {
     if (node.chiChtAtvsv) {
-      if (this.account.chucVuId != 'CHT' || this.account.chucVuId != 'ATVSV') return false
+      if (this.account.chucVuId != 'CHT' || this.account.chucVuId != 'ATVSV')
+        return false;
     }
     const imagesSelecting = this.evaluate?.lstImages.filter(
       (img: any) => img.tieuChiCode === code
@@ -617,8 +620,12 @@ export class EvaluateComponent implements OnInit {
 
       // Kiểm tra có đủ ảnh không
       if (tieuChi.isImg) {
-
-        if (tieuChi.chiChtAtvsv && !(this.account.chucVuId === 'CHT' || this.account.chucVuId === 'ATVSV')) {
+        if (
+          tieuChi.chiChtAtvsv &&
+          !(
+            this.account.chucVuId === 'CHT' || this.account.chucVuId === 'ATVSV'
+          )
+        ) {
           continue;
         }
 
@@ -900,7 +907,6 @@ export class EvaluateComponent implements OnInit {
       document.querySelectorAll('.div-dem .answered').length +
       document.querySelectorAll('.div-dem .red-false').length;
     this.chuaCham = this.lstTieuChi.length - this.daCham;
-
   }
 
   getFullName(userName: string): string {
