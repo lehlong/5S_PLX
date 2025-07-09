@@ -186,5 +186,7 @@
   [nzFooter]="null"
   (nzOnCancel)="isPreviewVisible = false"
 >
+ <ng-container *nzModalContent>
   <img [src]="previewImageUrl" alt="Chi tiết ảnh" style="width: 100%; height: auto;" />
+ </ng-container>
 </nz-modal>
