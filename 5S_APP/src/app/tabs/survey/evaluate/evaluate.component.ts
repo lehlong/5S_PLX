@@ -267,8 +267,8 @@ export class EvaluateComponent implements OnInit {
     for (const node of tree) {
       if (node.isGroup === false) {
         node.number = this.leaveIndex++
-        console.log(node);
-        // result.push(node);
+        // console.log(node);
+        result.push(node);
       }
       if (Array.isArray(node.children) && node.children.length > 0) {
         result = result.concat(this.filterTieuChiLeaves(node.children));
