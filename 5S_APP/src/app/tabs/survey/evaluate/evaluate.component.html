@@ -67,7 +67,7 @@
                     ">
                     <ng-container *ngFor="let i of evaluate?.lstEvaluate; trackBy: trackByKey">
                       <ion-textarea *ngIf="i.tieuChiCode == node.code" [disabled]="!isEdit" placeholder="Ý kiến đề xuất"
-                        autoGrow="true" [(ngModel)]="i.feedBack" class="textarea" style="padding-top: 8px; height: 0;">
+                        autoGrow="true" [(ngModel)]="i.feedBack" class="textarea" >
                       </ion-textarea>
                     </ng-container>
 

@@ -46,11 +46,14 @@
   }
 }
 
-::ng-deep .native-wrapper.sc-ion-textarea-md textarea.sc-ion-textarea-md{
-    padding-top: 10px;
-    height: 34px
+::ng-deep .native-wrapper.sc-ion-textarea-md textarea.sc-ion-textarea-md {
+  padding-top: 10px;
+  height: 34px;
 }
 
+::ng-deep .textarea-wrapper.sc-ion-textarea-ios textarea.sc-ion-textarea-ios {
+  padding: 17px 0px 0px;
+}
 .circle {
   width: 20px;
   height: 20px;
@@ -98,7 +101,7 @@
 }
 
 .border-link {
-  border: 2px solid #5F4B8B;
+  border: 2px solid #5f4b8b;
   border-radius: 5px;
 }
 
