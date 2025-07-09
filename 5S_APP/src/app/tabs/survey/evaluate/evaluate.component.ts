@@ -56,6 +56,7 @@ export class EvaluateComponent implements OnInit {
   data: any = {};
   headerId: any = '';
   count: any = 0;
+  leaveIndex : any = 0;
   isEdit: any = true;
   dateNow: Date = new Date();
   account: any = {};
@@ -119,9 +120,7 @@ export class EvaluateComponent implements OnInit {
         );
         if (data == null) {
           this.getAllTieuChi();
-          console.log(this.dataTree);
-
-          // this.getAllTieuChiLeaves();
+          // console.log(this.dataTree);
         } else {
           this.dataTree = JSON.parse(data);
           this.treeData = this.dataTree?.tree;
@@ -129,9 +128,7 @@ export class EvaluateComponent implements OnInit {
           this.lstTieuChi = this.dataTree?.leaves;
           await this.cdr.detectChanges();
         }
-        for (let index = 0; index < this.lstTieuChi.length; index++) {
-          this.lstTieuChi[index].number = index;
-        }
+
 
         console.log(this.treeData);
         console.log(this.lstTieuChi);
@@ -267,12 +264,12 @@ export class EvaluateComponent implements OnInit {
 
   filterTieuChiLeaves(tree: any[]) {
     let result: any[] = [];
-
     for (const node of tree) {
       if (node.isGroup === false) {
-        result.push(node);
+        node.number = this.leaveIndex++
+        console.log(node);
+        // result.push(node);
       }
-
       if (Array.isArray(node.children) && node.children.length > 0) {
         result = result.concat(this.filterTieuChiLeaves(node.children));
       }
@@ -322,24 +319,6 @@ export class EvaluateComponent implements OnInit {
     L.marker([lat, lng]).addTo(this.map).openPopup();
   }
 
-  // private initMap(): void {
-  //   L.Icon.Default.mergeOptions({
-  //     iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
-  //     iconUrl: 'assets/leaflet/marker-icon.png',
-  //     shadowUrl: 'assets/leaflet/marker-shadow.png',
-  //   });
-
-  //   const lat = this.latitude; // Vĩ độ động
-  //   const lng = this.longitude; // Kinh độ động
-
-  //   this.map = L.map('map').setView([lat, lng], 13);
-
-  //   L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
-  //     attribution: '© OpenStreetMap France',
-  //   }).addTo(this.map);
-
-  //   L.marker([lat, lng]).addTo(this.map).openPopup();
-  // }
   isActive(itemId: string): boolean {
     return this.currentSelect === itemId;
   }
