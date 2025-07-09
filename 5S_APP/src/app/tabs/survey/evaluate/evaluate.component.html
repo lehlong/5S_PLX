@@ -38,7 +38,7 @@
       <ng-container *ngFor="let node of nodes; trackBy: trackByKey">
         <ion-accordion [value]="node.key" [ngClass]="{ 'border-link': node.id === selectedAccordionId }">
           <ion-item slot="header" color="light" id="{{ node.id }}">
-            <ion-label [innerHTML]="renderTitle(node) | highlightSearch : searchKeyword"></ion-label>
+            <ion-label [innerHTML]="node.number ?  node.number + ' - '+ node.title : node.title | highlightSearch : searchKeyword"></ion-label>
           </ion-item>
 
           <div style="padding: 5px 0" slot="content">

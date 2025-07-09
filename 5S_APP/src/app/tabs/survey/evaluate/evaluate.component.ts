@@ -56,7 +56,7 @@ export class EvaluateComponent implements OnInit {
   data: any = {};
   headerId: any = '';
   count: any = 0;
-  leaveIndex : any = 0;
+  leaveIndex : any = 1;
   isEdit: any = true;
   dateNow: Date = new Date();
   account: any = {};
@@ -140,13 +140,13 @@ export class EvaluateComponent implements OnInit {
   openSearchInput() {
     this.isSearchVisible = !this.isSearchVisible;
   }
-  renderTitle(node: any): string {
-    const found = this.lstTieuChi.find((x: any) => x.id == node.key);
-    if (found) {
-      return `${found.number + 1} - ${found.title || node.title}`;
-    }
-    return node.title;
-  }
+  // renderTitle(node: any): string {
+  //   const found = this.lstTieuChi.find((x: any) => x.id == node.key);
+  //   if (found) {
+  //     return `${found.number + 1} - ${found.title || node.title}`;
+  //   }
+  //   return node.title;
+  // }
 
   private removeHighlights() {
     this.currentHighlights.forEach((el) => {
