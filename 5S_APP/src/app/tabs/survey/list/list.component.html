@@ -1,38 +1,43 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-button fill="" slot="start">
-      <ion-back-button></ion-back-button>
-    </ion-button>
+      <ion-back-button slot="start"></ion-back-button>
     <h5 class="t-center"> Chấm điểm 5S {{ doiTuong }} </h5>
     <ion-button (click)="openFilterModal()" id="open-modal" fill="clear" slot="end" color="dark">
       <ion-icon name="filter-outline" fill="clear"></ion-icon>
     </ion-button>
   </ion-toolbar>
 </ion-header>
-<ion-content color="light" class="ion-padding">
-  <ion-item-group>
-    <ion-item>
-      <ion-icon slot="start" name="calendar-outline"></ion-icon>
+
+
+<ion-content color="light"
+  style="font-size: 12px;">
+  <ion-item-group class="custom-icon">
+    <ion-item >
+      <ion-icon style="color: #ffc409;" slot="start" name="calendar-outline"></ion-icon>
       <p>{{ filter.filterKiKhaoSat?.name }}</p>
     </ion-item>
     <ion-item>
-      <ion-icon slot="start" name="warning-outline"></ion-icon>
+      <ion-icon slot="start" class="c-purple" name="warning-outline"></ion-icon>
       <p>Trạng thái</p>
       <ion-chip *ngIf="filter.filterKiKhaoSat.trangThaiKi === '0'" slot="end" color="danger">Đã đóng</ion-chip>
       <ion-chip *ngIf="filter.filterKiKhaoSat.trangThaiKi === '1'" slot="end" color="primary">Khởi tạo</ion-chip>
       <ion-chip *ngIf="filter.filterKiKhaoSat.trangThaiKi === '2'" slot="end" color="success">Đang mở</ion-chip>
     </ion-item>
-    <ion-item>
-      <ion-select justify="end" interface="popover" label="Sắp xếp theo:" placeholder="" [(ngModel)]="selectValue" (ionChange)="onFilter2()">
+    <ion-item lines="none">
+      <ion-select justify="end" interface="popover" label="Sắp xếp theo:" placeholder="" [(ngModel)]="selectValue"
+        (ionChange)="onFilter2()">
         <ion-select-option value="1">Tên cửa hàng</ion-select-option>
         <ion-select-option value="2">Điểm thấp đến cao</ion-select-option>
         <ion-select-option value="3">Điểm cao đến thấp</ion-select-option>
       </ion-select>
     </ion-item>
   </ion-item-group>
+
   <ion-item-group style="margin-top: 10px">
-    <ion-list *ngFor="let item of lstDoiTuong">
-      <ion-item (click)="navigateTo(item)">
+    <ion-list class="custom-icon">
+      <ion-item *ngFor="let item of lstDoiTuong" (click)="navigateTo(item)" >
+        <ion-icon style="color: #D1805F;" slot="start" name="home-outline"></ion-icon>
+
         <ion-label>{{ item?.name }}</ion-label>
         <ion-label slot="end">{{ item.point }} điểm</ion-label>
       </ion-item>
@@ -40,15 +45,16 @@
   </ion-item-group>
 </ion-content>
 
-<ion-modal [isOpen]="isOpen" (didDismiss)="closeFilterModal()" [initialBreakpoint]="1" [breakpoints]="[1]" cssClass="custom-modal">
-<!-- <ion-modal trigger="open-modal" [(isOpen)]="isOpen" [initialBreakpoint]="1" [breakpoints]="[1]" cssClass="custom-modal"> -->
+<ion-modal [isOpen]="isOpen" (didDismiss)="closeFilterModal()" [initialBreakpoint]="1" [breakpoints]="[1]"
+  cssClass="custom-modal">
+  <!-- <ion-modal trigger="open-modal" [(isOpen)]="isOpen" [initialBreakpoint]="1" [breakpoints]="[1]" cssClass="custom-modal"> -->
   <ng-template>
     <ion-header>
       <ion-toolbar>
         <ion-title style="text-align: center">Bộ lọc</ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content class="ion-padding">
+    <ion-content >
       <ion-accordion-group>
         <ion-accordion value="first">
           <ion-item slot="header" color="light">
@@ -106,7 +112,7 @@
 
         <ion-item>
           <ion-label>
-            <ion-checkbox [(ngModel)]="filter.chuaCham"  labelPlacement="end">Cửa hàng chưa chấm</ion-checkbox>
+            <ion-checkbox [(ngModel)]="filter.chuaCham" labelPlacement="end">Cửa hàng chưa chấm</ion-checkbox>
           </ion-label>
         </ion-item>
       </div>

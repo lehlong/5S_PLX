@@ -42,6 +42,7 @@ export class KiKhaoSatComponent {
   paginationResult = new PaginationResult();
   loading: boolean = false;
   lstAccount: any = [];
+  lstAllAccount: any = [];
   lstAllDoiTuong: any = []
   headerId: any = '';
   kiKhaoSatId: any = '';
@@ -280,6 +281,7 @@ export class KiKhaoSatComponent {
   closeDrawer(): void {
     this.visible = false;
     this.visibleKiKhaoSat = false;
+    this.lstAccount = []
     this.kiKhaoSat = [];
     this.drawerVisible = false;
     this.selectedNodeDetails = []
@@ -296,6 +298,7 @@ export class KiKhaoSatComponent {
     };
     this.calculationRows = []
     this.visibleKiKhaoSat = false
+    this.lstAccount = []
     this.leavesVisible = false;
     this.dataInsertTree.name = '';
   }
@@ -367,7 +370,7 @@ export class KiKhaoSatComponent {
   getAllAccount() {
     this.accountService.getall().subscribe({
       next: (data) => {
-        this.lstAccount = data;
+        this.lstAllAccount = data;
       },
 
       error: (response) => {
@@ -375,7 +378,14 @@ export class KiKhaoSatComponent {
       },
     });
   }
+  onTabChange(index: number) {
+    // Nếu tab "NGƯỜI CHẤM ĐIỂM" là tab thứ 1
+    if (index === 1) {
 
+      this.lstAccount = this.lstAllAccount
+      console.log(this.lstAccount);
+    }
+  }
   getAllKho() {
     this.isSubmit = false
     this._khoService.getAll().subscribe({
@@ -427,13 +437,13 @@ export class KiKhaoSatComponent {
         this.inputKi = data
         console.log(data);
         this.setDataKy()
+        this.edit = false;
+        this.visibleKiKhaoSat = true;
       },
       error: (response) => {
         console.log(response);
       },
     });
-    this.edit = false;
-    this.visibleKiKhaoSat = true;
   }
 
   getInputCopyKy() {
@@ -441,15 +451,10 @@ export class KiKhaoSatComponent {
     if (this.inputKi.kyCopyId == null || this.inputKi.kyCopyId == '') {
       return
     }
-
     this._service.getInputCopyKy(this.inputKi.kyCopyId).subscribe({
       next: (data) => {
-        console.log(data);
-
         this.inputKi = data
-
         this.setDataKy()
-        // this.search();
       },
       error: (response) => {
         console.log(response);
@@ -475,13 +480,12 @@ export class KiKhaoSatComponent {
       next: (data) => {
         this.inputKi = data
         this.setDataKy()
+        setTimeout(() => {
+          this.edit = true;
+          this.visibleKiKhaoSat = true;
+        }, 200);
       }
     })
-    console.log(this.kiKhaoSat)
-    setTimeout(() => {
-      this.edit = true;
-      this.visibleKiKhaoSat = true;
-    }, 200);
   }
 
   nzEvent(event: NzFormatEmitEvent): void {
@@ -756,7 +760,7 @@ export class KiKhaoSatComponent {
     );
 
   trackByKey(index: number, item: any): string {
-    return item.key; // hoặc item.id nếu bạn dùng id
+    return item.key || item.code || item.key; // hoặc item.id nếu bạn dùng id
   }
 
 }

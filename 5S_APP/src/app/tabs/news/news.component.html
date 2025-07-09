@@ -1,13 +1,51 @@
 <ion-content>
   <div class="main-news">
-    <h4><ion-icon name="newspaper-outline"></ion-icon>Tin tức</h4>
-    <div class="news-item">
-      <div class="news-type">Hoạt động công ty</div>
+    <div style="padding: 20px 10px;">
+
+      <h4>Khảo Sát 5S</h4>
+      <h4>Morning, Hoang Trung Kien</h4>
+    </div>
+
+    <!-- <ion-searchbar style="padding: 5px 10px;" class="custom"></ion-searchbar> -->
+
+    <ion-segment-view style="padding: 10px;">
+      <ion-segment-content id="first">
+        <div class="news-type" style="width: 70vw; height: 75px; margin: 10px; border-bottom: 1px solid rgb(130, 130, 130);"  class="d-block">
+          <strong class="d-block" >
+            Chấm điểm cửa hàng 5S
+          </strong>
+          <div class="d-flex justify-space-between">
+            <!-- <ion-item  class="d-block" style=""> -->
+              <ion-label>
+                <ion-text class="d-block" style="padding: 3px 0;">chấm điểm tháng 7</ion-text>
+                <ion-note>07/08/2002</ion-note>
+              </ion-label>
+              <ion-chip slot="end" style="font-size: 13px;">đang mở</ion-chip>
+            </div>
+          <!-- </ion-item> -->
+        </div>
+        <div style="height: 100px; max-width: 20vw ;">
+          <ion-icon style="width: 100px; height: 100px; color: rgb(119, 119, 119)" name="create-outline"></ion-icon>
+        </div>
+
+      </ion-segment-content>
+      <ion-segment-content id="second">Second</ion-segment-content>
+      <ion-segment-content id="third">Third</ ion-segment-content>
+    </ion-segment-view>
+
+
+    <div class="horizontal-scroll-buttons" style="padding: 0 10px;">
+      <ion-button class="custom active" size="small" shape="round">Tất cả</ion-button>
+      <ion-button class="custom" size="small" shape="round">Tôi chấm</ion-button>
+      <ion-button class="custom" size="small" shape="round">Thông báo</ion-button>
+
+    </div>
+    <!-- <div class="news-item">
       <div class="news-time">13:22 07-05-2024</div>
       <div class="news-title">Đào tạo sử dụng phần mềm chấm điểm 5S trên thiết bị di động</div>
       <div class="news-content">Ngày 02.05.2024, Công ty Xăng dầu Nghệ An (Petrolimex Nghệ An/ Công ty)
         tổ chức khoá đào tạo sử dụng phần mềm chấm điểm 5S cho các đơn vị trực thuộc và Tổ chuyên gia đánh giá tại hội
-      trường Văn phòng...</div>
+        trường Văn phòng...</div>
       <img src="assets/img/3.webp" />
     </div>
 
@@ -17,7 +55,7 @@
       <div class="news-title">Đào tạo sử dụng phần mềm chấm điểm 5S trên thiết bị di động</div>
       <div class="news-content">Ngày 02.05.2024, Công ty Xăng dầu Nghệ An (Petrolimex Nghệ An/ Công ty)
         tổ chức khoá đào tạo sử dụng phần mềm chấm điểm 5S cho các đơn vị trực thuộc và Tổ chuyên gia đánh giá tại hội
-      trường Văn phòng...</div>
+        trường Văn phòng...</div>
       <img src="assets/img/2.webp" />
     </div>
 
@@ -27,8 +65,8 @@
       <div class="news-title">Đào tạo sử dụng phần mềm chấm điểm 5S trên thiết bị di động</div>
       <div class="news-content">Ngày 02.05.2024, Công ty Xăng dầu Nghệ An (Petrolimex Nghệ An/ Công ty)
         tổ chức khoá đào tạo sử dụng phần mềm chấm điểm 5S cho các đơn vị trực thuộc và Tổ chuyên gia đánh giá tại hội
-      trường Văn phòng...</div>
+        trường Văn phòng...</div>
       <img src="assets/img/1.webp" />
-    </div>
+    </div> -->
   </div>
 </ion-content>

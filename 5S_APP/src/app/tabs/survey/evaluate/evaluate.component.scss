@@ -46,6 +46,11 @@
   }
 }
 
+::ng-deep .native-wrapper.sc-ion-textarea-md textarea.sc-ion-textarea-md{
+    padding-top: 10px;
+    height: 34px
+}
+
 .circle {
   width: 20px;
   height: 20px;
@@ -80,19 +85,20 @@
 }
 
 .answered {
-  border: rgb(0, 10, 100) solid 2px;
-  background-color: blue;
+  border: #d7d7d7 solid 1px;
+
+  background-color: #1890ff;
   color: white;
 }
 
-.red-false{
-  border: rgb(100, 0, 0) solid 2px;
-  background-color: red;
+.red-false {
+  border: #d7d7d7 solid 1px;
+  background-color: #ff4d4f;
   color: white;
 }
 
 .border-link {
-  border: 2px solid purple;
+  border: 2px solid #5F4B8B;
   border-radius: 5px;
 }
 
@@ -117,6 +123,7 @@
     font-size: 18px;
   }
 }
+
 .file-wrapper {
   position: relative;
   display: inline-block;
@@ -128,6 +135,7 @@
     border-radius: 8px;
     object-fit: cover;
   }
+
   ion-chip.md.ion-activatable {
     .delete-btn {
       position: absolute;
@@ -150,10 +158,12 @@
   z-index: 100;
   opacity: 0;
 }
+
 .image-item {
   flex-direction: row;
   width: 100%;
 }
+
 .result-search {
   height: 50px;
   border-radius: 4px;
@@ -161,11 +171,13 @@
   display: flex;
   align-items: center;
 }
+
 .btn-group {
   border-left: 1px solid blue;
   height: 100%;
   width: 30%;
   display: flex;
+
   ion-button {
     width: 100%;
     --background: #f1f1f1;
@@ -173,6 +185,7 @@
     --color: #000;
   }
 }
+
 .highlight-search {
   background-color: yellow;
   font-weight: bold;

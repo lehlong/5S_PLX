@@ -1,35 +1,36 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-button fill="" slot="start">
-      <ion-back-button></ion-back-button>
+      <ion-back-button  slot="start"></ion-back-button>
+    <h5 class="t-center"> Chấm điểm 5S {{ kiKhaoSat.doiTuong }} </h5>
+    <ion-button slot="end" fill="clear">
     </ion-button>
-
-    <h5 class=""> Chấm điểm 5S {{ kiKhaoSat.doiTuong }} </h5>
   </ion-toolbar>
 </ion-header>
-<ion-content color="light" class="ion-padding">
-  <ion-item-group>
+<ion-content color="light">
+  <ion-item-group class="custom-icon">
     <ion-item>
-      <ion-icon slot="start" name="calendar-outline"></ion-icon>
+      <ion-icon style="color: #ffc409;"  slot="start" name="calendar-outline"></ion-icon>
       <p>{{ kiKhaoSat?.name }}</p>
     </ion-item>
     <ion-item>
-      <ion-icon slot="start" name="warning-outline"></ion-icon>
+      <ion-icon slot="start"  class="c-purple" name="warning-outline"></ion-icon>
       <p>Trạng thái</p>
       <ion-chip *ngIf="kiKhaoSat?.trangThaiKi === '0'" slot="end" color="danger">Đã đóng</ion-chip>
       <ion-chip *ngIf="kiKhaoSat?.trangThaiKi === '1'" slot="end" color="primary">Khởi tạo</ion-chip>
       <ion-chip *ngIf="kiKhaoSat?.trangThaiKi === '2'" slot="end" color="success">Đang mở</ion-chip>
     </ion-item>
-    <ion-item>
-      <ion-icon slot="start" name="home-outline"></ion-icon>
+    <ion-item lines="none">
+      <ion-icon style="color: #D1805F;" slot="start" name="home-outline"></ion-icon>
       <p>{{ doiTuong?.name }}</p>
     </ion-item>
   </ion-item-group>
-  <ion-item-group style="margin-top: 20px">
+  <ion-item-group style="margin-top: 10px">
     <ion-item *ngFor="let item of lstHisEvaluate" style="--padding-start: 0px;  --inner-padding-end: 0px; ">
       <ion-grid>
-        <ion-item-sliding lines="none" style="padding: 0;">
-          <ion-item lines="none" [button]="true" style="display: flex; width: 100%; padding-bottom: 4px; justify-content: space-between;"   (click)="openEditEvaluate(item)">
+        <ion-item-sliding style="padding: 0;">
+          <ion-item lines="none" [button]="true"
+            style="display: flex; width: 100%; padding-bottom: 4px; justify-content: space-between;"
+            (click)="openEditEvaluate(item)">
             <div class="">
               <h5 class="mg-0" style="margin: 9px 0;">{{ item?.name }}</h5>
               <span class="text-italic" style="font-size: 14px;">{{ getFullName(item.accountUserName) }}</span>
@@ -38,7 +39,6 @@
               <p class="mg-0" style="padding-left: 70px;">
                 <ion-chip slot="end" color="primary">
                   {{ item.point ?? '0' }}
-
                 </ion-chip>
               </p>
               <span class="text-italic" style="font-size: 14px;">{{ item.updateDate | date: 'HH:mm dd/MM/yyyy' }}</span>
@@ -57,7 +57,8 @@
 </ion-content>
 
 <ion-footer *ngIf="checkRightEvaluate()">
-  <ion-button (click)="navigateTo()" expand="full" style="width: 100%;font-weight: 700;">Chấm điểm</ion-button>
+  <ion-button (click)="navigateTo()" expand="full" style="width: 100%;font-weight: 700; height: 12vw; ">Chấm
+    điểm</ion-button>
 </ion-footer>
 
 

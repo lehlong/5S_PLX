@@ -1,10 +1,8 @@
 @import "@ionic/angular/css/core.css";
-
 @import "@ionic/angular/css/normalize.css";
 @import "@ionic/angular/css/structure.css";
 @import "@ionic/angular/css/typography.css";
 @import "@ionic/angular/css/display.css";
-
 @import "@ionic/angular/css/padding.css";
 @import "@ionic/angular/css/float-elements.css";
 @import "@ionic/angular/css/text-alignment.css";
@@ -12,38 +10,92 @@
 @import "@ionic/angular/css/flex-utils.css";
 @import '@ionic/angular/css/palettes/dark.system.css';
 
-ion-header{
+ion-header {
   border-radius: 6px;
 }
 
-.t-center{
+.t-center {
   text-align: center;
 }
 
-.d-flex{
+.d-flex {
   display: flex;
 }
-.d-block{
+
+.d-block {
   display: block;
 }
 
-:root {
-  --safe-top: env(safe-area-inset-top);
+.c-purple{
+  color:#7045ff
 }
 
-ion-header {
-  // padding-top: 53px !important;
-  // padding-top: var(--safe-top);/
+.color{
+  .red{
+    color:#ad000d
+  }
 }
+
+:root {
+
+  // --ion-font-size-base: 14px;
+  font-size: 14px !important;
+  --safe-top: env(safe-area-inset-top);
+  --ion-text-color: #222;
+  --custom-bg-color: #000000;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ion-text-color: #fff;
+    --custom-bg-color: #ffffff !important;
+  }
+}
+
+ion-content {
+  font-size: 14px;
+  --padding-top: 2.5vw;
+  --padding-start: 1.5vw;
+  --padding-end: 2vw;
+  --padding-bottom: 2.5vw;
+}
+
+ion-toolbar ion-button {
+  --padding-start: 0;
+  --padding-end: 0;
+  width: 40px;
+}
+
+::ng-deep ion-back-button .button-native {
+  // width: 45px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.custom-icon{
+  ion-icon{
+    margin-right: 5vw;
+  }
+}
+.w-600{
+  font-weight: 600;
+}
+
 ion-content::part(scroll)::-webkit-scrollbar {
   width: 4px;
 }
 
-.mg-0{
+.justify-space-between {
+  justify-content: space-between
+}
+
+;
+
+.mg-0 {
   margin: 0;
 }
 
 ion-content::part(scroll)::-webkit-scrollbar-thumb {
-  background-color: rgba(255,255,255,0.2);
+  background-color: rgba(255, 255, 255, 0.2);
   border-radius: 10px;
 }

@@ -1,32 +1,39 @@
-<ion-header [translucent]="true">
+<!-- <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title class="t-center">
-      <h4><ion-icon name="person-circle-outline"></ion-icon>Tài khoản</h4>
     </ion-title>
     <ion-button fill="clear" (click)="navigateTo('/account/setting-account')" slot="end"><ion-icon
         name="settings"></ion-icon></ion-button>
   </ion-toolbar>
-</ion-header>
-<ion-content color="light" class="ion-padding">
-  <ion-list lines="inset">
+</ion-header> -->
+<ion-content color="light" >
+  <div class="d-flex justify-space-between" style="margin-bottom: 10px; margin-left: 10px;">
+    <h4 class="w-600">
+      <!-- <ion-icon name="person-circle-outline"></ion-icon> -->
+      Tài khoản</h4>
+
+    <ion-button fill="clear" color="dark" (click)="navigateTo('/account/setting-account')" slot="end"><ion-icon
+        name="settings"></ion-icon></ion-button>
+  </div>
+  <ion-list lines="inset" class="custom-icon">
     <ng-container *ngIf="userInfo">
-      <ion-list>
-        <h3 class="text-head">Thông tin cơ bản</h3>
+        <!-- <h3 class="text-head">Thông tin cơ bản</h3> -->
         <ion-item>
-          <ion-icon style=" color: purple" slot="start" name="person-circle"></ion-icon>
+          <ion-icon style="font-size: 25px;"  class="c-purple" slot="start" name="person-circle"></ion-icon>
           <ion-label>{{ userInfo.fullName }}</ion-label>
         </ion-item>
         <ion-item>
-          <ion-icon style="font-size: 25px;" slot="start" name="call-outline"></ion-icon>
+          <ion-icon style="font-size: 25px; color: #2dd55b" slot="start" name="call-outline"></ion-icon>
           <div>{{ userInfo.phoneNumber }}</div>
         </ion-item>
         <ion-item>
           <ion-icon style="font-size: 25px" slot="start" name="mail-outline"></ion-icon>
           <div>{{ userInfo.email }}</div>
         </ion-item>
-      </ion-list>
     </ng-container>
   </ion-list>
+
+
   <ion-list style="
       margin-top: 20px;
       display: flex;
@@ -35,21 +42,21 @@
       justify-content: space-between;
     " (click)="navigateTo('/account/terms-and-polices')">
     <span style="display: flex; align-items: center">
-      <ion-icon style="font-size: 25px; margin-right: 25px; color: grey" slot="start"
-        name="person-circle-outline"></ion-icon>
+      <ion-icon style="font-size: 25px; margin-right: 25px; color: #ffc409;" slot="start" name="warning-outline"></ion-icon>
       Điều khoản và chính sách
     </span>
 
     <ion-icon style="font-size: 25px" name="chevron-forward-outline"></ion-icon>
   </ion-list>
-  <ion-list style="
+  <div class="color" >
+    <ion-list class="red" style="
       margin-top: 20px;
       display: flex;
       align-items: center;
-      color: red;
       padding: 10px 15px;
-    " (click)="Logout()">
-    <ion-icon style="font-size: 25px; margin-right: 25px" slot="start" name="log-out"></ion-icon>
+      " (click)="Logout()">
+    <ion-icon  style="font-size: 25px; margin-right: 25px" slot="start" name="log-out"></ion-icon>
     Đăng xuất
   </ion-list>
+</div>
 </ion-content>

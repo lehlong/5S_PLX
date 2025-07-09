@@ -1,20 +1,20 @@
-<ion-header [translucent]="true">
+<!-- <ion-header [translucent]="true">
   <ion-toolbar>
-    <!-- <ion-button fill="" slot="start">
-      <ion-back-button></ion-back-button>
-    </ion-button> -->
     <ion-title class="t-center">
-      <h4>
-        <img slot="start" style="width: 30px;" src="../../../assets/img/logo.png" alt="">
-        Khảo sát 5S
-      </h4>
     </ion-title>
   </ion-toolbar>
-</ion-header>
-<ion-content [fullscreen]="true">
-  <div class="main-home">
+</ion-header> -->
+<ion-content [fullscreen]="true" color="light" >
+  <div class="main-home ">
+    <div class="d-flex justify-space-between" style="margin-bottom: 10px;">
+      <div class=""></div>
+      <h4> KHẢO SÁT<img slot="start" style="width: 40px;" src="../../../assets/img/logo.png" alt=""></h4>
+
+    </div>
     <ng-container *ngFor="let item of data">
-      <h4><ion-icon name="checkbox-outline"></ion-icon>{{ item.name }}</h4>
+      <h4>
+        <!-- <ion-icon name="checkbox-outline"></ion-icon> -->
+        {{ item.name }}</h4>
       <img [src]="item.image == 1 ? 'assets/img/1.jpg' : item.image" class="p-5s" (click)="navigateTo(item)" />
 
     </ng-container>

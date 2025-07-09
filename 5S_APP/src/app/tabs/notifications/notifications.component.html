@@ -1,14 +1,16 @@
-<ion-header [translucent]="true">
+<!-- <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-button fill="" slot="start">
       <ion-back-button></ion-back-button>
     </ion-button>
-    <h4 class="t-center"><ion-icon name="notifications-outline"></ion-icon> Thông báo</h4>
   </ion-toolbar>
-</ion-header>
+</ion-header> -->
 
-<ion-content>
+<ion-content color="light" >
   <div class="main-notifications"  >
+    <h4 style="padding-bottom: 10px;" class="t-center" >
+      <!-- <ion-icon  name="notifications-outline"></ion-icon>  -->
+      Thông báo</h4>
 
     <div class="noti-item" *ngFor="let noti of lstData">
       <div class="noti-title">{{ noti.title }}</div>

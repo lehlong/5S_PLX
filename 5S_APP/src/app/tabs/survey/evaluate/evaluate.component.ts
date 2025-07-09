@@ -129,6 +129,10 @@ export class EvaluateComponent implements OnInit {
           this.lstTieuChi = this.dataTree?.leaves;
           await this.cdr.detectChanges();
         }
+        for (let index = 0; index < this.lstTieuChi.length; index++) {
+          this.lstTieuChi[index].number = index;
+        }
+
         console.log(this.treeData);
         console.log(this.lstTieuChi);
       },
@@ -138,6 +142,13 @@ export class EvaluateComponent implements OnInit {
   //Hàm search
   openSearchInput() {
     this.isSearchVisible = !this.isSearchVisible;
+  }
+  renderTitle(node: any): string {
+    const found = this.lstTieuChi.find((x: any) => x.id == node.key);
+    if (found) {
+      return `${found.number + 1} - ${found.title || node.title}`;
+    }
+    return node.title;
   }
 
   private removeHighlights() {
@@ -294,8 +305,8 @@ export class EvaluateComponent implements OnInit {
 
   private initMap(): void {
     L.Icon.Default.mergeOptions({
-      // iconRetinaUrl: 'media/marker-icon-2V3QKKVC.png',
-      iconUrl: 'media/marker-icon-2V3QKKVC.png',
+      iconRetinaUrl: 'media/marker-icon-2V3QKKVC.png',
+      // iconUrl: 'media/marker-icon-2V3QKKVC.png',
       // shadowUrl: 'media/marker-icon-2V3QKKVC.png',
     });
 

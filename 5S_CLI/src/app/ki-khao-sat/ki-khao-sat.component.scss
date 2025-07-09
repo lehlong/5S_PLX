@@ -37,7 +37,9 @@
   width: 100%;
   overflow-x: auto;
 }
-
+::ng-deep .ant-drawer-body {
+    overflow: unset !important;
+}
 /* Button styling */
 button.space-btn {
   display: flex;

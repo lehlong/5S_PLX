@@ -113,7 +113,7 @@
   <ng-container *nzDrawerContent>
 
     <!-- <form nz-form nzLayout="vertical" [formGroup]="validateForm" (ngSubmit)="submitForm()"> -->
-    <nz-tabset>
+    <nz-tabset  (nzSelectedIndexChange)="onTabChange($event)">
       <nz-tab nzTitle="THÔNG TIN KÌ CHẤM ĐIỂM">
         <div nz-row [nzGutter]="12">
           <div nz-col [nzXs]="12">
@@ -164,7 +164,7 @@
       </nz-tab>
 
       <nz-tab nzTitle="NGƯỜI CHẤM ĐIỂM">
-        <nz-space style="float: right;">
+        <!-- <nz-space style="float: right;">
           <app-input-clear placeholder="Tìm kiếm" (enterEvent)="searchNguoiChamDiem()"
             [(value)]="filterNguoiChamDiem"></app-input-clear>
           <button (click)="searchNguoiChamDiem()" class="flex !items-center !border-l-0 gray-btn" nzType="default"
@@ -175,14 +175,14 @@
             nzType="default">
             <span nz-icon nzType="redo"></span>
           </button>
-        </nz-space>
+        </nz-space> -->
         <nz-table *ngIf="inputKi.lstInputStore?.length  != 0" class="auto-scroll-table" #headerTable
           [nzData]="inputKi.lstInputStore" [nzFrontPagination]="false" [nzScroll]="{ y: 'calc(100vh - 244px)' }">
           <thead>
             <tr>
               <th nzWidth="60px">STT</th>
               <th nzWidth="160px" [nzSortFn]="true" [nzAlign]="'left'">
-                Mã Kì
+                Mã
               </th>
               <th [nzSortFn]="true">
                 Tên Cửa Hàng
@@ -211,10 +211,9 @@
               <td nzAlign="center">
                 <nz-select style="width: 100%;" [nzMaxTagCount]="3" [nzMaxTagPlaceholder]="tagPlaceHolder"
                   nzMode="multiple" nzPlaceHolder="Please select" [ngModelOptions]="{ standalone: true }"
-                  [(ngModel)]="data.lstChamDiem" (ngModelChange)="onChangeChamDiem($event, data)">
-                  <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.fullName"
+                  [(ngModel)]="data.lstChamDiem" (ngModelChange)="onChangeChamDiem($event, data)" >
+                    <nz-option  cdkScrollable *ngFor="let item of lstAccount; trackBy: trackByKey" [nzLabel]="item.fullName"
                     [nzValue]="item.userName">
-                    <!-- [nzValue]="item.userName"> -->
                   </nz-option>
                 </nz-select>
               </td>
@@ -228,7 +227,7 @@
             <tr>
               <th nzWidth="60px">STT</th>
               <th nzWidth="160px" [nzSortFn]="true" [nzAlign]="'left'">
-                Mã Kì
+                Mã
               </th>
               <th [nzSortFn]="true">
                 Tên Kho
@@ -259,7 +258,7 @@
                 <nz-select style="width: 100%;" [nzMaxTagCount]="3" [nzMaxTagPlaceholder]="tagPlaceHolder"
                   nzMode="multiple" nzPlaceHolder="Please select" [ngModelOptions]="{ standalone: true }"
                   [(ngModel)]="data.lstChamDiem" (ngModelChange)="onChangeChamDiem($event, data)">
-                  <nz-option cdkScrollable *ngFor="let item of lstAccount; " [nzLabel]="item.fullName"
+                  <nz-option cdkScrollable *ngFor="let item of lstAccount; trackBy: trackByKey" [nzLabel]="item.fullName"
                     [nzValue]="item.userName">
                     <!-- [nzValue]="item.userName"> -->
                   </nz-option>
