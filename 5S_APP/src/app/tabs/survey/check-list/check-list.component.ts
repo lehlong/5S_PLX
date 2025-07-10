@@ -105,8 +105,6 @@ export class CheckListComponent implements OnInit {
   }
 
   navigateTo() {
-    console.log(this.doiTuong);
-
     this.lstHisEvaluate = []
     let userInfo = JSON.parse(localStorage.getItem('UserInfo') ?? '');
     this.deviceID = userInfo?.deviceId || '';

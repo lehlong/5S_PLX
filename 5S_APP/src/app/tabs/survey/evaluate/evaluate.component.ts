@@ -24,6 +24,7 @@ import { IonHeader } from '@ionic/angular/standalone';
 import { AuthService } from 'src/app/service/auth.service';
 import { Capacitor } from '@capacitor/core';
 import mediumZoom from 'medium-zoom';
+import { image } from 'ionicons/icons';
 
 @Component({
   imports: [SharedModule, HighlightSearchPipe],
@@ -89,10 +90,8 @@ export class EvaluateComponent implements OnInit {
     private renderer: Renderer2
   ) { }
 
-  ngOnInit() {
-    this.apiFile =
-      (environment as any).apiFile ?? 'http://sso.d2s.com.vn:1347/';
-    console.log('api file', this.apiFile);
+  async ngOnInit() {
+    this.apiFile = (environment as any).apiFile ?? 'http://sso.d2s.com.vn:1347/';
 
     this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
     this.route.paramMap.subscribe({
@@ -105,32 +104,30 @@ export class EvaluateComponent implements OnInit {
         this.kiKhaoSat = JSON.parse(nav ?? '').kiKhaoSat;
 
         if (mode == 'draft') {
-          console.log(this.doiTuong.id + '_' + this.kiKhaoSat.code);
-
           this.evaluate = await this._storageService.get(
             this.doiTuong.id + '_' + this.kiKhaoSat.code
           );
+
         } else {
           this.isEdit = false;
           this.getResultEvaluate();
           this.getAllAccount();
         }
-
         let data = localStorage.getItem(
           this.doiTuong.id + '_' + this.kiKhaoSat.code
         );
         if (data == null) {
           this.getAllTieuChi();
-          // console.log(this.dataTree);
         } else {
           this.dataTree = JSON.parse(data);
           this.treeData = this.dataTree?.tree;
-          this.lstTreeOpen = [...this.getKeysAndLeaves(this.treeData).keys];
           this.lstTieuChi = this.dataTree?.leaves;
+          this.lstTreeOpen = [...this.getKeysAndLeaves(this.treeData).keys];
           await this.cdr.detectChanges();
         }
       },
     });
+
   }
   ngAfterViewInit() {
     mediumZoom('.zoom-image');
@@ -225,9 +222,7 @@ export class EvaluateComponent implements OnInit {
   getResultEvaluate() {
     this._service.getResultEvaluate(this.headerId).subscribe({
       next: async (data) => {
-        console.log(data);
         this.evaluate = data;
-        await this.cdr.detectChanges();
       },
     });
   }
@@ -238,9 +233,7 @@ export class EvaluateComponent implements OnInit {
       .subscribe({
         next: async (data) => {
           this.treeData = [data];
-
           const result = this.getKeysAndLeaves([data]);
-          console.log(result.keys);
 
           this.lstTreeOpen = [...result.keys];
           this.lstTieuChi = result.leaves;
@@ -706,14 +699,16 @@ export class EvaluateComponent implements OnInit {
   selectedImage: any = {};
 
   openFullScreen(img: any) {
+    let filePath = { ...img };
     if (this.isEdit == false) {
-      img.filePath = this.apiFile + img.filePath;
+      filePath.filePath = this.apiFile + img.filePath;
     }
     this.longitude = img.kinhDo;
     this.latitude = img.viDo;
-    console.log(this.longitude, this.latitude);
 
-    this.selectedImage = img;
+    this.selectedImage = filePath;
+    console.log(img);
+
     this.isImageModalOpen = true;
     setTimeout(() => {
       this.initMap();
@@ -749,7 +744,6 @@ export class EvaluateComponent implements OnInit {
   }
 
   deleteImage2(img: any) {
-    console.log('deleteImage2', img);
     this.selectedImage = img;
     this.confirmDeleteImage();
   }
@@ -841,47 +835,6 @@ export class EvaluateComponent implements OnInit {
     }
   }
 
-  // async openCamera(code: any) {
-  //   if (!this.isEdit) return;
-
-  //   try {
-  //     // 👉 Lấy vị trí hiện tại
-  //     const position = await Geolocation.getCurrentPosition();
-  //     console.log(position)
-  //     const latitude = position.coords.latitude + 0.002273;
-  //     const longitude = position.coords.longitude - 0.006651;
-  //     console.log('Vị trí hiện tại:', latitude, longitude);
-
-  //     console.log('Vị trí hiện tại:', latitude, longitude);
-
-  //     const image = await Camera.getPhoto({
-  //       quality: 90,
-  //       allowEditing: false,
-  //       resultType: CameraResultType.Base64,
-  //       source: CameraSource.Camera,
-  //     });
-
-  //     const base64Image = `data:image/jpeg;base64,${image.base64String}`;
-  //     let thumbnail = await this.generateThumbnail(base64Image, 100, 100);
-
-  //     this.evaluate.lstImages.push({
-  //       code: '-1',
-  //       fileName: '',
-  //       evaluateHeaderCode: this.headerId,
-  //       filePath: base64Image,
-  //       pathThumbnail: thumbnail,
-  //       tieuChiCode: code,
-  //       viDo: latitude,
-  //       kinhDo: longitude,
-  //       type: 'img',
-  //     });
-  //     this.cdr.detectChanges();
-
-  //     this._storageService.set(this.doiTuong.id + "_" + this.kiKhaoSat.code, this.evaluate);
-  //   } catch (err) {
-  //     console.error('Camera error:', err);
-  //   }
-  // }
 
   openMenu() {
     if (this.lstTieuChi.length == 0) {
