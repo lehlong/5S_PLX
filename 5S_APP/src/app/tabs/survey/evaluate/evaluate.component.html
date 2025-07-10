@@ -58,7 +58,7 @@
                   <ion-radio-group [value]="filterDiem(node.code)" (ionChange)="setDiem(node, $event)">
                     <ng-container *ngFor="let diem of node.diemTieuChi; trackBy: trackByKey">
                       <ion-item>
-                        <ion-label style="pointer-events: none;" >{{ diem.moTa }}</ion-label>
+                        <ion-label style="pointer-events: none;">{{ diem.moTa }}</ion-label>
                         <ion-radio slot="end" [value]="diem.id" [disabled]="!isEdit"></ion-radio>
                       </ion-item>
                     </ng-container>
@@ -178,27 +178,27 @@
 <ion-menu side="end" contentId="main-content" [style.--width]="'85%'">
   <ion-header>
     <ion-toolbar>
-        <ion-list>
-          <ion-item lines="none" style="--min-height: 27px; align-items: center; display: flex">
-            <ion-label style="align-items: center; margin: 0;" class="d-flex">
-              <span style="background-color: #2dd55b" class="circle"></span>Đang chọn
-            </ion-label>
-            <ion-label style="align-items: center; margin: 0;" class="d-flex">
-              <span style="background-color: rgb(220, 220, 220)" class="circle"></span>Chưa trả
-              lời
-            </ion-label>
-          </ion-item>
-          <ion-item lines="none" style="--min-height: 27px; align-items: center; display: flex">
-            <ion-label style="align-items: center; margin: 0;" class="d-flex">
-              <span style="background-color: #1890ff" class="circle"></span>Đã trả lời
-            </ion-label>
-            <ion-label style="align-items: center; margin: 0;" class="d-flex">
-              <span style="background-color: #ff4d4f" class="circle"></span>Không đạt
+      <ion-list>
+        <ion-item lines="none" style="--min-height: 27px; align-items: center; display: flex">
+          <ion-label style="align-items: center; margin: 0;" class="d-flex">
+            <span style="background-color: #2dd55b" class="circle"></span>Đang chọn
+          </ion-label>
+          <ion-label style="align-items: center; margin: 0;" class="d-flex">
+            <span style="background-color: rgb(220, 220, 220)" class="circle"></span>Chưa trả
+            lời
+          </ion-label>
+        </ion-item>
+        <ion-item lines="none" style="--min-height: 27px; align-items: center; display: flex">
+          <ion-label style="align-items: center; margin: 0;" class="d-flex">
+            <span style="background-color: #1890ff" class="circle"></span>Đã trả lời
+          </ion-label>
+          <ion-label style="align-items: center; margin: 0;" class="d-flex">
+            <span style="background-color: #ff4d4f" class="circle"></span>Không đạt
 
-            </ion-label>
-          </ion-item>
-        </ion-list>
-        <!-- <ion-grid>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+      <!-- <ion-grid>
           <ion-row>
 
             <ion-col size="6" style="display: flex; align-items: center">
@@ -233,8 +233,12 @@
       </ion-item>
       <ion-item>
         <ion-label>Lần chấm thứ 2</ion-label>
-        <ion-label>{{ isEdit ? (dateNow | date: 'HH:mm dd/MM/yyyy') : (evaluate.header.updateDate | date: 'HH:mm
-          dd/MM/yyyy') }}</ion-label>
+        <ion-label>
+          {{ isEdit
+          ? (dateNow | date: 'HH:mm dd/MM/yyyy')
+          : (evaluate.header.updateDate | date: 'HH:mm dd/MM/yyyy')
+          }}
+        </ion-label>
       </ion-item>
       <ion-item>
         <ion-label>Tổng</ion-label>
@@ -261,7 +265,7 @@
         <ion-icon name="trash-outline" slot="end"></ion-icon>
       </ion-button>
       <div *ngIf="selectedImage.type == 'img'">
-        <img [src]="selectedImage.filePath" class="full-image" />
+        <img [src]="selectedImage.filePath" class="full-image zoom-image" />
         <div id="map" style="height: 400px"></div>
       </div>
       <video *ngIf="selectedImage.type == 'mp4'" class="full-image" [src]="selectedImage.filePath" controls

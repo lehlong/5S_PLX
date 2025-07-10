@@ -57,10 +57,10 @@ export class LoginComponent implements OnInit {
 
   processLogin() {
     this.isLogin = true;
-    // this.model.deviceId = this.deviceId;
-    this.model.deviceId = 'faf599b6-41d0-4156-b34d-ad6b16d69282';
-    this.model.deviceId = "47d6a7ca58006a50";
-    // this.model.deviceName = this.info.name ;
+    this.model.deviceId = this.deviceId;
+    // this.model.deviceId = 'faf599b6-41d0-4156-b34d-ad6b16d69282';
+    // this.model.deviceId = "47d6a7ca58006a50";
+    this.model.deviceName = this.info.name ;
     this.model.deviceName = 'iphone';
     this.model.model = this.info.model;
     this.model.operatingSystem = this.info.operatingSystem;

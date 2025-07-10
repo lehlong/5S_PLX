@@ -23,6 +23,7 @@ import { HighlightSearchPipe } from '../../../shared/pipes/highlight-search.pipe
 import { IonHeader } from '@ionic/angular/standalone';
 import { AuthService } from 'src/app/service/auth.service';
 import { Capacitor } from '@capacitor/core';
+import mediumZoom from 'medium-zoom';
 
 @Component({
   imports: [SharedModule, HighlightSearchPipe],
@@ -131,18 +132,13 @@ export class EvaluateComponent implements OnInit {
       },
     });
   }
-
+  ngAfterViewInit() {
+    mediumZoom('.zoom-image');
+  }
   //Hàm search
   openSearchInput() {
     this.isSearchVisible = !this.isSearchVisible;
   }
-  // renderTitle(node: any): string {
-  //   const found = this.lstTieuChi.find((x: any) => x.id == node.key);
-  //   if (found) {
-  //     return `${found.number + 1} - ${found.title || node.title}`;
-  //   }
-  //   return node.title;
-  // }
 
   private removeHighlights() {
     this.currentHighlights.forEach((el) => {
