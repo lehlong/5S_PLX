@@ -56,7 +56,7 @@ export class EvaluateComponent implements OnInit {
   data: any = {};
   headerId: any = '';
   count: any = 0;
-  leaveIndex : any = 1;
+  leaveIndex: any = 1;
   isEdit: any = true;
   dateNow: Date = new Date();
   account: any = {};
@@ -86,7 +86,7 @@ export class EvaluateComponent implements OnInit {
     private messageService: MessageService,
     private cdr: ChangeDetectorRef,
     private renderer: Renderer2
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.apiFile =
@@ -124,14 +124,10 @@ export class EvaluateComponent implements OnInit {
         } else {
           this.dataTree = JSON.parse(data);
           this.treeData = this.dataTree?.tree;
-          this.lstTreeOpen = [...this.extractAllKeys(this.treeData)];
+          this.lstTreeOpen = [...this.getKeysAndLeaves(this.treeData).keys];
           this.lstTieuChi = this.dataTree?.leaves;
           await this.cdr.detectChanges();
         }
-
-
-        console.log(this.treeData);
-        console.log(this.lstTieuChi);
       },
     });
   }
@@ -246,8 +242,12 @@ export class EvaluateComponent implements OnInit {
       .subscribe({
         next: async (data) => {
           this.treeData = [data];
-          this.lstTreeOpen = [...this.extractAllKeys([data])];
-          this.lstTieuChi = await this.filterTieuChiLeaves(this.treeData);
+
+          const result = this.getKeysAndLeaves([data]);
+          console.log(result.keys);
+
+          this.lstTreeOpen = [...result.keys];
+          this.lstTieuChi = result.leaves;
 
           this.dataTree.leaves = this.lstTieuChi;
           this.dataTree.tree = this.treeData;
@@ -262,20 +262,29 @@ export class EvaluateComponent implements OnInit {
       });
   }
 
-  filterTieuChiLeaves(tree: any[]) {
-    let result: any[] = [];
-    for (const node of tree) {
-      if (node.isGroup === false) {
-        node.number = this.leaveIndex++
-        // console.log(node);
-        result.push(node);
+  getKeysAndLeaves(tree: any[]): { keys: string[], leaves: any[] } {
+    let keys: string[] = [];
+    let leaves: any[] = [];
+
+    const traverse = (nodes: any[]) => {
+      for (const node of nodes) {
+        if (node.key) keys.push(node.key);
+
+        if (!node.isGroup) {
+          node.number = this.leaveIndex++;
+          leaves.push(node);
+        }
+
+        if (Array.isArray(node.children) && node.children.length > 0) {
+          traverse(node.children);
+        }
       }
-      if (Array.isArray(node.children) && node.children.length > 0) {
-        result = result.concat(this.filterTieuChiLeaves(node.children));
-      }
-    }
-    return result;
+    };
+
+    traverse(tree);
+    return { keys, leaves };
   }
+
 
   isValidChildren(children: any): boolean {
     return Array.isArray(children) && children.length > 0;
@@ -367,20 +376,20 @@ export class EvaluateComponent implements OnInit {
     return imagesSelecting < node.numberImg;
   }
 
-  extractAllKeys(tree: any[]): string[] {
-    let keys: string[] = [];
+  // extractAllKeys(tree: any[]): string[] {
+  //   let keys: string[] = [];
 
-    tree.forEach((node) => {
-      if (node.key) {
-        keys.push(node.key);
-      }
-      if (Array.isArray(node.children)) {
-        keys = keys.concat(this.extractAllKeys(node.children));
-      }
-    });
+  //   tree.forEach((node) => {
+  //     if (node.key) {
+  //       keys.push(node.key);
+  //     }
+  //     if (Array.isArray(node.children)) {
+  //       keys = keys.concat(this.extractAllKeys(node.children));
+  //     }
+  //   });
 
-    return keys;
-  }
+  //   return keys;
+  // }
 
   onImageSelected(event: any, code: any) {
     if (!this.isEdit) return;

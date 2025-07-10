@@ -33,7 +33,7 @@
             (click)="openEditEvaluate(item)">
             <div class="">
               <h5 class="mg-0" style="margin: 9px 0;">{{ item?.name }}</h5>
-              <span class="text-italic" style="font-size: 14px;">{{ getFullName(item.accountUserName) }}</span>
+              <span class="text-italic" style="font-size: 12px;">{{ getFullName(item.accountUserName) }}</span>
             </div>
             <div slot="end">
               <p class="mg-0" style="padding-left: 70px;">
@@ -41,7 +41,7 @@
                   {{ item.point ?? '0' }}
                 </ion-chip>
               </p>
-              <span class="text-italic" style="font-size: 14px;">{{ item.updateDate | date: 'HH:mm dd/MM/yyyy' }}</span>
+              <span class="text-italic" style="font-size: 12px; padding-left: 15px;">{{ item.updateDate | date: 'HH:mm dd/MM/yyyy' }}</span>
             </div>
           </ion-item>
           <ion-item-options *ngIf="item.name == 'Bản nháp'" slot="end">

@@ -54,6 +54,7 @@
 ::ng-deep .textarea-wrapper.sc-ion-textarea-ios textarea.sc-ion-textarea-ios {
   padding: 17px 0px 0px;
 }
+
 .circle {
   width: 20px;
   height: 20px;
@@ -105,14 +106,26 @@
   border-radius: 5px;
 }
 
+.p-10 {
+  // border: 1px solid;
+  // border-radius: 50%;
+  height: 30px;
+  // width: 10px;
+  display: flex;
+  padding-right: 10px;
+  // justify-content: center;
+  // align-items: center;
+}
+
 .images-wrapper {
   position: relative;
   display: inline-block;
   margin: 3px;
 
   .image-preview {
-    width: 100px;
-    height: 100px;
+    padding: 5px;
+    width: 29vw;
+    height: 29vw;
     border-radius: 8px;
     object-fit: cover;
   }

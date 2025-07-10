@@ -38,7 +38,10 @@
       <ng-container *ngFor="let node of nodes; trackBy: trackByKey">
         <ion-accordion [value]="node.key" [ngClass]="{ 'border-link': node.id === selectedAccordionId }">
           <ion-item slot="header" color="light" id="{{ node.id }}">
-            <ion-label [innerHTML]="node.number ?  node.number + ' - '+ node.title : node.title | highlightSearch : searchKeyword"></ion-label>
+            <ion-label class="d-flex">
+              <div [ngClass]="{ 'p-10': node.number,  }">{{ node.number ?  node.number+'.' : ''}}</div>
+              <ion-label [innerHTML]="node.title | highlightSearch : searchKeyword"></ion-label>
+            </ion-label>
           </ion-item>
 
           <div style="padding: 5px 0" slot="content">
@@ -116,9 +119,7 @@
                 </div>
 
                 <!-- Hiển thị tài liệu -->
-                <div *ngIf="
-                    !node.isGroup && filterImage(node)?.documents.length > 0
-                  " class="file-wrapper d-flex" style="width: 100vw">
+                <div *ngIf="!node.isGroup && filterImage(node)?.documents.length > 0" class="file-wrapper d-flex" style="width: 100vw">
                   <div class="image-preview" *ngFor="
                       let doc of filterImage(node)?.documents;
                       trackBy: trackByKey
