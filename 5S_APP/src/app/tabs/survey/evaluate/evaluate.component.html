@@ -58,7 +58,7 @@
                   <ion-radio-group [value]="filterDiem(node.code)" (ionChange)="setDiem(node, $event)">
                     <ng-container *ngFor="let diem of node.diemTieuChi; trackBy: trackByKey">
                       <ion-item>
-                        <ion-label>{{ diem.moTa }}</ion-label>
+                        <ion-label style="pointer-events: none;" >{{ diem.moTa }}</ion-label>
                         <ion-radio slot="end" [value]="diem.id" [disabled]="!isEdit"></ion-radio>
                       </ion-item>
                     </ng-container>
@@ -91,8 +91,8 @@
                 </p>
 
                 <div *ngIf="node.isImg" style="margin-top: 10px">
-                  <label style="color: orange">[Chú ý: Tối thiểu {{ node.numberImg }} ảnh]</label>
-                  <p *ngIf="hasEnoughImages(node.code, node)" style="color: red">
+                  <label style="color: #ffc409">[Chú ý: Tối thiểu {{ node.numberImg }} ảnh]</label>
+                  <p *ngIf="hasEnoughImages(node.code, node)" style="color: #c5000f">
                     (*) Tiêu chí này bắt buộc chọn {{ node.numberImg }} hình ảnh
                   </p>
                 </div>
@@ -178,18 +178,17 @@
 <ion-menu side="end" contentId="main-content" [style.--width]="'85%'">
   <ion-header>
     <ion-toolbar>
-      <ion-title>
         <ion-list>
-          <ion-item lines="none" style="--min-height: 25px; align-items: center; display: flex">
+          <ion-item lines="none" style="--min-height: 27px; align-items: center; display: flex">
             <ion-label style="align-items: center; margin: 0;" class="d-flex">
-              <span style="background-color: green" class="circle"></span>Đang chọn
+              <span style="background-color: #2dd55b" class="circle"></span>Đang chọn
             </ion-label>
             <ion-label style="align-items: center; margin: 0;" class="d-flex">
               <span style="background-color: rgb(220, 220, 220)" class="circle"></span>Chưa trả
               lời
             </ion-label>
           </ion-item>
-          <ion-item lines="none" style="--min-height: 25px; align-items: center; display: flex">
+          <ion-item lines="none" style="--min-height: 27px; align-items: center; display: flex">
             <ion-label style="align-items: center; margin: 0;" class="d-flex">
               <span style="background-color: #1890ff" class="circle"></span>Đã trả lời
             </ion-label>
@@ -213,7 +212,6 @@
                 class="circle"></span><span class="font-12">Không đạt</span></ion-col>
           </ion-row>
         </ion-grid> -->
-      </ion-title>
     </ion-toolbar>
   </ion-header>
   <ion-content class="ion-padding">
