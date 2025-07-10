@@ -206,3 +206,36 @@
   background-color: yellow;
   font-weight: bold;
 }
+
+
+//css zoom
+.zoom-wrapper {
+  width: 100%;
+  height: calc(100vh - 400px); /* trừ phần map */
+  overflow: auto; /* 👈 Cho phép scroll/pan */
+  touch-action: auto; /* 👈 Cho phép kéo bằng cảm ứng */
+  -webkit-overflow-scrolling: touch; /* Cho mượt trên iOS */
+}
+
+.full-image-container {
+  position: relative; /* ✅ Cho phép translate */
+  overflow: hidden;   /* ✅ Ẩn phần ngoài khi kéo */
+  max-width: 100%;
+  max-height: 100%;
+  width: 100%;
+  height: 100%;
+  touch-action: none; /* ✅ Tránh zoom/pan mặc định trên di động */
+}
+
+.full-image {
+  transition: transform 0.3s ease;
+  transform-origin: center;
+  cursor: zoom-in;
+  user-select: none;
+  pointer-events: all;
+  will-change: transform;
+}
+
+.full-image.zoomed {
+  cursor: grab;
+}

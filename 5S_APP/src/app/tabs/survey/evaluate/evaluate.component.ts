@@ -34,6 +34,17 @@ import { image } from 'ionicons/icons';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EvaluateComponent implements OnInit {
+  @ViewChild('zoomImg') zoomImg!: ElementRef;
+  private currentScale = 1;
+  private lastTapTime = 0;
+  private doubleTapThreshold = 300;
+  private isZoomed = false;
+  private isDragging = false;
+  private lastX = 0;
+  private lastY = 0;
+  private currentX = 0;
+  private currentY = 0;
+  ////---------------
   private map: L.Map | undefined;
   private highlightClass = 'highlight-search';
   private currentHighlights: HTMLElement[] = [];
@@ -88,10 +99,11 @@ export class EvaluateComponent implements OnInit {
     private messageService: MessageService,
     private cdr: ChangeDetectorRef,
     private renderer: Renderer2
-  ) { }
+  ) {}
 
   async ngOnInit() {
-    this.apiFile = (environment as any).apiFile ?? 'http://sso.d2s.com.vn:1347/';
+    this.apiFile =
+      (environment as any).apiFile ?? 'http://sso.d2s.com.vn:1347/';
 
     this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
     this.route.paramMap.subscribe({
@@ -107,7 +119,6 @@ export class EvaluateComponent implements OnInit {
           this.evaluate = await this._storageService.get(
             this.doiTuong.id + '_' + this.kiKhaoSat.code
           );
-
         } else {
           this.isEdit = false;
           this.getResultEvaluate();
@@ -127,11 +138,125 @@ export class EvaluateComponent implements OnInit {
         }
       },
     });
-
   }
   ngAfterViewInit() {
     mediumZoom('.zoom-image');
   }
+
+  //Zoom
+zoomOnClick(event: MouseEvent | TouchEvent) {
+  const currentTime = new Date().getTime();
+  const tapInterval = currentTime - this.lastTapTime;
+  this.lastTapTime = currentTime;
+
+  const imgEl = this.zoomImg.nativeElement as HTMLElement;
+  const rect = imgEl.getBoundingClientRect();
+
+  let clientX: number;
+  let clientY: number;
+
+  if (event instanceof TouchEvent) {
+    const touch = event.touches[0] || event.changedTouches[0];
+    clientX = touch.clientX;
+    clientY = touch.clientY;
+  } else {
+    clientX = event.clientX;
+    clientY = event.clientY;
+  }
+
+  if (tapInterval < this.doubleTapThreshold && this.isZoomed) {
+    console.log('[zoomOnClick] Double tap → reset to scale(1)');
+    this.resetZoom();
+    return;
+  }
+
+  if (!this.isZoomed) {
+    const offsetX = clientX - rect.left;
+    const offsetY = clientY - rect.top;
+
+    const percentX = (offsetX / rect.width) * 100;
+    const percentY = (offsetY / rect.height) * 100;
+
+    imgEl.style.transformOrigin = `${percentX}% ${percentY}%`;
+
+    this.currentX = 0;
+    this.currentY = 0;
+    this.currentScale = 4; // 👈 set scale 4
+    this.applyTransform();
+
+    imgEl.classList.add('zoomed');
+    this.isZoomed = true;
+
+    console.log('[zoomOnClick] Zoomed in at', percentX.toFixed(1), '%', percentY.toFixed(1), '%');
+  }
+}
+
+
+resetZoom() {
+  const imgEl = this.zoomImg.nativeElement as HTMLElement;
+
+  imgEl.style.transformOrigin = 'center center';
+  this.currentX = 0;
+  this.currentY = 0;
+  this.currentScale = 1; 
+  this.applyTransform();
+
+  imgEl.classList.remove('zoomed');
+  this.isZoomed = false;
+}
+
+
+onDragStart(event: MouseEvent | TouchEvent) {
+  if (!this.isZoomed) return;
+
+  this.isDragging = true;
+
+  if (event instanceof TouchEvent) {
+    this.lastX = event.touches[0].clientX;
+    this.lastY = event.touches[0].clientY;
+  } else {
+    this.lastX = event.clientX;
+    this.lastY = event.clientY;
+  }
+}
+
+onDragMove(event: MouseEvent | TouchEvent) {
+  if (!this.isZoomed || !this.isDragging) return;
+
+  let clientX: number;
+  let clientY: number;
+
+  if (event instanceof TouchEvent) {
+    clientX = event.touches[0].clientX;
+    clientY = event.touches[0].clientY;
+  } else {
+    clientX = event.clientX;
+    clientY = event.clientY;
+  }
+
+  const dx = clientX - this.lastX;
+  const dy = clientY - this.lastY;
+
+  this.currentX += dx;
+  this.currentY += dy;
+
+  this.lastX = clientX;
+  this.lastY = clientY;
+
+  this.applyTransform();
+}
+
+onDragEnd() {
+  this.isDragging = false;
+}
+
+applyTransform() {
+  const imgEl = this.zoomImg.nativeElement as HTMLElement;
+  imgEl.style.transform = `scale(${this.currentScale}) translate(${this.currentX / this.currentScale}px, ${this.currentY / this.currentScale}px)`;
+}
+
+
+
   //Hàm search
   openSearchInput() {
     this.isSearchVisible = !this.isSearchVisible;
@@ -251,7 +376,7 @@ export class EvaluateComponent implements OnInit {
       });
   }
 
-  getKeysAndLeaves(tree: any[]): { keys: string[], leaves: any[] } {
+  getKeysAndLeaves(tree: any[]): { keys: string[]; leaves: any[] } {
     let keys: string[] = [];
     let leaves: any[] = [];
 
@@ -273,7 +398,6 @@ export class EvaluateComponent implements OnInit {
     traverse(tree);
     return { keys, leaves };
   }
-
 
   isValidChildren(children: any): boolean {
     return Array.isArray(children) && children.length > 0;
@@ -834,7 +958,6 @@ export class EvaluateComponent implements OnInit {
       console.error('❌ Lỗi openCamera:', err);
     }
   }
-
 
   openMenu() {
     if (this.lstTieuChi.length == 0) {
