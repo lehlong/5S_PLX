@@ -36,6 +36,25 @@ ion-header {
   }
 }
 
+
+.ion-color-dark {
+  --ion-color-base: #000 !important;
+}
+
+.bg-purple {
+  background-color: #6030ff;
+}
+
+.bg-warning {
+  background-color: #ffc409;
+}
+
+.bg-success {
+  background-color: #2dd55b;
+}
+
+
+
 :root {
 
   // --ion-font-size-base: 14px;

@@ -1,72 +1,169 @@
 <ion-content>
   <div class="main-news">
-    <div style="padding: 20px 10px;">
+    <div class="d-flex " style="margin-bottom: 10px;">
+      <!-- <div class=""></div> -->
+      <img style="width: 40px;" src="../../../assets/img/logo.png" alt="">
+      <h4 style="font-size: 20px;    border-bottom: 1px solid #d7d7d7;    padding-left: 4px;    margin: 5px 0;">
+        Khảo sát
+      </h4>
+    </div>
+    <!-- <div style="padding: 20px 10px;">
 
       <h4>Khảo Sát 5S</h4>
       <h4>Morning, Hoang Trung Kien</h4>
+    </div> -->
+
+
+    <div class="user-info" style="padding: 8px;">
+      <ion-grid style="background-color: #254EDB; border-radius: 10px;">
+        <ion-row class="ion-align-items-center">
+          <ion-col size="2">
+            <!-- <ion-icon class="icon-user" name="person-outline"></ion-icon> -->
+            <ion-icon class="icon-user" name="person-circle-outline"></ion-icon>
+
+          </ion-col>
+          <ion-col size="8">
+            <h5 class="user-name">Nguyễn Văn A</h5>
+            <p class="user-position">Cán bộ văn thư</p>
+          </ion-col>
+          <ion-col style="text-align: center;">
+            <div style="position: relative; display: inline-block; color: black;">
+              <ion-icon style="align-items: end;" class="icon-bell" name="notifications-outline"></ion-icon>
+              <p class="number-noti">2</p>
+            </div>
+          </ion-col>
+        </ion-row>
+        <ion-row class="calendar-row ion-justify-content-start" style="width: 100%;">
+          <ion-icon name="calendar-outline" style=" padding: 0 10px; "></ion-icon> Thứ Bảy, Ngày 26 thang 11 năm 2025
+        </ion-row>
+
+      </ion-grid>
     </div>
 
-    <!-- <ion-searchbar style="padding: 5px 10px;" class="custom"></ion-searchbar> -->
+    <div>
+      <ion-grid class="container-job-card">
+        <ion-row gap="2" class="space-card">
+          <div class="bg-success card-job-item ion-text-center">
+            <h5><strong style="color:white;">24</strong></h5>
+            <p style="color: white;">Lần chấm</p>
+          </div>
+          <div class="bg-warning card-job-item ion-text-center">
+            <h5><strong style="color:white;">12</strong></h5>
+            <p style="color:white;">chưa chấm</p>
+          </div>
 
-    <ion-segment-view style="padding: 10px;">
-      <ion-segment-content id="first">
-        <div class="news-type" style="width: 70vw; height: 75px; margin: 10px; border-bottom: 1px solid rgb(130, 130, 130);"  class="d-block">
-          <strong class="d-block" >
-            Chấm điểm cửa hàng 5S
-          </strong>
-          <div class="d-flex justify-space-between">
-            <!-- <ion-item  class="d-block" style=""> -->
-              <ion-label>
-                <ion-text class="d-block" style="padding: 3px 0;">chấm điểm tháng 7</ion-text>
-                <ion-note>07/08/2002</ion-note>
-              </ion-label>
-              <ion-chip slot="end" style="font-size: 13px;">đang mở</ion-chip>
-            </div>
-          <!-- </ion-item> -->
-        </div>
-        <div style="height: 100px; max-width: 20vw ;">
-          <ion-icon style="width: 100px; height: 100px; color: rgb(119, 119, 119)" name="create-outline"></ion-icon>
-        </div>
-
-      </ion-segment-content>
-      <ion-segment-content id="second">Second</ion-segment-content>
-      <ion-segment-content id="third">Third</ ion-segment-content>
-    </ion-segment-view>
-
-
+          <div class="bg-purple card-job-item ion-text-center">
+            <h5> <strong style="color:white;">3</strong></h5>
+            <p style="color: white;">Vi phạm</p>
+          </div>
+        </ion-row>
+      </ion-grid>
+    </div>
     <div class="horizontal-scroll-buttons" style="padding: 0 10px;">
       <ion-button class="custom active" size="small" shape="round">Tất cả</ion-button>
       <ion-button class="custom" size="small" shape="round">Tôi chấm</ion-button>
       <ion-button class="custom" size="small" shape="round">Thông báo</ion-button>
 
     </div>
-    <!-- <div class="news-item">
-      <div class="news-time">13:22 07-05-2024</div>
-      <div class="news-title">Đào tạo sử dụng phần mềm chấm điểm 5S trên thiết bị di động</div>
-      <div class="news-content">Ngày 02.05.2024, Công ty Xăng dầu Nghệ An (Petrolimex Nghệ An/ Công ty)
-        tổ chức khoá đào tạo sử dụng phần mềm chấm điểm 5S cho các đơn vị trực thuộc và Tổ chuyên gia đánh giá tại hội
-        trường Văn phòng...</div>
-      <img src="assets/img/3.webp" />
-    </div>
 
-    <div class="news-item">
-      <div class="news-type">Hoạt động công ty</div>
-      <div class="news-time">13:22 07-05-2024</div>
-      <div class="news-title">Đào tạo sử dụng phần mềm chấm điểm 5S trên thiết bị di động</div>
-      <div class="news-content">Ngày 02.05.2024, Công ty Xăng dầu Nghệ An (Petrolimex Nghệ An/ Công ty)
-        tổ chức khoá đào tạo sử dụng phần mềm chấm điểm 5S cho các đơn vị trực thuộc và Tổ chuyên gia đánh giá tại hội
-        trường Văn phòng...</div>
-      <img src="assets/img/2.webp" />
-    </div>
 
-    <div class="news-item">
-      <div class="news-type">Hoạt động công ty</div>
-      <div class="news-time">13:22 07-05-2024</div>
-      <div class="news-title">Đào tạo sử dụng phần mềm chấm điểm 5S trên thiết bị di động</div>
-      <div class="news-content">Ngày 02.05.2024, Công ty Xăng dầu Nghệ An (Petrolimex Nghệ An/ Công ty)
-        tổ chức khoá đào tạo sử dụng phần mềm chấm điểm 5S cho các đơn vị trực thuộc và Tổ chuyên gia đánh giá tại hội
-        trường Văn phòng...</div>
-      <img src="assets/img/1.webp" />
-    </div> -->
+    <ion-item-group style="margin-top: 5px">
+      <ion-grid>
+        <ion-list>
+
+          <ion-item [button]="true" style="width: 100%; padding-bottom: 2px;">
+            <div class="" style="width: 100%; ">
+              <div class="d-flex d-block" style="width: 100%; padding: 4px 0; justify-content: space-between;">
+                <h5 class="mg-0" style="margin: 9px 0;">PETROLIMEX-CỬA HÀNG 01</h5>
+                <p class="mg-0">
+                  <ion-chip color="primary" class="mg-0">
+                    đang mở
+                  </ion-chip>
+                </p>
+              </div>
+              <div style="padding-bottom: 6px; margin: 0;  justify-content: space-between;" class="d-flex">
+                <span class="text-italic" style="font-size: 12px;"><ion-icon name="calendar-outline"></ion-icon>
+                  T08/2025</span>
+                <span class="text-italic" style="font-size: 12px; padding-left: 15px;">Trong thời gian (01-07/08)</span>
+              </div>
+            </div>
+          </ion-item>
+
+
+          <ion-item [button]="true" style="width: 100%; padding-bottom: 2px;">
+            <div class="" style="width: 100%; ">
+              <div class="d-flex d-block" style="width: 100%; padding: 4px 0; justify-content: space-between;">
+                <h5 class="mg-0" style="margin: 9px 0;">PETROLIMEX-CỬA HÀNG 01</h5>
+                <p class="mg-0">
+                  <ion-chip color="primary" class="mg-0">
+                    đang mở
+                  </ion-chip>
+                </p>
+              </div>
+              <div style="padding-bottom: 6px; margin: 0;  justify-content: space-between;" class="d-flex">
+                <span class="text-italic" style="font-size: 12px;"><ion-icon name="calendar-outline"></ion-icon>
+                  T08/2025</span>
+                <span class="text-italic" style="font-size: 12px; padding-left: 15px;">Trong thời gian (15-23/08)</span>
+              </div>
+            </div>
+          </ion-item>
+
+
+          <ion-item [button]="true" style="width: 100%; padding-bottom: 2px;">
+            <div class="" style="width: 100%; ">
+              <div class="d-flex d-block" style="width: 100%; padding: 4px 0; justify-content: space-between;">
+                <h5 class="mg-0" style="margin: 9px 0;">PETROLIMEX-CỬA HÀNG 01</h5>
+                <p class="mg-0">
+                  <ion-chip color="primary" class="mg-0">
+                    đang mở
+                  </ion-chip>
+                </p>
+              </div>
+              <div style="padding-bottom: 6px; margin: 0;  justify-content: space-between;" class="d-flex">
+                <span class="text-italic" style="font-size: 12px;"><ion-icon name="calendar-outline"></ion-icon>
+                  T08/2025</span>
+                <span class="text-italic" style="font-size: 12px; padding-left: 15px;">Ngoài thời gian chấm</span>
+              </div>
+            </div>
+          </ion-item>
+
+
+
+        </ion-list>
+      </ion-grid>
+    </ion-item-group>
+
+
+
+
+    <ion-segment-view style="padding: 0 15px;">
+      <!-- <ion-segment-content id="first">
+        <div class="news-type"
+          style="width: 70vw; height: 75px; margin: 10px; border-bottom: 1px solid rgb(130, 130, 130);" class="d-block">
+          <strong class="d-block">
+            Chấm điểm cửa hàng 5S
+          </strong>
+          <div class="d-flex justify-space-between">
+            <ion-label>
+              <ion-text class="d-block" style="padding: 3px 0;">chấm điểm tháng 7</ion-text>
+              <ion-note>07/08/2002</ion-note>
+            </ion-label>
+            <ion-chip slot="end" style="font-size: 13px;">đang mở</ion-chip>
+          </div>
+        </div>
+        <div style="height: 100px; max-width: 20vw ;">
+          <ion-icon style="width: 100px; height: 100px; color: rgb(119, 119, 119)" name="create-outline"></ion-icon>
+        </div>
+
+      </ion-segment-content> -->
+      <ion-segment-content id="second"
+        style="background-image: url('../../../assets/img/bg-store.jpeg'); background-size: cover ; background-repeat: no-repeat; background-position: center;">Second</ion-segment-content>
+
+      <ion-segment-content id="third"
+        style="background-image: url('../../../assets/img/bg-ware-house.jpeg'); background-size: cover ; background-repeat: no-repeat; background-position: center;">Third
+        </ ion-segment-content>
+    </ion-segment-view>
+
+
   </div>
 </ion-content>
