@@ -37,7 +37,7 @@ h4 {
   font-weight: 600;
   margin-bottom: 6px;
 }
-::ng-deep .news-type .item-native{
+::ng-deep .news-type .item-native {
   padding: 0;
 }
 .news-time,
@@ -66,25 +66,28 @@ ion-segment-content {
 
 ::ng-deep .searchbar-input .sc-ion-searchbar-md {
   border-radius: 4px;
-
 }
 
-::ng-deep .item-inner{
+::ng-deep .item-inner {
   padding-right: 0 !important;
 }
 
-ion-button.custom{
-  --background: rgba(255, 255, 255, 0);
-  border: 3px solid rgb(130, 130, 130);
+ion-button.custom {
+  --background: #f3f3f3;
+  border: none;
   // font-weight: 500;
-  border-radius: 20px;
-  --color: rgb(130, 130, 130)
+  border-radius: 5px;
+  --color: #000000;
+  width: calc(100% / 3 - 5px);
+  --box-shadow: none
 }
 ion-button.active {
-  border: 3px solid var(--custom-bg-color);
+  width: calc(100% / 3 - 5px);
+  border: none;
   font-weight: 600;
-  --background: var(--custom-bg-color) !important;
-  color: rgb(130, 130, 130);
+  --background: #254edb;
+  color: #fff;
+  --box-shadow: none
 }
 // ion-segment-content:nth-of-type(1) {
 //   background: lightpink;
@@ -96,17 +99,15 @@ ion-button.active {
 //   background: lightgreen;
 // }
 ion-searchbar.custom {
-
   --border-radius: 15px;
 }
 
-
-.text-bold{
-    font-weight: 700;
+.text-bold {
+  font-weight: 700;
 }
-.text-italic{
-    font-style: italic;
-    color: #555;
+.text-italic {
+  font-style: italic;
+  color: #555;
 }
 ion-col[size="7"] {
   text-align: left;
@@ -115,8 +116,6 @@ ion-col[size="7"] {
 ion-col[size="5"] {
   text-align: right;
 }
-
-
 
 .space-card {
   display: flex;
@@ -136,5 +135,46 @@ ion-col[size="5"] {
   p {
     font-size: 14px;
   }
-
+}
+.avatar {
+  width: 48px;
+  height: 48px;
+}
+ion-col {
+  .user-name {
+    font-weight: 700;
+    font-size: 18px;
+    color: #f4f4f5;
+  }
+  .user-position {
+    font-weight: 500;
+    font-size: 14px;
+    color: #f4f4f5;
+  }
+}
+ion-list {
+  ion-item {
+    width: 100%;
+    border: 0.5px solid #E0E0E0;
+    border-radius: 10px;
+    --inner-border-width: 0; 
+  }
+}
+.text-segment-content{
+  p{
+    font-weight: 700;
+    font-size: 18px;
+    color: #fff
+  }
+  a{
+    font-size: 16px;
+    font-weight: 500;
+    color: #fff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    ion-icon{
+      margin-left: 8px;
+    }
+  }
 }
