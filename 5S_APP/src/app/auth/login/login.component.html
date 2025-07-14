@@ -15,7 +15,7 @@
     </ion-button>
     <ion-title class="t-center"> Chấm điểm 5S cửa hàng </ion-title>
   </ion-toolbar>
-</ion-header> -->
+</ion-header>
 <ion-content>
   <div style="display: flex; justify-content: center; align-items: center; height: 35vh;">
     <img src="../../../assets/img/logo.png" alt="Logo" style="height: 20vh;">
@@ -51,4 +51,97 @@
   <ion-footer class="" style="text-align: center; bottom: 10px; position: absolute;">
     © 2025 d2s.com.vn
   </ion-footer>
+</ion-content> -->
+
+<!-- login mới -->
+<ion-content>
+  <div class="bg-color">
+    <div class="d-flex justify-space-between logo-group" style="width: 100%">
+      <img
+        class="logo"
+        src="../../../assets/img/logo-petrolimex.png"
+        alt="Logo"
+      />
+      <img class="logo" src="../../../assets/img/logo.png" alt="Logo" />
+    </div>
+    <div class="img-grid-background-top"></div>
+    <div class="container">
+      <h2 class="titleApp">Khảo sát chấm điểm 5s</h2>
+      <h3 class="sub-titleApp">Công ty xăng dầu Petrolimex NA</h3>
+      <div class="login">
+        <ion-accordion-group class="form-login">
+          <ion-label class="label-login">Tên đăng nhập</ion-label>
+          <div class="input-wrapper">
+            <ion-icon
+              name="person-outline"
+              style="padding-right: 7px"
+            ></ion-icon>
+            <ion-input
+              color="dark"
+              [clearInput]="true"
+              placeholder="Tài khoản"
+              [(ngModel)]="model.userName"
+            >
+            </ion-input>
+          </div>
+        </ion-accordion-group>
+
+        <ion-accordion-group class="form-login">
+          <ion-label class="label-login">Mật khẩu</ion-label>
+          <div class="input-wrapper">
+            <ion-icon
+              [(ngModel)]="model.password"
+              name="lock-closed-outline"
+              style="padding-right: 7px"
+            ></ion-icon>
+            <ion-input
+              [type]="showPassword ? 'text' : 'password'"
+              placeholder="Mật khẩu"
+              [(ngModel)]="model.password"
+            ></ion-input>
+            <ion-icon
+              [name]="showPassword ? 'eye-off' : 'eye'"
+              slot="end"
+              class="password-toggle-icon"
+              (click)="togglePasswordVisibility()"
+            ></ion-icon>
+          </div>
+        </ion-accordion-group>
+
+        <div class="d-flex justify-space-between">
+          <ion-checkbox [(ngModel)]="saveAccount" labelPlacement="end"
+            >Ghi nhớ</ion-checkbox
+          >
+          <a
+            style="text-decoration: none; font-weight: 500; color: #4a7def"
+            href=""
+            >Quên mật khẩu ?</a
+          >
+        </div>
+        <div>
+          <ion-button
+            expand="full"
+            [disabled]="isLogin"
+            (click)="processLogin()"
+            style="font-weight: 700; --background: #4a7def"
+            >Đăng nhập</ion-button
+          >
+        </div>
+        <div class="register d-flex justify-center" style="gap: 10px">
+          <span>Bạn không có tài khoản?</span>
+          <a style="color: #4a7def" href="">Đăng ký</a>
+        </div>
+      </div>
+    </div>
+    <div class="img-grid-background-bottom"></div>
+    <div class="circle-1"></div>
+    <div class="circle-2"></div>
+    <div class="circle-3"></div>
+  </div>
 </ion-content>
+<ion-footer
+  class=""
+  style="color: white; text-align: center; bottom: 10px; position: absolute"
+>
+  © 2025 d2s.com.vn
+</ion-footer>
