@@ -11,7 +11,7 @@
           margin: 5px 0;
         "
       >
-        Khảo sát chấm điểm 5s
+        Khảo sát
       </h4>
     </div>
     <!-- <div style="padding: 20px 10px;">
@@ -19,41 +19,47 @@
       <h4>Khảo Sát 5S</h4>
       <h4>Morning, Hoang Trung Kien</h4>
     </div> -->
-
-    <div class="user-info" style="padding: 8px">
-      <ion-grid
-        style="background-color: #254edb; border-radius: 10px; padding: 10px"
-      >
-        <ion-row class="ion-align-items-center">
-          <ion-col size="2">
-            <!-- <ion-icon class="icon-user" name="person-outline"></ion-icon> -->
-            <img class="avatar" src="../../../assets/img/logo.png" />
-          </ion-col>
-          <ion-col size="8">
-            <h5 class="user-name">Trần Thanh Phương</h5>
-            <p class="user-position">Chuyên viên 5s</p>
-          </ion-col>
-          <ion-col style="text-align: center">
-            <div
-              style="position: relative; display: inline-block; color: black"
-            ></div>
-          </ion-col>
-        </ion-row>
-        <ion-row
-          class="calendar-row ion-justify-content-start"
-          style="
-            width: 100%;
-            color: #f4f4f5;
-            padding: 8px;
-            border-radius: 8px;
-            background-color: #183188;
-          "
+    <ng-container *ngIf="userInfo">
+      <div class="user-info" style="padding: 8px">
+        <ion-grid
+          style="background-color: #254edb; border-radius: 10px; padding: 10px"
         >
-          <ion-icon name="calendar-outline" style="padding: 0 10px"></ion-icon>
-          Thứ Bảy, Ngày 26 thang 11 năm 2025
-        </ion-row>
-      </ion-grid>
-    </div>
+          <ion-row class="ion-align-items-center">
+            <ion-col size="2">
+              <!-- <ion-icon class="icon-user" name="person-outline"></ion-icon> -->
+              <img class="avatar" src="../../../assets/img/logo.png" />
+            </ion-col>
+            <ion-col size="8">
+              <h5 class="user-name">{{ userInfo.fullName }}</h5>
+              <p class="user-position">
+                {{ getChucVuName(userInfo.chucVuId) }}
+              </p>
+            </ion-col>
+            <ion-col style="text-align: center">
+              <div
+                style="position: relative; display: inline-block; color: black"
+              ></div>
+            </ion-col>
+          </ion-row>
+          <ion-row
+            class="calendar-row ion-justify-content-start"
+            style="
+              width: 100%;
+              color: #f4f4f5;
+              padding: 8px;
+              border-radius: 8px;
+              background-color: #183188;
+            "
+          >
+            <ion-icon
+              name="calendar-outline"
+              style="padding: 0 10px"
+            ></ion-icon>
+            {{ formattedDate }}
+          </ion-row>
+        </ion-grid>
+      </div>
+    </ng-container>
 
     <div>
       <ion-grid class="container-job-card">
@@ -231,6 +237,7 @@
           align-items: center;
           justify-content: space-around;
         "
+        (click)="navigateTo('03805572-e6b7-4455-90fe-9b6584eef46f')"
       >
         <div class="text-segment-content">
           <p>Chấm điểm 5s cửa hàng</p>
@@ -258,6 +265,7 @@
           align-items: center;
           justify-content: space-around;
         "
+        (click)="navigateTo('16d30d78-0b80-4323-bd86-2498aae676a1')"
       >
         <div class="text-segment-content">
           <p>Chấm điểm 5s kho</p>
