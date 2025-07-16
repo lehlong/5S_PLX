@@ -155,14 +155,13 @@ namespace PLX5S.API.Controllers.BU
             return Ok(transferObject);
         }
 
-        [HttpGet("FilterLstChamDiem")]
-        public async Task<IActionResult> FilterLstChamDiem([FromQuery] BaseFilter filter)
+        [HttpPost("HandlePointStore")]
+        public async Task<IActionResult> HandlePointStore([FromBody] EvaluateFilter param)
         {
             var transferObject = new TransferObject();
-            var data = await _service.FilterLstChamDiem(filter);
+            await _service.HandlePointStore(param);
             if (_service.Status)
             {
-                transferObject.Data = data;
                 transferObject.Status = true;
             }
             else
@@ -230,6 +229,26 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
+
+        [HttpGet("GetDataHome")]
+        public async Task<IActionResult> GetDataHome([FromQuery] string userName)
+        {
+            var transferObject = new TransferObject();
+            var data = await _service.GetDataHome(userName);
+            if (_service.Status)
+            {
+                transferObject.Data = data;
+                transferObject.Status = true;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
+
 
         //[HttpPost("upload-image")]
         //public async Task<IActionResult> UploadImage([FromBody] ImageUploadRequest request)

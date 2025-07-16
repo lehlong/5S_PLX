@@ -13,6 +13,8 @@ using PLX5S.CORE;
 using PLX5S.CORE.Entities.BU;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -31,15 +33,19 @@ namespace PLX5S.BUSINESS.Services.BU
         Task<List<TblBuPoint>> GetPointStore(string kiKhaoSatid, string surveyId);
         Task<List<TblBuEvaluateHeader>> FilterLstChamDiem(BaseFilter filter);
         Task <List<TblBuNotification>> GetNotification();
+        Task HandlePointStore(EvaluateFilter param);
+        Task<HomeModel> GetDataHome(string userName);
     }
 
     public class AppEvaluateService : GenericService<TblBuEvaluateHeader, EvaluateHeaderDto>, IAppEvaluateService
     {
+        private readonly IKikhaosatService _kiKhaoSatService;
         private readonly IWebHostEnvironment _environment;
 
-        public AppEvaluateService(AppDbContext dbContext, IMapper mapper, IWebHostEnvironment environment) : base(dbContext, mapper)
+        public AppEvaluateService(AppDbContext dbContext, IMapper mapper, IWebHostEnvironment environment, IKikhaosatService KiKhaoSatService) : base(dbContext, mapper)
         {
             _environment = environment;
+            _kiKhaoSatService = KiKhaoSatService;
         }
 
         public override async Task<PagedResponseDto> Search(BaseFilter filter)
@@ -199,6 +205,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         Point = 0,
                         Order = 0,
                         DoiTuongId = doiTuongId,
+                        IsActive = true,
                         KiKhaoSatId = kiKhaoSatId,
                         CreateDate = DateTime.Now,
                         DeviceId= deviceId
@@ -238,23 +245,41 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
+                var dateNow = DateTime.Now;
+                if (_dbContext.TblBuKiKhaoSat.Any(x => x.Id == data.Header.KiKhaoSatId && x.EndDate <= dateNow))
+                {
+                    this.Status = false;
+                    return;
+                };
+
                 var lstImage = new List<TblBuEvaluateImage>();
 
-                var header = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == data.Header.KiKhaoSatId && x.DoiTuongId == data.Header.DoiTuongId).OrderByDescending(x => x.Order).FirstOrDefault();
-                var number = header != null ? header.Order + 1 : 1;
+                var lstHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == data.Header.KiKhaoSatId && x.DoiTuongId == data.Header.DoiTuongId).ToList();
+                var header = lstHeader.OrderByDescending(x => x.Order).FirstOrDefault();
 
-                var dateNow = DateTime.Now;
-                data.Header.IsActive = true;
+                    
+                bool hasFirstPeriod = lstHeader.Any(x =>
+                    x.CreateDate >= new DateTime(dateNow.Year, dateNow.Month, 1) &&
+                    x.CreateDate <= new DateTime(dateNow.Year, dateNow.Month, 7));
 
-                if (data.Header.ChucVuId == "CHT" || data.Header.ChucVuId == "ATVSV")
+                bool hasSecondPeriod = lstHeader.Any(x =>
+                    x.CreateDate >= new DateTime(dateNow.Year, dateNow.Month, 15) &&
+                    x.CreateDate <= new DateTime(dateNow.Year, dateNow.Month, 23));
+
+
+                if (data.Header.ChucVuId == "CHT" || data.Header.ChucVuId == "ATVSV" || data.Header.ChucVuId == "TK")
                 {
-                    if (dateNow.Day > 07 && dateNow.Day < 15 || dateNow.Day > 23)
+                    if (((dateNow.Day > 07 && dateNow.Day < 15) || (dateNow.Day >= 15 && dateNow.Day <= 23)) && !hasFirstPeriod)
+                    {
+                        data.Header.IsActive = false;
+                    }
+                    else if ((!hasFirstPeriod && !hasSecondPeriod) && (dateNow.Day > 23))
                     {
                         data.Header.IsActive = false;
                     }
                 }
-                data.Header.Name = "Lần chấm thứ " + (number).ToString();
-                data.Header.Order = number;
+                data.Header.Name = "Lần chấm thứ " + (header != null ? header.Order + 1 : 1).ToString();
+                data.Header.Order = header != null ? header.Order + 1 : 1;
                 data.Header.UpdateDate = DateTime.Now;
                 
 
@@ -343,6 +368,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 return null;
             }
         }
+
         public byte[] GenerateThumbnailBytes(byte[] originalBytes, int maxWidth, int maxHeight)
         {
             using (var inputStream = new MemoryStream(originalBytes))
@@ -451,11 +477,97 @@ namespace PLX5S.BUSINESS.Services.BU
             }
         }
 
+        public async Task HandlePointStore(EvaluateFilter param)
+        {
+            try
+            {
+                var lstEvaHeader = await _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == param.KiKhaoSatId && x.DoiTuongId == param.DoiTuongId).ToListAsync();
+                var lstUser = _dbContext.TblAdAccount.Where(u => param.LstData.Contains(u.UserName)).ToList();
+                var filterLst = lstEvaHeader.Where(x => x.IsActive == false).ToList();
+                var dateNow = DateTime.Now;
+                decimal tong = 0;
+
+                foreach (var item in filterLst)
+                {
+                    lstEvaHeader.RemoveAll(x => x.AccountUserName == item.AccountUserName);
+                }
+
+                foreach (var item in lstUser)
+                {
+                    decimal tongPointUser = 0;
+                    decimal count = 0;
+
+                    if (item.ChucVuId == "CHT" || item.ChucVuId == "ATVSV" || item.ChucVuId == "TK")
+                    {
+
+                        bool hasFirstPeriod = lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList().Any(x =>
+                            x.CreateDate >= new DateTime(dateNow.Year, dateNow.Month, 1) &&
+                            x.CreateDate <= new DateTime(dateNow.Year, dateNow.Month, 7));
+
+                        bool hasSecondPeriod = lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList().Any(x =>
+                            x.CreateDate >= new DateTime(dateNow.Year, dateNow.Month, 15) &&
+                            x.CreateDate <= new DateTime(dateNow.Year, dateNow.Month, 23));
+
+                        if (dateNow.Day < 23 && hasFirstPeriod && hasSecondPeriod)
+                        {
+                            foreach (var i in lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList())
+                            {
+                                tongPointUser = tongPointUser + i.Point;
+                                count++;
+                            }
+                            tong = tong + ((tongPointUser / 2) / count);
+                        }
+                        else
+                        {
+                            tong = 0;
+                        }
+
+                    }
+                    else
+                    {
+                        foreach (var i in lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList())
+                        {
+                            tongPointUser = tongPointUser + i.Point;
+                            count++;
+                        }
+                        tong = tong + ((tongPointUser) / count);
+                    }
+                }
+
+                await TinhTongLanCham(new TblBuPoint
+                {
+                    Code = "",
+                    DoiTuongId = param.DoiTuongId,
+                    KiKhaoSatId = param.KiKhaoSatId,
+                    SurveyId = param.SurveyId,
+                    Point = tong / param.LstData.Count,
+                });
+
+            }
+            catch (Exception ex)
+            {
+                this.Status = false;
+            }
+        }
+
+
         public async Task<List<TblBuEvaluateHeader>> FilterLstChamDiem(BaseFilter filter)
         {
             try
             {
                 var lstEvaHeader = await _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filter.KeyWord && x.DoiTuongId == filter.SortColumn).ToListAsync();
+                var dateNow = DateTime.Now;
+
+                //var filterLst = lstEvaHeader.Where(x => x.CreateDate < new DateTime(dateNow.Year, 6, 20)).ToList();
+
+
+
+                //foreach (var item in filterLst)
+                //{
+                //    lstEvaHeader.RemoveAll(x => x.AccountUserName == item.AccountUserName);
+                //}
+                //return filterLst;
+
                 var filterLst = lstEvaHeader.Where(x => x.IsActive == false).ToList();
 
                 foreach (var item in filterLst)
@@ -486,6 +598,65 @@ namespace PLX5S.BUSINESS.Services.BU
             }
         }
 
+        public async Task<HomeModel> GetDataHome(string userName)
+        {
+            try
+            {
+                var result = new HomeModel();
+                var lstDoiTuong = new List<DoiTuong>();
+
+                var lstInChamDiem = _dbContext.TblBuInputChamDiem.Where(x => x.UserName == userName && x.IsActive == true).ToList();
+                var lstPoint = _dbContext.TblBuPoint.OrderBy(x => x.Code).ToList();
+
+                var lstInStore = _dbContext.TblBuInputStore.Where(x => x.SurveyMgmtId == "03805572-e6b7-4455-90fe-9b6584eef46f").ToList();
+                var lstInWareHouse = _dbContext.TblBuInputWareHouse.Where(x => x.SurveyMgmtId == "16d30d78-0b80-4323-bd86-2498aae676a1").ToList();
+
+                var lstStore = _dbContext.tblMdStore.Where(x => x.IsActive == true).ToList();
+                var lstWareHouse = _dbContext.TblMdWareHouse.Where(x => x.IsActive == true).ToList();
+
+                var lstKiKhaoSatStore = _dbContext.TblBuKiKhaoSat.Where(x => x.TrangThaiKi == "2" && (x.SurveyMgmtId == "03805572-e6b7-4455-90fe-9b6584eef46f")).ToList();
+                var lstKiKhaoSatKho = _dbContext.TblBuKiKhaoSat.Where(x => x.TrangThaiKi == "2" && (x.SurveyMgmtId == "16d30d78-0b80-4323-bd86-2498aae676a1")).ToList();
+               
+
+                foreach(var i in lstKiKhaoSatStore)
+                {
+                    foreach (var e in lstInStore)
+                    {
+                        lstDoiTuong.AddRange(lstInChamDiem.Where(x => x.KiKhaoSatId == i.Id && x.InStoreId == e.Id).Select(x => new DoiTuong
+                        {
+                            Id = e.Id,
+                            Name = lstStore.FirstOrDefault(_x => _x.Id == e.StoreId).Name,
+                            FDate = i.StartDate,
+                            Type = "DT1",
+                            Point = lstPoint.FirstOrDefault(y => y.DoiTuongId == e.Id && y.KiKhaoSatId == i.Id)?.Point ?? 0,
+                        }).ToList());
+                    }
+                }
+                foreach (var i in lstKiKhaoSatKho)
+                {
+                    foreach (var e in lstInWareHouse)
+                    {
+                        lstDoiTuong.AddRange(lstInChamDiem.Where(x => x.KiKhaoSatId == i.Id && x.InStoreId == e.Id).Select(x => new DoiTuong
+                        {
+                            Id = e.Id,
+                            Name = lstWareHouse.FirstOrDefault(_x => _x.Id == e.WareHouseId).Name,
+                            FDate = i.StartDate,
+                            Type = "DT2",
+                            Point = lstPoint.FirstOrDefault(y => y.DoiTuongId == e.Id && y.KiKhaoSatId == i.Id)?.Point ?? 0,
+
+                        }).ToList());
+                    }
+                }
+                result.LstDoiTuong.AddRange(lstDoiTuong);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                this.Status = false;
+                return null;
+            }
+        }
 
     }
 }

@@ -17,4 +17,14 @@
         public List<string>? Fields { get; set; }
 
     }
+
+
+    public class EvaluateFilter
+    {
+        public string? SurveyId { set; get; }
+        public string? KiKhaoSatId { set; get; }
+        public string? DoiTuongId { set; get; }
+        public List<string>? LstData; 
+
+    }
 }

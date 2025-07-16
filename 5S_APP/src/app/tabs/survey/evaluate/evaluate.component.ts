@@ -99,7 +99,7 @@ export class EvaluateComponent implements OnInit {
     private messageService: MessageService,
     private cdr: ChangeDetectorRef,
     private renderer: Renderer2
-  ) {}
+  ) { }
 
   async ngOnInit() {
     this.apiFile =
@@ -144,116 +144,116 @@ export class EvaluateComponent implements OnInit {
   }
 
   //Zoom
-zoomOnClick(event: MouseEvent | TouchEvent) {
-  const currentTime = new Date().getTime();
-  const tapInterval = currentTime - this.lastTapTime;
-  this.lastTapTime = currentTime;
+  zoomOnClick(event: MouseEvent | TouchEvent) {
+    const currentTime = new Date().getTime();
+    const tapInterval = currentTime - this.lastTapTime;
+    this.lastTapTime = currentTime;
 
-  const imgEl = this.zoomImg.nativeElement as HTMLElement;
-  const rect = imgEl.getBoundingClientRect();
+    const imgEl = this.zoomImg.nativeElement as HTMLElement;
+    const rect = imgEl.getBoundingClientRect();
 
-  let clientX: number;
-  let clientY: number;
+    let clientX: number;
+    let clientY: number;
 
-  if (event instanceof TouchEvent) {
-    const touch = event.touches[0] || event.changedTouches[0];
-    clientX = touch.clientX;
-    clientY = touch.clientY;
-  } else {
-    clientX = event.clientX;
-    clientY = event.clientY;
+    if (event instanceof TouchEvent) {
+      const touch = event.touches[0] || event.changedTouches[0];
+      clientX = touch.clientX;
+      clientY = touch.clientY;
+    } else {
+      clientX = event.clientX;
+      clientY = event.clientY;
+    }
+
+    if (tapInterval < this.doubleTapThreshold && this.isZoomed) {
+      console.log('[zoomOnClick] Double tap → reset to scale(1)');
+      this.resetZoom();
+      return;
+    }
+
+    if (!this.isZoomed) {
+      const offsetX = clientX - rect.left;
+      const offsetY = clientY - rect.top;
+
+      const percentX = (offsetX / rect.width) * 100;
+      const percentY = (offsetY / rect.height) * 100;
+
+      imgEl.style.transformOrigin = `${percentX}% ${percentY}%`;
+
+      this.currentX = 0;
+      this.currentY = 0;
+      this.currentScale = 4; // 👈 set scale 4
+      this.applyTransform();
+
+      imgEl.classList.add('zoomed');
+      this.isZoomed = true;
+
+      console.log('[zoomOnClick] Zoomed in at', percentX.toFixed(1), '%', percentY.toFixed(1), '%');
+    }
   }
 
-  if (tapInterval < this.doubleTapThreshold && this.isZoomed) {
-    console.log('[zoomOnClick] Double tap → reset to scale(1)');
-    this.resetZoom();
-    return;
-  }
 
-  if (!this.isZoomed) {
-    const offsetX = clientX - rect.left;
-    const offsetY = clientY - rect.top;
+  resetZoom() {
+    const imgEl = this.zoomImg.nativeElement as HTMLElement;
 
-    const percentX = (offsetX / rect.width) * 100;
-    const percentY = (offsetY / rect.height) * 100;
-
-    imgEl.style.transformOrigin = `${percentX}% ${percentY}%`;
-
+    imgEl.style.transformOrigin = 'center center';
     this.currentX = 0;
     this.currentY = 0;
-    this.currentScale = 4; // 👈 set scale 4
+    this.currentScale = 1;
     this.applyTransform();
 
-    imgEl.classList.add('zoomed');
-    this.isZoomed = true;
-
-    console.log('[zoomOnClick] Zoomed in at', percentX.toFixed(1), '%', percentY.toFixed(1), '%');
-  }
-}
-
-
-resetZoom() {
-  const imgEl = this.zoomImg.nativeElement as HTMLElement;
-
-  imgEl.style.transformOrigin = 'center center';
-  this.currentX = 0;
-  this.currentY = 0;
-  this.currentScale = 1; 
-  this.applyTransform();
-
-  imgEl.classList.remove('zoomed');
-  this.isZoomed = false;
-}
-
-
-onDragStart(event: MouseEvent | TouchEvent) {
-  if (!this.isZoomed) return;
-
-  this.isDragging = true;
-
-  if (event instanceof TouchEvent) {
-    this.lastX = event.touches[0].clientX;
-    this.lastY = event.touches[0].clientY;
-  } else {
-    this.lastX = event.clientX;
-    this.lastY = event.clientY;
-  }
-}
-
-onDragMove(event: MouseEvent | TouchEvent) {
-  if (!this.isZoomed || !this.isDragging) return;
-
-  let clientX: number;
-  let clientY: number;
-
-  if (event instanceof TouchEvent) {
-    clientX = event.touches[0].clientX;
-    clientY = event.touches[0].clientY;
-  } else {
-    clientX = event.clientX;
-    clientY = event.clientY;
+    imgEl.classList.remove('zoomed');
+    this.isZoomed = false;
   }
 
-  const dx = clientX - this.lastX;
-  const dy = clientY - this.lastY;
 
-  this.currentX += dx;
-  this.currentY += dy;
+  onDragStart(event: MouseEvent | TouchEvent) {
+    if (!this.isZoomed) return;
 
-  this.lastX = clientX;
-  this.lastY = clientY;
+    this.isDragging = true;
 
-  this.applyTransform();
-}
+    if (event instanceof TouchEvent) {
+      this.lastX = event.touches[0].clientX;
+      this.lastY = event.touches[0].clientY;
+    } else {
+      this.lastX = event.clientX;
+      this.lastY = event.clientY;
+    }
+  }
 
-onDragEnd() {
-  this.isDragging = false;
-}
+  onDragMove(event: MouseEvent | TouchEvent) {
+    if (!this.isZoomed || !this.isDragging) return;
 
-applyTransform() {
-  const imgEl = this.zoomImg.nativeElement as HTMLElement;
-  imgEl.style.transform = `scale(${this.currentScale}) translate(${this.currentX / this.currentScale}px, ${this.currentY / this.currentScale}px)`;
-}
+    let clientX: number;
+    let clientY: number;
+
+    if (event instanceof TouchEvent) {
+      clientX = event.touches[0].clientX;
+      clientY = event.touches[0].clientY;
+    } else {
+      clientX = event.clientX;
+      clientY = event.clientY;
+    }
+
+    const dx = clientX - this.lastX;
+    const dy = clientY - this.lastY;
+
+    this.currentX += dx;
+    this.currentY += dy;
+
+    this.lastX = clientX;
+    this.lastY = clientY;
+
+    this.applyTransform();
+  }
+
+  onDragEnd() {
+    this.isDragging = false;
+  }
+
+  applyTransform() {
+    const imgEl = this.zoomImg.nativeElement as HTMLElement;
+    imgEl.style.transform = `scale(${this.currentScale}) translate(${this.currentX / this.currentScale}px, ${this.currentY / this.currentScale}px)`;
+  }
 
 
 
@@ -760,8 +760,16 @@ applyTransform() {
     this._service.insertEvaluate(this.evaluate).subscribe({
       next: () => {
         console.log('Chấm điểm thành công');
-        this.tinhTongLanCham();
-
+        this._service.HandlePointStore(
+          {
+            kiKhaoSatId: this.kiKhaoSat.id,
+            doiTuongId: this.doiTuong.id,
+            surveyId: localStorage.getItem('surveyId'),
+            lstData: this.doiTuong.lstChamDiem,
+          },
+      ).subscribe({
+        next: (data) => {}
+      })
         this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
         this._storageService.remove(
           this.doiTuong.id + '_' + this.kiKhaoSat.code
@@ -773,45 +781,6 @@ applyTransform() {
         console.log(ex);
       },
     });
-  }
-
-  tinhTongLanCham() {
-    this._service
-      .filterLstChamDiem({
-        sortColumn: this.doiTuong.id,
-        keyWord: this.kiKhaoSat.id,
-      })
-      .subscribe({
-        next: (data) => {
-          console.log(data.length);
-
-          const total = data.reduce((sum: any, item: any) => {
-            let pointitem = item.point;
-            if (item.ChucVuId === 'CHT' || item.ChucVuId === 'ATVSV') {
-              pointitem = item.point / 2;
-              console.log(pointitem);
-            }
-            console.log(pointitem);
-
-            return sum + pointitem;
-          }, 0);
-          const avg = data.length >= 0 ? total / data.length : 0;
-
-          const point = {
-            code: '',
-            doiTuongId: this.doiTuong.id,
-            surveyId: localStorage.getItem('surveyId'),
-            kiKhaoSatId: this.kiKhaoSat.id,
-            point: avg,
-            length: data.length,
-          };
-          this._service.tinhTongLanCham(point).subscribe({
-            next: (data) => {
-              console.log('tính tổng điểm thành công');
-            },
-          });
-        },
-      });
   }
 
   navigateTo(itemId: string) {

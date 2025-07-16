@@ -4,7 +4,7 @@
     </ion-title>
   </ion-toolbar>
 </ion-header> -->
-<ion-content [fullscreen]="true" color="light" >
+<ion-content [fullscreen]="true" color="light">
   <div class="main-home ">
     <div class="d-flex " style="margin-bottom: 10px;">
       <!-- <div class=""></div> -->
@@ -17,7 +17,8 @@
     <ng-container *ngFor="let item of data">
       <h4>
         <!-- <ion-icon name="checkbox-outline"></ion-icon> -->
-        {{ item.name }}</h4>
+        {{ item.name }}
+      </h4>
       <img [src]="item.image == 1 ? 'assets/img/1.jpg' : item.image" class="p-5s" (click)="navigateTo(item)" />
 
     </ng-container>

@@ -17,7 +17,7 @@ namespace PLX5S.CORE.Entities.BU
         public string? Name { get; set; }
 
         [Column("POINT", TypeName = "DECIMAL(18.0)")]
-        public decimal? Point { get; set; }
+        public decimal Point { get; set; }
 
         [Column("ACCOUNT_USER_NAME", TypeName = "NVARCHAR(150)")]
         public string? AccountUserName { get; set; }

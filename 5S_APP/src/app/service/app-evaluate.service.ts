@@ -12,9 +12,10 @@ export class AppEvaluateService {
     return this.commonService.get('AppEvaluate/Search', params)
   }
 
-  filterLstChamDiem(params: any): Observable<any> {
-    return this.commonService.get('AppEvaluate/FilterLstChamDiem', params)
+  HandlePointStore(params: any): Observable<any> {
+    return this.commonService.post(`AppEvaluate/HandlePointStore`, params)
   }
+
   GetAllTieuChiLeaves(kiKhaoSatId: any, doiTuongId: any): Observable<any> {
     return this.commonService.get(`AppEvaluate/GetAllTieuChiLeaves?kiKhaoSatId=${kiKhaoSatId}&doiTuongId=${doiTuongId}`)
   }
