@@ -17,9 +17,9 @@ namespace PLX5S.BUSINESS.Models
 
     public class HomeModel
     {
-        public string LanCham { set; get; }
-        public string ChuaCham { set; get; }
-        public string ViPham { set; get; }
+        public decimal? LanCham { set; get; } = 0;
+        public decimal? ChuaCham { set; get; } = 0;
+        public decimal? ViPham { set; get; } = 0;
         public List<DoiTuong> LstDoiTuong { set; get; } = new List<DoiTuong>();
     }
 
@@ -28,6 +28,9 @@ namespace PLX5S.BUSINESS.Models
         public string? Id { set; get; }
         public string? Name { set; get; }
         public string? Type { set; get; }
+        public bool? IsScore { set; get; }
+        public string? KiKhaoSatName { set; get; }
+        public string? KiKhaoSatId { set; get; }
         public decimal? Point { set; get; }
         public DateTime? FDate { set; get; }
     }
