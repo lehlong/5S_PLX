@@ -28,7 +28,7 @@ namespace PLX5S.BUSINESS.Models
         public string? Id { set; get; }
         public string? Name { set; get; }
         public string? Type { set; get; }
-        public bool? IsScore { set; get; }
+        public bool? IsScore { set; get; } = false;
         public string? KiKhaoSatName { set; get; }
         public string? KiKhaoSatId { set; get; }
         public decimal? Point { set; get; }

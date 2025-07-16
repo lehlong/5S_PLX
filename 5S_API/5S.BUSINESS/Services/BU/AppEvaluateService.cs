@@ -644,6 +644,7 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
+                //var dateNow = new DateTime(2025, 7, 24);
                 var dateNow = DateTime.Now;
                 var lstEvaHeader = await _dbContext.TblBuEvaluateHeader.Where(x => x.AccountUserName == userName && x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 1)).ToListAsync();
                 
@@ -651,7 +652,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 {
                     foreach (var item in data.LstDoiTuong)
                     {
-                        if (lstEvaHeader.Any(x => x.DoiTuongId == item.Id && x.KiKhaoSatId == item.KiKhaoSatId && x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 7)))
+                        if (item.FDate <= new DateTime(dateNow.Year, dateNow.Month, 1) || lstEvaHeader.Any(x => x.DoiTuongId == item.Id && x.KiKhaoSatId == item.KiKhaoSatId && x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 1) && x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 7)))
                         {
                             item.IsScore = false;
                         }
@@ -666,7 +667,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 {
                     foreach (var item in data.LstDoiTuong)
                     {
-                        if (lstEvaHeader.Any(x => x.DoiTuongId == item.Id && x.KiKhaoSatId == item.KiKhaoSatId && x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 7)))
+                        if (item.FDate <= new DateTime(dateNow.Year, dateNow.Month, 1) || lstEvaHeader.Any(x => x.DoiTuongId == item.Id && x.KiKhaoSatId == item.KiKhaoSatId && x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 1) && x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 7)))
                         {
                             item.IsScore = false;
                         }
@@ -681,7 +682,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 {
                     foreach (var item in data.LstDoiTuong)
                     {
-                        if (lstEvaHeader.Any(x => x.DoiTuongId == item.Id && x.KiKhaoSatId == item.KiKhaoSatId && x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 15) && x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 23)))
+                        if (item.FDate <= new DateTime(dateNow.Year, dateNow.Month, 1) || lstEvaHeader.Any(x => x.DoiTuongId == item.Id && x.KiKhaoSatId == item.KiKhaoSatId && x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 15) && x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 23)))
                         {
                             item.IsScore = false;
                         }
@@ -692,11 +693,11 @@ namespace PLX5S.BUSINESS.Services.BU
                         }
                     }
                 }
-                else 
+                else if (dateNow.Day > 23)
                 {
                     foreach (var item in data.LstDoiTuong)
                     {
-                        if (lstEvaHeader.Any(x => x.DoiTuongId == item.Id && x.KiKhaoSatId == item.KiKhaoSatId && x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 15) && x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 23)))
+                        if (item.FDate <= new DateTime(dateNow.Year, dateNow.Month, 1) || lstEvaHeader.Any(x => x.DoiTuongId == item.Id && x.KiKhaoSatId == item.KiKhaoSatId && x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 15) && x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 23)))
                         {
                             item.IsScore = false;
                         }
