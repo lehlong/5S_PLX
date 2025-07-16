@@ -11,4 +11,7 @@ export class HomeService {
   getAllChucVu(){
     return this.commonService.get('ChucVu/getall')
   }
+  getDataHome(params: any){
+    return this.commonService.get(`AppEvaluate/GetDataHome?userName=${params}`)
+  }
 }

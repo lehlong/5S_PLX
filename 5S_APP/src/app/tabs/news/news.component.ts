@@ -13,6 +13,7 @@ interface UserInfo {
   email: string;
   chucVuId: string;
   chucVuName: string;
+  userName: string;
 }
 @Component({
   selector: 'app-news',
@@ -22,22 +23,34 @@ interface UserInfo {
   standalone: true,
 })
 export class NewsComponent implements OnInit {
+  dataHomeStore: any;
+  dataHomeWareHouse: any;
+  dataHomeAll: any;
+  dataHomeChuaCham: any;
   dataChucVu: any;
   formattedDate: string = '';
+  selected: string = 'all';
   userInfo: UserInfo = {
     fullName: '',
     phoneNumber: '',
     email: '',
     chucVuId: '',
     chucVuName: '',
+    userName: '',
   };
-
+  buttons = [
+    { label: 'Tất cả', value: 'all' },
+    { label: 'Cửa hàng', value: 'store' },
+    { label: 'Kho', value: 'warehouse' },
+    { label: 'Chưa chấm', value: 'chuaCham' },
+  ];
   constructor(private _service: HomeService, private router: Router) {}
 
   ngOnInit() {
     this.loadUserInfo();
     this.getChucVu();
     this.formatToday();
+    this.getDataHome();
   }
 
   slideOpts = {
@@ -52,14 +65,12 @@ export class NewsComponent implements OnInit {
     const userInfoString = localStorage.getItem('UserInfo');
     if (userInfoString) {
       const userInfo = JSON.parse(userInfoString);
-      console.log(userInfo);
       this.userInfo = userInfo;
     }
   }
   getChucVu() {
     this._service.getAllChucVu().subscribe((data: any) => {
       this.dataChucVu = data;
-      console.log(this.dataChucVu);
     });
   }
   getChucVuName(id: string): string {
@@ -88,5 +99,86 @@ export class NewsComponent implements OnInit {
 
   navigateTo(id: any) {
     this.router.navigate([`/survey/list/${id}`]);
+  }
+
+  select(value: string) {
+    this.selected = value;
+  }
+  getDataHome() {
+    this._service.getDataHome(this.userInfo.userName).subscribe((data: any) => {
+      const sortedList = [...data.lstDoiTuong].sort((a: any, b: any) => {
+        return b.isScore === false ? 1 : -1; 
+      });
+
+      this.dataHomeAll = sortedList;
+      this.dataHomeStore = sortedList.filter((x: any) => x.type === 'DT1');
+      this.dataHomeWareHouse = sortedList.filter((x: any) => x.type === 'DT2');
+      this.dataHomeChuaCham = sortedList.filter(
+        (x: any) => x.isScore === true
+      );
+    });
+  }
+
+  formatToMonthYear(dateStr: string): string {
+    const date = new Date(dateStr);
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `T${month}/${year}`;
+  }
+  getChamDiemStatus(fDate: string): string {
+    const date = new Date(fDate);
+    const now = new Date();
+
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    const dateMonth = date.getMonth();
+    const dateYear = date.getFullYear();
+    const dateDay = now.getDate();
+
+    if (dateMonth !== currentMonth || dateYear !== currentYear) {
+      return 'Ngoài thời gian chấm';
+    }
+
+    if (dateDay >= 1 && dateDay <= 7) {
+      return `Trong thời gian (01-07/${(currentMonth + 1)
+        .toString()
+        .padStart(2, '0')})`;
+    }
+
+    if (dateDay >= 15 && dateDay <= 23) {
+      return `Trong thời gian (15-23/${(currentMonth + 1)
+        .toString()
+        .padStart(2, '0')})`;
+    }
+
+    return 'Ngoài thời gian chấm';
+  }
+
+  navigateItem(item: any) {
+    const filterStr = localStorage.getItem('filterCS');
+    if (!filterStr) return;
+
+    const filter = JSON.parse(filterStr);
+
+    filter.doiTuong = item;
+
+    filter.doiTuong.lstChamDiem = [this.userInfo.userName];
+    const kiKhaoSatId = item.kiKhaoSatId;
+    const kiKhaoSatName = item.kiKhaoSatName;
+    const doiTuongText =
+      item.type === 'DT1'
+        ? 'Cửa hàng'
+        : item.type === 'DT2'
+        ? 'Kho'
+        : 'Không xác định';
+    filter.kiKhaoSat.doiTuong = doiTuongText;
+    filter.kiKhaoSat.id = kiKhaoSatId;
+    filter.kiKhaoSat.code = kiKhaoSatName;
+    filter.kiKhaoSat.name = kiKhaoSatName;
+
+    localStorage.setItem('filterCS', JSON.stringify(filter));
+
+    this.router.navigate([`survey/check-list/${item.id}`]);
   }
 }

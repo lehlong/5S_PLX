@@ -27,7 +27,7 @@
           <ion-row class="ion-align-items-center">
             <ion-col size="2">
               <!-- <ion-icon class="icon-user" name="person-outline"></ion-icon> -->
-              <img class="avatar" src="../../../assets/img/logo.png" />
+              <ion-icon class="avatar" name="person-outline"></ion-icon>
             </ion-col>
             <ion-col size="8">
               <h5 class="user-name">{{ userInfo.fullName }}</h5>
@@ -84,128 +84,220 @@
       class="horizontal-scroll-buttons d-flex"
       style="padding: 0 10px; width: 100%; gap: 5px"
     >
-      <ion-button class="custom active">Tất cả</ion-button>
-      <ion-button class="custom">Tôi chấm</ion-button>
-      <ion-button class="custom">Thông báo</ion-button>
+      <ion-button
+        *ngFor="let item of buttons"
+        [class.active]="selected === item.value"
+        class="custom"
+        (click)="select(item.value)"
+      >
+        {{ item.label }}
+      </ion-button>
     </div>
+    <!-- all -->
+    <ng-container *ngIf="selected === 'all'">
+      <ng-container *ngFor="let data of dataHomeAll">
+        <ion-item-group style="margin-top: 5px">
+          <ion-grid>
+            <ion-list style="display: flex; gap: 10px; flex-direction: column">
+              <ion-item
+                [button]="true"
+                (click)="navigateItem(data)"
+                [ngClass]="{ 'highlight-score': data.isScore === false }"
+              >
+                <div class="" style="width: 100%; margin: 16px 7px">
+                  <div
+                    class="d-flex d-block"
+                    style="
+                      width: 100%;
+                      padding: 4px 0;
+                      justify-content: space-between;
+                    "
+                  >
+                    <h5 class="mg-0" style="margin: 9px 0">
+                      {{ data.name }}
+                    </h5>
+                    <p class="mg-0">
+                      <ion-chip color="primary" class="mg-0">
+                        {{ data.point }}
+                      </ion-chip>
+                    </p>
+                  </div>
+                  <div
+                    style="
+                      padding-bottom: 6px;
+                      margin: 0;
+                      justify-content: space-between;
+                    "
+                    class="d-flex"
+                  >
+                    <span class="text-italic" style="font-size: 12px"
+                      ><ion-icon name="calendar-outline"></ion-icon>
+                      {{ formatToMonthYear(data.fDate) }}</span
+                    >
+                    <span
+                      class="text-italic"
+                      style="font-size: 12px; padding-left: 15px"
+                      >{{ getChamDiemStatus(data.fDate) }}</span
+                    >
+                  </div>
+                </div>
+              </ion-item>
+            </ion-list>
+          </ion-grid>
+        </ion-item-group>
+      </ng-container>
+    </ng-container>
+    <!-- store -->
+    <ng-container *ngIf="selected === 'store'">
+      <ng-container *ngFor="let data of dataHomeStore">
+        <ion-item-group style="margin-top: 5px">
+          <ion-grid>
+            <ion-list style="display: flex; gap: 10px; flex-direction: column">
+              <ion-item [button]="true" (click)="navigateItem(data)">
+                <div class="" style="width: 100%; margin: 16px 7px">
+                  <div
+                    class="d-flex d-block"
+                    style="
+                      width: 100%;
+                      padding: 4px 0;
+                      justify-content: space-between;
+                    "
+                  >
+                    <h5 class="mg-0" style="margin: 9px 0">
+                      {{ data.name }}
+                    </h5>
+                    <p class="mg-0">
+                      <ion-chip color="primary" class="mg-0">
+                        {{ data.point }}
+                      </ion-chip>
+                    </p>
+                  </div>
+                  <div
+                    style="
+                      padding-bottom: 6px;
+                      margin: 0;
+                      justify-content: space-between;
+                    "
+                    class="d-flex"
+                  >
+                    <span class="text-italic" style="font-size: 12px"
+                      ><ion-icon name="calendar-outline"></ion-icon>
+                      {{ formatToMonthYear(data.fDate) }}</span
+                    >
+                    <span
+                      class="text-italic"
+                      style="font-size: 12px; padding-left: 15px"
+                      >{{ getChamDiemStatus(data.fDate) }}</span
+                    >
+                  </div>
+                </div>
+              </ion-item>
+            </ion-list>
+          </ion-grid>
+        </ion-item-group>
+      </ng-container>
+    </ng-container>
 
-    <ion-item-group style="margin-top: 5px">
-      <ion-grid>
-        <ion-list style="display: flex; gap: 10px; flex-direction: column">
-          <ion-item [button]="true">
-            <div class="" style="width: 100%; margin: 16px 7px">
-              <div
-                class="d-flex d-block"
-                style="
-                  width: 100%;
-                  padding: 4px 0;
-                  justify-content: space-between;
-                "
-              >
-                <h5 class="mg-0" style="margin: 9px 0">
-                  PETROLIMEX-CỬA HÀNG 01
-                </h5>
-                <p class="mg-0">
-                  <ion-chip color="primary" class="mg-0"> đang mở </ion-chip>
-                </p>
-              </div>
-              <div
-                style="
-                  padding-bottom: 6px;
-                  margin: 0;
-                  justify-content: space-between;
-                "
-                class="d-flex"
-              >
-                <span class="text-italic" style="font-size: 12px"
-                  ><ion-icon name="calendar-outline"></ion-icon> T08/2025</span
-                >
-                <span
-                  class="text-italic"
-                  style="font-size: 12px; padding-left: 15px"
-                  >Trong thời gian (01-07/08)</span
-                >
-              </div>
-            </div>
-          </ion-item>
-
-          <ion-item [button]="true">
-            <div class="" style="width: 100%; margin: 16px 7px">
-              <div
-                class="d-flex d-block"
-                style="
-                  width: 100%;
-                  padding: 4px 0;
-                  justify-content: space-between;
-                "
-              >
-                <h5 class="mg-0" style="margin: 9px 0">
-                  PETROLIMEX-CỬA HÀNG 01
-                </h5>
-                <p class="mg-0">
-                  <ion-chip color="primary" class="mg-0"> đang mở </ion-chip>
-                </p>
-              </div>
-              <div
-                style="
-                  padding-bottom: 6px;
-                  margin: 0;
-                  justify-content: space-between;
-                "
-                class="d-flex"
-              >
-                <span class="text-italic" style="font-size: 12px"
-                  ><ion-icon name="calendar-outline"></ion-icon> T08/2025</span
-                >
-                <span
-                  class="text-italic"
-                  style="font-size: 12px; padding-left: 15px"
-                  >Trong thời gian (15-23/08)</span
-                >
-              </div>
-            </div>
-          </ion-item>
-
-          <ion-item [button]="true">
-            <div class="" style="width: 100%; margin: 16px 7px">
-              <div
-                class="d-flex d-block"
-                style="
-                  width: 100%;
-                  padding: 4px 0;
-                  justify-content: space-between;
-                "
-              >
-                <h5 class="mg-0" style="margin: 9px 0">
-                  PETROLIMEX-CỬA HÀNG 01
-                </h5>
-                <p class="mg-0">
-                  <ion-chip color="primary" class="mg-0"> đang mở </ion-chip>
-                </p>
-              </div>
-              <div
-                style="
-                  padding-bottom: 6px;
-                  margin: 0;
-                  justify-content: space-between;
-                "
-                class="d-flex"
-              >
-                <span class="text-italic" style="font-size: 12px"
-                  ><ion-icon name="calendar-outline"></ion-icon> T08/2025</span
-                >
-                <span
-                  class="text-italic"
-                  style="font-size: 12px; padding-left: 15px"
-                  >Ngoài thời gian chấm</span
-                >
-              </div>
-            </div>
-          </ion-item>
-        </ion-list>
-      </ion-grid>
-    </ion-item-group>
-
+    <!-- warehouse -->
+    <ng-container *ngIf="selected === 'warehouse'">
+      <ng-container *ngFor="let data of dataHomeWareHouse">
+        <ion-item-group style="margin-top: 5px">
+          <ion-grid>
+            <ion-list style="display: flex; gap: 10px; flex-direction: column">
+              <ion-item [button]="true" (click)="navigateItem(data)">
+                <div class="" style="width: 100%; margin: 16px 7px">
+                  <div
+                    class="d-flex d-block"
+                    style="
+                      width: 100%;
+                      padding: 4px 0;
+                      justify-content: space-between;
+                    "
+                  >
+                    <h5 class="mg-0" style="margin: 9px 0">
+                      {{ data.name }}
+                    </h5>
+                    <p class="mg-0">
+                      <ion-chip color="primary" class="mg-0">
+                        {{ data.point }}
+                      </ion-chip>
+                    </p>
+                  </div>
+                  <div
+                    style="
+                      padding-bottom: 6px;
+                      margin: 0;
+                      justify-content: space-between;
+                    "
+                    class="d-flex"
+                  >
+                    <span class="text-italic" style="font-size: 12px"
+                      ><ion-icon name="calendar-outline"></ion-icon>
+                      {{ formatToMonthYear(data.fDate) }}</span
+                    >
+                    <span
+                      class="text-italic"
+                      style="font-size: 12px; padding-left: 15px"
+                      >{{ getChamDiemStatus(data.fDate) }}</span
+                    >
+                  </div>
+                </div>
+              </ion-item>
+            </ion-list>
+          </ion-grid>
+        </ion-item-group>
+      </ng-container>
+    </ng-container>
+    <!-- Chưa chấm -->
+    <ng-container *ngIf="selected === 'chuaCham'">
+      <ng-container *ngFor="let data of dataHomeChuaCham">
+        <ion-item-group style="margin-top: 5px">
+          <ion-grid>
+            <ion-list style="display: flex; gap: 10px; flex-direction: column">
+              <ion-item [button]="true" (click)="navigateItem(data)">
+                <div class="" style="width: 100%; margin: 16px 7px">
+                  <div
+                    class="d-flex d-block"
+                    style="
+                      width: 100%;
+                      padding: 4px 0;
+                      justify-content: space-between;
+                    "
+                  >
+                    <h5 class="mg-0" style="margin: 9px 0">
+                      {{ data.name }}
+                    </h5>
+                    <p class="mg-0">
+                      <ion-chip color="primary" class="mg-0">
+                        {{ data.point }}
+                      </ion-chip>
+                    </p>
+                  </div>
+                  <div
+                    style="
+                      padding-bottom: 6px;
+                      margin: 0;
+                      justify-content: space-between;
+                    "
+                    class="d-flex"
+                  >
+                    <span class="text-italic" style="font-size: 12px"
+                      ><ion-icon name="calendar-outline"></ion-icon>
+                      {{ formatToMonthYear(data.fDate) }}</span
+                    >
+                    <span
+                      class="text-italic"
+                      style="font-size: 12px; padding-left: 15px"
+                      >{{ getChamDiemStatus(data.fDate) }}</span
+                    >
+                  </div>
+                </div>
+              </ion-item>
+            </ion-list>
+          </ion-grid>
+        </ion-item-group>
+      </ng-container>
+    </ng-container>
     <ion-segment-view style="padding: 0 15px">
       <!-- <ion-segment-content id="first">
         <div class="news-type"

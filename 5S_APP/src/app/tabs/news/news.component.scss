@@ -139,6 +139,7 @@ ion-col[size="5"] {
 .avatar {
   width: 48px;
   height: 48px;
+  color: #ffff;
 }
 ion-col {
   .user-name {
@@ -177,4 +178,7 @@ ion-list {
       margin-left: 8px;
     }
   }
+}
+ion-item.highlight-score {
+  --background: #e6f7ff; 
 }

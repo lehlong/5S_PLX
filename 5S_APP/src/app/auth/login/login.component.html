@@ -54,7 +54,14 @@
 </ion-content> -->
 
 <!-- login mới -->
-<ion-content>
+<ion-content
+  style="
+    --padding-top: 0;
+    --padding-bottom: 0;
+    --padding-start: 0;
+    --padding-end: 0;
+  "
+>
   <div class="bg-color">
     <div class="d-flex justify-space-between logo-group" style="width: 100%">
       <img
@@ -66,7 +73,7 @@
     </div>
     <div class="img-grid-background-top"></div>
     <div class="container">
-      <h2 class="titleApp">Khảo sát chấm điểm 5s</h2>
+      <h2 class="titleApp">Khảo sát 5s</h2>
       <h3 class="sub-titleApp">Công ty xăng dầu Petrolimex NA</h3>
       <div class="login">
         <ion-accordion-group class="form-login">
@@ -81,6 +88,7 @@
               [clearInput]="true"
               placeholder="Tài khoản"
               [(ngModel)]="model.userName"
+              class="custom"
             >
             </ion-input>
           </div>
@@ -98,6 +106,7 @@
               [type]="showPassword ? 'text' : 'password'"
               placeholder="Mật khẩu"
               [(ngModel)]="model.password"
+               class="custom"
             ></ion-input>
             <ion-icon
               [name]="showPassword ? 'eye-off' : 'eye'"
@@ -123,12 +132,12 @@
             expand="full"
             [disabled]="isLogin"
             (click)="processLogin()"
-            style="font-weight: 700; --background: #4a7def"
+            style="font-weight: 700; --background: #4a7def; --color: #fff"
             >Đăng nhập</ion-button
           >
         </div>
         <div class="register d-flex justify-center" style="gap: 10px">
-          <span>Bạn không có tài khoản?</span>
+          <span style="color: #000;">Bạn không có tài khoản?</span>
           <a style="color: #4a7def" href="">Đăng ký</a>
         </div>
       </div>
