@@ -64,19 +64,21 @@
     <div>
       <ion-grid class="container-job-card">
         <ion-row gap="2" class="space-card">
+          <ng-container *ngIf="fullData">
           <div class="bg-success card-job-item ion-text-center">
-            <h5><strong style="color: white">24</strong></h5>
+            <h5><strong style="color: white">{{fullData.lanCham}}</strong></h5>
             <p style="color: white">Lần chấm</p>
           </div>
           <div class="bg-warning card-job-item ion-text-center">
-            <h5><strong style="color: white">12</strong></h5>
+            <h5><strong style="color: white">{{fullData.chuaCham}}</strong></h5>
             <p style="color: white">chưa chấm</p>
           </div>
 
           <div class="bg-purple card-job-item ion-text-center">
-            <h5><strong style="color: white">3</strong></h5>
+            <h5><strong style="color: white">{{fullData.viPham}}</strong></h5>
             <p style="color: white">Vi phạm</p>
           </div>
+          </ng-container>
         </ion-row>
       </ion-grid>
     </div>
@@ -98,7 +100,7 @@
       <ng-container *ngFor="let data of dataHomeAll">
         <ion-item-group style="margin-top: 5px">
           <ion-grid>
-            <ion-list style="display: flex; gap: 10px; flex-direction: column">
+            <ion-list style="display: flex; gap: 5px; flex-direction: column">
               <ion-item
                 [button]="true"
                 (click)="navigateItem(data)"
@@ -328,6 +330,7 @@
           display: flex;
           align-items: center;
           justify-content: space-around;
+          cursor: pointer;
         "
         (click)="navigateTo('03805572-e6b7-4455-90fe-9b6584eef46f')"
       >

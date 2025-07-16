@@ -23,6 +23,7 @@ interface UserInfo {
   standalone: true,
 })
 export class NewsComponent implements OnInit {
+  fullData: any;
   dataHomeStore: any;
   dataHomeWareHouse: any;
   dataHomeAll: any;
@@ -106,16 +107,15 @@ export class NewsComponent implements OnInit {
   }
   getDataHome() {
     this._service.getDataHome(this.userInfo.userName).subscribe((data: any) => {
+      this.fullData = data;
       const sortedList = [...data.lstDoiTuong].sort((a: any, b: any) => {
-        return b.isScore === false ? 1 : -1; 
+        return b.isScore === true ? 1 : -1;
       });
 
       this.dataHomeAll = sortedList;
       this.dataHomeStore = sortedList.filter((x: any) => x.type === 'DT1');
       this.dataHomeWareHouse = sortedList.filter((x: any) => x.type === 'DT2');
-      this.dataHomeChuaCham = sortedList.filter(
-        (x: any) => x.isScore === true
-      );
+      this.dataHomeChuaCham = sortedList.filter((x: any) => x.isScore === true);
     });
   }
 
