@@ -27,7 +27,7 @@ export class NewsComponent implements OnInit {
   dataHomeStore: any;
   dataHomeWareHouse: any;
   dataHomeAll: any;
-  dataHome: any
+  dataHome: any;
   dataHomeChuaCham: any;
   dataChucVu: any;
   formattedDate: string = '';
@@ -44,7 +44,7 @@ export class NewsComponent implements OnInit {
     userName: '',
   };
   buttons = [
-    { label: 'Tất cả', value: 'all' },
+    { label: 'Tất cả', value: 'all'},
     { label: 'Cửa hàng', value: 'store' },
     { label: 'Kho', value: 'warehouse' },
     { label: 'Chưa chấm', value: 'chuaCham' },
@@ -56,7 +56,6 @@ export class NewsComponent implements OnInit {
     this.getChucVu();
     this.formatToday();
     this.getDataHome();
-
   }
 
   slideOpts = {
@@ -205,5 +204,4 @@ export class NewsComponent implements OnInit {
   reload() {
     this.getDataHome();
   }
-
 }
