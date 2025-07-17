@@ -105,23 +105,18 @@ namespace PLX5S.BUSINESS.Services.BU
         }
         public async Task<KiKhaoSatModel> BuilObjCreate(string surveyMgmtId)
         {
-            var lstInStore = await _dbContext.TblBuInputStore
+            var lstInDoiTuong = await _dbContext.TblBuInputDoiTuong
                 .Where(x => x.IsActive == true && x.SurveyMgmtId == surveyMgmtId)
                 .ToListAsync();
-            var storeIds = lstInStore.Select(x => x.StoreId).ToHashSet();
+            var DoiTuongIds = lstInDoiTuong.Select(x => x.DoiTuongId).ToHashSet();
 
             var lstMdStore = await _dbContext.tblMdStore
-                .Where(x => x.IsActive == true && storeIds.Contains(x.Id))
+                .Where(x => x.IsActive == true && DoiTuongIds.Contains(x.Id))
                 .OrderBy(x => x.Id)
                 .ToListAsync();
 
-            var lstInWareHouse = await _dbContext.TblBuInputWareHouse
-                .Where(x => x.IsActive == true && x.SurveyMgmtId == surveyMgmtId)
-                .ToListAsync();
-            var wareHouseIds = lstInWareHouse.Select(x => x.WareHouseId).ToHashSet();
-
             var lstMdWareHouse = await _dbContext.TblMdWareHouse
-                .Where(x => wareHouseIds.Contains(x.Id))
+                .Where(x => DoiTuongIds.Contains(x.Id))
                 .ToListAsync();
 
             var kiKhaoSat = new TblBuKiKhaoSat
@@ -309,49 +304,55 @@ namespace PLX5S.BUSINESS.Services.BU
                 var lstMdWareHouse = _dbContext.TblMdWareHouse.ToList();
                 var lstPointstore = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == idKi).ToList();
                 var lstChamDiem = _dbContext.TblBuInputChamDiem.Where(x => x.IsDeleted != true && x.KiKhaoSatId == idKi).ToList();
-                var lstInStore = _dbContext.TblBuInputStore.Where(x => x.IsDeleted != true && x.SurveyMgmtId == ki.SurveyMgmtId && x.IsActive == true).ToList();
-                var lstInWareHouse = _dbContext.TblBuInputWareHouse.Where(x => x.IsDeleted != true && x.SurveyMgmtId == ki.SurveyMgmtId && x.IsActive == true).ToList();
+                var lstInDoiTuong = _dbContext.TblBuInputDoiTuong.Where(x => x.IsDeleted != true && x.SurveyMgmtId == ki.SurveyMgmtId && x.IsActive == true).ToList();
 
-                foreach (var item in lstInStore)
+                foreach (var item in lstInDoiTuong)
                 {
-                    var store = lstMdStore.Where(x => x.Id == item.StoreId).FirstOrDefault();
-                    var lstChamDiem2 = lstChamDiem.Where(x => x.InStoreId == item.Id).ToList();
-                    var inStore = new InputStore()
+                    var store = lstMdStore.Where(x => x.Id == item.DoiTuongId).FirstOrDefault();
+                    var WareHouse = lstMdWareHouse.Where(x => x.Id == item.DoiTuongId).FirstOrDefault();
+                    if (store != null)
                     {
-                        Id = item.Id,
-                        PhoneNumber = store.PhoneNumber,
-                        Name = store.Name,
-                        CuaHangTruong = store.CuaHangTruong,
-                        NguoiPhuTrach = store.NguoiPhuTrach,
-                        ViDo = store.ViDo,
-                        KinhDo = store.KinhDo,
-                        TrangThaiCuaHang = store.TrangThaiCuaHang,
-                        StoreId = store.Id,
-                        SurveyMgmtId = ki.SurveyMgmtId,
-                        LstInChamDiem = lstChamDiem2,
-                        Point = lstPointstore.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
-                        LstChamDiem = lstChamDiem2.Select(x => x.UserName).ToList()
-                    };
-                    lstInputStore.Add(inStore);
+                        var lstChamDiem2 = lstChamDiem.Where(x => x.InStoreId == item.Id).ToList();
+                        var inStore = new InputStore()
+                        {
+                            Id = item.Id,
+                            PhoneNumber = store.PhoneNumber,
+                            Name = store.Name,
+                            CuaHangTruong = store.CuaHangTruong,
+                            NguoiPhuTrach = store.NguoiPhuTrach,
+                            ViDo = store.ViDo,
+                            KinhDo = store.KinhDo,
+                            TrangThaiCuaHang = store.TrangThaiCuaHang,
+                            StoreId = store.Id,
+                            SurveyMgmtId = ki.SurveyMgmtId,
+                            LstInChamDiem = lstChamDiem2,
+                            Point = lstPointstore.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
+                            LstChamDiem = lstChamDiem2.Select(x => x.UserName).ToList()
+                        };
+                        lstInputStore.Add(inStore);
+                    } 
+                    else if (WareHouse != null)
+                    {
+                        var lstChamDiem3 = lstChamDiem.Where(x => x.InStoreId == item.Id).ToList();
+                        var inWareHousee = new InputWarehouse()
+                        {
+                            Id = item.Id,
+                            Name = WareHouse.Name,
+                            TruongKho = WareHouse.TruongKho,
+                            NguoiPhuTrach = WareHouse.NguoiPhuTrach,
+                            WareHouseId = WareHouse.Id,
+                            SurveyMgmtId = ki.SurveyMgmtId,
+                            LstInChamDiem = lstChamDiem3,
+                            Point = lstPointstore.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
+                            LstChamDiem = lstChamDiem3.Select(x => x.UserName).ToList()
+                        };
+                        lstInputWareHouse.Add(inWareHousee);
+                    }
+
                 }
 
-                foreach (var item in lstInWareHouse)
+                foreach (var item in lstInDoiTuong)
                 {
-                    var WareHouse = lstMdWareHouse.Where(x => x.Id == item.WareHouseId).FirstOrDefault();
-                    var lstChamDiem2 = lstChamDiem.Where(x => x.InStoreId == item.Id).ToList();
-                    var inWareHousee = new InputWarehouse()
-                    {
-                        Id = item.Id,
-                        Name = WareHouse.Name,
-                        TruongKho = WareHouse.TruongKho,
-                        NguoiPhuTrach = WareHouse.NguoiPhuTrach,
-                        WareHouseId = WareHouse.Id,
-                        SurveyMgmtId = ki.SurveyMgmtId,
-                        LstInChamDiem = lstChamDiem2,
-                        Point = lstPointstore.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
-                        LstChamDiem = lstChamDiem2.Select(x => x.UserName).ToList()
-                    };
-                    lstInputWareHouse.Add(inWareHousee);
                 }
                 return new KiKhaoSatModel()
                 {

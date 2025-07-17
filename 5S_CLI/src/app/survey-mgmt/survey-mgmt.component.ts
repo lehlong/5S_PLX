@@ -168,7 +168,7 @@ export class SurveyMgmtComponent {
 
   submitForm(): void {
     this.isSubmit = true
-    console.log(this.dataInput);
+    // console.log(this.dataInput);
     this._service.create(this.dataInput).subscribe({
       next:(data) =>{
         this.search()
@@ -255,46 +255,31 @@ export class SurveyMgmtComponent {
 
   onAllChecked(value: boolean): void {
     if (value) {
-      this.dataInput.inputStores.forEach((item: any) => {
-        item.inputStore.isActive = true;
-      })
-      this.dataInput.inputWareHouse.forEach((item: any) => {
-        item.inputWareHouse.isActive = true;
+      this.dataInput.inputDoiTuong.forEach((item: any) => {
+        item.doiTuong.isActive = true;
       })
     } else {
-      this.dataInput.inputStores.forEach((item: any) => {
-        item.inputStore.isActive = false;
-      })
-      this.dataInput.inputWareHouse.forEach((item: any) => {
-        item.inputWareHouse.isActive = false;
+      this.dataInput.inputDoiTuong.forEach((item: any) => {
+        item.doiTuong.isActive = false;
       })
     }
   }
   updateCheckedSet(code: any, checked: boolean,): void {
     if (checked) {
-      this.dataInput.inputStores.forEach((item: any) => {
-        if (item.inputStore.id === code) {
-          item.inputStore.isActive = true;
-        }
-      });
-      this.dataInput.inputWareHouse.forEach((item: any) => {
-        if (item.inputWareHouse.id === code) {
-          item.inputWareHouse.isActive = true;
+      this.dataInput.inputDoiTuong.forEach((item: any) => {
+        if (item.doiTuong.id === code) {
+          item.doiTuong.isActive = true;
         }
       });
     } else {
-      this.dataInput.inputStores.forEach((item: any) => {
-        if (item.inputStore.id === code) {
-          item.inputStore.isActive = false;
-        }
-      });
-
-      this.dataInput.inputWareHouse.forEach((item: any) => {
-        if (item.inputWareHouse.id === code) {
-          item.inputWareHouse.isActive = false;
+      this.dataInput.inputDoiTuong.forEach((item: any) => {
+        if (item.doiTuong.id === code) {
+          item.doiTuong.isActive = false;
         }
       });
     }
+    console.log(this.dataInput.inputDoiTuong);
+
   }
   onItemChecked(code: String, checked: boolean,): void {
     this.updateCheckedSet(code, checked)

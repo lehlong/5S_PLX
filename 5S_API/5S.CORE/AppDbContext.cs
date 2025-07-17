@@ -150,6 +150,7 @@ namespace PLX5S.CORE
         public DbSet<TblBuInputAtvsv> TblBuInputAtvsv { get; set; }
         public DbSet<TblBuTieuChi> TblBuTieuChi { get; set; }
         public DbSet<TblBuInputStore> TblBuInputStore { get; set; }
+        public DbSet<TblBuInputDoiTuong> TblBuInputDoiTuong { get; set; }
         public DbSet<TblBuInputWareHouse> TblBuInputWareHouse { get; set; }
 
 

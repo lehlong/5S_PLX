@@ -13,8 +13,8 @@ namespace PLX5S.CORE.Entities.BU
         [Column("ID", TypeName = "NVARCHAR(50)")]
         public string Id { get; set; }
 
-        [Column("WARE_HOUSE_ID", TypeName = "NVARCHAR(50)")]
-        public string WareHouseId { get; set; }
+        //[Column("WARE_HOUSE_ID", TypeName = "NVARCHAR(50)")]
+        //public string WareHouseId { get; set; }
 
         [Column("SURVEY_MGMT_ID", TypeName = "NVARCHAR(50)")]
         public string SurveyMgmtId { get; set; }

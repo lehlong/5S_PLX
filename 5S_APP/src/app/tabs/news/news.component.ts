@@ -27,6 +27,7 @@ export class NewsComponent implements OnInit {
   dataHomeStore: any;
   dataHomeWareHouse: any;
   dataHomeAll: any;
+  dataHome: any
   dataHomeChuaCham: any;
   dataChucVu: any;
   formattedDate: string = '';
@@ -52,6 +53,7 @@ export class NewsComponent implements OnInit {
     this.getChucVu();
     this.formatToday();
     this.getDataHome();
+
   }
 
   slideOpts = {
@@ -103,8 +105,22 @@ export class NewsComponent implements OnInit {
   }
 
   select(value: string) {
+    if (value === 'all') {
+      console.log('All selected', this.dataHomeAll);
+
+      this.dataHome = this.dataHomeAll;
+    } else if (value === 'store') {
+      this.dataHome = this.dataHomeAll.filter((x: any) => x.type === 'DT1');
+      console.log('All store', this.dataHome);
+
+    } else if (value === 'warehouse') {
+      this.dataHome = this.dataHomeAll.filter((x: any) => x.type === 'DT2');
+    } else if (value === 'chuaCham') {
+      this.dataHome = this.dataHomeAll.filter((x: any) => x.isScore === true);
+    }
     this.selected = value;
   }
+
   getDataHome() {
     this._service.getDataHome(this.userInfo.userName).subscribe((data: any) => {
       this.fullData = data;
@@ -113,6 +129,8 @@ export class NewsComponent implements OnInit {
       });
 
       this.dataHomeAll = sortedList;
+      this.select(this.selected);
+
       this.dataHomeStore = sortedList.filter((x: any) => x.type === 'DT1');
       this.dataHomeWareHouse = sortedList.filter((x: any) => x.type === 'DT2');
       this.dataHomeChuaCham = sortedList.filter((x: any) => x.isScore === true);
@@ -181,4 +199,9 @@ export class NewsComponent implements OnInit {
 
     this.router.navigate([`survey/check-list/${item.id}`]);
   }
+
+  reload() {
+    this.getDataHome();
+  }
+
 }

@@ -23,12 +23,12 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./tabs/account/account.routes').then((m) => m.accountRoutes),
       },
-      {
-        path: 'home',
-        loadChildren: () =>
-          import('./tabs/home/home.routes').then((m) => m.homeRouter),
-        canActivate: [AuthGuard],
-      },
+      // {
+      //   path: 'home',
+      //   loadChildren: () =>
+      //     import('./tabs/home/home.routes').then((m) => m.homeRouter),
+      //   canActivate: [AuthGuard],
+      // },
       {
         path: 'report',
         loadChildren: () =>
@@ -36,7 +36,7 @@ export const routes: Routes = [
         canActivate: [AuthGuard],
       },
       // { path: 'report', component: ReportComponent, canActivate: [AuthGuard] },
-      { path: 'news', component: NewsComponent, canActivate: [AuthGuard] },
+      { path: 'home', component: NewsComponent, canActivate: [AuthGuard] },
       {
         path: 'notifications',
         loadComponent: () =>

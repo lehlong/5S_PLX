@@ -107,7 +107,7 @@ namespace PLX5S.BUSINESS.Services.MD
                     var atvsv = new TblBuInputAtvsv();
                     atvsv.Id = Guid.NewGuid().ToString();
                     atvsv.Name = item;
-                    atvsv.InputStoreId = data.Id;
+                    atvsv.InputDoiTuongId = data.Id;
                     atvsv.IsActive = true;
                     atvsv.Type = "DT1";
 

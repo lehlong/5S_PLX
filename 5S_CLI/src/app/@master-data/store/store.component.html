@@ -150,7 +150,7 @@
             <nz-form-label>* Chon cửa hàng trưởng</nz-form-label>
             <nz-form-control nzErrorTip="Không được để trống">
               <nz-select nzShowSearch nzAllowClear placeholder="Chọn cửa hàng trưởng" formControlName="cuaHangTruong">
-                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.userName + ' - ' + item.fullName"
+                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.userName + '- ' + item.fullName"
                   [nzValue]="item.userName">
                 </nz-option>
               </nz-select>
@@ -162,7 +162,7 @@
             <nz-form-label>* Người phụ trách</nz-form-label>
             <nz-form-control nzErrorTip="Không được để trống">
               <nz-select nzShowSearch nzAllowClear placeholder="Chọn người phụ trách" formControlName="nguoiPhuTrach">
-                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.userName + ' - ' + item.fullName"
+                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.userName + '- ' + item.fullName"
                   [nzValue]="item.userName">
                 </nz-option>
               </nz-select>
@@ -175,7 +175,7 @@
             <nz-form-control nzErrorTip="Không được để trống">
               <nz-select [nzMaxTagCount]="3" [nzMaxTagPlaceholder]="tagPlaceHolder" nzMode="multiple"
                 nzPlaceHolder="Please select" formControlName="ATVSV" [(ngModel)]="lstATVSV">
-                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.userName + ' - ' + item.fullName"
+                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.userName + '- ' + item.fullName"
                   [nzValue]="item.userName">
                 </nz-option>
               </nz-select>

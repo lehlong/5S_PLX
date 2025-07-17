@@ -84,7 +84,7 @@ namespace PLX5S.BUSINESS.Services.MD
                     {
                         Id = Guid.NewGuid().ToString(),
                         Name = item,
-                        InputStoreId = data.Id,
+                        InputDoiTuongId = data.Id,
                         IsActive = true,
                         Type = "DT2",
                     };
@@ -135,9 +135,9 @@ namespace PLX5S.BUSINESS.Services.MD
 
                 };
                 _dbContext.TblMdWareHouse.Update(store);
-                var lstdel = _dbContext.TblBuInputAtvsv.Where(x => x.InputStoreId == data.Id);
+                var lstdel = _dbContext.TblBuInputAtvsv.Where(x => x.InputDoiTuongId == data.Id);
                 _dbContext.TblBuInputAtvsv.RemoveRange(lstdel);
-                
+
                 var lstAtvs = new List<TblBuInputAtvsv>();
                 foreach (var item in data.ATVSV)
                 {
@@ -145,7 +145,7 @@ namespace PLX5S.BUSINESS.Services.MD
                     {
                         Id = Guid.NewGuid().ToString(),
                         Name = item,
-                        InputStoreId = data.Id,
+                        InputDoiTuongId = data.Id,
                         IsActive = true,
                         Type = "DT2",
                     };
@@ -171,7 +171,7 @@ namespace PLX5S.BUSINESS.Services.MD
         {
             try
             {
-                var lst = _dbContext.TblBuInputAtvsv.Where(x => x.InputStoreId == headerId).Select(x => x.Name).ToList();
+                var lst = _dbContext.TblBuInputAtvsv.Where(x => x.InputDoiTuongId == headerId).Select(x => x.Name).ToList();
 
                 return lst;
             }

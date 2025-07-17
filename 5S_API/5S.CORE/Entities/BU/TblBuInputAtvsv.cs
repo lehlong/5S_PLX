@@ -19,8 +19,9 @@ namespace PLX5S.CORE.Entities.BU
         [Column("NAME", TypeName = "NVARCHAR(255)")]
         public string? Name { get; set; }
 
-        [Column("INPUT_STORE_ID")]
-        public string? InputStoreId { get; set; }
+        [Column("INPUT_DOI_TUONG_ID")]
+        public string? InputDoiTuongId { get; set; }
+
         [Column("TYPE")]
         public string? Type { get; set; }
     }

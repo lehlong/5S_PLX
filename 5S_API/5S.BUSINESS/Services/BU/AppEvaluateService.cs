@@ -577,8 +577,8 @@ namespace PLX5S.BUSINESS.Services.BU
                 var lstPoint = _dbContext.TblBuPoint.OrderBy(x => x.Code).ToList();
                 var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.AccountUserName == userName).ToList();
 
-                var lstInStore = _dbContext.TblBuInputStore.Where(x => x.SurveyMgmtId == "03805572-e6b7-4455-90fe-9b6584eef46f").ToList();
-                var lstInWareHouse = _dbContext.TblBuInputWareHouse.Where(x => x.SurveyMgmtId == "16d30d78-0b80-4323-bd86-2498aae676a1").ToList();
+                var lstInStore = _dbContext.TblBuInputDoiTuong.Where(x => x.SurveyMgmtId == "03805572-e6b7-4455-90fe-9b6584eef46f").ToList();
+                var lstInWareHouse = _dbContext.TblBuInputDoiTuong.Where(x => x.SurveyMgmtId == "16d30d78-0b80-4323-bd86-2498aae676a1").ToList();
 
                 var lstStore = _dbContext.tblMdStore.Where(x => x.IsActive == true).ToList();
                 var lstWareHouse = _dbContext.TblMdWareHouse.Where(x => x.IsActive == true).ToList();
@@ -597,7 +597,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         lstDoiTuong.AddRange(lstInChamDiem.Where(x => x.KiKhaoSatId == i.Id && x.InStoreId == e.Id).Select(x => new DoiTuong
                         {
                             Id = e.Id,
-                            Name = lstStore.FirstOrDefault(_x => _x.Id == e.StoreId).Name,
+                            Name = lstStore.FirstOrDefault(_x => _x.Id == e.DoiTuongId).Name,
                             FDate = i.StartDate,
                             Type = "DT1",
                             Point = lstPoint.FirstOrDefault(y => y.DoiTuongId == e.Id && y.KiKhaoSatId == i.Id)?.Point ?? 0,
@@ -617,7 +617,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         lstDoiTuong.AddRange(lstInChamDiem.Where(x => x.KiKhaoSatId == i.Id && x.InStoreId == e.Id).Select(x => new DoiTuong
                         {
                             Id = e.Id,
-                            Name = lstWareHouse.FirstOrDefault(_x => _x.Id == e.WareHouseId).Name,
+                            Name = lstWareHouse.FirstOrDefault(_x => _x.Id == e.DoiTuongId).Name,
                             FDate = i.StartDate,
                             Type = "DT2",
                             Point = lstPoint.FirstOrDefault(y => y.DoiTuongId == e.Id && y.KiKhaoSatId == i.Id)?.Point ?? 0,
