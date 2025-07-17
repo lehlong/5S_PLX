@@ -9,106 +9,106 @@ namespace PLX5S.API.Controllers.MD
 {
     
     [Route("api/[controller]")]
-[ApiController]
-public class WareHouseController(IWarehouseService service) : ControllerBase
-{
-    public readonly IWarehouseService _service = service;
-
-    [HttpGet("Search")]
-    public async Task<IActionResult> Search([FromQuery] BaseFilter filter)
+    [ApiController]
+    public class WareHouseController(IWarehouseService service) : ControllerBase
     {
-        var transferObject = new TransferObject();
-        var result = await _service.Search(filter);
-        if (_service.Status)
+        public readonly IWarehouseService _service = service;
+
+        [HttpGet("Search")]
+        public async Task<IActionResult> Search([FromQuery] BaseFilter filter)
         {
-            transferObject.Data = result;
-        }
-        else
-        {
-            transferObject.Status = false;
+            var transferObject = new TransferObject();
+            var result = await _service.Search(filter);
+            if (_service.Status)
+            {
                 transferObject.Data = result;
+            }
+            else
+            {
+                transferObject.Status = false;
+                    transferObject.Data = result;
+                    transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
+        [HttpGet("GetAll")]
+        public async Task<IActionResult> GetAll([FromQuery] BaseMdFilter filter)
+        {
+            var transferObject = new TransferObject();
+            var result = await _service.GetAll(filter);
+            if (_service.Status)
+            {
+                transferObject.Data = result;
+            }
+            else
+            {
+                transferObject.Status = false;
                 transferObject.MessageObject.MessageType = MessageType.Error;
-            transferObject.GetMessage("0001", _service);
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
         }
-        return Ok(transferObject);
-    }
-    [HttpGet("GetAll")]
-    public async Task<IActionResult> GetAll([FromQuery] BaseMdFilter filter)
-    {
-        var transferObject = new TransferObject();
-        var result = await _service.GetAll(filter);
-        if (_service.Status)
+        [HttpPost("Insert")]
+        public async Task<IActionResult> Insert([FromBody] WarehouseDto time)
         {
-            transferObject.Data = result;
-        }
-        else
-        {
-            transferObject.Status = false;
-            transferObject.MessageObject.MessageType = MessageType.Error;
-            transferObject.GetMessage("0001", _service);
-        }
-        return Ok(transferObject);
-    }
-    [HttpPost("Insert")]
-    public async Task<IActionResult> Insert([FromBody] WarehouseDto time)
-    {
-        var transferObject = new TransferObject();
+            var transferObject = new TransferObject();
 
-        await _service.Insert(time);
+            await _service.Insert(time);
 
-        if (_service.Status)
-        {
-            //transferObject.Data = result;
-            transferObject.Status = true;
-            transferObject.MessageObject.MessageType = MessageType.Success;
-            transferObject.GetMessage("0100", _service);
+            if (_service.Status)
+            {
+                //transferObject.Data = result;
+                transferObject.Status = true;
+                transferObject.MessageObject.MessageType = MessageType.Success;
+                transferObject.GetMessage("0100", _service);
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0101", _service);
+            }
+            return Ok(transferObject);
         }
-        else
+        [HttpPut("Update")]
+        public async Task<IActionResult> Update([FromBody] WarehouseDto time)
         {
-            transferObject.Status = false;
-            transferObject.MessageObject.MessageType = MessageType.Error;
-            transferObject.GetMessage("0101", _service);
+            var transferObject = new TransferObject();
+            await _service.Update(time);
+            if (_service.Status)
+            {
+                transferObject.Status = true;
+                transferObject.MessageObject.MessageType = MessageType.Success;
+                transferObject.GetMessage("0103", _service);
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0104", _service);
+            }
+            return Ok(transferObject);
         }
-        return Ok(transferObject);
-    }
-    [HttpPut("Update")]
-    public async Task<IActionResult> Update([FromBody] WarehouseDto time)
-    {
-        var transferObject = new TransferObject();
-        await _service.Update(time);
-        if (_service.Status)
+        [HttpDelete("Delete/{id}")]
+        public async Task<IActionResult> Delete([FromRoute] string id)
         {
-            transferObject.Status = true;
-            transferObject.MessageObject.MessageType = MessageType.Success;
-            transferObject.GetMessage("0103", _service);
+            var transferObject = new TransferObject();
+            await _service.Delete(id);
+            if (_service.Status)
+            {
+                transferObject.Status = true;
+                transferObject.MessageObject.MessageType = MessageType.Success;
+                transferObject.GetMessage("0105", _service);
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0106", _service);
+            }
+            return Ok(transferObject);
         }
-        else
-        {
-            transferObject.Status = false;
-            transferObject.MessageObject.MessageType = MessageType.Error;
-            transferObject.GetMessage("0104", _service);
-        }
-        return Ok(transferObject);
-    }
-    [HttpDelete("Delete/{id}")]
-    public async Task<IActionResult> Delete([FromRoute] string id)
-    {
-        var transferObject = new TransferObject();
-        await _service.Delete(id);
-        if (_service.Status)
-        {
-            transferObject.Status = true;
-            transferObject.MessageObject.MessageType = MessageType.Success;
-            transferObject.GetMessage("0105", _service);
-        }
-        else
-        {
-            transferObject.Status = false;
-            transferObject.MessageObject.MessageType = MessageType.Error;
-            transferObject.GetMessage("0106", _service);
-        }
-        return Ok(transferObject);
-    }
         [HttpGet("GetATVSV")]
         public async Task<IActionResult> GetATVSV([FromQuery] string headerId)
         {

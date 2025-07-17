@@ -31,6 +31,9 @@ export class NewsComponent implements OnInit {
   dataHomeChuaCham: any;
   dataChucVu: any;
   formattedDate: string = '';
+  storeLength: string = '(0)';
+  wareHouseLength: string = '(0)';
+  chuaChamLength: string = '(0)';
   selected: string = 'all';
   userInfo: UserInfo = {
     fullName: '',
@@ -106,13 +109,9 @@ export class NewsComponent implements OnInit {
 
   select(value: string) {
     if (value === 'all') {
-      console.log('All selected', this.dataHomeAll);
-
       this.dataHome = this.dataHomeAll;
     } else if (value === 'store') {
       this.dataHome = this.dataHomeAll.filter((x: any) => x.type === 'DT1');
-      console.log('All store', this.dataHome);
-
     } else if (value === 'warehouse') {
       this.dataHome = this.dataHomeAll.filter((x: any) => x.type === 'DT2');
     } else if (value === 'chuaCham') {
@@ -129,6 +128,9 @@ export class NewsComponent implements OnInit {
       });
 
       this.dataHomeAll = sortedList;
+      this.storeLength = `(${sortedList.filter((x: any) => x.type === 'DT1').length})`;
+      this.wareHouseLength = `(${sortedList.filter((x: any) => x.type === 'DT2').length})`;
+      this.chuaChamLength = `(${sortedList.filter((x: any) => x.isScore === true).length})`;
       this.select(this.selected);
 
       this.dataHomeStore = sortedList.filter((x: any) => x.type === 'DT1');

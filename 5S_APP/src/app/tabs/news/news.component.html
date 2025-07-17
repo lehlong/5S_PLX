@@ -72,13 +72,13 @@
     </div>
     <div class="horizontal-scroll-buttons d-flex" style="padding: 0 10px; width: 100%; gap: 5px">
       <ion-button *ngFor="let item of buttons" [class.active]="selected === item.value" class="custom"
-        (click)="select(item.value)">
-        {{ item.label }}
+        (click)="select(item.value)">{{ item.label }}
+        {{ item.value == 'store' ? storeLength : item.value == 'warehouse' ? wareHouseLength : item.value == 'chuaCham' ? chuaChamLength : '' }}
       </ion-button>
     </div>
     <!-- all -->
       <ng-container >
-        <ion-item-group style="">
+        <ion-item-group >
           <ion-grid>
             <ion-list style="display: flex; gap: 5px; flex-direction: column; background: none; ">
               <ion-item [button]="true" *ngFor="let data of dataHome" (click)="navigateItem(data)" style=" --background: none; margin:  5px; width: auto;"
