@@ -33,5 +33,6 @@ namespace PLX5S.BUSINESS.Models
         public string? KiKhaoSatId { set; get; }
         public decimal? Point { set; get; }
         public DateTime? FDate { set; get; }
+        public List<string>? LstChamDiem { set; get; }
     }
 }

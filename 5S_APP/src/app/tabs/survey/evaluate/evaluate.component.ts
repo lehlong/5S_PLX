@@ -638,12 +638,12 @@ export class EvaluateComponent implements OnInit {
     };
   }
 
-  filterFeedBack(code: any) {
-    const item = this.evaluate?.lstEvaluate?.find(
-      (x: any) => x.tieuChiCode === code
-    );
-    return item?.feedBack || '';
-  }
+  // filterFeedBack(code: any) {
+  //   const item = this.evaluate?.lstEvaluate?.find(
+  //     (x: any) => x.tieuChiCode === code
+  //   );
+  //   return item?.feedBack || '';
+  // }
 
   setDiem(data: any, event: any) {
     if (!this.isEdit) return;
@@ -674,14 +674,10 @@ export class EvaluateComponent implements OnInit {
       }, 0);
       return sum + diemMax;
     }, 0);
-    this.evaluate.header.point = (
-      (this.evaluate.lstEvaluate.reduce(
-        (sum: any, item: any) => sum + (item.point || 0),
-        0
-      ) /
-        tongDiem) *
-      100
-    ).toFixed(2);
+
+    this.evaluate.header.point =
+      ((this.evaluate.lstEvaluate.reduce((sum: any, item: any) => sum + (item.point || 0), 0) / tongDiem) * 100)
+      .toFixed(2);
 
     this._storageService.set(
       this.doiTuong.id + '_' + this.kiKhaoSat.code,
@@ -756,6 +752,7 @@ export class EvaluateComponent implements OnInit {
     this.evaluate.header.accountUserName = this.account.userName;
     this.evaluate.header.chucVuId = this.account.chucVuId;
     this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
+    console.log(this.doiTuong);
 
     this._service.insertEvaluate(this.evaluate).subscribe({
       next: () => {
@@ -767,14 +764,16 @@ export class EvaluateComponent implements OnInit {
             surveyId: localStorage.getItem('surveyId'),
             lstData: this.doiTuong.lstChamDiem,
           },
-      ).subscribe({
-        next: (data) => {}
-      })
-        this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
-        this._storageService.remove(
-          this.doiTuong.id + '_' + this.kiKhaoSat.code
-        );
-        localStorage.removeItem(this.doiTuong.id + '_' + this.kiKhaoSat.code);
+        ).subscribe({
+          next: (data) => {
+            this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
+            this._storageService.remove(
+              this.doiTuong.id + '_' + this.kiKhaoSat.code
+            );
+            localStorage.removeItem(this.doiTuong.id + '_' + this.kiKhaoSat.code);
+
+          }
+        })
       },
 
       error: (ex) => {

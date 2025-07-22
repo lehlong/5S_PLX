@@ -24,7 +24,7 @@
         public string? SurveyId { set; get; }
         public string? KiKhaoSatId { set; get; }
         public string? DoiTuongId { set; get; }
-        public List<string>? LstData; 
+        public List<string>? LstData { set; get; } 
 
     }
 }

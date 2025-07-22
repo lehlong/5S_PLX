@@ -240,67 +240,7 @@ namespace PLX5S.BUSINESS.Services.BU
             }
         }
 
-        public async Task InsertEvaluate(EvaluateModel data)
-        {
-            try
-            {
-                var dateNow = DateTime.Now;
-                if (_dbContext.TblBuKiKhaoSat.Any(x => x.Id == data.Header.KiKhaoSatId && x.EndDate <= dateNow))
-                {
-                    this.Status = false;
-                    return;
-                };
 
-                var lstImage = new List<TblBuEvaluateImage>();
-
-                var lstHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == data.Header.KiKhaoSatId && x.DoiTuongId == data.Header.DoiTuongId).ToList();
-                var header = lstHeader.OrderByDescending(x => x.Order).FirstOrDefault();
-
-                    
-                bool hasFirstPeriod = lstHeader.Any(x =>
-                    x.CreateDate >= new DateTime(dateNow.Year, dateNow.Month, 1) &&
-                    x.CreateDate <= new DateTime(dateNow.Year, dateNow.Month, 7));
-
-                bool hasSecondPeriod = lstHeader.Any(x =>
-                    x.CreateDate >= new DateTime(dateNow.Year, dateNow.Month, 15) &&
-                    x.CreateDate <= new DateTime(dateNow.Year, dateNow.Month, 23));
-
-
-                if (data.Header.ChucVuId == "CHT" || data.Header.ChucVuId == "ATVSV" || data.Header.ChucVuId == "TK")
-                {
-                    if (((dateNow.Day > 07 && dateNow.Day < 15) || (dateNow.Day >= 15 && dateNow.Day <= 23)) && !hasFirstPeriod)
-                    {
-                        data.Header.IsActive = false;
-                    }
-                    else if ((!hasFirstPeriod && !hasSecondPeriod) && (dateNow.Day > 23))
-                    {
-                        data.Header.IsActive = false;
-                    }
-                }
-                data.Header.Name = "Lần chấm thứ " + (header != null ? header.Order + 1 : 1).ToString();
-                data.Header.Order = header != null ? header.Order + 1 : 1;
-                data.Header.UpdateDate = DateTime.Now;
-                
-
-                _dbContext.TblBuEvaluateHeader.Add(data.Header);
-
-                foreach (var item in data.LstImages)
-                {
-                    var a = await HandelFile(item);
-                    lstImage.Add(a);
-                }
-
-                _dbContext.TblBuEvaluateImage.AddRange(lstImage);
-                _dbContext.TblBuEvaluateValue.AddRange(data.LstEvaluate);
-
-                await _dbContext.SaveChangesAsync();
-                this.Status = true;
-            }
-            catch (Exception ex)
-            {
-                this.Status = false;
-            }
-        }
         public async Task<TblBuEvaluateImage> HandelFile(TblBuEvaluateImage request)
         {
             if (string.IsNullOrEmpty(request.FilePath))
@@ -476,62 +416,170 @@ namespace PLX5S.BUSINESS.Services.BU
             }
         }
 
+
+
+        public async Task InsertEvaluate(EvaluateModel data)
+        {
+            try
+            {
+                var dateNow = DateTime.Now;
+                if (_dbContext.TblBuKiKhaoSat.Any(x => x.Id == data.Header.KiKhaoSatId && x.EndDate <= dateNow))
+                {
+                    this.Status = false;
+                    return;
+                };
+
+                var lstImage = new List<TblBuEvaluateImage>();
+
+                var lstHeader = _dbContext.TblBuEvaluateHeader.Where(x => 
+                                    x.KiKhaoSatId == data.Header.KiKhaoSatId && 
+                                    x.DoiTuongId == data.Header.DoiTuongId && 
+                                    x.AccountUserName == data.Header.AccountUserName &&
+                                    x.IsActive == true).ToList();
+                var header = lstHeader.OrderByDescending(x => x.Order).FirstOrDefault();
+
+
+                bool dot1 = lstHeader.Any(x =>
+                    x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 1) &&
+                    x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 7));
+
+                bool dot2 = lstHeader.Any(x =>
+                    x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 8) &&
+                    x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 15));
+
+                bool dot3 = lstHeader.Any(x =>
+                    x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 16) &&
+                    x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 23));
+
+                if (data.Header.ChucVuId == "CHT" || data.Header.ChucVuId == "TK")
+                {
+                    if (((dateNow.Day >= 08 && dateNow.Day <= 15) || (dateNow.Day >= 16 && dateNow.Day <= 23)) && !dot1)
+                    {
+                        data.Header.IsActive = false;
+                    }
+                    else if ((!dot1 && !dot3) && (dateNow.Day > 23))
+                    {
+                        data.Header.IsActive = false;
+                    }
+                }
+                else if (data.Header.ChucVuId == "ATVSV" && dateNow.Day >= 16 && !dot2)
+                {
+                    data.Header.IsActive = false;
+                }
+
+                data.Header.Name = "Lần chấm thứ " + (header != null ? header.Order + 1 : 1).ToString();
+                data.Header.Order = header != null ? header.Order + 1 : 1;
+                data.Header.UpdateDate = DateTime.Now;
+
+
+                _dbContext.TblBuEvaluateHeader.Add(data.Header);
+
+                foreach (var item in data.LstImages)
+                {
+                    var a = await HandelFile(item);
+                    lstImage.Add(a);
+                }
+
+                _dbContext.TblBuEvaluateImage.AddRange(lstImage);
+                _dbContext.TblBuEvaluateValue.AddRange(data.LstEvaluate);
+
+                await _dbContext.SaveChangesAsync();
+                this.Status = true;
+            }
+            catch (Exception ex)
+            {
+                this.Status = false;
+            }
+        }
+
         public async Task HandlePointStore(EvaluateFilter param)
         {
             try
             {
                 var lstEvaHeader = await _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == param.KiKhaoSatId && x.DoiTuongId == param.DoiTuongId).ToListAsync();
                 var lstUser = _dbContext.TblAdAccount.Where(u => param.LstData.Contains(u.UserName)).ToList();
-                var filterLst = lstEvaHeader.Where(x => x.IsActive == false).ToList();
+                var checkViPham = lstEvaHeader.Any(x => x.IsActive == false);
                 var dateNow = DateTime.Now;
-                decimal tong = 0;
+                decimal tongChuyenVien = 0;
+                decimal tong = 1;
 
-                foreach (var item in filterLst)
+                if (checkViPham) 
                 {
-                    lstEvaHeader.RemoveAll(x => x.AccountUserName == item.AccountUserName);
+                    tong = 0;
                 }
-
-                foreach (var item in lstUser)
+                else
                 {
                     decimal tongPointUser = 0;
                     decimal count = 0;
-
-                    if (item.ChucVuId == "CHT" || item.ChucVuId == "ATVSV" || item.ChucVuId == "TK")
+                    decimal countChuyenVien = 0;
+                    foreach (var item in lstUser)
                     {
 
-                        bool hasFirstPeriod = lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList().Any(x =>
-                            x.CreateDate >= new DateTime(dateNow.Year, dateNow.Month, 1) &&
-                            x.CreateDate <= new DateTime(dateNow.Year, dateNow.Month, 7));
-
-                        bool hasSecondPeriod = lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList().Any(x =>
-                            x.CreateDate >= new DateTime(dateNow.Year, dateNow.Month, 15) &&
-                            x.CreateDate <= new DateTime(dateNow.Year, dateNow.Month, 23));
-
-                        if (dateNow.Day < 23 && hasFirstPeriod && hasSecondPeriod)
+                        if (item.ChucVuId == "CHT" || item.ChucVuId == "TK")
                         {
-                            foreach (var i in lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList())
+                            bool dot1 = lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList().Any(x =>
+                                x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 1) &&
+                                x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 7));
+
+                            bool dot3 = lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList().Any(x =>
+                                x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 16) &&
+                                x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 23));
+
+                            if ((dateNow.Day < 16 && dot1) || (dateNow.Day >= 16 && dot1 && dot3))
                             {
-                                tongPointUser = tongPointUser + i.Point;
-                                count++;
+                                foreach (var i in lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList())
+                                {
+                                    tongPointUser = tongPointUser + i.Point;
+                                    count++;
+                                }
                             }
-                            tong = tong + ((tongPointUser / 2) / count);
+                            else
+                            {
+                                tong = 0;
+                                break;
+                            }
+
+                        } 
+                        else if (item.ChucVuId == "ATVSV")
+                        {
+                            bool dot2 = lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList().Any(x =>
+                                x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 8) &&
+                                x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 15));
+
+                            bool dot4 = lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList().Any(x =>
+                                x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 24));
+
+                            if (dateNow.Day <= 7 || (dateNow.Day >= 8 && dateNow.Day < 23 && dot2) || (dateNow.Day >= 24 && dot4 && dot2))
+                            {
+                                foreach (var i in lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList())
+                                {
+                                    tongPointUser = tongPointUser + i.Point;
+                                    count++;
+                                }
+                            }
+                            else
+                            {
+                                tong = 0;
+                                break;
+                            }
                         }
                         else
                         {
-                            tong = 0;
+                            foreach (var i in lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList())
+                            {
+                                tongChuyenVien = tongChuyenVien + i.Point;
+                                countChuyenVien++;
+                            }
                         }
 
                     }
-                    else
-                    {
-                        foreach (var i in lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList())
-                        {
-                            tongPointUser = tongPointUser + i.Point;
-                            count++;
-                        }
-                        tong = tong + ((tongPointUser) / count);
-                    }
+                    tongChuyenVien = tongChuyenVien / countChuyenVien;
+                    tongPointUser = tongPointUser / count;
+
+                    tong = (tong * (tongPointUser + tongChuyenVien)) / 2;
+
                 }
+
 
                 await TinhTongLanCham(new TblBuPoint
                 {
@@ -539,7 +587,7 @@ namespace PLX5S.BUSINESS.Services.BU
                     DoiTuongId = param.DoiTuongId,
                     KiKhaoSatId = param.KiKhaoSatId,
                     SurveyId = param.SurveyId,
-                    Point = tong / param.LstData.Count,
+                    Point = tong,
                 });
 
             }
@@ -590,6 +638,7 @@ namespace PLX5S.BUSINESS.Services.BU
 
                 foreach (var i in lstKiKhaoSatStore)
                 {
+                    var lstAllNguoiCham = _dbContext.TblBuInputChamDiem.Where(x => x.KiKhaoSatId == i.Id).ToList();
                     foreach (var e in lstInStore)
                     {
                         result.LanCham = result.LanCham + lstEvaHeader.Count(x => x.KiKhaoSatId == i.Id && x.DoiTuongId == e.Id && x.IsActive == true);
@@ -602,6 +651,7 @@ namespace PLX5S.BUSINESS.Services.BU
                             Type = "DT1",
                             Point = lstPoint.FirstOrDefault(y => y.DoiTuongId == e.Id && y.KiKhaoSatId == i.Id)?.Point ?? 0,
                             KiKhaoSatName = i.Name,
+                            LstChamDiem = lstAllNguoiCham.Where(_x => _x.InStoreId == e.Id).Select(_x => _x.UserName).ToList(),
                             KiKhaoSatId = i.Id,
 
                         }).ToList());
@@ -609,6 +659,8 @@ namespace PLX5S.BUSINESS.Services.BU
                 }
                 foreach (var i in lstKiKhaoSatKho)
                 {
+                    var lstAllNguoiCham = _dbContext.TblBuInputChamDiem.Where(x => x.KiKhaoSatId == i.Id).ToList();
+
                     foreach (var e in lstInWareHouse)
                     {
                         result.LanCham = result.LanCham + lstEvaHeader.Count(x => x.KiKhaoSatId == i.Id && x.DoiTuongId == e.Id && x.IsActive == true);
@@ -622,7 +674,7 @@ namespace PLX5S.BUSINESS.Services.BU
                             Type = "DT2",
                             Point = lstPoint.FirstOrDefault(y => y.DoiTuongId == e.Id && y.KiKhaoSatId == i.Id)?.Point ?? 0,
                             KiKhaoSatName = i.Name,
-
+                            LstChamDiem = lstAllNguoiCham.Where(_x => _x.InStoreId == e.Id).Select(_x => _x.UserName).ToList(),
                             KiKhaoSatId = i.Id,
                         }).ToList());
                     }

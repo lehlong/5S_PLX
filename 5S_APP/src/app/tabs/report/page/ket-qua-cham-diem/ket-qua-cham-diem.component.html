@@ -49,9 +49,10 @@
         <ion-label style="margin: 0; display: block; text-align: center; line-height: 1.2">{{ data.length }}</ion-label>
         <ion-label style="margin: 0; display: block; text-align: center; line-height: 1.2">{{ data.point }}</ion-label>
         <ion-label style="margin: 0; display: block; text-align: center; line-height: 1.2">
-          <ion-chip *ngIf="data.point === 0" color="danger">Kém</ion-chip>
-          <ion-chip *ngIf="data.point >= 70" color="primary">Tốt</ion-chip>
-          <ion-chip *ngIf="data.point === 100" color="success">Xuất sắc</ion-chip>
+          <ion-chip *ngIf="data.point >= 95" color="success">Tốt</ion-chip>
+          <ion-chip *ngIf="data.point >= 90 && data.point < 95" color="primary">Khá</ion-chip>
+          <ion-chip *ngIf="data.point >= 80 && data.point < 90" color="warning">Trung Bình</ion-chip>
+          <ion-chip *ngIf="data.point < 80" color="tertiary">Kém</ion-chip>
         </ion-label>
       </ion-item>
     </ion-list>

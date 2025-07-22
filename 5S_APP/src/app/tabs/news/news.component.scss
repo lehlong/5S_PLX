@@ -76,7 +76,7 @@ ion-button.custom {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%; 
+  max-width: 100%;
   padding: 0px;
   font-size: 10px;
   --background: #f3f3f3;
@@ -139,7 +139,7 @@ ion-col[size="5"] {
 }
 
 .card-job-item {
-  display: flex; 
+  display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
@@ -148,7 +148,8 @@ ion-col[size="5"] {
   // border: 1px solid #ccc;
   h5{
     font-size: 18px;
-    margin: 0px
+    margin: 0px;
+    padding-top: 7px
   }
   p {
     font-size: 14px;

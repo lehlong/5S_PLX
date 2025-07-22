@@ -14,11 +14,14 @@ namespace PLX5S.BUSINESS.Dtos.BU
         public decimal? Point { get; set; }
         public string? AccountUserName { get; set; }
         public decimal? Order { get; set; }
-        public string? StoreId { get; set; }
+        public string? DoiTuongId { get; set; }
+        public string? DeviceId { get; set; }
         public string? KiKhaoSatId { get; set; }
+        public string? ChucVuId { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
         public string CreateBy { set; get; }
+        public bool? IsActive { get; set; }
 
         public void Mapping(Profile profile)
         {

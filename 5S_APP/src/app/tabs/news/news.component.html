@@ -9,7 +9,7 @@
           padding-left: 4px;
           margin: 5px 0;
         ">
-        Khảo sát
+        Chấm điểm
       </h4>
     </div>
     <!-- <div style="padding: 20px 10px;">
@@ -27,7 +27,7 @@
             </ion-col>
             <ion-col size="8">
               <h5 style="margin: 0px" class="user-name">{{ userInfo.fullName }}</h5>
-              <p class="user-position" style="margin: 0px">
+              <p class="user-position" style="margin: 0px; opacity: 0.8;">
                 {{ getChucVuName(userInfo.chucVuId) }}
               </p>
             </ion-col>
@@ -37,7 +37,7 @@
           </ion-row>
           <ion-row class="calendar-row ion-justify-content-start" style="
               width: 100%;
-              color: #f4f4f5;
+              color: #f4f4f5d9;
               padding: 8px;
               border-radius: 8px;
               background-color: #183188;
@@ -74,47 +74,51 @@
     <div class="horizontal-scroll-buttons d-flex" style="padding: 0 10px; width: 100%; gap: 5px">
       <ion-button *ngFor="let item of buttons" [class.active]="selected === item.value" class="custom"
         (click)="select(item.value)">{{ item.label }}
-        {{ item.value == 'store' ? storeLength : item.value == 'warehouse' ? wareHouseLength : item.value == 'chuaCham' ? chuaChamLength : '' }}
+        {{ item.value == 'store' ? storeLength : item.value == 'warehouse' ? wareHouseLength : item.value == 'chuaCham'
+        ? chuaChamLength : '' }}
       </ion-button>
     </div>
     <!-- all -->
-      <ng-container >
-        <ion-item-group >
-          <ion-grid>
-            <ion-list style="display: flex; gap: 5px; flex-direction: column; background: none; ">
-              <ion-item [button]="true" *ngFor="let data of dataHome" (click)="navigateItem(data)" style=" --background: none; margin:  5px; width: auto;"
-                [ngClass]="{ 'highlight-score': data.isScore === false }">
-                <div class="" style="width: 100%;  margin: 10px 5px">
-                  <div class="d-flex d-block" style="
+    <ng-container>
+      <ion-item-group>
+        <ion-grid>
+          <ion-list style="display: flex; gap: 5px; flex-direction: column; background: none; ">
+            <ion-item [button]="true" *ngFor="let data of dataHome" (click)="navigateItem(data)"
+              style=" --background: none; margin:  5px; width: auto;"
+              [ngClass]="{ 'highlight-score': data.isScore === false }">
+              <div class="" style="width: 100%;  margin: 10px 5px">
+                <div class="d-flex d-block" style="
                       width: 100%;
                       padding: 4px 0;
                       justify-content: space-between;
                     ">
-                    <h5 class="mg-0" style="margin: 9px 0; font-size: 12px;">
-                      {{ data.name }}
-                    </h5>
-                    <p class="mg-0">
-                      <ion-chip color="primary" class="mg-0">
-                        {{ data.point }}
-                      </ion-chip>
-                    </p>
-                  </div>
-                  <div style="
+                  <h5 class="mg-0" style="margin: 9px 0; font-size: 13px;">
+                    {{ data.name }}
+                  </h5>
+                  <p class="mg-0">
+
+                    <ion-chip *ngIf="data.point >= 95" color="success">{{ data.point }}</ion-chip>
+                    <ion-chip *ngIf="data.point >= 90 && data.point < 95" color="primary">{{ data.point }}</ion-chip>
+                    <ion-chip *ngIf="data.point >= 80 && data.point < 90" color="warning">{{ data.point }}</ion-chip>
+                    <ion-chip *ngIf="data.point < 80" color="tertiary">{{ data.point }}</ion-chip>
+                  </p>
+                </div>
+                <div style="
                       padding-bottom: 6px;
                       margin: 0;
                       justify-content: space-between;
                     " class="d-flex">
-                    <span class="text-italic" style="font-size: 12px"><ion-icon name="calendar-outline"></ion-icon>
-                      {{ formatToMonthYear(data.fDate) }}</span>
-                    <span class="text-italic" style="font-size: 12px; padding-left: 15px">{{
-                      getChamDiemStatus(data.fDate) }}</span>
-                  </div>
+                  <span class="text-italic" style="font-size: 12px"><ion-icon name="calendar-outline"></ion-icon>
+                    {{ formatToMonthYear(data.fDate) }}</span>
+                  <span class="text-italic" style="font-size: 12px; padding-left: 15px">{{
+                    getChamDiemStatus(data.fDate) }}</span>
                 </div>
-              </ion-item>
-            </ion-list>
-          </ion-grid>
-        </ion-item-group>
-      </ng-container>
+              </div>
+            </ion-item>
+          </ion-list>
+        </ion-grid>
+      </ion-item-group>
+    </ng-container>
     <!-- store -->
     <ion-segment-view style="padding: 0 15px">
       <ion-segment-content id="second" style="
