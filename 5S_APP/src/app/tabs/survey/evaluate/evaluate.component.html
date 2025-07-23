@@ -3,15 +3,15 @@
     <ion-back-button slot="start"></ion-back-button>
 
     <ion-title class="t-center">Chi tiết chấm điểm </ion-title>
-    <ion-button (click)="openSearchInput()" slot="end" fill="clear" color="dark" style="
+    <ion-buttons slot="end">
+      <ion-button (click)="openSearchInput()" fill="clear" color="light" class="custom-color" style="
         --padding: 0;
         --padding-end: 0;
         --padding-top: 0;
         --padding-bottom: 0;
       ">
-      <ion-icon name="search-outline" style="font-size: 25px"></ion-icon>
-    </ion-button>
-    <ion-buttons slot="end">
+        <ion-icon name="search-outline" style="font-size: 25px"></ion-icon>
+      </ion-button>
       <ion-menu-button (click)="openMenu()">
         <ion-icon name="list-outline" style="font-size: 25px"></ion-icon></ion-menu-button>
     </ion-buttons>

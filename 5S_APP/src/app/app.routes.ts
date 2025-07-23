@@ -1,16 +1,8 @@
 import { Routes } from '@angular/router';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
-import { HomeComponent } from './tabs/home/home.component';
-import { ReportComponent } from './tabs/report/report.component';
 import { NewsComponent } from './tabs/news/news.component';
-import { NotificationsComponent } from './tabs/notifications/notifications.component';
-import { AccountComponent } from './tabs/account/account.component';
-import { homeRouter } from './tabs/home/home.routes';
-import { surveyRoutes } from './tabs/survey/survey.routes';
-import { accountRoutes } from './tabs/account/account.routes';
 import { LoginComponent } from './auth/login/login.component';
 import AuthGuard from './auth/guards/auth.guard';
-import { reportRoutes } from './tabs/report/report.routes';
 
 export const routes: Routes = [
   {
@@ -23,19 +15,12 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./tabs/account/account.routes').then((m) => m.accountRoutes),
       },
-      // {
-      //   path: 'home',
-      //   loadChildren: () =>
-      //     import('./tabs/home/home.routes').then((m) => m.homeRouter),
-      //   canActivate: [AuthGuard],
-      // },
       {
         path: 'report',
         loadChildren: () =>
           import('./tabs/report/report.routes').then((m) => m.reportRoutes),
         canActivate: [AuthGuard],
       },
-      // { path: 'report', component: ReportComponent, canActivate: [AuthGuard] },
       { path: 'home', component: NewsComponent, canActivate: [AuthGuard] },
       {
         path: 'notifications',
@@ -45,11 +30,6 @@ export const routes: Routes = [
           ),
         canActivate: [AuthGuard],
       },
-      // {
-      //   path: 'account',
-      //   loadComponent: ()=>import('./tabs/account/account.component').then((m)=>m.AccountComponent),
-      //   canActivate: [AuthGuard],
-      // },
     ],
   },
   {

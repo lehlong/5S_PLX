@@ -26,10 +26,12 @@ namespace PLX5S.BUSINESS.Models
     public class DoiTuong
     {
         public string? Id { set; get; }
+        public string? KiKhaoSatCode { set; get; }
         public string? Name { set; get; }
         public string? Type { set; get; }
         public bool? IsScore { set; get; } = false;
         public string? KiKhaoSatName { set; get; }
+        public string? SurveyId { set; get; }
         public string? KiKhaoSatId { set; get; }
         public decimal? Point { set; get; }
         public DateTime? FDate { set; get; }

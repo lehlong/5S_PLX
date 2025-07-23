@@ -43,6 +43,17 @@ export class NewsComponent implements OnInit {
     chucVuName: '',
     userName: '',
   };
+
+  filter: any = {
+    doiTuong: null,
+    kiKhaoSat: {
+      id: null,
+      code: null,
+      name: null,
+      doiTuong: null,
+      surveyMgmtId: null,
+    },
+  }
   buttons = [
     { label: 'Tất cả', value: 'all'},
     { label: 'Cửa hàng', value: 'store' },
@@ -66,6 +77,7 @@ export class NewsComponent implements OnInit {
       delay: 3000,
     },
   };
+
   loadUserInfo() {
     const userInfoString = localStorage.getItem('UserInfo');
     if (userInfoString) {
@@ -185,28 +197,26 @@ export class NewsComponent implements OnInit {
     return 'Ngoài thời gian chấm';
   }
 
+
+
   navigateItem(item: any) {
-    const filterStr = localStorage.getItem('filterCS');
-    if (!filterStr) return;
+    this.filter.doiTuong = item;
 
-    const filter = JSON.parse(filterStr);
-
-    filter.doiTuong = item;
-
-    const kiKhaoSatId = item.kiKhaoSatId;
-    const kiKhaoSatName = item.kiKhaoSatName;
     const doiTuongText =
-      item.type === 'DT1'
-        ? 'Cửa hàng'
-        : item.type === 'DT2'
-        ? 'Kho'
-        : 'Không xác định';
-    filter.kiKhaoSat.doiTuong = doiTuongText;
-    filter.kiKhaoSat.id = kiKhaoSatId;
-    filter.kiKhaoSat.code = kiKhaoSatName;
-    filter.kiKhaoSat.name = kiKhaoSatName;
+    item.type === 'DT1'
+    ? 'Cửa hàng'
+    : item.type === 'DT2'
+    ? 'Kho'
+    : 'Không xác định';
 
-    localStorage.setItem('filterCS', JSON.stringify(filter));
+    this.filter.kiKhaoSat.doiTuong = doiTuongText;
+    this.filter.kiKhaoSat.id = item.kiKhaoSatId;
+    this.filter.kiKhaoSat.trangThaiKi = '2';
+    this.filter.kiKhaoSat.code = item.kiKhaoSatCode;
+    this.filter.kiKhaoSat.name = item.kiKhaoSatName;
+    this.filter.kiKhaoSat.surveyMgmtId = item.surveyId ;
+
+    localStorage.setItem('filterCS', JSON.stringify(this.filter));
 
     this.router.navigate([`survey/check-list/${item.id}`]);
   }

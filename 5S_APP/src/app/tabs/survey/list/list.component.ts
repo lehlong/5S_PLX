@@ -81,8 +81,6 @@ export class ListComponent implements OnInit {
       .subscribe({
         next: (data) => {
           this.lstKiKhaoSat = data.data;
-          console.log("lstKiKhaoSat", this.lstKiKhaoSat);
-
           const filter = localStorage.getItem('filterLS') ?? ""
           const filter2 = data.data.reduce((a: any, b: any) =>
             new Date(a.endDate) > new Date(b.endDate) ? a : b

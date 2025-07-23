@@ -677,7 +677,7 @@ export class EvaluateComponent implements OnInit {
 
     this.evaluate.header.point =
       ((this.evaluate.lstEvaluate.reduce((sum: any, item: any) => sum + (item.point || 0), 0) / tongDiem) * 100)
-      .toFixed(2);
+        .toFixed(2);
 
     this._storageService.set(
       this.doiTuong.id + '_' + this.kiKhaoSat.code,
@@ -751,35 +751,33 @@ export class EvaluateComponent implements OnInit {
     // Trường hợp đủ
     this.evaluate.header.accountUserName = this.account.userName;
     this.evaluate.header.chucVuId = this.account.chucVuId;
-    this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
-    console.log(this.doiTuong);
+    // this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
+    console.log(this.kiKhaoSat);
 
     this._service.insertEvaluate(this.evaluate).subscribe({
-      next: () => {
+      next: (data) => {
         console.log('Chấm điểm thành công');
-        this._service.HandlePointStore(
-          {
-            kiKhaoSatId: this.kiKhaoSat.id,
-            doiTuongId: this.doiTuong.id,
-            surveyId: localStorage.getItem('surveyId'),
-            lstData: this.doiTuong.lstChamDiem,
-          },
-        ).subscribe({
-          next: (data) => {
-            this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
-            this._storageService.remove(
-              this.doiTuong.id + '_' + this.kiKhaoSat.code
-            );
-            localStorage.removeItem(this.doiTuong.id + '_' + this.kiKhaoSat.code);
 
-          }
-        })
-      },
 
-      error: (ex) => {
-        console.log(ex);
       },
     });
+    this._service.HandlePointStore(
+      {
+        kiKhaoSatId: this.kiKhaoSat.id,
+        doiTuongId: this.doiTuong.id,
+        surveyId: this.kiKhaoSat.surveyMgmtId,
+        lstData: this.doiTuong.lstChamDiem,
+      },
+    ).subscribe({
+      next: (data) => {
+        console.log('tính tổng điểm thành công');
+        this._storageService.remove(
+          this.doiTuong.id + '_' + this.kiKhaoSat.code
+        );
+        localStorage.removeItem(this.doiTuong.id + '_' + this.kiKhaoSat.code);
+        this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
+      }
+    })
   }
 
   navigateTo(itemId: string) {

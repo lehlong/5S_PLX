@@ -30,6 +30,6 @@ namespace PLX5S.CORE.Entities.BU
         public decimal? Point { get; set; }
 
         [Column("LENGTH", TypeName = "DECIMAIL(18.0)")]
-        public decimal? Length { get; set; }
+        public decimal? Length { get; set; } //đếm số lần chấm điểm
     }
 }

@@ -1,6 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-      <ion-back-button  slot="start"></ion-back-button>
+    <ion-back-button slot="start"></ion-back-button>
     <h5 class="t-center"> Chấm điểm 5S {{ kiKhaoSat.doiTuong }} </h5>
     <ion-button slot="end" fill="clear">
     </ion-button>
@@ -9,11 +9,11 @@
 <ion-content color="light">
   <ion-item-group class="custom-icon">
     <ion-item>
-      <ion-icon style="color: #ffc409;"  slot="start" name="calendar-outline"></ion-icon>
+      <ion-icon style="color: #ffc409;" slot="start" name="calendar-outline"></ion-icon>
       <p>{{ kiKhaoSat?.name }}</p>
     </ion-item>
     <ion-item>
-      <ion-icon slot="start"  class="c-purple" name="warning-outline"></ion-icon>
+      <ion-icon slot="start" class="c-purple" name="warning-outline"></ion-icon>
       <p>Trạng thái</p>
       <ion-chip *ngIf="kiKhaoSat?.trangThaiKi === '0'" slot="end" color="danger">Đã đóng</ion-chip>
       <ion-chip *ngIf="kiKhaoSat?.trangThaiKi === '1'" slot="end" color="primary">Khởi tạo</ion-chip>
@@ -35,13 +35,15 @@
               <h5 class="mg-0" style="margin: 9px 0;">{{ item?.name }}</h5>
               <span class="text-italic" style="font-size: 12px;">{{ getFullName(item.accountUserName) }}</span>
             </div>
-            <div slot="end">
+            <div slot="end" style="text-align: right;">
               <p class="mg-0" style="padding-left: 70px;">
-                <ion-chip slot="end" color="primary">
-                  {{ item.point ?? '0' }}
-                </ion-chip>
+                    <ion-chip *ngIf="item.point >= 95" color="success">{{ item.point }}</ion-chip>
+                    <ion-chip *ngIf="item.point >= 90 && item.point < 95" color="primary">{{ item.point }}</ion-chip>
+                    <ion-chip *ngIf="item.point >= 80 && item.point < 90" color="warning">{{ item.point }}</ion-chip>
+                    <ion-chip *ngIf="item.point < 80" color="tertiary">{{ item.point }}</ion-chip>
               </p>
-              <span class="text-italic" style="font-size: 12px; padding-left: 15px;">{{ item.updateDate | date: 'HH:mm dd/MM/yyyy' }}</span>
+              <span class="text-italic" style="font-size: 12px; padding-right: 7px;">{{ item.updateDate
+              | date: 'HH:mm dd/MM/yyyy' }}</span>
             </div>
           </ion-item>
           <ion-item-options *ngIf="item.name == 'Bản nháp'" slot="end">

@@ -17,6 +17,7 @@ using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
+using static Google.Cloud.Firestore.V1.StructuredAggregationQuery.Types.Aggregation.Types;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PLX5S.BUSINESS.Services.BU
@@ -398,16 +399,14 @@ namespace PLX5S.BUSINESS.Services.BU
                 if(diem == null)
                 {
                     point.Code = Guid.NewGuid().ToString();
-                    _dbContext.TblBuPoint.Add(point);
+                    await _dbContext.TblBuPoint.AddAsync(point);
                 }
                 else
                 {
                     diem.Point = point.Point;
                     diem.Length = point.Length;
-                    _dbContext.Update(diem);
                 }
                 await _dbContext.SaveChangesAsync();
-                this.Status = true;
             }
             catch(Exception ex)
             {
@@ -502,6 +501,9 @@ namespace PLX5S.BUSINESS.Services.BU
                 var dateNow = DateTime.Now;
                 decimal tongChuyenVien = 0;
                 decimal tong = 1;
+                decimal tongPointUser = 0;
+                decimal count = 0;
+                decimal countChuyenVien = 0;
 
                 if (checkViPham) 
                 {
@@ -509,9 +511,6 @@ namespace PLX5S.BUSINESS.Services.BU
                 }
                 else
                 {
-                    decimal tongPointUser = 0;
-                    decimal count = 0;
-                    decimal countChuyenVien = 0;
                     foreach (var item in lstUser)
                     {
 
@@ -549,7 +548,7 @@ namespace PLX5S.BUSINESS.Services.BU
                             bool dot4 = lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList().Any(x =>
                                 x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 24));
 
-                            if (dateNow.Day <= 7 || (dateNow.Day >= 8 && dateNow.Day < 23 && dot2) || (dateNow.Day >= 24 && dot4 && dot2))
+                            if (dateNow.Day <= 7 || (dateNow.Day >= 8 && dateNow.Day <= 23 && dot2) || (dateNow.Day >= 24 && dot4 && dot2))
                             {
                                 foreach (var i in lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList())
                                 {
@@ -573,10 +572,18 @@ namespace PLX5S.BUSINESS.Services.BU
                         }
 
                     }
-                    tongChuyenVien = tongChuyenVien / countChuyenVien;
-                    tongPointUser = tongPointUser / count;
+                    if(count == 0 || countChuyenVien == 0)
+                    {
+                        tong = 0;
+                    }
+                    else
+                    {
+                        tongChuyenVien = tongChuyenVien / (countChuyenVien);
+                        tongPointUser = tongPointUser / count;
 
-                    tong = (tong * (tongPointUser + tongChuyenVien)) / 2;
+                        tong = (tong * (tongPointUser + tongChuyenVien)) / 2;
+
+                    }
 
                 }
 
@@ -586,6 +593,7 @@ namespace PLX5S.BUSINESS.Services.BU
                     Code = "",
                     DoiTuongId = param.DoiTuongId,
                     KiKhaoSatId = param.KiKhaoSatId,
+                    Length = countChuyenVien + count,
                     SurveyId = param.SurveyId,
                     Point = tong,
                 });
@@ -649,7 +657,9 @@ namespace PLX5S.BUSINESS.Services.BU
                             Name = lstStore.FirstOrDefault(_x => _x.Id == e.DoiTuongId).Name,
                             FDate = i.StartDate,
                             Type = "DT1",
+                            SurveyId = "03805572-e6b7-4455-90fe-9b6584eef46f",
                             Point = lstPoint.FirstOrDefault(y => y.DoiTuongId == e.Id && y.KiKhaoSatId == i.Id)?.Point ?? 0,
+                            KiKhaoSatCode = i.Code,
                             KiKhaoSatName = i.Name,
                             LstChamDiem = lstAllNguoiCham.Where(_x => _x.InStoreId == e.Id).Select(_x => _x.UserName).ToList(),
                             KiKhaoSatId = i.Id,
@@ -672,7 +682,9 @@ namespace PLX5S.BUSINESS.Services.BU
                             Name = lstWareHouse.FirstOrDefault(_x => _x.Id == e.DoiTuongId).Name,
                             FDate = i.StartDate,
                             Type = "DT2",
+                            SurveyId = "16d30d78-0b80-4323-bd86-2498aae676a1",
                             Point = lstPoint.FirstOrDefault(y => y.DoiTuongId == e.Id && y.KiKhaoSatId == i.Id)?.Point ?? 0,
+                            KiKhaoSatCode = i.Code,
                             KiKhaoSatName = i.Name,
                             LstChamDiem = lstAllNguoiCham.Where(_x => _x.InStoreId == e.Id).Select(_x => _x.UserName).ToList(),
                             KiKhaoSatId = i.Id,

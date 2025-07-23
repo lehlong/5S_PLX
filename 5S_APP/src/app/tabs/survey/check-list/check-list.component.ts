@@ -46,9 +46,9 @@ export class CheckListComponent implements OnInit {
 
         const filter = JSON.parse(localStorage.getItem('filterCS') ?? "")
         this.kiKhaoSat = filter.kiKhaoSat
-        console.log('kiKhaoSat', this.kiKhaoSat);
-
         this.doiTuong = filter.doiTuong
+
+        console.log(filter);
 
         // await this._storageService.clear()
         let eva = await this._storageService.get(this.doiTuong.id + "_" + this.kiKhaoSat.code)
@@ -86,7 +86,9 @@ export class CheckListComponent implements OnInit {
       },
     });
   }
+
   checkRightEvaluate() {
+
     if (this.kiKhaoSat?.trangThaiKi !== '2') return false;
     if(this.account.allowScoring) return true;
     return this.doiTuong.lstChamDiem?.some(
