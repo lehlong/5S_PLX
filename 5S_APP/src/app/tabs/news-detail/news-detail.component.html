@@ -1,0 +1,35 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-button fill="" slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-button>
+    <ion-title>
+      <div style="display: flex; justify-content: center; align-items: center">
+        <img
+          class="logo"
+          src="../../../assets/img/logo-petrolimex.png"
+          alt="Logo"
+        />
+        <div class="text-title">tin tức</div>
+      </div>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ng-container *ngIf="newsDetail">
+    <h3 class="title-content">{{ newsDetail.title }}</h3>
+    <h5 class="date">{{ newsDetail.date }}</h5>
+    <img class="img-content" [src]="newsDetail.image" alt="news image" />
+    <p
+      clas="text-content"
+      style="
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #333;
+        text-align: justify;
+      "
+    >
+      {{ newsDetail.content }}
+    </p>
+  </ng-container>
+</ion-content>

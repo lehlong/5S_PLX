@@ -1,0 +1,58 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .trademark {
+    display: flex;
+    align-items: center;
+    .logo {
+    }
+    .petrolimex-text {
+      font-family: "Roboto", sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, #003da5, #f37021);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+}
+.btn-login {
+  background-color: #003da5;
+}
+.fuel-price__header {
+  color: #003da5;
+}
+.fuel-price__list ion-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.fuel-price__list ion-label h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #003da5;
+  margin: 0;
+}
+
+.fuel-price__list ion-label p {
+  font-size: 14px;
+  color: #333;
+  margin: 2px 0 0 0;
+}
+
+.news__header {
+  color: #003da5;
+}
+ion-card{
+  margin-bottom: 15px;
+}
+.btn-card {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  ion-button {
+    color: #003da5;
+  }
+}
