@@ -24,16 +24,19 @@ namespace PLX5S.CORE.Entities.BU
         [Column("TRANG_THAI_KI", TypeName = "NVARCHAR(1)")]
         public string? TrangThaiKi { get; set; }
 
-        [Column("START_DATE")]
-        public DateTime? StartDate { get; set; }
-
         [Column("SURVEY_MGMT_ID")]
         public string? SurveyMgmtId { get; set; }
+
+        [Column("DOI_TUONG_ID")]
+        public string? DoiTuongId { get; set; }
+
+        [Column("START_DATE")]
+        public DateTime? StartDate { get; set; }
 
         [Column("END_DATE")]
         public DateTime? EndDate { get; set; }
 
-      
+        
 
     }
 }

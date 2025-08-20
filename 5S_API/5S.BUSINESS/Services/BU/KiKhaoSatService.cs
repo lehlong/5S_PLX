@@ -56,7 +56,6 @@ namespace PLX5S.BUSINESS.Services.BU
                 if (!string.IsNullOrWhiteSpace(filter.KeyWord))
                 {
                     query = query.Where(x => (x.SurveyMgmtId.ToString().Contains(filter.headerId) || x.Name.Contains(filter.KeyWord)) && x.IsDeleted == false);
-
                 }
                 else
                 {
@@ -190,13 +189,13 @@ namespace PLX5S.BUSINESS.Services.BU
                 }
                 data.KiKhaoSat.TrangThaiKi = "1";
                 _dbContext.TblBuKiKhaoSat.Add(data.KiKhaoSat);
-
+                var lstInChamDiem = new List<TblBuInputChamDiem>();
 
                 foreach (var item in data.lstInputStore)
                 {
                     foreach (var d in item.LstChamDiem)
                     {
-                        _dbContext.TblBuInputChamDiem.Add(new TblBuInputChamDiem
+                        lstInChamDiem.Add(new TblBuInputChamDiem
                         {
                             Id = Guid.NewGuid().ToString(),
                             InStoreId = item.Id,
@@ -211,7 +210,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 {
                     foreach (var d in item.LstChamDiem)
                     {
-                        _dbContext.TblBuInputChamDiem.Add(new TblBuInputChamDiem
+                        lstInChamDiem.Add(new TblBuInputChamDiem
                         {
                             Id = Guid.NewGuid().ToString(),
                             InStoreId = item.Id,
@@ -222,6 +221,8 @@ namespace PLX5S.BUSINESS.Services.BU
                         });
                     }
                 }
+                _dbContext.AddRange(lstInChamDiem);
+
                 await _dbContext.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -421,30 +422,19 @@ namespace PLX5S.BUSINESS.Services.BU
 
                 foreach (var item in data.lstInputStore)
                 {
-                    foreach (var old in item.LstInChamDiem)
-                    {
-                        old.IsDeleted = true;
-                    }
+                    _dbContext.RemoveRange(item.LstInChamDiem);
 
                     foreach (var d in item.LstChamDiem)
                     {
-                        var check = item.LstInChamDiem.FirstOrDefault(x => x.UserName == d);
-                        if (check != null)
+                        _dbContext.TblBuInputChamDiem.Add(new TblBuInputChamDiem
                         {
-                            check.IsDeleted = false;
-                        }
-                        else
-                        {
-                            _dbContext.TblBuInputChamDiem.Add(new TblBuInputChamDiem
-                            {
-                                Id = Guid.NewGuid().ToString(),
-                                InStoreId = item.Id,
-                                IsDeleted = false,
-                                IsActive = true,
-                                KiKhaoSatId = data.KiKhaoSat.Id,
-                                UserName = d
-                            });
-                        }
+                            Id = Guid.NewGuid().ToString(),
+                            InStoreId = item.Id,
+                            IsDeleted = false,
+                            IsActive = true,
+                            KiKhaoSatId = data.KiKhaoSat.Id,
+                            UserName = d
+                        });
                     }
 
                     _dbContext.TblBuInputChamDiem.UpdateRange(item.LstInChamDiem);
@@ -452,30 +442,19 @@ namespace PLX5S.BUSINESS.Services.BU
 
                 foreach (var item in data.lstInputWareHouse)
                 {
-                    foreach (var old in item.LstInChamDiem)
-                    {
-                        old.IsDeleted = true;
-                    }
+                    _dbContext.RemoveRange(item.LstInChamDiem);
 
                     foreach (var d in item.LstChamDiem)
                     {
-                        var check = item.LstInChamDiem.FirstOrDefault(x => x.UserName == d);
-                        if (check != null)
+                        _dbContext.TblBuInputChamDiem.Add(new TblBuInputChamDiem
                         {
-                            check.IsDeleted = false;
-                        }
-                        else
-                        {
-                            _dbContext.TblBuInputChamDiem.Add(new TblBuInputChamDiem
-                            {
-                                Id = Guid.NewGuid().ToString(),
-                                InStoreId = item.Id,
-                                IsDeleted = false,
-                                IsActive = true,
-                                KiKhaoSatId = data.KiKhaoSat.Id,
-                                UserName = d
-                            });
-                        }
+                            Id = Guid.NewGuid().ToString(),
+                            InStoreId = item.Id,
+                            IsDeleted = false,
+                            IsActive = true,
+                            KiKhaoSatId = data.KiKhaoSat.Id,
+                            UserName = d
+                        });
                     }
 
                     _dbContext.TblBuInputChamDiem.UpdateRange(item.LstInChamDiem);

@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PLX5S.BUSINESS.Models;
+using DocumentFormat.OpenXml.Bibliography;
 
 namespace PLX5S.BUSINESS.Services.BU
 {
@@ -168,21 +169,77 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
+                var survey = await _dbContext.TblBuSurveyMgmt.Where(x => x.Id == id).FirstOrDefaultAsync();
                 var lstInDoiTuong = _dbContext.TblBuInputDoiTuong.Where(x => x.SurveyMgmtId == id).ToList() ?? [];
                 var lstInAtvsv = _dbContext.TblBuInputAtvsv.Where(x => x.IsDeleted != true).ToList();
+                var atvst = await _dbContext.tblMdAtvsv.Where(x => x.IsActive == true).ToListAsync();
+
                 var InputDoiTuong = new List<InputDoiTuong>();
 
-                foreach (var item in lstInDoiTuong)
+                if (survey.DoiTuongId == "DT1")
                 {
-                    InputDoiTuong.Add(new InputDoiTuong
+                    var lstStore = _dbContext.tblMdStore.Where(x => x.IsActive == true).OrderBy(x => x.Id).ToList();
+
+                    foreach (var s in lstStore)
                     {
-                        DoiTuong = item,
-                        Atvsvs = lstInAtvsv.Where(x => x.InputDoiTuongId == item.Id).ToList()
-                    });
+                        var check = lstInDoiTuong.FirstOrDefault(x => x.DoiTuongId == s.Id);
+                        if (check != null)
+                        {
+                            InputDoiTuong.Add(new InputDoiTuong
+                            {
+                                DoiTuong = check,
+                                Atvsvs = lstInAtvsv.Where(x => x.InputDoiTuongId == check.Id).ToList()
+                            });
+                        }
+                        else
+                        {
+                            InputDoiTuong.Add(new InputDoiTuong
+                            {
+                                DoiTuong = new TblBuInputDoiTuong()
+                                {
+                                    Id = "-",
+                                    DoiTuongId = s.Id,
+                                    SurveyMgmtId = id,
+                                    IsActive = false
+                                },
+                            });
+                        }
+                    }
+                }
+                else if (survey.DoiTuongId == "DT2")
+                {
+                    var lstWareHouse = _dbContext.TblMdWareHouse.Where(x => x.IsActive == true).ToList();
+
+
+                    foreach (var s in lstWareHouse)
+                    {
+                        var check = lstInDoiTuong.FirstOrDefault(x => x.DoiTuongId == s.Id);
+                        if (check != null)
+                        {
+                            InputDoiTuong.Add(new InputDoiTuong
+                            {
+                                DoiTuong = check,
+                                Atvsvs = lstInAtvsv.Where(x => x.InputDoiTuongId == check.Id).ToList()
+                            });
+                        }
+                        else
+                        {
+                            InputDoiTuong.Add(new InputDoiTuong
+                            {
+                                DoiTuong = new TblBuInputDoiTuong()
+                                {
+                                    Id = "-",
+                                    DoiTuongId = s.Id,
+                                    SurveyMgmtId = id,
+                                    IsActive = false
+                                },
+                            });
+                        }
+                    }
                 }
                 return new SurveyMgmtModel
                 {
-                    SurveyMgmt = await _dbContext.TblBuSurveyMgmt.Where(x => x.Id == id).FirstOrDefaultAsync(),
+                    SurveyMgmt = survey,
                     InputDoiTuong = InputDoiTuong
                 };
             }
@@ -200,8 +257,16 @@ namespace PLX5S.BUSINESS.Services.BU
             {
                 foreach (var item in dataInput.InputDoiTuong)
                 {
-                    _dbContext.TblBuInputDoiTuong.Update(item.DoiTuong);
-                    _dbContext.TblBuInputAtvsv.UpdateRange(item.Atvsvs);
+                    if(item.DoiTuong.Id == "-")
+                    {
+                        item.DoiTuong.Id = Guid.NewGuid().ToString();
+                        _dbContext.TblBuInputDoiTuong.Add(item.DoiTuong);
+                    }
+                    else
+                    {
+                        _dbContext.TblBuInputDoiTuong.Update(item.DoiTuong);
+                        _dbContext.TblBuInputAtvsv.UpdateRange(item.Atvsvs);
+                    }
                 }
                 _dbContext.TblBuSurveyMgmt.Update(dataInput.SurveyMgmt);
 
