@@ -143,6 +143,23 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
+        [HttpPut("DeleteTreeGroup")]
+        public async Task<IActionResult> DeleteTreeGroup([FromBody] TieuChiDto data)
+        {
+            var transferObject = new TransferObject();
+            await _service.deleteTreeGroup(data);
+            if (_service.Status)
+            {
+                transferObject.Status = true;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
         [HttpPut("UpdateOrderTree")]
         public async Task<IActionResult> UpdateOrderTree([FromBody] TieuChiDto data)
         {

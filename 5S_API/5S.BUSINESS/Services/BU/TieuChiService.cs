@@ -23,6 +23,7 @@ namespace PLX5S.BUSINESS.Services.BU
         Task InsertTreeLeaves(TieuChiDto data);
         Task updateLeaves(TieuChiDto item);
         Task updateTreeGroup(TieuChiDto item);
+        Task deleteTreeGroup(TieuChiDto item);
         Task UpdateOrderTree(TieuChiDto moduleDto);
         Task UpdateOrderLeaves(List<TieuChiDto> lsrModule);
         Task<bool> CheckLeaves(string pId, string kiKhaoSatId);
@@ -273,6 +274,18 @@ namespace PLX5S.BUSINESS.Services.BU
                     IsDeleted = item.IsDeleted ?? false
                 });
 
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Status = false;
+            }
+        }
+        public async Task deleteTreeGroup(TieuChiDto item)
+        {
+            try
+            {
+                await this.DeleteTree(item.Id, item.KiKhaoSatId);
                 await _dbContext.SaveChangesAsync();
             }
             catch (Exception ex)

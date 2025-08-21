@@ -34,6 +34,10 @@ export class TreeTieuChiService {
   UpdateTreeGroup(data: any) {
     return this.commonService.put('TieuChi/UpdateTreeGroup', data);
   }
+    DeleteTreeGroup(data: any) {
+    return this.commonService.put('TieuChi/DeleteTreeGroup', data);
+  }
+
 
   UpdateOrderTree(data: any) {
     return this.commonService.put('TieuChi/UpdateOrderTree', data);

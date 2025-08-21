@@ -237,7 +237,7 @@ export class KiKhaoSatComponent {
   deleteTree(data: any): void {
     data.origin.isDeleted = true;
     console.log("object,", data.origin);
-    this._treeTieuChiService.UpdateTreeGroup(data.origin).subscribe({
+    this._treeTieuChiService.DeleteTreeGroup(data.origin).subscribe({
       next: (res) => {
         this.treeEditVisible = false;
         this.loading = false;
