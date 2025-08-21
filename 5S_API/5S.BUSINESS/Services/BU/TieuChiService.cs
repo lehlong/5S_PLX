@@ -258,8 +258,21 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
-               
-                await this.DeleteTree(item.Id, item.KiKhaoSatId);
+                _dbContext.TblBuTieuChi.Update(new TblBuTieuChi()
+                {
+                    Code = item.Code,
+                    Id = item.Id,
+                    PId = item.PId,
+                    Name = item.Name,
+                    IsImg = item.IsImg,
+                    Report = item.Report,
+                    IsGroup = item.IsGroup,
+                    NumberImg = item.NumberImg,
+                    KiKhaoSatId = item.KiKhaoSatId,
+                    OrderNumber = item.OrderNumber,
+                    IsDeleted = item.IsDeleted ?? false
+                });
+
                 await _dbContext.SaveChangesAsync();
             }
             catch (Exception ex)
