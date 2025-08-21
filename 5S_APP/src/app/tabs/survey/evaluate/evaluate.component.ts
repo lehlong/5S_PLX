@@ -754,30 +754,29 @@ export class EvaluateComponent implements OnInit {
     // this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
     console.log(this.kiKhaoSat);
 
-    this._service.insertEvaluate(this.evaluate).subscribe({
-      next: (data) => {
+    await this._service.insertEvaluate(this.evaluate).subscribe({
+      next: async (data) => {
         console.log('Chấm điểm thành công');
-
-
+        await this._service.HandlePointStore(
+          {
+            kiKhaoSatId: this.kiKhaoSat.id,
+            doiTuongId: this.doiTuong.id,
+            surveyId: this.kiKhaoSat.surveyMgmtId,
+            lstData: this.doiTuong.lstChamDiem,
+          },
+        ).subscribe({
+          next: (data) => {
+            console.log('tính tổng điểm thành công');
+            this._storageService.remove(
+              this.doiTuong.id + '_' + this.kiKhaoSat.code
+            );
+            localStorage.removeItem(this.doiTuong.id + '_' + this.kiKhaoSat.code);
+            this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
+          }
+        })
       },
     });
-    this._service.HandlePointStore(
-      {
-        kiKhaoSatId: this.kiKhaoSat.id,
-        doiTuongId: this.doiTuong.id,
-        surveyId: this.kiKhaoSat.surveyMgmtId,
-        lstData: this.doiTuong.lstChamDiem,
-      },
-    ).subscribe({
-      next: (data) => {
-        console.log('tính tổng điểm thành công');
-        this._storageService.remove(
-          this.doiTuong.id + '_' + this.kiKhaoSat.code
-        );
-        localStorage.removeItem(this.doiTuong.id + '_' + this.kiKhaoSat.code);
-        this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
-      }
-    })
+
   }
 
   navigateTo(itemId: string) {
