@@ -651,7 +651,7 @@ namespace PLX5S.BUSINESS.Services.BU
                     {
                         result.LanCham = result.LanCham + lstEvaHeader.Count(x => x.KiKhaoSatId == i.Id && x.DoiTuongId == e.Id && x.IsActive == true);
                         result.ViPham = result.ViPham + lstEvaHeader.Count(x => x.KiKhaoSatId == i.Id && x.DoiTuongId == e.Id && x.IsActive == false);
-                        lstDoiTuong.AddRange(lstInChamDiem.Where(x => x.KiKhaoSatId == i.Id && x.InStoreId == e.Id).Select(x => new DoiTuong
+                        lstDoiTuong.AddRange(lstInChamDiem.Where(x => x.KiKhaoSatId == i.Id && x.DoiTuongId == e.DoiTuongId).Select(x => new DoiTuong
                         {
                             Id = e.Id,
                             Name = lstStore.FirstOrDefault(_x => _x.Id == e.DoiTuongId).Name,
@@ -661,7 +661,7 @@ namespace PLX5S.BUSINESS.Services.BU
                             Point = lstPoint.FirstOrDefault(y => y.DoiTuongId == e.Id && y.KiKhaoSatId == i.Id)?.Point ?? 0,
                             KiKhaoSatCode = i.Code,
                             KiKhaoSatName = i.Name,
-                            LstChamDiem = lstAllNguoiCham.Where(_x => _x.InStoreId == e.Id).Select(_x => _x.UserName).ToList(),
+                            LstChamDiem = lstAllNguoiCham.Where(_x => _x.DoiTuongId == e.DoiTuongId).Select(_x => _x.UserName).ToList(),
                             KiKhaoSatId = i.Id,
 
                         }).ToList());
@@ -676,7 +676,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         result.LanCham = result.LanCham + lstEvaHeader.Count(x => x.KiKhaoSatId == i.Id && x.DoiTuongId == e.Id && x.IsActive == true);
                         result.ViPham = result.ViPham + lstEvaHeader.Count(x => x.KiKhaoSatId == i.Id && x.DoiTuongId == e.Id && x.IsActive == false);
 
-                        lstDoiTuong.AddRange(lstInChamDiem.Where(x => x.KiKhaoSatId == i.Id && x.InStoreId == e.Id).Select(x => new DoiTuong
+                        lstDoiTuong.AddRange(lstInChamDiem.Where(x => x.KiKhaoSatId == i.Id && x.DoiTuongId == e.DoiTuongId).Select(x => new DoiTuong
                         {
                             Id = e.Id,
                             Name = lstWareHouse.FirstOrDefault(_x => _x.Id == e.DoiTuongId).Name,
@@ -686,7 +686,7 @@ namespace PLX5S.BUSINESS.Services.BU
                             Point = lstPoint.FirstOrDefault(y => y.DoiTuongId == e.Id && y.KiKhaoSatId == i.Id)?.Point ?? 0,
                             KiKhaoSatCode = i.Code,
                             KiKhaoSatName = i.Name,
-                            LstChamDiem = lstAllNguoiCham.Where(_x => _x.InStoreId == e.Id).Select(_x => _x.UserName).ToList(),
+                            LstChamDiem = lstAllNguoiCham.Where(_x => _x.DoiTuongId == e.DoiTuongId).Select(_x => _x.UserName).ToList(),
                             KiKhaoSatId = i.Id,
                         }).ToList());
                     }

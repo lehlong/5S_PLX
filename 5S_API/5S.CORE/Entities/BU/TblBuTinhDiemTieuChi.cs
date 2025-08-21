@@ -24,5 +24,8 @@ namespace PLX5S.CORE.Entities.BU
 
         [Column("TIEU_CHI_CODE", TypeName = "NVARCHAR(50)")]
         public string? TieuChiCode { get; set; }
+
+        [Column("ORDER_NUMBER", TypeName = "DECIMAL(2)")]
+        public decimal? Order { get; set; }
     }
 }

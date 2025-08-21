@@ -173,6 +173,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 var lstInDoiTuong = _dbContext.TblBuInputDoiTuong.Where(x => x.SurveyMgmtId == id).ToList() ?? [];
                 var lstInAtvsv = _dbContext.TblBuInputAtvsv.Where(x => x.IsDeleted != true).ToList();
                 var atvst = await _dbContext.tblMdAtvsv.Where(x => x.IsActive == true).ToListAsync();
+                int fId = -1;
 
                 var InputDoiTuong = new List<InputDoiTuong>();
 
@@ -197,7 +198,7 @@ namespace PLX5S.BUSINESS.Services.BU
                             {
                                 DoiTuong = new TblBuInputDoiTuong()
                                 {
-                                    Id = "-",
+                                    Id = (fId--).ToString(),
                                     DoiTuongId = s.Id,
                                     SurveyMgmtId = id,
                                     IsActive = false
@@ -209,7 +210,6 @@ namespace PLX5S.BUSINESS.Services.BU
                 else if (survey.DoiTuongId == "DT2")
                 {
                     var lstWareHouse = _dbContext.TblMdWareHouse.Where(x => x.IsActive == true).ToList();
-
 
                     foreach (var s in lstWareHouse)
                     {
@@ -228,7 +228,7 @@ namespace PLX5S.BUSINESS.Services.BU
                             {
                                 DoiTuong = new TblBuInputDoiTuong()
                                 {
-                                    Id = "-",
+                                    Id = (fId--).ToString(),
                                     DoiTuongId = s.Id,
                                     SurveyMgmtId = id,
                                     IsActive = false
@@ -253,27 +253,36 @@ namespace PLX5S.BUSINESS.Services.BU
 
         public async Task UpdateInput(SurveyMgmtModel dataInput)
         {
+            using var transaction = await _dbContext.Database.BeginTransactionAsync();
             try
             {
                 foreach (var item in dataInput.InputDoiTuong)
                 {
-                    if(item.DoiTuong.Id == "-")
+                    if (string.IsNullOrEmpty(item.DoiTuong.Id) || !Guid.TryParse(item.DoiTuong.Id, out _))
                     {
                         item.DoiTuong.Id = Guid.NewGuid().ToString();
                         _dbContext.TblBuInputDoiTuong.Add(item.DoiTuong);
+
                     }
-                    else
+                    else 
                     {
                         _dbContext.TblBuInputDoiTuong.Update(item.DoiTuong);
-                        _dbContext.TblBuInputAtvsv.UpdateRange(item.Atvsvs);
+
+                        if (item.Atvsvs != null && item.Atvsvs.Any())
+                        {
+                            _dbContext.TblBuInputAtvsv.UpdateRange(item.Atvsvs);
+                        }
                     }
                 }
+
                 _dbContext.TblBuSurveyMgmt.Update(dataInput.SurveyMgmt);
 
                 await _dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
             }
             catch (Exception ex)
             {
+                await transaction.RollbackAsync();
                 Status = false;
                 Exception = ex;
             }

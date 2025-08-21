@@ -198,7 +198,8 @@ namespace PLX5S.BUSINESS.Services.BU
                         lstInChamDiem.Add(new TblBuInputChamDiem
                         {
                             Id = Guid.NewGuid().ToString(),
-                            InStoreId = item.Id,
+                            //InStoreId = item.Id,
+                            DoiTuongId = item.Id,
                             IsDeleted = false,
                             IsActive = true,
                             KiKhaoSatId = data.KiKhaoSat.Id,
@@ -213,7 +214,8 @@ namespace PLX5S.BUSINESS.Services.BU
                         lstInChamDiem.Add(new TblBuInputChamDiem
                         {
                             Id = Guid.NewGuid().ToString(),
-                            InStoreId = item.Id,
+                            DoiTuongId = item.Id,
+                            //InStoreId = item.Id,
                             IsDeleted = false,
                             IsActive = true,
                             KiKhaoSatId = data.KiKhaoSat.Id,
@@ -313,7 +315,7 @@ namespace PLX5S.BUSINESS.Services.BU
                     var WareHouse = lstMdWareHouse.Where(x => x.Id == item.DoiTuongId).FirstOrDefault();
                     if (store != null)
                     {
-                        var lstChamDiem2 = lstChamDiem.Where(x => x.InStoreId == item.Id).ToList();
+                        var lstChamDiem2 = lstChamDiem.Where(x => x.DoiTuongId == item.DoiTuongId).ToList();
                         var inStore = new InputStore()
                         {
                             Id = item.Id,
@@ -334,7 +336,7 @@ namespace PLX5S.BUSINESS.Services.BU
                     } 
                     else if (WareHouse != null)
                     {
-                        var lstChamDiem3 = lstChamDiem.Where(x => x.InStoreId == item.Id).ToList();
+                        var lstChamDiem3 = lstChamDiem.Where(x => x.DoiTuongId == item.DoiTuongId).ToList();
                         var inWareHousee = new InputWarehouse()
                         {
                             Id = item.Id,
@@ -411,14 +413,11 @@ namespace PLX5S.BUSINESS.Services.BU
                 this.Status = false;
             }
         }
-
         public async Task UpdateDataInput(KiKhaoSatModel data)
         {
             try
             {
                 _dbContext.TblBuKiKhaoSat.Update(data.KiKhaoSat);
-
-
 
                 foreach (var item in data.lstInputStore)
                 {
@@ -429,15 +428,13 @@ namespace PLX5S.BUSINESS.Services.BU
                         _dbContext.TblBuInputChamDiem.Add(new TblBuInputChamDiem
                         {
                             Id = Guid.NewGuid().ToString(),
-                            InStoreId = item.Id,
+                            DoiTuongId = item.StoreId,
                             IsDeleted = false,
                             IsActive = true,
                             KiKhaoSatId = data.KiKhaoSat.Id,
                             UserName = d
                         });
                     }
-
-                    _dbContext.TblBuInputChamDiem.UpdateRange(item.LstInChamDiem);
                 }
 
                 foreach (var item in data.lstInputWareHouse)
@@ -449,15 +446,13 @@ namespace PLX5S.BUSINESS.Services.BU
                         _dbContext.TblBuInputChamDiem.Add(new TblBuInputChamDiem
                         {
                             Id = Guid.NewGuid().ToString(),
-                            InStoreId = item.Id,
+                            DoiTuongId = item.WareHouseId,
                             IsDeleted = false,
                             IsActive = true,
                             KiKhaoSatId = data.KiKhaoSat.Id,
                             UserName = d
                         });
                     }
-
-                    _dbContext.TblBuInputChamDiem.UpdateRange(item.LstInChamDiem);
                 }
 
                 await _dbContext.SaveChangesAsync();

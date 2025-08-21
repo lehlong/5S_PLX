@@ -127,11 +127,11 @@ export class ListComponent implements OnInit {
   }
 
 
-  filterPoint(inStoreId: any) {
-    const record = this.lstPointStore.find((x: any) => x.inStoreId === inStoreId);
+  // filterPoint(inStoreId: any) {
+  //   const record = this.lstPointStore.find((x: any) => x.inStoreId === inStoreId);
 
-    return record?.point ?? 0;
-  }
+  //   return record?.point ?? 0;
+  // }
 
   // getAllAccount() {
   //   this._authService.(this.filter.filterKiKhaoSat.id).subscribe({

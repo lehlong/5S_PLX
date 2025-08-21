@@ -169,7 +169,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         KiKhaoSatId = item.KiKhaoSatId,
                         ChiChtAtvsv = item.ChiChtAtvsv,
                         OrderNumber = item.OrderNumber,
-                        DiemTieuChi = _dbContext.TblBuTinhDiemTieuChi.Where(x => x.TieuChiCode == item.Code && x.IsDeleted != true).ToList(),
+                        DiemTieuChi = _dbContext.TblBuTinhDiemTieuChi.Where(x => x.TieuChiCode == item.Code && x.IsDeleted != true).OrderByDescending(x => x.Diem).ToList(),
                         LstCriteriaExcludedOject = _dbContext.TblBuCriteriaExcludedObject.Where(x => x.TieuChiCode == item.Code && x.IsDeleted != true).ToList() ?? null
 
                     };
