@@ -174,25 +174,25 @@ export class NewsComponent implements OnInit {
     }
     if (this.userInfo.chucVuId == "CHT" || this.userInfo.chucVuId == "TK" || this.userInfo.chucVuId == "ATVSV") {
       if (dateDay >= 1 && dateDay <= 7 && (this.userInfo.chucVuId == "CHT" || this.userInfo.chucVuId == "TK")) {
-        return `Trong thời gian (01-07/${(currentMonth + 1)
+        return `Trong thời gian (01-07/${(currentMonth)
           .toString()
           .padStart(2, '0')})`;
       }
 
       if (dateDay >= 16 && dateDay <= 23 && (this.userInfo.chucVuId == "CHT" || this.userInfo.chucVuId == "TK")) {
-        return `Trong thời gian (15-23/${(currentMonth + 1)
+        return `Trong thời gian (15-23/${(currentMonth)
           .toString()
           .padStart (2, '0')})`;
       }
 
       if (dateDay >= 8 && dateDay <= 15 && (this.userInfo.chucVuId == "ATVSV")) {
-        return `Trong thời gian (08-15/${(currentMonth + 1)
+        return `Trong thời gian (08-15/${(currentMonth)
           .toString()
           .padStart(2, '0')})`;
       }
 
       if (dateDay >= 24 && (this.userInfo.chucVuId == "ATVSV")) {
-        return `Trong thời gian (24-30/${(currentMonth + 1)
+        return `Trong thời gian (24-30/${(currentMonth)
           .toString()
           .padStart(2, '0')})`;
       }
