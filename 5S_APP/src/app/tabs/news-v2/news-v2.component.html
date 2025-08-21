@@ -31,7 +31,7 @@
           <img alt="ảnh" src="assets/img/1.webp" />
           <ion-card-header>
             <ion-card-title>{{ news.title }}</ion-card-title>
-            <ion-card-subtitle>{{ news.date }}</ion-card-subtitle>
+            <ion-card-subtitle>{{ news.createdDate | date : "dd/MM/yyyy HH:mm:ss" }}</ion-card-subtitle>
           </ion-card-header>
           <ion-card-content>
             {{ news.summary }}

@@ -18,8 +18,8 @@
 <ion-content>
   <ng-container *ngIf="newsDetail">
     <h3 class="title-content">{{ newsDetail.title }}</h3>
-    <h5 class="date">{{ newsDetail.date }}</h5>
-    <img class="img-content" [src]="newsDetail.image" alt="news image" />
+    <h5 class="date">{{ newsDetail.createdDate }}</h5>
+    <img class="img-content" src="assets/img/1.webp" alt="news image" />
     <p
       clas="text-content"
       style="

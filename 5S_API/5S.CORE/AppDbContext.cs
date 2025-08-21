@@ -120,7 +120,7 @@ namespace PLX5S.CORE
         public DbSet<TblAdAccountRefreshToken> TblAdAccountRefreshToken { get; set; }
         public DbSet<TblAdAppVersion> TblAdAppVersion { get; set; }
         public DbSet<TblAdAccount_AccountGroup> TblAdAccount_AccountGroup { get; set; }
-        public DbSet<TblActionLog> TblActionLogs {get; set;}
+        public DbSet<TblActionLog> TblActionLogs { get; set; }
         public DbSet<TblAdSystemTrace> TblAdSystemTrace { get; set; }
         public DbSet<tblAdOrganize> tblAdOrganize { get; set; }
         #endregion
@@ -133,6 +133,7 @@ namespace PLX5S.CORE
         public DbSet<TblMdWareHouse> TblMdWareHouse { get; set; }
         public DbSet<TblMdAtvsv> tblMdAtvsv { get; set; }
         public DbSet<TblMdDevice> tblMdDevice { get; set; }
+        public DbSet<TblMdNews> tblMdNews { get; set; }
 
         #endregion
 
