@@ -80,6 +80,8 @@ export class ListComponent implements OnInit {
       .search({ keyWord: this.surveyId })
       .subscribe({
         next: (data) => {
+          console.log(data);
+
           this.lstKiKhaoSat = data.data;
           const filter = localStorage.getItem('filterLS') ?? ""
           const filter2 = data.data.reduce((a: any, b: any) =>

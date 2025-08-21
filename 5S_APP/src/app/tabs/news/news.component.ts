@@ -55,12 +55,12 @@ export class NewsComponent implements OnInit {
     },
   }
   buttons = [
-    { label: 'Tất cả', value: 'all'},
+    { label: 'Tất cả', value: 'all' },
     { label: 'Cửa hàng', value: 'store' },
     { label: 'Kho', value: 'warehouse' },
     { label: 'Chưa chấm', value: 'chuaCham' },
   ];
-  constructor(private _service: HomeService, private router: Router) {}
+  constructor(private _service: HomeService, private router: Router) { }
 
   ngOnInit() {
     this.loadUserInfo();
@@ -156,45 +156,51 @@ export class NewsComponent implements OnInit {
     const year = date.getFullYear();
     return `T${month}/${year}`;
   }
+
   getChamDiemStatus(fDate: string): string {
+    // debugger
     const date = new Date(fDate);
     const now = new Date();
 
-    const currentMonth = now.getMonth();
+    const currentMonth = now.getMonth() + 1;
     const currentYear = now.getFullYear();
 
-    const dateMonth = date.getMonth();
+    const dateMonth = date.getMonth() + 2;
     const dateYear = date.getFullYear();
     const dateDay = now.getDate();
 
     if (dateMonth !== currentMonth || dateYear !== currentYear) {
       return 'Ngoài thời gian chấm';
     }
+    if (this.userInfo.chucVuId == "CHT" || this.userInfo.chucVuId == "TK" || this.userInfo.chucVuId == "ATVSV") {
+      if (dateDay >= 1 && dateDay <= 7 && (this.userInfo.chucVuId == "CHT" || this.userInfo.chucVuId == "TK")) {
+        return `Trong thời gian (01-07/${(currentMonth + 1)
+          .toString()
+          .padStart(2, '0')})`;
+      }
 
-    if (dateDay >= 1 && dateDay <= 7 && (this.userInfo.chucVuId == "CHT" || this.userInfo.chucVuId == "TK")) {
-      return `Trong thời gian (01-07/${(currentMonth + 1)
-        .toString()
-        .padStart(2, '0')})`;
-    }
+      if (dateDay >= 16 && dateDay <= 23 && (this.userInfo.chucVuId == "CHT" || this.userInfo.chucVuId == "TK")) {
+        return `Trong thời gian (15-23/${(currentMonth + 1)
+          .toString()
+          .padStart (2, '0')})`;
+      }
 
-    if (dateDay >= 16 && dateDay <= 23 && (this.userInfo.chucVuId == "CHT" || this.userInfo.chucVuId == "TK")) {
-      return `Trong thời gian (15-23/${(currentMonth + 1)
-        .toString()
-        .padStart(2, '0')})`;
-    }
+      if (dateDay >= 8 && dateDay <= 15 && (this.userInfo.chucVuId == "ATVSV")) {
+        return `Trong thời gian (08-15/${(currentMonth + 1)
+          .toString()
+          .padStart(2, '0')})`;
+      }
 
-    if (dateDay >= 8 && dateDay <= 15 && (this.userInfo.chucVuId == "ATVSV")) {
-      return `Trong thời gian (08-15/${(currentMonth + 1)
-        .toString()
-        .padStart(2, '0')})`;
+      if (dateDay >= 24 && (this.userInfo.chucVuId == "ATVSV")) {
+        return `Trong thời gian (24-30/${(currentMonth + 1)
+          .toString()
+          .padStart(2, '0')})`;
+      }
+      return 'Ngoài thời gian chấm';
     }
-
-    if (dateDay >= 24 && (this.userInfo.chucVuId == "ATVSV")) {
-      return `Trong thời gian (24-30/${(currentMonth + 1)
-        .toString()
-        .padStart(2, '0')})`;
+    else{
+      return 'Trong thời gian chấm'
     }
-    return 'Ngoài thời gian chấm';
   }
 
 
@@ -203,18 +209,18 @@ export class NewsComponent implements OnInit {
     this.filter.doiTuong = item;
 
     const doiTuongText =
-    item.type === 'DT1'
-    ? 'Cửa hàng'
-    : item.type === 'DT2'
-    ? 'Kho'
-    : 'Không xác định';
+      item.type === 'DT1'
+        ? 'Cửa hàng'
+        : item.type === 'DT2'
+          ? 'Kho'
+          : 'Không xác định';
 
     this.filter.kiKhaoSat.doiTuong = doiTuongText;
     this.filter.kiKhaoSat.id = item.kiKhaoSatId;
     this.filter.kiKhaoSat.trangThaiKi = '2';
     this.filter.kiKhaoSat.code = item.kiKhaoSatCode;
     this.filter.kiKhaoSat.name = item.kiKhaoSatName;
-    this.filter.kiKhaoSat.surveyMgmtId = item.surveyId ;
+    this.filter.kiKhaoSat.surveyMgmtId = item.surveyId;
 
     localStorage.setItem('filterCS', JSON.stringify(this.filter));
 
