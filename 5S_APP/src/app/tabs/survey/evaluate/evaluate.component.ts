@@ -698,10 +698,10 @@ export class EvaluateComponent implements OnInit {
           (img: any) => img.tieuChiCode === tieuChi.code
         ).length;
 
-        if (imagesSelecting < numberImgRequired) {
-          errorMessage += `- Tiêu chí "${tieuChi.name}" thiếu ảnh. `;
-          allChecksPassed = false;
-        }
+        // if (imagesSelecting < numberImgRequired) {
+        //   errorMessage += `- Tiêu chí "${tieuChi.name}" thiếu ảnh. `;
+        //   allChecksPassed = false;
+        // }
       }
     }
 
@@ -736,7 +736,12 @@ export class EvaluateComponent implements OnInit {
           next: (data) => {
             console.log('tính tổng điểm thành công');
             this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
+            this._storageService.remove(
+              this.doiTuong.id + '_' + this.kiKhaoSat.code
+            );
+            localStorage.removeItem(this.doiTuong.id + '_' + this.kiKhaoSat.code);
           }
+          
         })
       },
     });

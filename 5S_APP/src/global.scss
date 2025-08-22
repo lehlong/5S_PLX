@@ -9,6 +9,15 @@
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 // @import '@ionic/angular/css/palettes/dark.system.css';
+html,
+body {
+  touch-action: manipulation;
+  -ms-touch-action: manipulation;
+}
+
+•⁠ {
+  -webkit-tap-highlight-color: transparent;
+}
 
 ion-header {
   border-radius: 6px;
@@ -27,15 +36,14 @@ ion-header {
 }
 
 .c-purple {
-  color: #7045ff
+  color: #7045ff;
 }
 
 .color {
   .red {
-    color: #ad000d
+    color: #ad000d;
   }
 }
-
 
 .ion-color-dark {
   --ion-color-base: #000 !important;
@@ -53,10 +61,7 @@ ion-header {
   background-color: #2dd55b;
 }
 
-
-
 :root {
-
   // --ion-font-size-base: 14px;
   font-size: 14px !important;
   --safe-top: env(safe-area-inset-top);
@@ -79,7 +84,7 @@ ion-header {
       --ion-color-base: rgb(255, 255, 255) !important;
       // --ion-color-base: rgb(0, 0, 0) !important;
 
-    // --color: var(--ion-color-white, #ffffff);
+      // --color: var(--ion-color-white, #ffffff);
     }
   }
 }
@@ -119,14 +124,12 @@ ion-content::part(scroll)::-webkit-scrollbar {
 }
 
 .justify-space-between {
-  justify-content: space-between
+  justify-content: space-between;
 }
 
 .justify-center {
   justify-content: center;
 }
-
-;
 
 .mg-0 {
   margin: 0;
