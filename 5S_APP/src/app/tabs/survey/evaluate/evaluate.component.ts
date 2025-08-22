@@ -695,10 +695,10 @@ export class EvaluateComponent implements OnInit {
           (img: any) => img.tieuChiCode === tieuChi.code
         ).length;
 
-        // if (imagesSelecting < numberImgRequired) {
-        //   errorMessage += `- Tiêu chí "${tieuChi.name}" thiếu ảnh. `;
-        //   allChecksPassed = false;
-        // }
+        if (imagesSelecting < numberImgRequired) {
+          errorMessage += `- Tiêu chí "${tieuChi.name}" thiếu ảnh. `;
+          allChecksPassed = false;
+        }
       }
     }
 
