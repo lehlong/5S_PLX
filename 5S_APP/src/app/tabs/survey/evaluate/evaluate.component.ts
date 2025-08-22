@@ -78,7 +78,7 @@ export class EvaluateComponent implements OnInit {
   daCham: any = 0;
   chuaCham: any = 0;
   lstHisEvaluate: any = [];
-  environment = environment
+  environment = environment;
   lstAccout: any = [];
   evaluate: any = {
     header: {},
@@ -98,8 +98,9 @@ export class EvaluateComponent implements OnInit {
     private _authService: AuthService,
     private messageService: MessageService,
     private cdr: ChangeDetectorRef,
-    private renderer: Renderer2
-  ) { }
+    private renderer: Renderer2,
+    private router: Router
+  ) {}
 
   async ngOnInit() {
     this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
@@ -116,6 +117,10 @@ export class EvaluateComponent implements OnInit {
           this.evaluate = await this._storageService.get(
             this.doiTuong.id + '_' + this.kiKhaoSat.code
           );
+
+          if ((this.evaluate === null || this.evaluate === undefined)) {
+            this.router.navigate([`/survey/check-list/${this.doiTuong.id}`]);
+          }
         } else {
           this.isEdit = false;
           this.getResultEvaluate();
@@ -184,10 +189,15 @@ export class EvaluateComponent implements OnInit {
       imgEl.classList.add('zoomed');
       this.isZoomed = true;
 
-      console.log('[zoomOnClick] Zoomed in at', percentX.toFixed(1), '%', percentY.toFixed(1), '%');
+      console.log(
+        '[zoomOnClick] Zoomed in at',
+        percentX.toFixed(1),
+        '%',
+        percentY.toFixed(1),
+        '%'
+      );
     }
   }
-
 
   resetZoom() {
     const imgEl = this.zoomImg.nativeElement as HTMLElement;
@@ -201,7 +211,6 @@ export class EvaluateComponent implements OnInit {
     imgEl.classList.remove('zoomed');
     this.isZoomed = false;
   }
-
 
   onDragStart(event: MouseEvent | TouchEvent) {
     if (!this.isZoomed) return;
@@ -249,10 +258,10 @@ export class EvaluateComponent implements OnInit {
 
   applyTransform() {
     const imgEl = this.zoomImg.nativeElement as HTMLElement;
-    imgEl.style.transform = `scale(${this.currentScale}) translate(${this.currentX / this.currentScale}px, ${this.currentY / this.currentScale}px)`;
+    imgEl.style.transform = `scale(${this.currentScale}) translate(${
+      this.currentX / this.currentScale
+    }px, ${this.currentY / this.currentScale}px)`;
   }
-
-
 
   //Hàm search
   openSearchInput() {
@@ -640,9 +649,14 @@ export class EvaluateComponent implements OnInit {
       return sum + diemMax;
     }, 0);
 
-    this.evaluate.header.point =
-      ((this.evaluate.lstEvaluate.reduce((sum: any, item: any) => sum + (item.point || 0), 0) / tongDiem) * 100)
-        .toFixed(2);
+    this.evaluate.header.point = (
+      (this.evaluate.lstEvaluate.reduce(
+        (sum: any, item: any) => sum + (item.point || 0),
+        0
+      ) /
+        tongDiem) *
+      100
+    ).toFixed(2);
 
     this._storageService.set(
       this.doiTuong.id + '_' + this.kiKhaoSat.code,
@@ -702,7 +716,6 @@ export class EvaluateComponent implements OnInit {
       }
     }
 
-
     if (!allChecksPassed) {
       const alert = await this.alertController.create({
         header: 'Thiếu thông tin',
@@ -722,27 +735,30 @@ export class EvaluateComponent implements OnInit {
     await this._service.insertEvaluate(this.evaluate).subscribe({
       next: async (data) => {
         console.log('Chấm điểm thành công');
-        await this._service.HandlePointStore(
-          {
+        await this._service
+          .HandlePointStore({
             kiKhaoSatId: this.kiKhaoSat.id,
             doiTuongId: this.doiTuong.id,
             surveyId: this.kiKhaoSat.surveyMgmtId,
             lstData: this.doiTuong.lstChamDiem,
-          },
-        ).subscribe({
-          next: (data) => {
-            console.log('tính tổng điểm thành công');
-            this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
-            this._storageService.remove(
-              this.doiTuong.id + '_' + this.kiKhaoSat.code
-            );
-            localStorage.removeItem(this.doiTuong.id + '_' + this.kiKhaoSat.code);
-          }
-
-        })
+          })
+          .subscribe({
+            next: (data) => {
+              console.log('tính tổng điểm thành công');
+              this.messageService.show(
+                `Chấm điểm Cửa hàng thành công`,
+                'success'
+              );
+              this._storageService.remove(
+                this.doiTuong.id + '_' + this.kiKhaoSat.code
+              );
+              localStorage.removeItem(
+                this.doiTuong.id + '_' + this.kiKhaoSat.code
+              );
+            },
+          });
       },
     });
-
   }
 
   navigateTo(itemId: string) {
@@ -829,10 +845,6 @@ export class EvaluateComponent implements OnInit {
 
   feedback: string = '';
 
-
-
-
-
   async openCamera(code: any) {
     console.log('🚀 Đã gọi openCamera()');
     console.log('✳️ isEdit:', this.isEdit);
@@ -857,14 +869,18 @@ export class EvaluateComponent implements OnInit {
       const base64Image = `data:image/jpeg;base64,${image.base64String}`;
 
       // 🚀 Tối ưu 3: Lấy vị trí sau khi đã chụp ảnh (không block camera)
-      let latitude = 0, longitude = 0;
+      let latitude = 0,
+        longitude = 0;
       try {
         const location = await this.getCurrentLocationFast();
         latitude = location.latitude;
         longitude = location.longitude;
         console.log('📍 Vị trí:', { latitude, longitude });
       } catch (locationErr) {
-        console.warn('⚠️ Không lấy được vị trí, tiếp tục với vị trí mặc định:', locationErr);
+        console.warn(
+          '⚠️ Không lấy được vị trí, tiếp tục với vị trí mặc định:',
+          locationErr
+        );
       }
 
       // 🚀 Tối ưu 4: Tạo object ảnh và thêm vào danh sách ngay
@@ -888,7 +904,6 @@ export class EvaluateComponent implements OnInit {
 
       // 🚀 Tối ưu 5: Xử lý thumbnail và storage bất đồng bộ (không block UI)
       this.processImageAsync(imageObj, base64Image);
-
     } catch (err) {
       console.error('❌ Lỗi openCamera:', err);
       throw err;
@@ -921,7 +936,10 @@ export class EvaluateComponent implements OnInit {
   }
 
   // 🚀 Hàm lấy vị trí nhanh với timeout ngắn
-  private async getCurrentLocationFast(): Promise<{ latitude: number, longitude: number }> {
+  private async getCurrentLocationFast(): Promise<{
+    latitude: number;
+    longitude: number;
+  }> {
     // Kiểm tra quyền nhanh
     if (!this.locationPermissionGranted) {
       const perm = await Geolocation.checkPermissions();
@@ -942,17 +960,12 @@ export class EvaluateComponent implements OnInit {
 
     return {
       latitude: position.coords.latitude,
-      longitude: position.coords.longitude
+      longitude: position.coords.longitude,
     };
   }
 
-
-
   // 🚀 Cache permission
   private locationPermissionGranted: boolean = false;
-
-
-
 
   openMenu() {
     if (this.lstTieuChi.length == 0) {
