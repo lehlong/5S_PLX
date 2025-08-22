@@ -1,4 +1,14 @@
 <ion-content>
+  <!-- 🚀 Thêm ion-refresher vào đầu ion-content -->
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)" pullFactor="0.5" pullMin="100" pullMax="200">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Kéo xuống để làm mới..."
+      refreshingSpinner="circles"
+      refreshingText="Đang tải lại...">
+    </ion-refresher-content>
+  </ion-refresher>
+
   <div class="main-news">
     <div class="d-flex" style="margin-bottom: 10px" (click)="reload()">
       <!-- <div class=""></div> -->

@@ -125,7 +125,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         NumberImg = menu.NumberImg ?? 0,
                         Expanded = true,
                         IsLeaf = false,
-                        DiemTieuChi = _dbContext.TblBuTinhDiemTieuChi.Where(x => x.TieuChiCode == menu.Code).ToList(),
+                        DiemTieuChi = _dbContext.TblBuTinhDiemTieuChi.Where(x => x.TieuChiCode == menu.Code).OrderByDescending(x => x.Diem).ToList(),
                     };
                     lstNode.Add(node1);
                 }

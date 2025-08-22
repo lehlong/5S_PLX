@@ -78,7 +78,7 @@ export class EvaluateComponent implements OnInit {
   daCham: any = 0;
   chuaCham: any = 0;
   lstHisEvaluate: any = [];
-  apiFile = (environment as any).apiFile;
+  environment = environment
   lstAccout: any = [];
   evaluate: any = {
     header: {},
@@ -102,9 +102,6 @@ export class EvaluateComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
-    this.apiFile =
-      (environment as any).apiFile ?? 'http://sso.d2s.com.vn:1347/';
-
     this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
     this.route.paramMap.subscribe({
       next: async (params) => {
@@ -741,7 +738,7 @@ export class EvaluateComponent implements OnInit {
             );
             localStorage.removeItem(this.doiTuong.id + '_' + this.kiKhaoSat.code);
           }
-          
+
         })
       },
     });
@@ -759,7 +756,7 @@ export class EvaluateComponent implements OnInit {
   openFullScreen(img: any) {
     let filePath = { ...img };
     if (this.isEdit == false) {
-      filePath.filePath = this.apiFile + img.filePath;
+      filePath.filePath = this.environment.apiFile + img.filePath;
     }
     this.longitude = img.kinhDo;
     this.latitude = img.viDo;
@@ -776,7 +773,7 @@ export class EvaluateComponent implements OnInit {
   filePath(filePath: string) {
     if (this.isEdit) return filePath;
 
-    return this.apiFile + filePath;
+    return this.environment.apiFile + filePath;
   }
 
   closeFullScreen() {

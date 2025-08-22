@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { LoadingController, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import {
   IonContent,
@@ -60,7 +61,12 @@ export class NewsComponent implements OnInit {
     { label: 'Kho', value: 'warehouse' },
     { label: 'Chưa chấm', value: 'chuaCham' },
   ];
-  constructor(private _service: HomeService, private router: Router) { }
+  constructor(
+    private _service: HomeService,
+    private router: Router,
+    private loadingController: LoadingController,
+    private toastController: ToastController,
+  ) { }
 
   ngOnInit() {
     this.loadUserInfo();
@@ -182,7 +188,7 @@ export class NewsComponent implements OnInit {
       if (dateDay >= 16 && dateDay <= 23 && (this.userInfo.chucVuId == "CHT" || this.userInfo.chucVuId == "TK")) {
         return `Trong thời gian (15-23/${(currentMonth)
           .toString()
-          .padStart (2, '0')})`;
+          .padStart(2, '0')})`;
       }
 
       if (dateDay >= 8 && dateDay <= 15 && (this.userInfo.chucVuId == "ATVSV")) {
@@ -198,7 +204,7 @@ export class NewsComponent implements OnInit {
       }
       return 'Ngoài thời gian chấm';
     }
-    else{
+    else {
       return 'Trong thời gian chấm'
     }
   }
@@ -227,7 +233,65 @@ export class NewsComponent implements OnInit {
     this.router.navigate([`survey/check-list/${item.id}`]);
   }
 
-  reload() {
-    this.getDataHome();
+
+
+  async doRefresh(event: any) {
+    console.log('🔄 Pull to refresh triggered');
+
+    try {
+      this.getDataHome()
+
+    } catch (error) {
+      console.error('❌ Lỗi khi làm mới dữ liệu:', error);
+    } finally {
+      // 🚨 Quan trọng: Phải gọi complete() để ẩn spinner
+      event.target.complete();
+    }
   }
+
+
+  async reload() {
+    const loading = await this.loadingController.create({
+      message: 'Đang tải...',
+      spinner: 'circles'
+    });
+
+    await loading.present();
+
+    try {
+      await this.getDataHome()
+
+    } catch (error) {
+      console.error('❌ Lỗi reload:', error);
+    } finally {
+      await loading.dismiss();
+    }
+  }
+
+  // 🚀 Tùy chỉnh thêm: Tự động refresh mỗi 30 giây
+  private autoRefreshInterval: any;
+
+  // ionViewDidEnter() {
+  //   // Bắt đầu auto refresh
+  //   this.startAutoRefresh();
+  // }
+
+  ionViewWillLeave() {
+    // Dừng auto refresh khi rời khỏi trang
+    this.stopAutoRefresh();
+  }
+
+  // private startAutoRefresh() {
+  //   this.autoRefreshInterval = setInterval(async () => {
+  //     console.log('🔄 Auto refresh...');
+  //     await this.loadAllData();
+  //   }, 30000); // 30 giây
+  // }
+
+  private stopAutoRefresh() {
+    if (this.autoRefreshInterval) {
+      clearInterval(this.autoRefreshInterval);
+    }
+  }
+
 }

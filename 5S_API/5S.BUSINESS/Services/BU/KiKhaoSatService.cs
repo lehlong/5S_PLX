@@ -421,7 +421,10 @@ namespace PLX5S.BUSINESS.Services.BU
 
                 foreach (var item in data.lstInputStore)
                 {
-                    _dbContext.RemoveRange(item.LstInChamDiem);
+                    var oldRecords = _dbContext.TblBuInputChamDiem.Where(x => x.DoiTuongId == item.StoreId
+                                     && x.KiKhaoSatId == data.KiKhaoSat.Id);
+
+                    _dbContext.TblBuInputChamDiem.RemoveRange(oldRecords);
 
                     foreach (var d in item.LstChamDiem)
                     {
@@ -439,7 +442,10 @@ namespace PLX5S.BUSINESS.Services.BU
 
                 foreach (var item in data.lstInputWareHouse)
                 {
-                    _dbContext.RemoveRange(item.LstInChamDiem);
+                    var oldRecords = _dbContext.TblBuInputChamDiem.Where(x => x.DoiTuongId == item.WareHouseId
+                                     && x.KiKhaoSatId == data.KiKhaoSat.Id);
+
+                    _dbContext.TblBuInputChamDiem.RemoveRange(oldRecords);
 
                     foreach (var d in item.LstChamDiem)
                     {

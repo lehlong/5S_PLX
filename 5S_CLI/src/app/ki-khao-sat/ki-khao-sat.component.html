@@ -209,7 +209,7 @@
               <td nzAlign="left">{{ getNameByCodeAccount(data.cuaHangTruong) }}</td>
               <td nzAlign="left">{{ getNameByCodeAccount(data.nguoiPhuTrach) }}</td>
               <td nzAlign="center">
-                <nz-select style="width: 100%;" [nzMaxTagCount]="5" [nzMaxTagPlaceholder]="tagPlaceHolder"
+                <nz-select style="width: 100%;" [nzMaxTagCount]="10" [nzMaxTagPlaceholder]="tagPlaceHolder"
                   nzMode="multiple" nzPlaceHolder="Please select" [ngModelOptions]="{ standalone: true }"
                   [(ngModel)]="data.lstChamDiem" (ngModelChange)="onChangeChamDiem($event, data)" >
                     <nz-option  cdkScrollable *ngFor="let item of lstAccount; trackBy: trackByKey" [nzLabel]="item.fullName"
