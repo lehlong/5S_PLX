@@ -1,3 +1,4 @@
+import { ThemeService } from './service/theme.service';
 import { Component, OnDestroy } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { Storage } from '@ionic/storage-angular';
@@ -17,7 +18,8 @@ export class AppComponent implements OnDestroy {
 
   constructor(
     private platform: Platform,
-    private storage: Storage
+    private storage: Storage,
+    private theme: ThemeService
   ) {
     this.darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
@@ -32,12 +34,16 @@ export class AppComponent implements OnDestroy {
           this.mediaQueryListener = async (e: MediaQueryListEvent) => {
             await this.updateStatusBarTheme(e.matches);
           };
-          this.darkModeMediaQuery.addEventListener('change', this.mediaQueryListener);
+          this.darkModeMediaQuery.addEventListener(
+            'change',
+            this.mediaQueryListener
+          );
         } catch (err) {
           console.error('Error initializing StatusBar', err);
         }
       }
     });
+    this.theme.enableLightMode();
   }
 
   ngOnInit() {
@@ -60,34 +66,41 @@ export class AppComponent implements OnDestroy {
 
   ngOnDestroy() {
     if (this.mediaQueryListener) {
-      this.darkModeMediaQuery.removeEventListener('change', this.mediaQueryListener);
+      this.darkModeMediaQuery.removeEventListener(
+        'change',
+        this.mediaQueryListener
+      );
     }
   }
 
-
   initializePush() {
-    PushNotifications.requestPermissions().then(result => {
+    PushNotifications.requestPermissions().then((result) => {
       if (result.receive === 'granted') {
         PushNotifications.register();
       }
     });
 
-    PushNotifications.addListener('registration', token => {
+    PushNotifications.addListener('registration', (token) => {
       console.log('Push registration success, token:', token.value);
       // Gửi token lên server nếu cần
     });
 
-    PushNotifications.addListener('registrationError', error => {
+    PushNotifications.addListener('registrationError', (error) => {
       console.error('Push registration error:', error);
     });
 
-    PushNotifications.addListener('pushNotificationReceived', notification => {
-      console.log('Push received: ', notification);
-    });
+    PushNotifications.addListener(
+      'pushNotificationReceived',
+      (notification) => {
+        console.log('Push received: ', notification);
+      }
+    );
 
-    PushNotifications.addListener('pushNotificationActionPerformed', notification => {
-      console.log('Push action performed', notification);
-    });
+    PushNotifications.addListener(
+      'pushNotificationActionPerformed',
+      (notification) => {
+        console.log('Push action performed', notification);
+      }
+    );
   }
-
 }

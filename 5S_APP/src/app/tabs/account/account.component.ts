@@ -38,12 +38,15 @@ export class AccountComponent implements OnInit {
     if (userInfoString) {
       const userInfo = JSON.parse(userInfoString);
       console.log(userInfo);
-      this.userInfo = userInfo
+      this.userInfo = userInfo;
     }
   }
 
   Logout() {
     localStorage.clear();
-    this.router.navigate(['/login']);
+    sessionStorage.clear();
+    this.router.navigate(['/login']).then(() => {
+      window.location.reload(); 
+    });
   }
 }
