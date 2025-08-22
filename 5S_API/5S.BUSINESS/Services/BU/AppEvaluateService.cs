@@ -433,7 +433,6 @@ namespace PLX5S.BUSINESS.Services.BU
                 var lstHeader = _dbContext.TblBuEvaluateHeader.Where(x => 
                                     x.KiKhaoSatId == data.Header.KiKhaoSatId && 
                                     x.DoiTuongId == data.Header.DoiTuongId && 
-                                    x.AccountUserName == data.Header.AccountUserName &&
                                     x.IsActive == true).ToList();
                 var header = lstHeader.OrderByDescending(x => x.Order).FirstOrDefault();
 
