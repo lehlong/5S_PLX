@@ -403,14 +403,6 @@ export class EvaluateComponent implements OnInit {
     return Array.isArray(children) && children.length > 0;
   }
 
-  // renderTitle(node: any) {
-
-  //   if(node.isGroup) return node.title;
-
-  //   console.log(node);
-  //   return (this.tieuChiIndex = this.tieuChiIndex + 1) + '- ' + node.title
-  // }
-
   //Active
   setItem(itemId: string) {
     this.currentSelect = itemId;
@@ -424,8 +416,6 @@ export class EvaluateComponent implements OnInit {
   private initMap(): void {
     L.Icon.Default.mergeOptions({
       iconRetinaUrl: 'media/marker-icon-2V3QKKVC.png',
-      // iconUrl: 'media/marker-icon-2V3QKKVC.png',
-      // shadowUrl: 'media/marker-icon-2V3QKKVC.png',
     });
 
     const lat = this.latitude; // Vĩ độ động
@@ -488,21 +478,6 @@ export class EvaluateComponent implements OnInit {
     ).length;
     return imagesSelecting < node.numberImg;
   }
-
-  // extractAllKeys(tree: any[]): string[] {
-  //   let keys: string[] = [];
-
-  //   tree.forEach((node) => {
-  //     if (node.key) {
-  //       keys.push(node.key);
-  //     }
-  //     if (Array.isArray(node.children)) {
-  //       keys = keys.concat(this.extractAllKeys(node.children));
-  //     }
-  //   });
-
-  //   return keys;
-  // }
 
   onImageSelected(event: any, code: any) {
     if (!this.isEdit) return;
@@ -638,13 +613,6 @@ export class EvaluateComponent implements OnInit {
     };
   }
 
-  // filterFeedBack(code: any) {
-  //   const item = this.evaluate?.lstEvaluate?.find(
-  //     (x: any) => x.tieuChiCode === code
-  //   );
-  //   return item?.feedBack || '';
-  // }
-
   setDiem(data: any, event: any) {
     if (!this.isEdit) return;
 
@@ -714,29 +682,29 @@ export class EvaluateComponent implements OnInit {
         errorMessage += `- Tiêu chí "${tieuChi.name}" chưa chấm điểm. `;
         allChecksPassed = false;
       }
-
       // Kiểm tra có đủ ảnh không
-      // if (tieuChi.isImg) {
-      //   if (
-      //     tieuChi.chiChtAtvsv &&
-      //     !(
-      //       this.account.chucVuId === 'CHT' || this.account.chucVuId === 'ATVSV'
-      //     )
-      //   ) {
-      //     continue;
-      //   }
+      if (tieuChi.isImg) {
+        if (
+          tieuChi.chiChtAtvsv &&
+          !(
+            this.account.chucVuId === 'CHT' || this.account.chucVuId === 'ATVSV'
+          )
+        ) {
+          continue;
+        }
 
-      //   const numberImgRequired = tieuChi.numberImg || 0;
-      //   const imagesSelecting = this.evaluate?.lstImages?.filter(
-      //     (img: any) => img.tieuChiCode === tieuChi.code
-      //   ).length;
+        const numberImgRequired = tieuChi.numberImg || 0;
+        const imagesSelecting = this.evaluate?.lstImages?.filter(
+          (img: any) => img.tieuChiCode === tieuChi.code
+        ).length;
 
-      //   if (imagesSelecting < numberImgRequired) {
-      //     errorMessage += `- Tiêu chí "${tieuChi.name}" thiếu ảnh. `;
-      //     allChecksPassed = false;
-      //   }
-      // }
+        if (imagesSelecting < numberImgRequired) {
+          errorMessage += `- Tiêu chí "${tieuChi.name}" thiếu ảnh. `;
+          allChecksPassed = false;
+        }
+      }
     }
+
 
     if (!allChecksPassed) {
       const alert = await this.alertController.create({
@@ -767,10 +735,6 @@ export class EvaluateComponent implements OnInit {
         ).subscribe({
           next: (data) => {
             console.log('tính tổng điểm thành công');
-            // this._storageService.remove(
-            //   this.doiTuong.id + '_' + this.kiKhaoSat.code
-            // );
-            // localStorage.removeItem(this.doiTuong.id + '_' + this.kiKhaoSat.code);
             this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
           }
         })
@@ -863,6 +827,10 @@ export class EvaluateComponent implements OnInit {
 
   feedback: string = '';
 
+
+
+
+
   async openCamera(code: any) {
     console.log('🚀 Đã gọi openCamera()');
     console.log('✳️ isEdit:', this.isEdit);
@@ -873,56 +841,116 @@ export class EvaluateComponent implements OnInit {
     }
 
     try {
-      const perm = await Geolocation.requestPermissions();
-      console.log('🔐 Quyền vị trí:', perm);
+      console.log('📱 Nền tảng:', Capacitor.getPlatform());
+      console.log('🎯 Mở camera ngay lập tức');
 
-      const position = await Geolocation.getCurrentPosition({
-        enableHighAccuracy: true,
-        timeout: 10000,
-      });
-      console.log('📍 Vị trí gốc:', position.coords);
-
-      let latitude = position.coords.latitude;
-      let longitude = position.coords.longitude;
-
-      // 👉 Xử lý khác nhau theo platform
-      const platform = Capacitor.getPlatform();
-      console.log('📱 Nền tảng:', platform);
-
-      console.log('🎯 Trước khi gọi Camera');
+      // 🚀 Tối ưu 1: Mở camera trước (quan trọng nhất với user)
       const image = await Camera.getPhoto({
-        quality: 90,
+        quality: 80, // 🚀 Tối ưu 2: Giảm quality từ 90 xuống 80
         resultType: CameraResultType.Base64,
         source: CameraSource.Camera,
       });
-      console.log('📷 Ảnh đã chụp');
 
+      console.log('📷 Ảnh đã chụp, đang xử lý...');
       const base64Image = `data:image/jpeg;base64,${image.base64String}`;
-      const thumbnail = await this.generateThumbnail(base64Image, 100, 100);
 
-      this.evaluate.lstImages.push({
+      // 🚀 Tối ưu 3: Lấy vị trí sau khi đã chụp ảnh (không block camera)
+      let latitude = 0, longitude = 0;
+      try {
+        const location = await this.getCurrentLocationFast();
+        latitude = location.latitude;
+        longitude = location.longitude;
+        console.log('📍 Vị trí:', { latitude, longitude });
+      } catch (locationErr) {
+        console.warn('⚠️ Không lấy được vị trí, tiếp tục với vị trí mặc định:', locationErr);
+      }
+
+      // 🚀 Tối ưu 4: Tạo object ảnh và thêm vào danh sách ngay
+      const imageObj = {
         code: '-1',
         fileName: '',
         evaluateHeaderCode: this.headerId,
         filePath: base64Image,
-        pathThumbnail: thumbnail,
+        pathThumbnail: '', // Sẽ được cập nhật sau
         tieuChiCode: code,
         viDo: latitude,
         kinhDo: longitude,
         type: 'img',
-      });
+      };
 
-      console.log('✅ Ảnh và vị trí đã lưu');
+      this.evaluate.lstImages.push(imageObj);
+      console.log('✅ Ảnh đã được thêm vào danh sách');
 
+      // Cập nhật UI ngay lập tức
       this.cdr.detectChanges();
+
+      // 🚀 Tối ưu 5: Xử lý thumbnail và storage bất đồng bộ (không block UI)
+      this.processImageAsync(imageObj, base64Image);
+
+    } catch (err) {
+      console.error('❌ Lỗi openCamera:', err);
+      throw err;
+    }
+  }
+
+  // 🚀 Hàm xử lý ảnh bất đồng bộ
+  private async processImageAsync(imageObj: any, base64Image: string) {
+    try {
+      // Tạo thumbnail với kích thước nhỏ hơn
+      const thumbnail = await this.generateThumbnail(base64Image, 80, 80);
+      imageObj.pathThumbnail = thumbnail;
+
+      // Lưu vào storage
       this._storageService.set(
         this.doiTuong.id + '_' + this.kiKhaoSat.code,
         this.evaluate
       );
+
+      console.log('✅ Thumbnail và storage đã được cập nhật');
+      this.cdr.detectChanges();
     } catch (err) {
-      console.error('❌ Lỗi openCamera:', err);
+      console.warn('⚠️ Lỗi xử lý thumbnail:', err);
+      // Vẫn lưu storage dù không có thumbnail
+      this._storageService.set(
+        this.doiTuong.id + '_' + this.kiKhaoSat.code,
+        this.evaluate
+      );
     }
   }
+
+  // 🚀 Hàm lấy vị trí nhanh với timeout ngắn
+  private async getCurrentLocationFast(): Promise<{ latitude: number, longitude: number }> {
+    // Kiểm tra quyền nhanh
+    if (!this.locationPermissionGranted) {
+      const perm = await Geolocation.checkPermissions();
+      if (perm.location !== 'granted') {
+        const requestPerm = await Geolocation.requestPermissions();
+        if (requestPerm.location !== 'granted') {
+          throw new Error('Không có quyền truy cập vị trí');
+        }
+      }
+      this.locationPermissionGranted = true;
+    }
+
+    const position = await Geolocation.getCurrentPosition({
+      enableHighAccuracy: false, // 🚀 Nhanh hơn
+      timeout: 3000, // 🚀 Timeout rất ngắn 3s
+      maximumAge: 60000, // 🚀 Cho phép dùng cache 1 phút
+    });
+
+    return {
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude
+    };
+  }
+
+
+
+  // 🚀 Cache permission
+  private locationPermissionGranted: boolean = false;
+
+
+
 
   openMenu() {
     if (this.lstTieuChi.length == 0) {
