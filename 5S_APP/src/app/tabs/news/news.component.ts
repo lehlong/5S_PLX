@@ -212,6 +212,8 @@ export class NewsComponent implements OnInit {
 
 
   navigateItem(item: any) {
+    console.log(item);
+
     this.filter.doiTuong = item;
 
     const doiTuongText =
@@ -222,10 +224,12 @@ export class NewsComponent implements OnInit {
           : 'Không xác định';
 
     this.filter.kiKhaoSat.doiTuong = doiTuongText;
+
     this.filter.kiKhaoSat.id = item.kiKhaoSatId;
-    this.filter.kiKhaoSat.trangThaiKi = '2';
-    this.filter.kiKhaoSat.code = item.kiKhaoSatCode;
     this.filter.kiKhaoSat.name = item.kiKhaoSatName;
+    this.filter.kiKhaoSat.code = item.kiKhaoSatCode;
+    this.filter.kiKhaoSat.trangThaiKi = '2';
+    this.filter.kiKhaoSat.endDate = item.endDate;
     this.filter.kiKhaoSat.surveyMgmtId = item.surveyId;
 
     localStorage.setItem('filterCS', JSON.stringify(this.filter));
@@ -271,22 +275,10 @@ export class NewsComponent implements OnInit {
   // 🚀 Tùy chỉnh thêm: Tự động refresh mỗi 30 giây
   private autoRefreshInterval: any;
 
-  // ionViewDidEnter() {
-  //   // Bắt đầu auto refresh
-  //   this.startAutoRefresh();
-  // }
-
   ionViewWillLeave() {
     // Dừng auto refresh khi rời khỏi trang
     this.stopAutoRefresh();
   }
-
-  // private startAutoRefresh() {
-  //   this.autoRefreshInterval = setInterval(async () => {
-  //     console.log('🔄 Auto refresh...');
-  //     await this.loadAllData();
-  //   }, 30000); // 30 giây
-  // }
 
   private stopAutoRefresh() {
     if (this.autoRefreshInterval) {

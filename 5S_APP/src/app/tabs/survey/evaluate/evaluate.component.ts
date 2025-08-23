@@ -100,7 +100,7 @@ export class EvaluateComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private renderer: Renderer2,
     private router: Router
-  ) {}
+  ) { }
 
   async ngOnInit() {
     this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
@@ -112,6 +112,29 @@ export class EvaluateComponent implements OnInit {
         let nav = localStorage.getItem('filterCS');
         this.doiTuong = JSON.parse(nav ?? '').doiTuong;
         this.kiKhaoSat = JSON.parse(nav ?? '').kiKhaoSat;
+
+        setTimeout(async () => {
+          if (this.evaluate != null) {
+            console.log(this.evaluate);
+
+            let data = localStorage.getItem(
+              this.doiTuong.id + '_' + this.kiKhaoSat.code
+            );
+            if (data == null) {
+              this.getAllTieuChi();
+            } else {
+              this.dataTree = JSON.parse(data);
+              this.treeData = this.dataTree?.tree;
+              this.lstTieuChi = this.dataTree?.leaves;
+              this.lstTreeOpen = [...this.getKeysAndLeaves(this.treeData).keys];
+              await this.cdr.detectChanges();
+            }
+          }
+          else{
+            console.log(this.evaluate);
+
+          }
+        }, 500);
 
         if (mode == 'draft') {
           this.evaluate = await this._storageService.get(
@@ -126,21 +149,13 @@ export class EvaluateComponent implements OnInit {
           this.getResultEvaluate();
           this.getAllAccount();
         }
-        let data = localStorage.getItem(
-          this.doiTuong.id + '_' + this.kiKhaoSat.code
-        );
-        if (data == null) {
-          this.getAllTieuChi();
-        } else {
-          this.dataTree = JSON.parse(data);
-          this.treeData = this.dataTree?.tree;
-          this.lstTieuChi = this.dataTree?.leaves;
-          this.lstTreeOpen = [...this.getKeysAndLeaves(this.treeData).keys];
-          await this.cdr.detectChanges();
-        }
+
+
       },
     });
   }
+
+
   ngAfterViewInit() {
     mediumZoom('.zoom-image');
   }
@@ -741,22 +756,20 @@ export class EvaluateComponent implements OnInit {
             doiTuongId: this.doiTuong.id,
             surveyId: this.kiKhaoSat.surveyMgmtId,
             lstData: this.doiTuong.lstChamDiem,
-          })
-          .subscribe({
-            next: (data) => {
-              console.log('tính tổng điểm thành công');
-              this.messageService.show(
-                `Chấm điểm Cửa hàng thành công`,
-                'success'
-              );
-              this._storageService.remove(
-                this.doiTuong.id + '_' + this.kiKhaoSat.code
-              );
-              localStorage.removeItem(
-                this.doiTuong.id + '_' + this.kiKhaoSat.code
-              );
-            },
-          });
+          },
+        ).subscribe({
+          next: (data) => {
+            console.log('tính tổng điểm thành công');
+            this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
+            this._storageService.remove(
+              this.doiTuong.id + '_' + this.kiKhaoSat.code
+            );
+            localStorage.removeItem(this.doiTuong.id + '_' + this.kiKhaoSat.code);
+
+            this.router.navigate([`/survey/check-list/${this.doiTuong.id}`]);
+          }
+
+        })
       },
     });
   }

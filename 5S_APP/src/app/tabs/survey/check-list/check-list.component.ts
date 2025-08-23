@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { IonButton } from '@ionic/angular/standalone';
+import { LoadingController, ToastController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppEvaluateService } from 'src/app/service/app-evaluate.service';
 import { StorageService } from 'src/app/service/storage.service';
@@ -33,8 +34,10 @@ export class CheckListComponent implements OnInit {
     private route: ActivatedRoute,
     private _authService: AuthService,
     private _storageService: StorageService,
-    private _service: AppEvaluateService
-  ) {}
+    private _service: AppEvaluateService,
+    private loadingController: LoadingController,
+    private toastController: ToastController,
+  ) { }
 
   ngOnInit() {
     this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
@@ -93,7 +96,14 @@ export class CheckListComponent implements OnInit {
   }
 
   checkRightEvaluate() {
-    if (this.kiKhaoSat?.trangThaiKi !== '2') return false;
+    // console.log(this.kiKhaoSat);
+
+    const date = new Date(this.kiKhaoSat.endDate);
+    const now = new Date();
+
+    const currentMonth = now.getMonth() + 1;
+
+    if (this.kiKhaoSat?.trangThaiKi !== '2' || (date.getMonth() + 1) < currentMonth) return false;
     if (this.account.allowScoring) return true;
     return (
       this.doiTuong.lstChamDiem?.some(
@@ -112,10 +122,11 @@ export class CheckListComponent implements OnInit {
     }
   }
 
-  navigateTo() {
+  async navigateTo() {
     this.lstHisEvaluate = [];
     let userInfo = JSON.parse(localStorage.getItem('UserInfo') ?? '');
     this.deviceID = userInfo?.deviceId || '';
+
     if (this.mode == 'new') {
       this._service
         .BuildInputEvaluate(this.kiKhaoSat.id, this.doiTuong.id, this.deviceID)
@@ -127,21 +138,20 @@ export class CheckListComponent implements OnInit {
             );
             console.log('tạo mới', data);
 
-            setTimeout(() => {
-              this.router.navigate([
-                `survey/evaluate/draft/${data.header.code}`,
-              ]);
-            }, 1000);
+            // setTimeout(() => {
+            this.router.navigate([
+              `survey/evaluate/draft/${data.header.code}`,
+            ]);
+            // }, 1000);
           },
-        });
+        })
     } else {
-      console.log('chỉnh sửa');
-      this.router.navigate([
-        `survey/evaluate/draft/${this.evaluate.header.code}`,
+      console.log('✏️ Chỉnh sửa - Navigate ngay');
+      await this.router.navigate([
+        `survey/evaluate/draft/${this.evaluate.header.code}`
       ]);
     }
   }
-
   getFullName(userName: string): string {
     const account = this.lstAccout.find(
       (acc: any) => acc.userName === userName

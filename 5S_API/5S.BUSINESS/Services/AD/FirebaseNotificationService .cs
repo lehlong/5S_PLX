@@ -15,6 +15,7 @@ using PLX5S.BUSINESS.Models;
 using PLX5S.BUSINESS.Dtos.AD;
 using System.Text.Json;
 using Dtos.AD;
+using Microsoft.Extensions.Logging;
 
 namespace Services.AD
 {
@@ -31,11 +32,13 @@ namespace Services.AD
     public class FirebaseNotificationService : IFirebaseNotificationService
     {
         private readonly FirebaseSettings _firebaseSettings;
+        private readonly ILogger<FirebaseNotificationService> _logger;
         private FirebaseApp? _firebaseApp;
 
-        public FirebaseNotificationService(IOptions<FirebaseSettings> firebaseSettings)
+        public FirebaseNotificationService(IOptions<FirebaseSettings> firebaseSettings, ILogger<FirebaseNotificationService> logger)
         {
             _firebaseSettings = firebaseSettings.Value;
+            _logger = logger;
             InitializeFirebase();
         }
 
@@ -93,17 +96,18 @@ namespace Services.AD
             };
             return await SendToTopicAsync("test", "Đồng chí có công việc cần xử lý", body, data);
         }
-
         public async Task<FirebaseNotificationResponseDto> SendNotificationAsync(FirebaseNotificationDto notification)
         {
             try
             {
                 if (_firebaseApp == null)
                 {
+                    var errorMessage = "Firebase chưa được khởi tạo";
+                    _logger?.LogError(errorMessage);
                     return new FirebaseNotificationResponseDto
                     {
                         Success = false,
-                        Message = "Firebase chưa được khởi tạo"
+                        Message = errorMessage
                     };
                 }
 
@@ -119,7 +123,8 @@ namespace Services.AD
                         Priority = Priority.High,
                         Notification = new AndroidNotification
                         {
-                            Sound = "default"
+                            Sound = "default",
+                            ChannelId = "default"
                         }
                     },
                     Apns = new ApnsConfig
@@ -131,24 +136,32 @@ namespace Services.AD
                     }
                 };
 
-                // Nếu có custom data thì thêm vào message.Data
+                // Add custom data if provided
                 if (notification.Data != null)
                 {
-                    if (notification.Data is Dictionary<string, string> dict)
+                    try
                     {
-                        message.Data = dict;
+                        if (notification.Data is Dictionary<string, string> dict)
+                        {
+                            message.Data = dict;
+                        }
+                        else
+                        {
+                            var json = JsonSerializer.Serialize(notification.Data);
+                            var dataDict = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+                            if (dataDict != null)
+                            {
+                                message.Data = dataDict.ToDictionary(kvp => kvp.Key, kvp => kvp.Value?.ToString() ?? "");
+                            }
+                        }
                     }
-                    else
+                    catch (Exception dataEx)
                     {
-                        // Convert object sang Dictionary<string, string>
-                        var json = JsonSerializer.Serialize(notification.Data);
-                        var dataDict = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
-                        if (dataDict != null)
-                            message.Data = dataDict;
+                        _logger?.LogWarning(dataEx, "⚠️ Failed to serialize notification data");
                     }
                 }
 
-                // Thêm token hoặc topic
+                // Set target (token or topic)
                 if (!string.IsNullOrEmpty(notification.Token))
                 {
                     message.Token = notification.Token;
@@ -161,6 +174,8 @@ namespace Services.AD
                 var messaging = FirebaseMessaging.GetMessaging(_firebaseApp);
                 var response = await messaging.SendAsync(message);
 
+                _logger?.LogInformation("✅ Notification sent successfully. MessageId: {MessageId}", response);
+
                 return new FirebaseNotificationResponseDto
                 {
                     Success = true,
@@ -170,6 +185,7 @@ namespace Services.AD
             }
             catch (Exception ex)
             {
+                _logger?.LogError(ex, "❌ Failed to send notification: {Error}", ex.Message);
                 return new FirebaseNotificationResponseDto
                 {
                     Success = false,
@@ -177,6 +193,7 @@ namespace Services.AD
                 };
             }
         }
+
 
         //public async Task<FirebaseNotificationResponseDto> SendToTopicAsync(string topic, string title, string body)
         //{
