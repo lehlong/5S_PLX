@@ -139,3 +139,68 @@ ion-content::part(scroll)::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.2);
   border-radius: 10px;
 }
+
+//aleart chấm điểm (không xoá)
+.alert-container-evaluate {
+  display: flex;
+  flex-direction: column;
+}
+.alert-header-evaluate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-items: center;
+  text-align: center;
+  padding: 12px;
+  box-sizing: border-box;
+  border-bottom: 1px solid #eee;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  max-height: 137px;
+  background-color: #ffff;
+  z-index: 10;
+}
+.alert-icon-evaluate {
+  font-size: 36px;
+  color: #ff9800;
+  margin-bottom: 8px;
+}
+.title-evaluate {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+.subtitle-evaluate {
+  font-size: 14px;
+  color: #666;
+  margin-top: 4px;
+  white-space: nowrap;
+}
+.alert-body {
+  font-size: 14px;
+  color: #444;
+  line-height: 23px;
+  text-align: left;
+  margin-top: 128px;
+}
+.custom-alert-center-btn .alert-button-group {
+  justify-content: center !important;
+  width: 100%;
+  margin: 0;
+}
+
+.custom-alert-center-btn .alert-button {
+  flex: none !important;
+  width: 100%;
+  text-align: center;
+  background-color: #6030ff;
+  color: #fff;
+}
+.alert-button-inner.sc-ion-alert-md {
+  justify-content: center;
+}
+.alert-head{
+  display: none !important
+}

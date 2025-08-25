@@ -20,7 +20,6 @@
 }
 .btn-login {
   background-color: #003da5;
-  border-radius: 6px;
 }
 .fuel-price__header {
   color: #003da5;
@@ -56,4 +55,8 @@ ion-card{
   ion-button {
     color: #003da5;
   }
+}
+.card-title{
+  font-weight: 400;
+  font-size: 1rem;
 }

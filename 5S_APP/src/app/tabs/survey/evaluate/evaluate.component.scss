@@ -207,7 +207,6 @@
   font-weight: bold;
 }
 
-
 //css zoom
 .zoom-wrapper {
   width: 100%;
@@ -219,7 +218,7 @@
 
 .full-image-container {
   position: relative; /* ✅ Cho phép translate */
-  overflow: hidden;   /* ✅ Ẩn phần ngoài khi kéo */
+  overflow: hidden; /* ✅ Ẩn phần ngoài khi kéo */
   max-width: 100%;
   max-height: 100%;
   width: 100%;

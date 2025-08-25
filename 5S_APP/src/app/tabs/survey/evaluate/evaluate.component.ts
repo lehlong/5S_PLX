@@ -693,7 +693,9 @@ export class EvaluateComponent implements OnInit {
     let allChecksPassed = true;
     let errorMessage: string[] = [];
 
-    for (const tieuChi of this.lstTieuChi) {
+    for (let index = 0; index < this.lstTieuChi.length; index++) {
+      const tieuChi = this.lstTieuChi[index];
+
       const evaluateItem = this.evaluate.lstEvaluate.find(
         (i: any) => i.tieuChiId === tieuChi.id || i.tieuChiCode === tieuChi.code
       );
@@ -701,7 +703,7 @@ export class EvaluateComponent implements OnInit {
       // 1. Kiểm tra pointId
       if (!evaluateItem || !evaluateItem.pointId) {
         // errorMessage += `- Tiêu chí "${tieuChi.name}" chưa chấm điểm. `;
-        errorMessage.push(`- Tiêu chí <b>${tieuChi.name}</b> chưa chấm điểm.`);
+        errorMessage.push(`- <b>Câu ${index + 1}</b>: chưa chấm điểm.`);
         allChecksPassed = false;
       }
       // Kiểm tra có đủ ảnh không
@@ -722,7 +724,7 @@ export class EvaluateComponent implements OnInit {
 
         if (imagesSelecting < numberImgRequired) {
           // errorMessage += `- Tiêu chí "${tieuChi.name}" thiếu ảnh. `;
-          errorMessage.push(`- Tiêu chí <b>${tieuChi.name}</b> thiếu ảnh.`);
+          errorMessage.push(`- <b>Câu ${index + 1}</b>: thiếu ảnh.`);
           allChecksPassed = false;
         }
       }
@@ -730,9 +732,19 @@ export class EvaluateComponent implements OnInit {
 
     if (!allChecksPassed) {
       const alert = await this.alertController.create({
-        header: 'Thiếu thông tin',
-        message: errorMessage.join('<br/>'),
-        buttons: ['OK'],
+        message: `<div class="alert-header-evaluate">
+      <div class="alert-icon-evaluate"><ion-icon name="warning"></ion-icon></div>
+        <div class="title-evaluate">Đánh giá chưa hoàn tất</div>
+        <div class="subtitle-evaluate">Bạn đã bỏ sót <b class="highlight">${
+          errorMessage.length
+        }</b> tiêu chí chưa chấm</div>
+    </div>
+    <div class="alert-body">
+      ${errorMessage.join('<br/>')}
+    </div>
+       `,
+        buttons: ['Quay lại chấm'],
+        cssClass: 'custom-alert-center-btn',
       });
       await alert.present();
       return;
