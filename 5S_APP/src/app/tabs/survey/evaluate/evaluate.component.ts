@@ -737,7 +737,7 @@ export class EvaluateComponent implements OnInit {
         <div class="title-evaluate">Đánh giá chưa hoàn tất</div>
         <div class="subtitle-evaluate">Bạn đã bỏ sót <b class="highlight">${
           errorMessage.length
-        }</b> tiêu chí chưa chấm</div>
+        }</b> tiêu chí quan trọng</div>
     </div>
     <div class="alert-body">
       ${errorMessage.join('<br/>')}

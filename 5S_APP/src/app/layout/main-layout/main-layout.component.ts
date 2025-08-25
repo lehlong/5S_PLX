@@ -21,7 +21,8 @@ export class MainLayoutComponent implements OnInit {
         // check url
         if (
           event.urlAfterRedirects.startsWith('/survey/evaluate/draft') ||
-          event.urlAfterRedirects.startsWith('/survey/check-list')
+          event.urlAfterRedirects.startsWith('/survey/check-list') ||
+          event.urlAfterRedirects.startsWith('/survey/evaluate/view')
         ) {
           this.showFooter = false;
         } else {

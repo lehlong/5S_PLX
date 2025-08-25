@@ -81,8 +81,8 @@ ion-header {
     --custom-bg-color: #ffffff !important;
 
     .custom-color {
-      --ion-color-base: rgb(255, 255, 255) !important;
-      // --ion-color-base: rgb(0, 0, 0) !important;
+      // --ion-color-base: rgb(255, 255, 255) !important;
+      --ion-color-base: rgb(0, 0, 0) !important;
 
       // --color: var(--ion-color-white, #ffffff);
     }
@@ -190,6 +190,10 @@ ion-content::part(scroll)::-webkit-scrollbar-thumb {
   width: 100%;
   margin: 0;
 }
+.alert-message {
+  max-height: 400px !important;
+  width: 75vw !important;
+}
 
 .custom-alert-center-btn .alert-button {
   flex: none !important;
@@ -198,9 +202,9 @@ ion-content::part(scroll)::-webkit-scrollbar-thumb {
   background-color: #6030ff;
   color: #fff;
 }
-.alert-button-inner.sc-ion-alert-md {
+.alert-button-inner {
   justify-content: center;
 }
-.alert-head{
-  display: none !important
+.alert-head {
+  display: none !important;
 }
