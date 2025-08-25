@@ -9,7 +9,9 @@ bootstrapApplication(AppComponent, {
   ...appConfig,
   providers: [
     ...(appConfig.providers || []),
-    provideIonicAngular(),
+    provideIonicAngular({
+      innerHTMLTemplatesEnabled: true   // 🔑 cho phép HTML trong Alert
+    }),
     importProvidersFrom(IonicStorageModule.forRoot()) // ✅ đúng cách để dùng Storage
   ]
 });

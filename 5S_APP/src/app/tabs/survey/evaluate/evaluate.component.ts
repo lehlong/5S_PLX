@@ -100,7 +100,7 @@ export class EvaluateComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private renderer: Renderer2,
     private router: Router
-  ) { }
+  ) {}
 
   async ngOnInit() {
     this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
@@ -129,10 +129,8 @@ export class EvaluateComponent implements OnInit {
               this.lstTreeOpen = [...this.getKeysAndLeaves(this.treeData).keys];
               await this.cdr.detectChanges();
             }
-          }
-          else{
+          } else {
             console.log(this.evaluate);
-
           }
         }, 500);
 
@@ -141,7 +139,7 @@ export class EvaluateComponent implements OnInit {
             this.doiTuong.id + '_' + this.kiKhaoSat.code
           );
 
-          if ((this.evaluate === null || this.evaluate === undefined)) {
+          if (this.evaluate === null || this.evaluate === undefined) {
             this.router.navigate([`/survey/check-list/${this.doiTuong.id}`]);
           }
         } else {
@@ -149,12 +147,9 @@ export class EvaluateComponent implements OnInit {
           this.getResultEvaluate();
           this.getAllAccount();
         }
-
-
       },
     });
   }
-
 
   ngAfterViewInit() {
     mediumZoom('.zoom-image');
@@ -696,7 +691,7 @@ export class EvaluateComponent implements OnInit {
     if (!this.isEdit) return;
 
     let allChecksPassed = true;
-    let errorMessage = '';
+    let errorMessage: string[] = [];
 
     for (const tieuChi of this.lstTieuChi) {
       const evaluateItem = this.evaluate.lstEvaluate.find(
@@ -705,7 +700,8 @@ export class EvaluateComponent implements OnInit {
 
       // 1. Kiểm tra pointId
       if (!evaluateItem || !evaluateItem.pointId) {
-        errorMessage += `- Tiêu chí "${tieuChi.name}" chưa chấm điểm. `;
+        // errorMessage += `- Tiêu chí "${tieuChi.name}" chưa chấm điểm. `;
+        errorMessage.push(`- Tiêu chí <b>${tieuChi.name}</b> chưa chấm điểm.`);
         allChecksPassed = false;
       }
       // Kiểm tra có đủ ảnh không
@@ -725,7 +721,8 @@ export class EvaluateComponent implements OnInit {
         ).length;
 
         if (imagesSelecting < numberImgRequired) {
-          errorMessage += `- Tiêu chí "${tieuChi.name}" thiếu ảnh. `;
+          // errorMessage += `- Tiêu chí "${tieuChi.name}" thiếu ảnh. `;
+          errorMessage.push(`- Tiêu chí <b>${tieuChi.name}</b> thiếu ảnh.`);
           allChecksPassed = false;
         }
       }
@@ -734,7 +731,7 @@ export class EvaluateComponent implements OnInit {
     if (!allChecksPassed) {
       const alert = await this.alertController.create({
         header: 'Thiếu thông tin',
-        message: errorMessage,
+        message: errorMessage.join('<br/>'),
         buttons: ['OK'],
       });
       await alert.present();
@@ -756,20 +753,24 @@ export class EvaluateComponent implements OnInit {
             doiTuongId: this.doiTuong.id,
             surveyId: this.kiKhaoSat.surveyMgmtId,
             lstData: this.doiTuong.lstChamDiem,
-          },
-        ).subscribe({
-          next: (data) => {
-            console.log('tính tổng điểm thành công');
-            this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
-            this._storageService.remove(
-              this.doiTuong.id + '_' + this.kiKhaoSat.code
-            );
-            localStorage.removeItem(this.doiTuong.id + '_' + this.kiKhaoSat.code);
+          })
+          .subscribe({
+            next: (data) => {
+              console.log('tính tổng điểm thành công');
+              this.messageService.show(
+                `Chấm điểm Cửa hàng thành công`,
+                'success'
+              );
+              this._storageService.remove(
+                this.doiTuong.id + '_' + this.kiKhaoSat.code
+              );
+              localStorage.removeItem(
+                this.doiTuong.id + '_' + this.kiKhaoSat.code
+              );
 
-            this.router.navigate([`/survey/check-list/${this.doiTuong.id}`]);
-          }
-
-        })
+              this.router.navigate([`/survey/check-list/${this.doiTuong.id}`]);
+            },
+          });
       },
     });
   }
