@@ -403,7 +403,7 @@ namespace PLX5S.BUSINESS.Services.AD
             try
             {
                 var user = _dbContext.TblAdAccount.Find(username);
-                user.Password = Utils.CryptographyMD5($"{username}@123");
+                user.Password = Utils.CryptographyMD5($"12345");
                 _dbContext.TblAdAccount.Update(user);
                 _dbContext.SaveChanges();
             }

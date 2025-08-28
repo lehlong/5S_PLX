@@ -5,11 +5,7 @@
     </ion-button>
     <ion-title>
       <div style="display: flex; justify-content: center; align-items: center">
-        <img
-          class="logo"
-          src="../../../assets/img/logo-petrolimex.png"
-          alt="Logo"
-        />
+        <img class="logo" width="65" height="50" src="../../../assets/img/Logo_of_Petrolimex.svg.png" alt="Logo" />
         <div class="text-title">tin tức</div>
       </div>
     </ion-title>
@@ -17,19 +13,21 @@
 </ion-header>
 <ion-content>
   <ng-container *ngIf="newsDetail">
-    <h3 class="title-content">{{ newsDetail.title }}</h3>
-    <h5 class="date">{{ newsDetail.createdDate }}</h5>
-    <img class="img-content" src="assets/img/1.webp" alt="news image" />
-    <p
-      clas="text-content"
-      style="
+    <div style="padding: 0 15px;">
+
+      <h3 class="title-content">{{ newsDetail.title }}</h3>
+      <h5 class="date">{{ newsDetail.createdDate }}</h5>
+      <img class="img-content" src="assets/img/1.webp" alt="news image" />
+      <p [innerText]="newsDetail.content" style="white-space: pre-line;" clas="text-content" style="
         font-size: 1rem;
         line-height: 1.5;
         color: #333;
         text-align: justify;
-      "
-    >
-      {{ newsDetail.content }}
-    </p>
+      ">
+        <!-- {{ newsDetail.content }} -->
+      </p>
+    </div>
+
+    <!-- <pre>{{newsDetail.content}}</pre> -->
   </ng-container>
 </ion-content>
