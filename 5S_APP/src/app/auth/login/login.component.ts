@@ -94,7 +94,7 @@ export class LoginComponent implements OnInit {
             next: (rights) => {
               this.registerPushNotifications()
               this.globalService.setRightData(JSON.stringify(rights || []))
-              this.router.navigate(['/'])
+              this.router.navigate(['/home'], { replaceUrl: true })
             },
             error: (error) => {
 

@@ -474,7 +474,11 @@
   <!-- </div> -->
 </ion-menu>
 
-<ion-modal [isOpen]="isImageModalOpen">
+<ion-modal
+  [backdropDismiss]="false"
+  [isOpen]="isImageModalOpen"
+  [canDismiss]="true"
+>
   <ng-template>
     <!-- <div class="d-flex justify-space-between">
       <ion-button class="delete-button" fill="clear" color="danger" *ngIf="isEdit" (click)="confirmDeleteImage()">
