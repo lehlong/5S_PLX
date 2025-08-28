@@ -15,20 +15,19 @@ import { AuthService } from 'src/app/service/auth.service';
   imports: [SharedModule, IonButton],
 })
 export class ListComponent implements OnInit {
-
   filter: any = {
     filterKiKhaoSat: {},
     filterDoiTuong: {},
     filterNguoiCham: {},
     cuaHangToiCham: false,
-    chuaCham: false
-  }
+    chuaCham: false,
+  };
   inputSearchKiKhaoSat: any = {};
   searchNguoiCham: any = '';
   inSearchStore: any = '';
   selectValue = '1';
   lstAccout: any = [];
-  doiTuong: any = ''
+  doiTuong: any = '';
   lstSearchChamDiem: any = [];
   lstSearchDoiTuong: any = [];
   lstDoiTuong: any = [];
@@ -36,19 +35,23 @@ export class ListComponent implements OnInit {
   surveyId: any;
   filterForm!: FormGroup;
   isOpen = false;
-  lstAccount: any = []
-  lstPointStore: any = []
-  user: any = {}
+  lstAccount: any = [];
+  lstPointStore: any = [];
+  user: any = {};
+  searchKeyword: string = '';
+  lstSearchDoiTuongFiltered: any[] = [];
+  searchNguoiChamKeyword: string = '';
+  lstSearchChamDiemFiltered: any[] = [];
 
   constructor(
     private _service: KyKhaoSatService,
     private _authService: AuthService,
     private router: Router,
     private route: ActivatedRoute
-  ) { }
+  ) {}
 
   ngOnInit() {
-    this.user = JSON.parse(localStorage.getItem('UserInfo') ?? "")
+    this.user = JSON.parse(localStorage.getItem('UserInfo') ?? '');
     this.route.paramMap.subscribe({
       next: (params) => {
         const id = params.get('id');
@@ -71,47 +74,47 @@ export class ListComponent implements OnInit {
   }
 
   getFullName(userName: string): string {
-    const account = this.lstAccout.find((acc: any) => acc.userName === userName);
+    const account = this.lstAccout.find(
+      (acc: any) => acc.userName === userName
+    );
     return account?.fullName;
   }
 
   getAllKyKhaoSat() {
-    this._service
-      .search({ keyWord: this.surveyId })
-      .subscribe({
-        next: (data) => {
-          console.log(data);
+    this._service.search({ keyWord: this.surveyId }).subscribe({
+      next: (data) => {
+        console.log(data);
 
-          this.lstKiKhaoSat = data.data;
-          const filter = localStorage.getItem('filterLS') ?? ""
-          const filter2 = data.data.reduce((a: any, b: any) =>
-            new Date(a.endDate) > new Date(b.endDate) ? a : b
-          );
-          if (filter != "") {
-            this.filter = JSON.parse(filter)
-            if (this.filter.filterKiKhaoSat.surveyMgmtId != this.surveyId) {
-              this.filter.filterKiKhaoSat = filter2
-            }
-          } else {
-            this.filter.filterKiKhaoSat = filter2
+        this.lstKiKhaoSat = data.data;
+        const filter = localStorage.getItem('filterLS') ?? '';
+        const filter2 = data.data.reduce((a: any, b: any) =>
+          new Date(a.endDate) > new Date(b.endDate) ? a : b
+        );
+        if (filter != '') {
+          this.filter = JSON.parse(filter);
+          if (this.filter.filterKiKhaoSat.surveyMgmtId != this.surveyId) {
+            this.filter.filterKiKhaoSat = filter2;
           }
+        } else {
+          this.filter.filterKiKhaoSat = filter2;
+        }
 
-          this.getAllDoiTuong();
+        this.getAllDoiTuong();
 
-          this.inputSearchKiKhaoSat = this.filter.filterKiKhaoSat;
-        },
-        error: (response) => {
-          console.log(response);
-        },
-      });
+        this.inputSearchKiKhaoSat = this.filter.filterKiKhaoSat;
+      },
+      error: (response) => {
+        console.log(response);
+      },
+    });
   }
 
   getAllDoiTuong() {
     this._service.getInputKiKhaoSat(this.filter.filterKiKhaoSat.id).subscribe({
       next: (data) => {
         if (data.lstInputStore.length != 0) {
-          this.filter.filterKiKhaoSat.doiTuong = "Cửa hàng";
-          this.doiTuong = "Cửa hàng";
+          this.filter.filterKiKhaoSat.doiTuong = 'Cửa hàng';
+          this.doiTuong = 'Cửa hàng';
           this.lstDoiTuong = data.lstInputStore;
           this.lstSearchDoiTuong = data.lstInputStore;
           return;
@@ -121,13 +124,13 @@ export class ListComponent implements OnInit {
           this.lstDoiTuong = data.lstInputWareHouse;
           this.lstSearchDoiTuong = data.lstInputWareHouse;
         }
+        this.lstSearchDoiTuongFiltered = [...this.lstSearchDoiTuong];
       },
       error: (response) => {
         console.log(response);
       },
     });
   }
-
 
   // filterPoint(inStoreId: any) {
   //   const record = this.lstPointStore.find((x: any) => x.inStoreId === inStoreId);
@@ -149,15 +152,19 @@ export class ListComponent implements OnInit {
 
   onFilter2() {
     if (this.selectValue === '1') {
-      this.lstDoiTuong = this.lstDoiTuong.sort((a: any, b: any) => a.name.localeCompare(b.name));
+      this.lstDoiTuong = this.lstDoiTuong.sort((a: any, b: any) =>
+        a.name.localeCompare(b.name)
+      );
     } else if (this.selectValue === '2') {
-      this.lstDoiTuong = this.lstDoiTuong.sort((a: any, b: any) => (b.point ?? 0) - (a.point ?? 0));
+      this.lstDoiTuong = this.lstDoiTuong.sort(
+        (a: any, b: any) => (b.point ?? 0) - (a.point ?? 0)
+      );
     } else if (this.selectValue === '3') {
-      this.lstDoiTuong = this.lstDoiTuong.sort((a: any, b: any) => (a.point ?? 0) - (b.point ?? 0));
+      this.lstDoiTuong = this.lstDoiTuong.sort(
+        (a: any, b: any) => (a.point ?? 0) - (b.point ?? 0)
+      );
     }
   }
-
-
 
   searchDoiTuong(kiKhaoSat: any) {
     this.inputSearchKiKhaoSat = kiKhaoSat;
@@ -183,6 +190,8 @@ export class ListComponent implements OnInit {
             ).values()
           );
         }
+        this.lstSearchDoiTuongFiltered = [...this.lstSearchDoiTuong];
+        this.lstSearchChamDiemFiltered = [...this.lstSearchChamDiem];
       },
       error: (response) => {
         console.log(response);
@@ -192,11 +201,11 @@ export class ListComponent implements OnInit {
   selectSearchStore(item: any) {
     this.filter.filterDoiTuong = item;
     console.log('Selected store:', this.filter.filterDoiTuong);
-    this.lstSearchChamDiem = item.lstInChamDiem
+    this.lstSearchChamDiem = item.lstInChamDiem;
   }
 
   selectSearchChamDiem(item: any) {
-    this.filter.filterNguoiCham = item
+    this.filter.filterNguoiCham = item;
   }
 
   openFilterModal() {
@@ -209,26 +218,38 @@ export class ListComponent implements OnInit {
   }
 
   onFilter() {
-    this.filter.filterKiKhaoSat = this.inputSearchKiKhaoSat
+    this.filter.filterKiKhaoSat = this.inputSearchKiKhaoSat;
 
     this.lstDoiTuong = this.lstSearchDoiTuong
-      .filter((s: any) =>
-        !this.filter.filterDoiTuong?.id || s.id == this.filter.filterDoiTuong?.id)
-      .filter((s: any) =>
-        !this.filter.filterNguoiCham?.userName || s.lstChamDiem?.some((x: any) => x == this.filter.filterNguoiCham.userName))
-      .filter((s: any) =>
-        this.filter.cuaHangToiCham !== true || s.lstChamDiem?.some((x: any) => x == this.user.userName))
-      .filter((s: any) =>
-        this.filter.chuaCham !== true || s?.point == 0)
-    localStorage.setItem('filterLS', JSON.stringify(this.filter))
+      .filter(
+        (s: any) =>
+          !this.filter.filterDoiTuong?.id ||
+          s.id == this.filter.filterDoiTuong?.id
+      )
+      .filter(
+        (s: any) =>
+          !this.filter.filterNguoiCham?.userName ||
+          s.lstChamDiem?.some(
+            (x: any) => x == this.filter.filterNguoiCham.userName
+          )
+      )
+      .filter(
+        (s: any) =>
+          this.filter.cuaHangToiCham !== true ||
+          s.lstChamDiem?.some((x: any) => x == this.user.userName)
+      )
+      .filter((s: any) => this.filter.chuaCham !== true || s?.point == 0);
+    localStorage.setItem('filterLS', JSON.stringify(this.filter));
     this.closeFilterModal();
   }
-
 
   navigateTo(item: any) {
     console.log(this.filter.filterKiKhaoSat);
 
-    localStorage.setItem('filterCS', JSON.stringify({ kiKhaoSat: this.filter.filterKiKhaoSat, doiTuong: item }))
+    localStorage.setItem(
+      'filterCS',
+      JSON.stringify({ kiKhaoSat: this.filter.filterKiKhaoSat, doiTuong: item })
+    );
     this.router.navigate([`/survey/check-list/${item.id}`]);
   }
 
@@ -236,14 +257,35 @@ export class ListComponent implements OnInit {
     this.filter.filterKiKhaoSat = this.lstKiKhaoSat.reduce((a: any, b: any) =>
       new Date(a.endDate) > new Date(b.endDate) ? a : b
     );
-    this.filter.filterDoiTuong.doiTuong = this.doiTuong
-    this.filter.filterDoiTuong = {}
-    this.inputSearchKiKhaoSat = this.filter.filterKiKhaoSat
-    this.filter.filterNguoiCham = {}
+    this.filter.filterDoiTuong.doiTuong = this.doiTuong;
+    this.filter.filterDoiTuong = {};
+    this.inputSearchKiKhaoSat = this.filter.filterKiKhaoSat;
+    this.filter.filterNguoiCham = {};
     this.filter.inSearchStore = '';
     this.filter.searchNguoiCham = '';
     this.filter.cuaHangToiCham = false;
-    localStorage.setItem('filterLS', JSON.stringify(this.filter))
-
+    localStorage.setItem('filterLS', JSON.stringify(this.filter));
   }
+
+  //search cửa hàng
+  onSearchChange() {
+    const keyword = this.searchKeyword?.toLowerCase() || '';
+    if (!keyword) {
+      this.lstSearchDoiTuongFiltered = this.lstSearchDoiTuong;
+    } else {
+      this.lstSearchDoiTuongFiltered = this.lstSearchDoiTuong.filter(
+        (item: any) => item.name.toLowerCase().includes(keyword)
+      );
+    }
+  }
+  onSearchNguoiChamChange() {
+  const keyword = this.searchNguoiChamKeyword?.toLowerCase() || '';
+  if (!keyword) {
+    this.lstSearchChamDiemFiltered = [...this.lstSearchChamDiem];
+  } else {
+    this.lstSearchChamDiemFiltered = this.lstSearchChamDiem.filter((item: any) =>
+      this.getFullName(item.userName)?.toLowerCase().includes(keyword)
+    );
+  }
+}
 }
