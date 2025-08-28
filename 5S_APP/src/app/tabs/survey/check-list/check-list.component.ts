@@ -71,18 +71,66 @@ export class CheckListComponent implements OnInit {
     });
   }
 
+  // getAllEvaluateHistory() {
+  //   this._service
+  //     .search({ keyWord: this.doiTuongId, sortColumn: this.kiKhaoSat.id })
+  //     .subscribe({
+  //       next: (data) => {
+  //         if (data.data.length == 0) return;
+  //         this.lstHisEvaluate.push(
+  //           ...data.data.sort((a: any, b: any) => b.order - a.order)
+  //         );
+  //       },
+  //     });
+  // }
   getAllEvaluateHistory() {
-    this._service
-      .search({ keyWord: this.doiTuongId, sortColumn: this.kiKhaoSat.id })
-      .subscribe({
-        next: (data) => {
-          if (data.data.length == 0) return;
-          this.lstHisEvaluate.push(
-            ...data.data.sort((a: any, b: any) => b.order - a.order)
+  this._service
+    .search({ keyWord: this.doiTuongId, sortColumn: this.kiKhaoSat.id })
+    .subscribe({
+      next: (data) => {
+        if (!data.data || data.data.length === 0) {
+          this.lstHisEvaluate = []; // clear luôn nếu không có gì
+          return;
+        }
+
+        // Ép point về number cho chắc
+        const normalized = data.data.map((x: any) => ({
+          ...x,
+          point: Number(x.point),
+        }));
+
+        // Tách bản nháp ra (API có thì lấy, không thì thử lấy từ localStorage)
+        let draft = normalized.find(
+          (x: any) => x.name?.trim().toLowerCase() === 'bản nháp'
+        );
+
+        if (!draft) {
+          const localDraft = localStorage.getItem(
+            this.doiTuongId + '_' + this.kiKhaoSat.code
           );
-        },
-      });
-  }
+          if (localDraft) {
+            draft = {
+              ...JSON.parse(localDraft),
+              name: 'Bản nháp',
+              point: 0,
+              updateDate: null,
+            };
+          }
+        }
+
+        // Lấy danh sách lịch sử (không gồm bản nháp)
+        const histories = normalized
+          .filter((x: any) => x.name?.trim().toLowerCase() !== 'bản nháp')
+          .sort((a: any, b: any) => b.order - a.order);
+
+        // Reset + gộp bản nháp vào đầu
+        this.lstHisEvaluate = draft ? [draft, ...histories] : histories;
+
+        console.log('lstHisEvaluate', this.lstHisEvaluate);
+      },
+    });
+}
+
 
   getAllAccount() {
     this._authService.GetAllAccount().subscribe({
