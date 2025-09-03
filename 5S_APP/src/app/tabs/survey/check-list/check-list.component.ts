@@ -36,12 +36,11 @@ export class CheckListComponent implements OnInit {
     private _storageService: StorageService,
     private _service: AppEvaluateService,
     private loadingController: LoadingController,
-    private toastController: ToastController,
-  ) { }
+    private toastController: ToastController
+  ) {}
 
   ngOnInit() {
     this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
-
     this.route.paramMap.subscribe({
       next: async (params) => {
         const id = params.get('id');
@@ -83,54 +82,106 @@ export class CheckListComponent implements OnInit {
   //       },
   //     });
   // }
+  // getAllEvaluateHistory() {
+  //   this._service
+  //     .search({ keyWord: this.doiTuongId, sortColumn: this.kiKhaoSat.id })
+  //     .subscribe({
+  //       next: (data) => {
+  //         if (!data.data || data.data.length === 0) {
+  //           this.lstHisEvaluate = []; // clear luôn nếu không có gì
+  //           return;
+  //         }
+
+  //         // Ép point về number cho chắc
+  //         const normalized = data.data.map((x: any) => ({
+  //           ...x,
+  //           point: Number(x.point),
+  //         }));
+
+  //         // Tách bản nháp ra (API có thì lấy, không thì thử lấy từ localStorage)
+  //         let draft = normalized.find(
+  //           (x: any) => x.name?.trim().toLowerCase() === 'bản nháp'
+  //         );
+
+  //         if (!draft) {
+  //           const localDraft = localStorage.getItem(
+  //             this.doiTuongId + '_' + this.kiKhaoSat.code
+  //           );
+  //           if (localDraft) {
+  //             draft = {
+  //               ...JSON.parse(localDraft),
+  //               name: 'Bản nháp',
+  //               point: 0,
+  //               updateDate: null,
+  //             };
+  //           }
+  //         }
+
+  //         // Lấy danh sách lịch sử (không gồm bản nháp)
+  //         const histories = normalized
+  //           .filter((x: any) => x.name?.trim().toLowerCase() !== 'bản nháp')
+  //           .sort((a: any, b: any) => b.order - a.order);
+
+  //         // Reset + gộp bản nháp vào đầu
+  //         this.lstHisEvaluate = draft ? [draft, ...histories] : histories;
+
+  //         console.log('lstHisEvaluate', this.lstHisEvaluate);
+  //       },
+  //     });
+  // }
   getAllEvaluateHistory() {
-  this._service
-    .search({ keyWord: this.doiTuongId, sortColumn: this.kiKhaoSat.id })
-    .subscribe({
-      next: (data) => {
-        if (!data.data || data.data.length === 0) {
-          this.lstHisEvaluate = []; // clear luôn nếu không có gì
-          return;
-        }
+    this._service
+      .search({ keyWord: this.doiTuongId, sortColumn: this.kiKhaoSat.id })
+      .subscribe({
+        next: (data) => {
+          // Khởi tạo danh sách lịch sử
+          let histories = [];
+          
+          // Kiểm tra xem có data từ API không
+          if (data.data && data.data.length > 0) {
+            // Nếu có data, ép kiểu và lọc bản nháp
+            const normalized = data.data.map((x:any) => ({
+              ...x,
+              point: Number(x.point),
+            }));
 
-        // Ép point về number cho chắc
-        const normalized = data.data.map((x: any) => ({
-          ...x,
-          point: Number(x.point),
-        }));
-
-        // Tách bản nháp ra (API có thì lấy, không thì thử lấy từ localStorage)
-        let draft = normalized.find(
-          (x: any) => x.name?.trim().toLowerCase() === 'bản nháp'
-        );
-
-        if (!draft) {
-          const localDraft = localStorage.getItem(
-            this.doiTuongId + '_' + this.kiKhaoSat.code
-          );
-          if (localDraft) {
-            draft = {
-              ...JSON.parse(localDraft),
-              name: 'Bản nháp',
-              point: 0,
-              updateDate: null,
-            };
+            histories = normalized
+              .filter((x:any) => x.name?.trim().toLowerCase() !== 'bản nháp')
+              .sort((a:any, b:any) => b.order - a.order);
           }
-        }
 
-        // Lấy danh sách lịch sử (không gồm bản nháp)
-        const histories = normalized
-          .filter((x: any) => x.name?.trim().toLowerCase() !== 'bản nháp')
-          .sort((a: any, b: any) => b.order - a.order);
+          // Tách bản nháp ra (API có thì lấy, không thì thử lấy từ localStorage)
+          let draft = null;
+          // Tìm bản nháp trong data trả về từ API
+          if (data.data) {
+             draft = data.data.find(
+              (x:any) => x.name?.trim().toLowerCase() === 'bản nháp'
+            );
+          }
 
-        // Reset + gộp bản nháp vào đầu
-        this.lstHisEvaluate = draft ? [draft, ...histories] : histories;
+          // Nếu không tìm thấy bản nháp từ API, kiểm tra trong localStorage
+          if (!draft) {
+            const localDraft = localStorage.getItem(
+              this.doiTuongId + '_' + this.kiKhaoSat.code
+            );
+            if (localDraft) {
+              draft = {
+                ...JSON.parse(localDraft),
+                name: 'Bản nháp',
+                point: 0,
+                updateDate: null,
+                code: this.doiTuongId,
+              };
+            }
+          }
 
-        console.log('lstHisEvaluate', this.lstHisEvaluate);
-      },
-    });
-}
-
+          // Gộp bản nháp vào đầu danh sách lịch sử nếu tồn tại
+          this.lstHisEvaluate = draft ? [draft, ...histories] : histories;
+          
+          console.log('lstHisEvaluate', this.lstHisEvaluate);
+        },
+      });
+  }
 
   getAllAccount() {
     this._authService.GetAllAccount().subscribe({
@@ -151,7 +202,11 @@ export class CheckListComponent implements OnInit {
 
     const currentMonth = now.getMonth() + 1;
 
-    if (this.kiKhaoSat?.trangThaiKi !== '2' || (date.getMonth() + 1) < currentMonth) return false;
+    if (
+      this.kiKhaoSat?.trangThaiKi !== '2' ||
+      date.getMonth() + 1 < currentMonth
+    )
+      return false;
     if (this.account.allowScoring) return true;
     return (
       this.doiTuong.lstChamDiem?.some(
@@ -187,16 +242,14 @@ export class CheckListComponent implements OnInit {
             console.log('tạo mới', data);
 
             // setTimeout(() => {
-            this.router.navigate([
-              `survey/evaluate/draft/${data.header.code}`,
-            ]);
+            this.router.navigate([`survey/evaluate/draft/${data.header.code}`]);
             // }, 1000);
           },
-        })
+        });
     } else {
       console.log('✏️ Chỉnh sửa - Navigate ngay');
       await this.router.navigate([
-        `survey/evaluate/draft/${this.evaluate.header.code}`
+        `survey/evaluate/draft/${this.evaluate.header.code}`,
       ]);
     }
   }
