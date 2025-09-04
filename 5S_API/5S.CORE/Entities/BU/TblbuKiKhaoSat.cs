@@ -31,10 +31,10 @@ namespace PLX5S.CORE.Entities.BU
         public string? DoiTuongId { get; set; }
 
         [Column("START_DATE")]
-        public DateTime? StartDate { get; set; }
+        public DateTime StartDate { get; set; }
 
         [Column("END_DATE")]
-        public DateTime? EndDate { get; set; }
+        public DateTime EndDate { get; set; }
 
         
 

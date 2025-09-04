@@ -638,10 +638,8 @@ namespace PLX5S.BUSINESS.Services.BU
                 var lstStore = _dbContext.tblMdStore.Where(x => x.IsActive == true).ToList();
                 var lstWareHouse = _dbContext.TblMdWareHouse.Where(x => x.IsActive == true).ToList();
 
-                var lstKiKhaoSatStore = _dbContext.TblBuKiKhaoSat.Where(x => x.TrangThaiKi == "2" && (x.SurveyMgmtId == "03805572-e6b7-4455-90fe-9b6584eef46f")).ToList();
-                var lstKiKhaoSatKho = _dbContext.TblBuKiKhaoSat.Where(x => x.TrangThaiKi == "2" && (x.SurveyMgmtId == "16d30d78-0b80-4323-bd86-2498aae676a1")).ToList();
-
-                //var checkDate = dateNow.Day <= 7 ? 1 : (dateNow.Day > 7 && dateNow.Day < 23) ? 0 : (dateNow.Day > 7 && dateNow.Day < 23)
+                var lstKiKhaoSatStore = _dbContext.TblBuKiKhaoSat.Where(x => x.TrangThaiKi == "2" && x.SurveyMgmtId == "03805572-e6b7-4455-90fe-9b6584eef46f" && x.EndDate.Month == dateNow.Month).ToList();
+                var lstKiKhaoSatKho = _dbContext.TblBuKiKhaoSat.Where(x => x.TrangThaiKi == "2" && (x.SurveyMgmtId == "16d30d78-0b80-4323-bd86-2498aae676a1") && x.EndDate.Month == dateNow.Month).ToList();
 
                 foreach (var i in lstKiKhaoSatStore)
                 {
@@ -663,7 +661,6 @@ namespace PLX5S.BUSINESS.Services.BU
                             KiKhaoSatName = i.Name,
                             LstChamDiem = lstAllNguoiCham.Where(_x => _x.DoiTuongId == e.DoiTuongId).Select(_x => _x.UserName).ToList(),
                             KiKhaoSatId = i.Id,
-
                         }).ToList());
                     }
                 }

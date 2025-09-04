@@ -199,7 +199,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         {
                             Id = Guid.NewGuid().ToString(),
                             //InStoreId = item.Id,
-                            DoiTuongId = item.Id,
+                            DoiTuongId = item.StoreId,
                             IsDeleted = false,
                             IsActive = true,
                             KiKhaoSatId = data.KiKhaoSat.Id,
@@ -214,7 +214,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         lstInChamDiem.Add(new TblBuInputChamDiem
                         {
                             Id = Guid.NewGuid().ToString(),
-                            DoiTuongId = item.Id,
+                            DoiTuongId = item.WareHouseId,
                             //InStoreId = item.Id,
                             IsDeleted = false,
                             IsActive = true,
@@ -259,8 +259,10 @@ namespace PLX5S.BUSINESS.Services.BU
                     KiKhaoSatId = data.KiKhaoSat.Id,
                     IsGroup = item.IsGroup,
                     IsImg = item.IsImg,
+                    NumberImg = item.NumberImg,
                     OrderNumber = item.OrderNumber,
                     Report = item.Report,
+                    ChiChtAtvsv = item.ChiChtAtvsv,
                     IsDeleted = item.IsDeleted
                 };
                 newTieuChiList.Add(newItem);
@@ -351,12 +353,8 @@ namespace PLX5S.BUSINESS.Services.BU
                         };
                         lstInputWareHouse.Add(inWareHousee);
                     }
-
                 }
 
-                foreach (var item in lstInDoiTuong)
-                {
-                }
                 return new KiKhaoSatModel()
                 {
                     KiKhaoSat = ki,
@@ -403,8 +401,6 @@ namespace PLX5S.BUSINESS.Services.BU
                     });
                     await _firebaseNotificationService.SendToTopicAsync("PLX5S_NOTI", "Đóng kỳ khảo sát", $"Kỳ khảo sát {kiKhaoSat.Name} đã được Đóng", new DataFireBase());
                 }
-
-
 
                 await _dbContext.SaveChangesAsync();
             }
