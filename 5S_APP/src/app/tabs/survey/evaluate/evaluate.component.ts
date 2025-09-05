@@ -707,27 +707,27 @@ async onSubmit() {
       allChecksPassed = false;
     }
     // Kiểm tra có đủ ảnh không
-    // if (tieuChi.isImg) {
-    //   if (
-    //     tieuChi.chiChtAtvsv &&
-    //     !(
-    //       this.account.chucVuId === 'CHT' || this.account.chucVuId === 'ATVSV'
-    //     )
-    //   ) {
-    //     continue;
-    //   }
+    if (tieuChi.isImg) {
+      if (
+        tieuChi.chiChtAtvsv &&
+        !(
+          this.account.chucVuId === 'CHT' || this.account.chucVuId === 'ATVSV'
+        )
+      ) {
+        continue;
+      }
 
-    //   const numberImgRequired = tieuChi.numberImg || 0;
-    //   const imagesSelecting = this.evaluate?.lstImages?.filter(
-    //     (img: any) => img.tieuChiCode === tieuChi.code
-    //   ).length;
+      const numberImgRequired = tieuChi.numberImg || 0;
+      const imagesSelecting = this.evaluate?.lstImages?.filter(
+        (img: any) => img.tieuChiCode === tieuChi.code
+      ).length;
 
-    //   if (imagesSelecting < numberImgRequired) {
-    //     // errorMessage += `- Tiêu chí "${tieuChi.name}" thiếu ảnh. `;
-    //     errorMessage.push(`- <b>Câu ${index + 1}</b>: thiếu ảnh.`);
-    //     allChecksPassed = false;
-    //   }
-    // }
+      if (imagesSelecting < numberImgRequired) {
+        // errorMessage += `- Tiêu chí "${tieuChi.name}" thiếu ảnh. `;
+        errorMessage.push(`- <b>Câu ${index + 1}</b>: thiếu ảnh.`);
+        allChecksPassed = false;
+      }
+    }
   }
 
   if (!allChecksPassed) {
