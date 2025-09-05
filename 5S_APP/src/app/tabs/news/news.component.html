@@ -86,9 +86,9 @@
     </div>
     <!-- all -->
     <ng-container>
-      <ion-item-group>
+      <ion-item-group style="max-height: 500px; overflow-y: auto; margin: 0">
         <ion-grid>
-          <ion-list style="display: flex; gap: 5px; flex-direction: column; background: none; ">
+          <ion-list style="display: flex; gap: 5px; flex-direction: column; background: none;">
             <ion-item [button]="true" *ngFor="let data of dataHome" (click)="navigateItem(data)"
               style=" --background: none; margin:  5px; width: auto;"
               [ngClass]="{ 'highlight-score': data.isScore === false }">
