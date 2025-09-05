@@ -37,10 +37,11 @@
             </div>
             <div slot="end" style="text-align: right;">
               <p class="mg-0" style="padding-left: 70px;">
-                    <ion-chip *ngIf="item.point >= 95" color="success">{{ item.point }}</ion-chip>
-                    <ion-chip *ngIf="item.point >= 90 && item.point < 95" color="primary">{{ item.point }}</ion-chip>
-                    <ion-chip *ngIf="item.point >= 80 && item.point < 90" color="warning">{{ item.point }}</ion-chip>
+                    <ion-chip *ngIf="item.point >= 95 && item.isActive == true" color="success">{{ item.point }}</ion-chip>
+                    <ion-chip *ngIf="item.point >= 90 && item.point < 95  && item.isActive == true" color="primary">{{ item.point }}</ion-chip>
+                    <ion-chip *ngIf="item.point >= 80 && item.point < 90 && item.isActive == true" color="warning">{{ item.point }}</ion-chip>
                     <ion-chip *ngIf="item.point < 80" color="tertiary">{{ item.point }}</ion-chip>
+                    <ion-chip *ngIf="item.isActive == false" color="danger">{{ item.point }}</ion-chip>
               </p>
               <span class="text-italic" style="font-size: 12px; padding-right: 7px;">{{ item.updateDate
               | date: 'HH:mm dd/MM/yyyy' }}</span>

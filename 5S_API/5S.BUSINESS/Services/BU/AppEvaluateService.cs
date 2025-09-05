@@ -706,22 +706,32 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
-                //var dateNow = new DateTime(2025, 7, 24);
+                //IsScore == true => chưa chấm
+
+                //var dateNow = new DateTime(2025, 9, 27);
                 var dateNow = DateTime.Now;
+                var user = _dbContext.TblAdAccount.FirstOrDefault(x => x.UserName == userName);
                 var lstEvaHeader = await _dbContext.TblBuEvaluateHeader.Where(x => x.AccountUserName == userName && x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 1)).ToListAsync();
                 
                 if (dateNow.Day <= 7)
                 {
                     foreach (var item in data.LstDoiTuong)
                     {
-                        if (item.FDate <= new DateTime(dateNow.Year, dateNow.Month, 1) || lstEvaHeader.Any(x => x.DoiTuongId == item.Id && x.KiKhaoSatId == item.KiKhaoSatId && x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 1) && x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 7)))
+                        if (lstEvaHeader.Any(x => x.DoiTuongId == item.Id && x.KiKhaoSatId == item.KiKhaoSatId && x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 1) && x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 7)))
                         {
                             item.IsScore = false;
                         }
                         else
                         {
-                            item.IsScore = true;
-                            data.ChuaCham = data.ChuaCham + 1;
+                            if(user.ChucVuId != "ATVSV")
+                            {
+                                item.IsScore = true;
+                                data.ChuaCham = data.ChuaCham + 1;
+                            }
+                            else
+                            {
+                                item.IsScore = false;
+                            }
                         }
                     }
                 } 
@@ -729,14 +739,25 @@ namespace PLX5S.BUSINESS.Services.BU
                 {
                     foreach (var item in data.LstDoiTuong)
                     {
-                        if (item.FDate <= new DateTime(dateNow.Year, dateNow.Month, 1) || lstEvaHeader.Any(x => x.DoiTuongId == item.Id && x.KiKhaoSatId == item.KiKhaoSatId && x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 1) && x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 7)))
+                        // nếu không có bản ghi nào của thủ trưởng chấm trong ngày 7 - 15
+                        if (lstEvaHeader.Any(x => x.DoiTuongId == item.Id && x.KiKhaoSatId == item.KiKhaoSatId && x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 1) && x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 7)))
                         {
-                            item.IsScore = false;
+                            if (user.ChucVuId == "CHT" || user.ChucVuId == "TK")
+                            {
+                                item.IsScore = true;
+                                data.ViPham = data.ViPham + 1;
+                                data.ChuaCham = data.ChuaCham + 1;
+                            }
+                            else
+                            {
+                                item.IsScore = false;
+                            }
                         }
                         else
                         {
-                            item.IsScore = false;
-                            data.ViPham = data.ViPham + 1;
+                            item.IsScore = true;
+                            data.ChuaCham = data.ChuaCham + 1;
+
                         }
                     }
                 }
@@ -744,14 +765,51 @@ namespace PLX5S.BUSINESS.Services.BU
                 {
                     foreach (var item in data.LstDoiTuong)
                     {
-                        if (item.FDate <= new DateTime(dateNow.Year, dateNow.Month, 1) || lstEvaHeader.Any(x => x.DoiTuongId == item.Id && x.KiKhaoSatId == item.KiKhaoSatId && x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 15) && x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 23)))
+                        if (user.ChucVuId == "CHT" || user.ChucVuId == "TK")
                         {
-                            item.IsScore = false;
+                            if (lstEvaHeader.Any(x => x.DoiTuongId == item.Id &&
+                                x.KiKhaoSatId == item.KiKhaoSatId &&
+                                x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 1) &&
+                                x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 7)))
+                            {
+                                item.IsScore = true;
+                                data.ChuaCham = data.ChuaCham + 1;
+                            }
+                            else
+                            {
+                                data.ViPham = data.ViPham + 1;
+                                data.ChuaCham = data.ChuaCham + 1;
+                                item.IsScore = false;
+                            }
+                        }else if (user.ChucVuId == "ATVSV")
+                        {
+                            if (lstEvaHeader.Any(x => x.DoiTuongId == item.Id &&
+                                x.KiKhaoSatId == item.KiKhaoSatId &&
+                                x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 8) &&
+                                x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 15)))
+                            {
+                                item.IsScore = false;
+                            }
+                            else
+                            {
+                                data.ViPham = data.ViPham + 1;
+                                item.IsScore = false;
+                            }
+
                         }
                         else
                         {
-                            item.IsScore = true;
-                            data.ChuaCham = data.ChuaCham + 1;
+                            if (lstEvaHeader.Any(x => x.DoiTuongId == item.Id &&
+                                x.KiKhaoSatId == item.KiKhaoSatId &&
+                                x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 15)))
+                            {
+                                item.IsScore = false;
+                            }
+                            else
+                            {
+                                item.IsScore = true;
+                                data.ChuaCham = data.ChuaCham + 1;
+                            }
                         }
                     }
                 }
@@ -759,14 +817,55 @@ namespace PLX5S.BUSINESS.Services.BU
                 {
                     foreach (var item in data.LstDoiTuong)
                     {
-                        if (item.FDate <= new DateTime(dateNow.Year, dateNow.Month, 1) || lstEvaHeader.Any(x => x.DoiTuongId == item.Id && x.KiKhaoSatId == item.KiKhaoSatId && x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 15) && x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 23)))
+                        if (user.ChucVuId == "CHT" || user.ChucVuId == "TK")
                         {
-                            item.IsScore = false;
+                            if (lstEvaHeader.Any(x => x.DoiTuongId == item.Id &&
+                                x.KiKhaoSatId == item.KiKhaoSatId && ((
+                                x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 1) &&
+                                x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 7)) || (
+                                x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 15) &&
+                                x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 23))
+                                ) ))
+                            {
+                                item.IsScore = false;
+                            }
+                            else
+                            {
+                                data.ViPham = data.ViPham + 1;
+                                item.IsScore = false;
+                            }
+                        }
+                        else if (user.ChucVuId == "ATVSV")
+                        {
+                            if (lstEvaHeader.Any(x => x.DoiTuongId == item.Id &&
+                                x.KiKhaoSatId == item.KiKhaoSatId &&
+                                x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 8) &&
+                                x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 15)))
+                            {
+                                item.IsScore = true;
+                                data.ChuaCham = data.ChuaCham + 1;
+                            }
+                            else
+                            {
+                                data.ViPham = data.ViPham + 1;
+                                data.ChuaCham = data.ChuaCham + 1;
+                                item.IsScore = false;
+                            }
+
                         }
                         else
                         {
-                            item.IsScore = false;
-                            data.ViPham = data.ViPham + 1;
+                            if (lstEvaHeader.Any(x => x.DoiTuongId == item.Id &&
+                                x.KiKhaoSatId == item.KiKhaoSatId &&
+                                x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 23)))
+                            {
+                                item.IsScore = false;
+                            }
+                            else
+                            {
+                                item.IsScore = true;
+                                data.ChuaCham = data.ChuaCham + 1;
+                            }
                         }
                     }
                 }

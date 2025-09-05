@@ -166,6 +166,7 @@ export class NewsComponent implements OnInit {
   getChamDiemStatus(fDate: string): string {
     // debugger
     const date = new Date(fDate);
+    // const now = new Date(2025, 8, 27);
     const now = new Date();
 
     const currentMonth = now.getMonth() + 1;
@@ -174,7 +175,7 @@ export class NewsComponent implements OnInit {
     const dateMonth = date.getMonth() + 2;
     const dateYear = date.getFullYear();
     const dateDay = now.getDate();
-
+// debugger
     if (dateMonth !== currentMonth || dateYear !== currentYear) {
       return 'Ngoài thời gian chấm';
     }

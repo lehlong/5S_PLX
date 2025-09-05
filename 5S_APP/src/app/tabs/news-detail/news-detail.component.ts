@@ -10,6 +10,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
   imports: [SharedModule],
 })
 export class NewsDetailComponent implements OnInit {
+[x: string]: any;
   newsId: any | null = null;
   newsDetail: any;
   DataGetAll: any = [];

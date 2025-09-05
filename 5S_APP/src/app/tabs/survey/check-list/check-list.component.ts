@@ -43,18 +43,24 @@ export class CheckListComponent implements OnInit {
     this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
     this.route.paramMap.subscribe({
       next: async (params) => {
-        const id = params.get('id');
+        console.log(this.lstHisEvaluate);
 
+        this.lstHisEvaluate = []
+        console.log(this.lstHisEvaluate);
+
+        const id = params.get('id');
         const filter = JSON.parse(localStorage.getItem('filterCS') ?? '');
         this.kiKhaoSat = filter.kiKhaoSat;
         this.doiTuong = filter.doiTuong;
 
-        console.log(filter);
+        // console.log(filter);
 
         // await this._storageService.clear()
         let eva = await this._storageService.get(
           this.doiTuong.id + '_' + this.kiKhaoSat.code
         );
+
+        //check xem có bản nháp trong sqlite hay không
         if (eva) {
           this.evaluate = eva;
           if (this.evaluate.header.kiKhaoSatId == this.kiKhaoSat.id) {
@@ -70,115 +76,15 @@ export class CheckListComponent implements OnInit {
     });
   }
 
-  // getAllEvaluateHistory() {
-  //   this._service
-  //     .search({ keyWord: this.doiTuongId, sortColumn: this.kiKhaoSat.id })
-  //     .subscribe({
-  //       next: (data) => {
-  //         if (data.data.length == 0) return;
-  //         this.lstHisEvaluate.push(
-  //           ...data.data.sort((a: any, b: any) => b.order - a.order)
-  //         );
-  //       },
-  //     });
-  // }
-  // getAllEvaluateHistory() {
-  //   this._service
-  //     .search({ keyWord: this.doiTuongId, sortColumn: this.kiKhaoSat.id })
-  //     .subscribe({
-  //       next: (data) => {
-  //         if (!data.data || data.data.length === 0) {
-  //           this.lstHisEvaluate = []; // clear luôn nếu không có gì
-  //           return;
-  //         }
-
-  //         // Ép point về number cho chắc
-  //         const normalized = data.data.map((x: any) => ({
-  //           ...x,
-  //           point: Number(x.point),
-  //         }));
-
-  //         // Tách bản nháp ra (API có thì lấy, không thì thử lấy từ localStorage)
-  //         let draft = normalized.find(
-  //           (x: any) => x.name?.trim().toLowerCase() === 'bản nháp'
-  //         );
-
-  //         if (!draft) {
-  //           const localDraft = localStorage.getItem(
-  //             this.doiTuongId + '_' + this.kiKhaoSat.code
-  //           );
-  //           if (localDraft) {
-  //             draft = {
-  //               ...JSON.parse(localDraft),
-  //               name: 'Bản nháp',
-  //               point: 0,
-  //               updateDate: null,
-  //             };
-  //           }
-  //         }
-
-  //         // Lấy danh sách lịch sử (không gồm bản nháp)
-  //         const histories = normalized
-  //           .filter((x: any) => x.name?.trim().toLowerCase() !== 'bản nháp')
-  //           .sort((a: any, b: any) => b.order - a.order);
-
-  //         // Reset + gộp bản nháp vào đầu
-  //         this.lstHisEvaluate = draft ? [draft, ...histories] : histories;
-
-  //         console.log('lstHisEvaluate', this.lstHisEvaluate);
-  //       },
-  //     });
-  // }
   getAllEvaluateHistory() {
     this._service
       .search({ keyWord: this.doiTuongId, sortColumn: this.kiKhaoSat.id })
       .subscribe({
         next: (data) => {
-          // Khởi tạo danh sách lịch sử
-          let histories = [];
-          
-          // Kiểm tra xem có data từ API không
-          if (data.data && data.data.length > 0) {
-            // Nếu có data, ép kiểu và lọc bản nháp
-            const normalized = data.data.map((x:any) => ({
-              ...x,
-              point: Number(x.point),
-            }));
-
-            histories = normalized
-              .filter((x:any) => x.name?.trim().toLowerCase() !== 'bản nháp')
-              .sort((a:any, b:any) => b.order - a.order);
-          }
-
-          // Tách bản nháp ra (API có thì lấy, không thì thử lấy từ localStorage)
-          let draft = null;
-          // Tìm bản nháp trong data trả về từ API
-          if (data.data) {
-             draft = data.data.find(
-              (x:any) => x.name?.trim().toLowerCase() === 'bản nháp'
-            );
-          }
-
-          // Nếu không tìm thấy bản nháp từ API, kiểm tra trong localStorage
-          if (!draft) {
-            const localDraft = localStorage.getItem(
-              this.doiTuongId + '_' + this.kiKhaoSat.code
-            );
-            if (localDraft) {
-              draft = {
-                ...JSON.parse(localDraft),
-                name: 'Bản nháp',
-                point: 0,
-                updateDate: null,
-                code: this.doiTuongId,
-              };
-            }
-          }
-
-          // Gộp bản nháp vào đầu danh sách lịch sử nếu tồn tại
-          this.lstHisEvaluate = draft ? [draft, ...histories] : histories;
-          
-          console.log('lstHisEvaluate', this.lstHisEvaluate);
+          if (data.data.length == 0) return;
+          this.lstHisEvaluate.push(
+            ...data.data.sort((a: any, b: any) => b.order - a.order)
+          );
         },
       });
   }
