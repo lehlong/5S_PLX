@@ -8,6 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { MessageService } from 'src/app/service/message.service';
+import { AuthService } from 'src/app/service/auth.service';
 
 @Component({
   selector: 'app-change-password',
@@ -18,10 +19,11 @@ import { MessageService } from 'src/app/service/message.service';
 })
 export class ChangePasswordComponent implements OnInit {
   changePasswordForm!: FormGroup;
-  private readonly currentPassword = 'd2s@123456';
+  // private readonly currentPassword = 'd2s@123456';
   constructor(
     private fb: FormBuilder,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -59,25 +61,27 @@ export class ChangePasswordComponent implements OnInit {
     return null;
   }
   onSubmit() {
-  const { oldPassword, newPassword } = this.changePasswordForm.value;
-
-  // check mật khẩu cũ có đúng không
-  if (oldPassword !== this.currentPassword) {
-    this.messageService.show('Mật khẩu cũ không đúng!', 'danger');
-    return;
+    const { oldPassword, newPassword } = this.changePasswordForm.value;
+    const userInfoRaw = localStorage.getItem('UserInfo');
+    const userInfo = userInfoRaw ? JSON.parse(userInfoRaw) : null;
+    const userName = userInfo?.userName || '';
+    if (userName) {
+      this.authService
+        .changePassword({ userName, oldPassword, newPassword })
+        .subscribe({
+          next: (res) => {
+            this.messageService.show('Đổi mật khẩu thành công!', 'success');
+            console.log('API Response:', res);
+            this.changePasswordForm.reset();
+          },
+          error: (err) => {
+            console.error(err);
+            this.messageService.show(
+              err.error?.message || 'Đổi mật khẩu thất bại!',
+              'danger'
+            );
+          },
+        });
+    }
   }
-
-  // check mật khẩu mới phải khác mật khẩu cũ
-  if (oldPassword === newPassword) {
-    this.messageService.show(
-      'Mật khẩu mới không được trùng mật khẩu cũ!',
-      'warning'
-    );
-    return;
-  }
-
-  this.messageService.show('Đổi mật khẩu thành công!', 'success');
-  console.log('Submit thành công:', oldPassword, newPassword);
-}
-
 }

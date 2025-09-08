@@ -11,7 +11,8 @@ export class AuthService {
     register: 'auth/register',
     forgotPassword: 'auth/forgot-password',
     resetPassword: 'auth/reset-password',
-    getRightOfUser: 'Right/getRightOfUser'
+    getRightOfUser: 'Right/getRightOfUser',
+    changePassword: 'Auth/ChangePassword',
   };
 
   constructor(private commonService: CommonService) {}
@@ -23,8 +24,8 @@ export class AuthService {
       false
     );
   }
-  GetAllAccount(): Observable<any>{
-    return this.commonService.get('Account/GetAll')
+  GetAllAccount(): Observable<any> {
+    return this.commonService.get('Account/GetAll');
   }
 
   getRightOfUser(params: any): Observable<any> {
@@ -58,5 +59,8 @@ export class AuthService {
 
   logout(): void {
     localStorage.clear();
+  }
+  changePassword(data: { userName: any; oldPassword: any; newPassword: any }) {
+    return this.commonService.put(this.authEndpoints.changePassword, data)
   }
 }
