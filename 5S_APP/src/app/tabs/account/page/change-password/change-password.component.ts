@@ -7,6 +7,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { MessageService } from 'src/app/service/message.service';
 
 @Component({
   selector: 'app-change-password',
@@ -17,7 +18,11 @@ import {
 })
 export class ChangePasswordComponent implements OnInit {
   changePasswordForm!: FormGroup;
-  constructor(private fb: FormBuilder) {}
+  private readonly currentPassword = 'd2s@123456';
+  constructor(
+    private fb: FormBuilder,
+    private messageService: MessageService
+  ) {}
 
   ngOnInit() {
     this.changePasswordForm = this.fb.group(
@@ -41,13 +46,38 @@ export class ChangePasswordComponent implements OnInit {
     }
     return null;
   }
-  onSubmit() {
-    if (this.changePasswordForm.invalid) {
-      this.changePasswordForm.markAllAsTouched();
-      return;
+  CheckDiffPassword(form: FormGroup) {
+    const oldPassword = form.get('oldPassword')?.value;
+    const newPassword = form.get('newPassword')?.value;
+    if (oldPassword && newPassword && oldPassword === newPassword) {
+      form.get('newPassword')?.setErrors({ sameAsOld: true });
+    } else {
+      if (form.get('newPassword')?.hasError('sameAsOld')) {
+        form.get('newPassword')?.setErrors(null);
+      }
     }
-
-    const { oldPassword, newPassword } = this.changePasswordForm.value;
-    console.log('Submit thành công:', oldPassword, newPassword);
+    return null;
   }
+  onSubmit() {
+  const { oldPassword, newPassword } = this.changePasswordForm.value;
+
+  // check mật khẩu cũ có đúng không
+  if (oldPassword !== this.currentPassword) {
+    this.messageService.show('Mật khẩu cũ không đúng!', 'danger');
+    return;
+  }
+
+  // check mật khẩu mới phải khác mật khẩu cũ
+  if (oldPassword === newPassword) {
+    this.messageService.show(
+      'Mật khẩu mới không được trùng mật khẩu cũ!',
+      'warning'
+    );
+    return;
+  }
+
+  this.messageService.show('Đổi mật khẩu thành công!', 'success');
+  console.log('Submit thành công:', oldPassword, newPassword);
+}
+
 }
