@@ -71,15 +71,32 @@
         class="logo"
         src="../../../assets/img/Logo_of_Petrolimex.svg.png"
         alt="Logo"
-        
       />
-      <img class="logo" src="../../../assets/img/logo.png" alt="Logo" />
+      <img (click)="showUrl()" class="logo" src="../../../assets/img/logo.png" alt="Logo" />
     </div>
     <div class="img-grid-background-top"></div>
     <div class="container">
       <h2 class="titleApp">Chấm điểm 5s</h2>
       <h3 class="sub-titleApp">Công ty xăng dầu Petrolimex NA</h3>
       <div class="login">
+        <ion-accordion-group *ngIf="showAccordion" class="form-login">
+          <ion-label class="label-login">Cấu hình đường dẫn url</ion-label>
+          <div class="input-wrapper">
+            <ion-icon
+              name="cog-outline"
+              style="padding-right: 7px"
+            ></ion-icon>
+            <ion-input
+              color="dark"
+              [clearInput]="true"
+              placeholder="Cấu hình url"
+              class="custom"
+              [(ngModel)]="customUrl"
+              (ngModelChange)="onUrlChange($event)"
+            >
+            </ion-input>
+          </div>
+        </ion-accordion-group>
         <ion-accordion-group class="form-login">
           <ion-label class="label-login">Tên đăng nhập</ion-label>
           <div class="input-wrapper">
@@ -109,7 +126,7 @@
               [type]="showPassword ? 'text' : 'password'"
               placeholder="Mật khẩu"
               [(ngModel)]="model.password"
-               class="custom"
+              class="custom"
             ></ion-input>
             <ion-icon
               [name]="showPassword ? 'eye-off' : 'eye'"
@@ -140,7 +157,7 @@
           >
         </div>
         <div class="register d-flex justify-center" style="gap: 10px">
-          <span style="color: #000;">Bạn không có tài khoản?</span>
+          <span style="color: #000">Bạn không có tài khoản?</span>
           <a style="color: #4a7def" href="">Đăng ký</a>
         </div>
       </div>

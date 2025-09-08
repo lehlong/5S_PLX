@@ -16,6 +16,7 @@ interface UserInfo {
   standalone: true,
 })
 export class AccountComponent implements OnInit {
+  apiUrl: any;
   userInfo: UserInfo = {
     fullName: '',
     phoneNumber: '',
@@ -43,10 +44,12 @@ export class AccountComponent implements OnInit {
   }
 
   Logout() {
+    this.apiUrl = localStorage.getItem('CapacitorStorage.apiUrl');
     localStorage.clear();
     sessionStorage.clear();
+    localStorage.setItem('CapacitorStorage.apiUrl', this.apiUrl);
     this.router.navigate(['/login']).then(() => {
-      window.location.reload(); 
+      window.location.reload();
     });
   }
 }

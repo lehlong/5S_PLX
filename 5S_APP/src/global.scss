@@ -213,3 +213,7 @@ ion-alert::part(button) {
 .alert-head {
   display: none !important;
 }
+.alert-wrapper.sc-ion-alert-ios {
+  display: flex !important;
+  gap: 25px !important;
+}

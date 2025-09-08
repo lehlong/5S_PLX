@@ -36,7 +36,7 @@ export class NewsV2Component implements OnInit {
   }
 
   goToLogin() {
-    this.router.navigate(['/login']);
+    this.router.navigate(['/login'], { replaceUrl: true });
     console.log('goLogin');
   }
   goToDetail(newsId: any) {

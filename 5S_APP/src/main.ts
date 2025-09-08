@@ -4,14 +4,22 @@ import { appConfig } from './app/app.config';
 import { provideIonicAngular } from '@ionic/angular/standalone';
 import { IonicStorageModule } from '@ionic/storage-angular';
 import { importProvidersFrom } from '@angular/core';
+import { Preferences } from '@capacitor/preferences';
 
-bootstrapApplication(AppComponent, {
-  ...appConfig,
-  providers: [
-    ...(appConfig.providers || []),
-    provideIonicAngular({
-      innerHTMLTemplatesEnabled: true   // 🔑 cho phép HTML trong Alert
-    }),
-    importProvidersFrom(IonicStorageModule.forRoot()) // ✅ đúng cách để dùng Storage
-  ]
-});
+async function initApp() {
+  const { value } = await Preferences.get({ key: 'baseApi' });
+  if (value) {
+    (window as any)['APP_BASE_API'] = value; 
+  }
+  bootstrapApplication(AppComponent, {
+    ...appConfig,
+    providers: [
+      ...(appConfig.providers || []),
+      provideIonicAngular({
+        innerHTMLTemplatesEnabled: true, 
+      }),
+      importProvidersFrom(IonicStorageModule.forRoot()), 
+    ],
+  });
+}
+initApp();

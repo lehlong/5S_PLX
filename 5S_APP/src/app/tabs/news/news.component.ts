@@ -8,6 +8,7 @@ import {
 } from '@ionic/angular/standalone';
 import { HomeService } from 'src/app/service/home.service';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { ConfigService } from 'src/app/service/config.service';
 interface UserInfo {
   fullName: string;
   phoneNumber: string;
@@ -54,7 +55,7 @@ export class NewsComponent implements OnInit {
       doiTuong: null,
       surveyMgmtId: null,
     },
-  }
+  };
   buttons = [
     { label: 'Tất cả', value: 'all' },
     { label: 'Cửa hàng', value: 'store' },
@@ -66,13 +67,19 @@ export class NewsComponent implements OnInit {
     private router: Router,
     private loadingController: LoadingController,
     private toastController: ToastController,
-  ) { }
+    private configService: ConfigService
+  ) {}
 
   ngOnInit() {
     this.loadUserInfo();
-    this.getChucVu();
+    this.configService.apiUrl$.subscribe((url) => {
+      // Khi URL thay đổi, gọi lại API
+      this.getChucVu();
+      this.getDataHome();
+    });
+    // this.getChucVu();
     this.formatToday();
-    this.getDataHome();
+    // this.getDataHome();
   }
 
   slideOpts = {
@@ -145,9 +152,15 @@ export class NewsComponent implements OnInit {
       });
 
       this.dataHomeAll = sortedList;
-      this.storeLength = `(${sortedList.filter((x: any) => x.type === 'DT1').length})`;
-      this.wareHouseLength = `(${sortedList.filter((x: any) => x.type === 'DT2').length})`;
-      this.chuaChamLength = `(${sortedList.filter((x: any) => x.isScore === true).length})`;
+      this.storeLength = `(${
+        sortedList.filter((x: any) => x.type === 'DT1').length
+      })`;
+      this.wareHouseLength = `(${
+        sortedList.filter((x: any) => x.type === 'DT2').length
+      })`;
+      this.chuaChamLength = `(${
+        sortedList.filter((x: any) => x.isScore === true).length
+      })`;
       this.select(this.selected);
 
       this.dataHomeStore = sortedList.filter((x: any) => x.type === 'DT1');
@@ -175,42 +188,51 @@ export class NewsComponent implements OnInit {
     const dateMonth = date.getMonth() + 2;
     const dateYear = date.getFullYear();
     const dateDay = now.getDate();
-// debugger
+    // debugger
     if (dateMonth !== currentMonth || dateYear !== currentYear) {
       return 'Ngoài thời gian chấm';
     }
-    if (this.userInfo.chucVuId == "CHT" || this.userInfo.chucVuId == "TK" || this.userInfo.chucVuId == "ATVSV") {
-      if (dateDay >= 1 && dateDay <= 7 && (this.userInfo.chucVuId == "CHT" || this.userInfo.chucVuId == "TK")) {
-        return `Trong thời gian (01-07/${(currentMonth)
+    if (
+      this.userInfo.chucVuId == 'CHT' ||
+      this.userInfo.chucVuId == 'TK' ||
+      this.userInfo.chucVuId == 'ATVSV'
+    ) {
+      if (
+        dateDay >= 1 &&
+        dateDay <= 7 &&
+        (this.userInfo.chucVuId == 'CHT' || this.userInfo.chucVuId == 'TK')
+      ) {
+        return `Trong thời gian (01-07/${currentMonth
           .toString()
           .padStart(2, '0')})`;
       }
 
-      if (dateDay >= 16 && dateDay <= 23 && (this.userInfo.chucVuId == "CHT" || this.userInfo.chucVuId == "TK")) {
-        return `Trong thời gian (15-23/${(currentMonth)
+      if (
+        dateDay >= 16 &&
+        dateDay <= 23 &&
+        (this.userInfo.chucVuId == 'CHT' || this.userInfo.chucVuId == 'TK')
+      ) {
+        return `Trong thời gian (15-23/${currentMonth
           .toString()
           .padStart(2, '0')})`;
       }
 
-      if (dateDay >= 8 && dateDay <= 15 && (this.userInfo.chucVuId == "ATVSV")) {
-        return `Trong thời gian (08-15/${(currentMonth)
+      if (dateDay >= 8 && dateDay <= 15 && this.userInfo.chucVuId == 'ATVSV') {
+        return `Trong thời gian (08-15/${currentMonth
           .toString()
           .padStart(2, '0')})`;
       }
 
-      if (dateDay >= 24 && (this.userInfo.chucVuId == "ATVSV")) {
-        return `Trong thời gian (24-30/${(currentMonth)
+      if (dateDay >= 24 && this.userInfo.chucVuId == 'ATVSV') {
+        return `Trong thời gian (24-30/${currentMonth
           .toString()
           .padStart(2, '0')})`;
       }
       return 'Ngoài thời gian chấm';
-    }
-    else {
-      return 'Trong thời gian chấm'
+    } else {
+      return 'Trong thời gian chấm';
     }
   }
-
-
 
   navigateItem(item: any) {
     console.log(item);
@@ -221,8 +243,8 @@ export class NewsComponent implements OnInit {
       item.type === 'DT1'
         ? 'Cửa hàng'
         : item.type === 'DT2'
-          ? 'Kho'
-          : 'Không xác định';
+        ? 'Kho'
+        : 'Không xác định';
 
     this.filter.kiKhaoSat.doiTuong = doiTuongText;
 
@@ -238,14 +260,12 @@ export class NewsComponent implements OnInit {
     this.router.navigate([`survey/check-list/${item.id}`]);
   }
 
-
-
   async doRefresh(event: any) {
     console.log('🔄 Pull to refresh triggered');
 
     try {
-      this.getDataHome()
-
+      this.getDataHome();
+      this.getChucVu();
     } catch (error) {
       console.error('❌ Lỗi khi làm mới dữ liệu:', error);
     } finally {
@@ -254,18 +274,17 @@ export class NewsComponent implements OnInit {
     }
   }
 
-
   async reload() {
     const loading = await this.loadingController.create({
       message: 'Đang tải...',
-      spinner: 'circles'
+      spinner: 'circles',
     });
 
     await loading.present();
 
     try {
-      await this.getDataHome()
-
+      await this.getDataHome();
+      await this.getChucVu();
     } catch (error) {
       console.error('❌ Lỗi reload:', error);
     } finally {
@@ -286,5 +305,4 @@ export class NewsComponent implements OnInit {
       clearInterval(this.autoRefreshInterval);
     }
   }
-
 }

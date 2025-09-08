@@ -1,6 +1,7 @@
 import UIKit
 import Capacitor
 import CoreLocation
+import CapacitorCamera 
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate {
@@ -12,13 +13,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         // Kiểm tra và yêu cầu quyền vị trí
         locationManager.delegate = self
         checkLocationAuthorization()
-
         return true
     }
 
     func checkLocationAuthorization() {
         let status = CLLocationManager.authorizationStatus()
-
         switch status {
         case .notDetermined:
             print("🔴 Location: Not determined → requesting...")

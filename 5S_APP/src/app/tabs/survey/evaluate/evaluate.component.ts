@@ -102,7 +102,7 @@ export class EvaluateComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private renderer: Renderer2,
     private router: Router
-  ) { }
+  ) {}
 
   async ngOnInit() {
     this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
@@ -270,8 +270,9 @@ export class EvaluateComponent implements OnInit {
 
   applyTransform() {
     const imgEl = this.zoomImg.nativeElement as HTMLElement;
-    imgEl.style.transform = `scale(${this.currentScale}) translate(${this.currentX / this.currentScale
-      }px, ${this.currentY / this.currentScale}px)`;
+    imgEl.style.transform = `scale(${this.currentScale}) translate(${
+      this.currentX / this.currentScale
+    }px, ${this.currentY / this.currentScale}px)`;
   }
 
   //Hàm search
@@ -687,133 +688,136 @@ export class EvaluateComponent implements OnInit {
     this.evaluate.lstEvaluate[idx].pointId = selected;
     this._storageService.set(this.doiTuong.id, this.evaluate);
   }
-async onSubmit() {
-  if (!this.isEdit) return;
+  async onSubmit() {
+    if (!this.isEdit) return;
 
-  let allChecksPassed = true;
-  let errorMessage: string[] = [];
+    let allChecksPassed = true;
+    let errorMessage: string[] = [];
 
-  for (let index = 0; index < this.lstTieuChi.length; index++) {
-    const tieuChi = this.lstTieuChi[index];
+    for (let index = 0; index < this.lstTieuChi.length; index++) {
+      const tieuChi = this.lstTieuChi[index];
 
-    const evaluateItem = this.evaluate.lstEvaluate.find(
-      (i: any) => i.tieuChiId === tieuChi.id || i.tieuChiCode === tieuChi.code
-    );
+      const evaluateItem = this.evaluate.lstEvaluate.find(
+        (i: any) => i.tieuChiId === tieuChi.id || i.tieuChiCode === tieuChi.code
+      );
 
-    // 1. Kiểm tra pointId
-    if (!evaluateItem || !evaluateItem.pointId) {
-      // errorMessage += `- Tiêu chí "${tieuChi.name}" chưa chấm điểm. `;
-      errorMessage.push(`- <b>Câu ${index + 1}</b>: chưa chấm điểm.`);
-      allChecksPassed = false;
-    }
-    // Kiểm tra có đủ ảnh không
-    if (tieuChi.isImg) {
-      if (
-        tieuChi.chiChtAtvsv &&
-        !(
-          this.account.chucVuId === 'CHT' || this.account.chucVuId === 'ATVSV'
-        )
-      ) {
-        continue;
-      }
-
-      const numberImgRequired = tieuChi.numberImg || 0;
-      const imagesSelecting = this.evaluate?.lstImages?.filter(
-        (img: any) => img.tieuChiCode === tieuChi.code
-      ).length;
-
-      if (imagesSelecting < numberImgRequired) {
-        // errorMessage += `- Tiêu chí "${tieuChi.name}" thiếu ảnh. `;
-        errorMessage.push(`- <b>Câu ${index + 1}</b>: thiếu ảnh.`);
+      // 1. Kiểm tra pointId
+      if (!evaluateItem || !evaluateItem.pointId) {
+        // errorMessage += `- Tiêu chí "${tieuChi.name}" chưa chấm điểm. `;
+        errorMessage.push(`- <b>Câu ${index + 1}</b>: chưa chấm điểm.`);
         allChecksPassed = false;
       }
-    }
-  }
+      // Kiểm tra có đủ ảnh không
+      if (tieuChi.isImg) {
+        if (
+          tieuChi.chiChtAtvsv &&
+          !(
+            this.account.chucVuId === 'CHT' || this.account.chucVuId === 'ATVSV'
+          )
+        ) {
+          continue;
+        }
 
-  if (!allChecksPassed) {
-    const alert = await this.alertController.create({
-      message: `<div class="alert-header-evaluate">
+        const numberImgRequired = tieuChi.numberImg || 0;
+        const imagesSelecting = this.evaluate?.lstImages?.filter(
+          (img: any) => img.tieuChiCode === tieuChi.code
+        ).length;
+
+        if (imagesSelecting < numberImgRequired) {
+          // errorMessage += `- Tiêu chí "${tieuChi.name}" thiếu ảnh. `;
+          errorMessage.push(`- <b>Câu ${index + 1}</b>: thiếu ảnh.`);
+          allChecksPassed = false;
+        }
+      }
+    }
+
+    if (!allChecksPassed) {
+      const alert = await this.alertController.create({
+        message: `<div class="alert-header-evaluate">
     <div class="alert-icon-evaluate"><ion-icon name="warning"></ion-icon></div>
       <div class="title-evaluate">Đánh giá chưa hoàn tất</div>
-      <div class="subtitle-evaluate">Bạn đã bỏ sót <b class="highlight">${errorMessage.length
-        }</b> tiêu chí quan trọng</div>
+      <div class="subtitle-evaluate">Bạn đã bỏ sót <b class="highlight">${
+        errorMessage.length
+      }</b> tiêu chí quan trọng</div>
   </div>
   <div class="alert-body">
     ${errorMessage.join('<br/>')}
   </div>
      `,
-      buttons: ['Quay lại chấm'],
-      cssClass: 'custom-alert-center-btn',
+        buttons: ['Quay lại chấm'],
+        cssClass: 'custom-alert-center-btn',
+      });
+      await alert.present();
+      return;
+    }
+
+    // Hiển thị loading
+    const loading = await this.loadingController.create({
+      message: 'Đang xử lý...',
+      spinner: 'circular',
     });
-    await alert.present();
-    return;
+    await loading.present();
+
+    try {
+      // Trường hợp đủ
+      this.evaluate.header.accountUserName = this.account.userName;
+      this.evaluate.header.chucVuId = this.account.chucVuId;
+      console.log(this.kiKhaoSat);
+
+      await this._service.insertEvaluate(this.evaluate).subscribe({
+        next: async (data) => {
+          console.log('Chấm điểm thành công');
+          await this._service
+            .HandlePointStore({
+              kiKhaoSatId: this.kiKhaoSat.id,
+              doiTuongId: this.doiTuong.id,
+              surveyId: this.kiKhaoSat.surveyMgmtId,
+              lstData: this.doiTuong.lstChamDiem,
+            })
+            .subscribe({
+              next: async (data) => {
+                console.log('tính tổng điểm thành công');
+
+                // Đóng loading
+                await loading.dismiss();
+
+                this.messageService.show(
+                  `Chấm điểm Cửa hàng thành công`,
+                  'success'
+                );
+                this._storageService.remove(
+                  this.doiTuong.id + '_' + this.kiKhaoSat.code
+                );
+                localStorage.removeItem(
+                  this.doiTuong.id + '_' + this.kiKhaoSat.code
+                );
+
+                this.router.navigate([
+                  `/survey/check-list/${this.doiTuong.id}`,
+                ]);
+              },
+              error: async (error) => {
+                // Đóng loading khi có lỗi
+                await loading.dismiss();
+                console.error('Lỗi khi tính tổng điểm:', error);
+                this.messageService.show('Có lỗi xảy ra khi tính tổng điểm');
+              },
+            });
+        },
+        error: async (error) => {
+          // Đóng loading khi có lỗi
+          await loading.dismiss();
+          console.error('Lỗi khi chấm điểm:', error);
+          this.messageService.show('Có lỗi xảy ra khi chấm điểm');
+        },
+      });
+    } catch (error) {
+      // Đóng loading trong trường hợp có lỗi không mong muốn
+      await loading.dismiss();
+      console.error('Lỗi không mong muốn:', error);
+      this.messageService.show('Có lỗi không mong muốn xảy ra');
+    }
   }
-
-  // Hiển thị loading
-  const loading = await this.loadingController.create({
-    message: 'Đang xử lý...',
-    spinner: 'circular'
-  });
-  await loading.present();
-
-  try {
-    // Trường hợp đủ
-    this.evaluate.header.accountUserName = this.account.userName;
-    this.evaluate.header.chucVuId = this.account.chucVuId;
-    console.log(this.kiKhaoSat);
-
-    await this._service.insertEvaluate(this.evaluate).subscribe({
-      next: async (data) => {
-        console.log('Chấm điểm thành công');
-        await this._service
-          .HandlePointStore({
-            kiKhaoSatId: this.kiKhaoSat.id,
-            doiTuongId: this.doiTuong.id,
-            surveyId: this.kiKhaoSat.surveyMgmtId,
-            lstData: this.doiTuong.lstChamDiem,
-          })
-          .subscribe({
-            next: async (data) => {
-              console.log('tính tổng điểm thành công');
-
-              // Đóng loading
-              await loading.dismiss();
-
-              this.messageService.show(
-                `Chấm điểm Cửa hàng thành công`,
-                'success'
-              );
-              this._storageService.remove(
-                this.doiTuong.id + '_' + this.kiKhaoSat.code
-              );
-              localStorage.removeItem(
-                this.doiTuong.id + '_' + this.kiKhaoSat.code
-              );
-
-              this.router.navigate([`/survey/check-list/${this.doiTuong.id}`]);
-            },
-            error: async (error) => {
-              // Đóng loading khi có lỗi
-              await loading.dismiss();
-              console.error('Lỗi khi tính tổng điểm:', error);
-              this.messageService.show('Có lỗi xảy ra khi tính tổng điểm');
-            }
-          });
-      },
-      error: async (error) => {
-        // Đóng loading khi có lỗi
-        await loading.dismiss();
-        console.error('Lỗi khi chấm điểm:', error);
-        this.messageService.show('Có lỗi xảy ra khi chấm điểm');
-      }
-    });
-  } catch (error) {
-    // Đóng loading trong trường hợp có lỗi không mong muốn
-    await loading.dismiss();
-    console.error('Lỗi không mong muốn:', error);
-    this.messageService.show('Có lỗi không mong muốn xảy ra');
-  }
-}
 
   navigateTo(itemId: string) {
     const currentUrl = window.location.href.split('#')[0]; // Lấy URL hiện tại mà không có hash
@@ -878,7 +882,9 @@ async onSubmit() {
 
     const alert = await this.alertController.create({
       header: 'Xác nhận',
-      message: 'Bạn có chắc muốn xóa ảnh này?',
+      message: `<div class="alert-header-evaluate">
+      <div class="subtitle-evaluate">Bạn có chắc muốn xoá ảnh này ?</div>
+      </div>`,
       buttons: [
         {
           text: 'Hủy',

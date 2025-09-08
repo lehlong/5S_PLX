@@ -18,6 +18,7 @@ import {
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
 import { GlobalService } from './global.service';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root',
@@ -32,8 +33,13 @@ export class CommonService {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private globalService: GlobalService
-  ) { }
+    private globalService: GlobalService,
+    private configService: ConfigService
+  ) {
+    this.configService.apiUrl$.subscribe((url) => {
+      this.baseUrl = url;
+    });
+  }
 
   get<T>(
     endpoint: string,
@@ -324,14 +330,12 @@ export class CommonService {
         }
       }
       if (error.error && error.error.messageObject) {
-        if(error.error.messageObject.messageDetail){
-          console.log(error.error.messageObject.messageDetail)
-          errorMessage=error.error.messageObject.messageDetail
-        }else{
- errorMessage = `MSG${error.error.messageObject.code} ${error.error.message}`;  
+        if (error.error.messageObject.messageDetail) {
+          console.log(error.error.messageObject.messageDetail);
+          errorMessage = error.error.messageObject.messageDetail;
+        } else {
+          errorMessage = `MSG${error.error.messageObject.code} ${error.error.message}`;
         }
-       
-        
 
         //console.log(error)
         //this.showError(error.error.messageObject.messageDetail.message)
