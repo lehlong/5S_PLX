@@ -226,5 +226,23 @@ namespace PLX5S.API.Controllers.MD
             }
             return Ok(transferObject);
         }
+
+
+        //[HttpGet("ResetAllPassUser")]
+        //public async Task<IActionResult> ResetAllPassUser([FromQuery] string username)
+        //{
+        //    var transferObject = new TransferObject();
+        //    await _service.ResetAllPassUser();
+        //    if (_service.Status)
+        //    {
+        //    }
+        //    else
+        //    {
+        //        transferObject.Status = false;
+        //        transferObject.MessageObject.MessageType = MessageType.Error;
+        //        transferObject.GetMessage("0104", _service);
+        //    }
+        //    return Ok(transferObject);
+        //}
     }
 }

@@ -22,6 +22,7 @@ namespace PLX5S.BUSINESS.Services.AD
         Task UpdateInformation(AccountUpdateInformationDto dto);
         Task<IList<AccountDto>> GetAll(AccountFilterLite filter);
         Task<AccountTreeRightDto> GetByIdWithRightTree(object id);
+        Task ResetAllPassUser();
         Task<IList<DeviceDto>> GetDiviceByUser(string username);
         Task MainDevice(string id);
         Task EnableDevice(string id);
@@ -417,7 +418,7 @@ namespace PLX5S.BUSINESS.Services.AD
         {
             try
             {
-                var listDevice =  _dbContext.tblMdDevice.Where(x => x.UserName == username).AsQueryable();
+                var listDevice =  _dbContext.tblMdDevice.OrderByDescending(x => x.CreateDate).Where(x => x.UserName == username).AsQueryable();
                 return _mapper.Map<IList<DeviceDto>>(await listDevice.ToListAsync());
             }
             catch (Exception ex)
@@ -470,7 +471,20 @@ namespace PLX5S.BUSINESS.Services.AD
             }
         }
 
+        public async Task ResetAllPassUser()
+        {
+            try
+            {
+                var lstUser = _dbContext.TblAdAccount.OrderBy(x => x.UserName).ToList();
+                foreach (var item in lstUser)
+                {
+                    ResetPassword(item.UserName);
+                }
+            }
+            catch (Exception ex)
+            {
 
-
+            }
+        }
     }
 }

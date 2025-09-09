@@ -219,6 +219,24 @@ namespace PLX5S.API.Controllers.BU
             return Ok(transferObject);
         }
 
+        //[HttpGet("AutoCreateKy")]
+        //public async Task<IActionResult> AutoCreateKy()
+        //{
+        //    var transferObject = new TransferObject();
+        //    await _service.AutoCreateKy();
+
+        //    if (_service.Status)
+        //    {
+        //        transferObject.Status = true;
+        //    }
+        //    else
+        //    {
+        //        transferObject.Status = false;
+        //        transferObject.MessageObject.MessageType = MessageType.Error;
+        //        transferObject.GetMessage("0001", _service);
+        //    }
+        //    return Ok(transferObject);
+        //}
 
     }
 }

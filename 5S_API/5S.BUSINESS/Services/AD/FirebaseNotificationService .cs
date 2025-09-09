@@ -96,6 +96,7 @@ namespace Services.AD
             };
             return await SendToTopicAsync("test", "Đồng chí có công việc cần xử lý", body, data);
         }
+
         public async Task<FirebaseNotificationResponseDto> SendNotificationAsync(FirebaseNotificationDto notification)
         {
             try
@@ -103,7 +104,7 @@ namespace Services.AD
                 if (_firebaseApp == null)
                 {
                     var errorMessage = "Firebase chưa được khởi tạo";
-                    _logger?.LogError(errorMessage);
+                    //_logger?.LogError(errorMessage);
                     return new FirebaseNotificationResponseDto
                     {
                         Success = false,
@@ -174,7 +175,7 @@ namespace Services.AD
                 var messaging = FirebaseMessaging.GetMessaging(_firebaseApp);
                 var response = await messaging.SendAsync(message);
 
-                _logger?.LogInformation("✅ Notification sent successfully. MessageId: {MessageId}", response);
+                //_logger?.LogInformation("✅ Notification sent successfully. MessageId: {MessageId}", response);
 
                 return new FirebaseNotificationResponseDto
                 {

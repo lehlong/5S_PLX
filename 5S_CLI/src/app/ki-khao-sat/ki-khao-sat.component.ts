@@ -701,7 +701,7 @@ export class KiKhaoSatComponent {
   }
 
   getNameByCodeAccount(code: any) {
-    const item = this.lstAccount.find((x: any) => x.userName === code);
+    const item = this.lstAllAccount.find((x: any) => x.userName === code);
     return item ? item.fullName : code;
   }
 
@@ -729,7 +729,6 @@ export class KiKhaoSatComponent {
       }
     });
     console.log(this.lstCheckedObject);
-
   }
 
   onItemCheckedObject(store: any, checked: boolean) {

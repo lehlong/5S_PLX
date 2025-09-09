@@ -45,7 +45,6 @@ namespace PLX5S.BUSINESS.Services.Auth
                 _dbContext.Update(account);
                 await _dbContext.SaveChangesAsync();
             }
-
             return;
         }
 
@@ -353,5 +352,7 @@ namespace PLX5S.BUSINESS.Services.Auth
 
             return new(refreshToken, expire);
         }
+
+
     }
 }

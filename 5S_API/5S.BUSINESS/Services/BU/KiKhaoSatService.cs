@@ -34,6 +34,7 @@ namespace PLX5S.BUSINESS.Services.BU
         Task<KiKhaoSatModel> GetInput(string idKi);
         Task UpdateKhaoSatTrangThai(TblBuKiKhaoSat kiKhaoSat);
         Task<PagedResponseDto> SearchKiKhaoSat(FilterKiKhaoSat filter);
+        //Task AutoCreateKy();
     }
     public class KikhaosatService : GenericService<TblBuKiKhaoSat, KiKhaoSatDto>, IKikhaosatService
     {
@@ -82,10 +83,10 @@ namespace PLX5S.BUSINESS.Services.BU
                 var query = _dbContext.TblBuKiKhaoSat.AsQueryable();
                 if (!string.IsNullOrWhiteSpace(filter.KeyWord))
                 {
-                    query = query.Where(x => x.SurveyMgmtId.ToString().Contains(filter.KeyWord) || 
-                    x.Name.Contains(filter.KeyWord) || 
-                    x.Code.Contains(filter.KeyWord) || 
-                    x.StartDate.ToString().Contains(filter.KeyWord) || 
+                    query = query.Where(x => x.SurveyMgmtId.ToString().Contains(filter.KeyWord) ||
+                    x.Name.Contains(filter.KeyWord) ||
+                    x.Code.Contains(filter.KeyWord) ||
+                    x.StartDate.ToString().Contains(filter.KeyWord) ||
                     x.EndDate.ToString().Contains(filter.KeyWord));
                 }
                 if (filter.IsActive.HasValue)
@@ -166,7 +167,7 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
-                if(data.KyCopyId == null)
+                if (data.KyCopyId == null)
                 {
                     var tree = new TblBuTieuChi()
                     {
@@ -304,12 +305,12 @@ namespace PLX5S.BUSINESS.Services.BU
             {
                 var lstInputStore = new List<InputStore>();
                 var lstInputWareHouse = new List<InputWarehouse>();
-                var ki = _dbContext.TblBuKiKhaoSat.Where(x => x.IsDeleted != true && x.Id == idKi).FirstOrDefault();
+                var ki = _dbContext.TblBuKiKhaoSat.AsNoTracking().Where(x => x.IsDeleted != true && x.Id == idKi).FirstOrDefault();
                 var lstMdStore = _dbContext.tblMdStore.ToList();
                 var lstMdWareHouse = _dbContext.TblMdWareHouse.ToList();
                 var lstPointstore = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == idKi).ToList();
-                var lstChamDiem = _dbContext.TblBuInputChamDiem.Where(x => x.IsDeleted != true && x.KiKhaoSatId == idKi).ToList();
-                var lstInDoiTuong = _dbContext.TblBuInputDoiTuong.Where(x => x.IsDeleted != true && x.SurveyMgmtId == ki.SurveyMgmtId && x.IsActive == true).ToList();
+                var lstChamDiem = _dbContext.TblBuInputChamDiem.AsNoTracking().Where(x => x.IsDeleted != true && x.KiKhaoSatId == idKi).ToList();
+                var lstInDoiTuong = _dbContext.TblBuInputDoiTuong.AsNoTracking().Where(x => x.IsDeleted != true && x.SurveyMgmtId == ki.SurveyMgmtId && x.IsActive == true).ToList();
 
                 foreach (var item in lstInDoiTuong)
                 {
@@ -335,7 +336,7 @@ namespace PLX5S.BUSINESS.Services.BU
                             LstChamDiem = lstChamDiem2.Select(x => x.UserName).ToList()
                         };
                         lstInputStore.Add(inStore);
-                    } 
+                    }
                     else if (WareHouse != null)
                     {
                         var lstChamDiem3 = lstChamDiem.Where(x => x.DoiTuongId == item.DoiTuongId).ToList();
@@ -362,13 +363,13 @@ namespace PLX5S.BUSINESS.Services.BU
                     lstInputWareHouse = lstInputWareHouse
                 };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Status = false;
                 return null;
             }
         }
-  
+
 
         public async Task UpdateKhaoSatTrangThai(TblBuKiKhaoSat kiKhaoSat)
         {
@@ -409,6 +410,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 this.Status = false;
             }
         }
+
         public async Task UpdateDataInput(KiKhaoSatModel data)
         {
             try
@@ -471,8 +473,9 @@ namespace PLX5S.BUSINESS.Services.BU
             try
             {
                 var idKi = Guid.NewGuid().ToString();
+                var kiKhaoSat = new KiKhaoSatModel();
+                kiKhaoSat = await GetInput(kiKhaoSatId);
 
-                var kiKhaoSat = await GetInput(kiKhaoSatId);
                 kiKhaoSat.KiKhaoSat.Id = idKi;
                 kiKhaoSat.KiKhaoSat.StartDate = DateTime.Now;
                 kiKhaoSat.KiKhaoSat.EndDate = DateTime.Now;
@@ -480,7 +483,7 @@ namespace PLX5S.BUSINESS.Services.BU
 
                 kiKhaoSat.KyCopyId = kiKhaoSatId;
 
-                foreach (var s in kiKhaoSat.lstInputStore) 
+                foreach (var s in kiKhaoSat.lstInputStore)
                 {
                     foreach (var d in s.LstInChamDiem)
                     {
@@ -530,7 +533,6 @@ namespace PLX5S.BUSINESS.Services.BU
             }
         }
 
-        
 
     }
 }

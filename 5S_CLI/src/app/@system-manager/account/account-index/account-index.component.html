@@ -120,59 +120,71 @@
 <app-account-group-edit [id]="idDetail" [close]="close.bind(this)" [reset]="loadInit.bind(this)"
   [visible]="showEditAcg">
 </app-account-group-edit>
-
-<nz-modal [nzWidth]="'90vw'" [nzBodyStyle]="{ height: '70vh', overflow: 'auto' }" [(nzVisible)]="isVisibleModal" nzTitle="Danh sách thiết bị" (nzOnCancel)="handleCancel()"
-  (nzOnOk)="handleOk()">
+<nz-modal
+  [nzWidth]="'90vw'"
+  [(nzVisible)]="isVisibleModal"
+  nzTitle="Danh sách thiết bị"
+  (nzOnCancel)="handleCancel()"
+  (nzOnOk)="handleOk()"
+  [nzBodyStyle]="{ padding: '0' }"
+>
   <ng-container *nzModalContent>
-    <nz-table [nzData]="listDevice" [nzFrontPagination]="false" [nzScroll]="{ y: 'calc(100vh - 244px)' }">
-      <thead>
-        <tr>
-          <th nzWidth="80px">STT</th>
-          <th>Địa chỉ IP</th>
-          <th>Tên thiết bị</th>
-          <th>Nhà sản xuất</th>
-          <th>Hệ điều hành</th>
-          <th>Phiên bản</th>
-          <th>Trạng thái</th>
-          <th>Thiết bị chính</th>
-          <th>#</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let device of listDevice; let i = index ">
-          <td nzAlign="center">{{ i + 1 }}</td>
-          <td nzAlign="center">{{ device.deviceId }}</td>
-          <td nzAlign="center">{{ device.deviceName }}</td>
-          <td nzAlign="center">{{ device.manufacturer }}</td>
-          <td nzAlign="center">{{ device.operatingSystem }}</td>
-          <td nzAlign="center">{{ device.osVersion }}</td>
-          <td nzAlign="center">
-            <nz-tag nzColor="success" *ngIf="device.enableLogin">
-              <nz-icon nzType="check-circle" />
-              <span>Kích hoạt</span>
-            </nz-tag>
-            <nz-tag nzColor="purple" *ngIf="!device.enableLogin">
-              <nz-icon nzType="close-circle" />
-              <span>Khóa</span>
-            </nz-tag>
-          </td>
-          <td nzAlign="center">
-            <nz-tag nzColor="purple" *ngIf="device.mainDevice">
-              <nz-icon nzType="check-circle" />
-            </nz-tag>
-          </td>
-          <td nzAlign="center">
-            <button nz-button nzType="default" style="margin-right: 10px;">
-              <span nz-icon nz-popover nzType="lock" nzPopoverContent="kích hoạt thiết bị"
-                (click)="enableDevice(device.id,device.userName)"></span>
-            </button>
-            <button nz-button nzType="default">
-              <span nz-icon nz-popover nzType="check-square" nzPopoverContent="Chọn làm thiết bị chính"
-                (click)="mainDevice(device.id,device.userName)"></span>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </nz-table>
+    <div style="max-height: 75vh; overflow-y: auto; padding: 16px;">
+      <nz-table
+        [nzData]="listDevice"
+        [nzFrontPagination]="false"
+        [nzBordered]="true"
+        [nzScroll]="{ y: '60vh' }"
+      >
+        <thead>
+          <tr>
+            <th nzWidth="80px">STT</th>
+            <th>Địa chỉ IP</th>
+            <th>Tên thiết bị</th>
+            <th>Nhà sản xuất</th>
+            <th>Hệ điều hành</th>
+            <th>Phiên bản</th>
+            <th>Trạng thái</th>
+            <th>Thiết bị chính</th>
+            <th>#</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let device of listDevice; let i = index">
+            <td nzAlign="center">{{ i + 1 }}</td>
+            <td nzAlign="center">{{ device.deviceId }}</td>
+            <td nzAlign="center">{{ device.deviceName }}</td>
+            <td nzAlign="center">{{ device.manufacturer }}</td>
+            <td nzAlign="center">{{ device.operatingSystem }}</td>
+            <td nzAlign="center">{{ device.osVersion }}</td>
+            <td nzAlign="center">
+              <nz-tag nzColor="success" *ngIf="device.enableLogin">
+                <nz-icon nzType="check-circle"></nz-icon>
+                <span>Kích hoạt</span>
+              </nz-tag>
+              <nz-tag nzColor="purple" *ngIf="!device.enableLogin">
+                <nz-icon nzType="close-circle"></nz-icon>
+                <span>Khóa</span>
+              </nz-tag>
+            </td>
+            <td nzAlign="center">
+              <nz-tag nzColor="purple" *ngIf="device.mainDevice">
+                <nz-icon nzType="check-circle"></nz-icon>
+              </nz-tag>
+            </td>
+            <td nzAlign="center">
+              <button nz-button nzType="default" nzSize="small" style="margin-right: 6px"
+                (click)="enableDevice(device.id,device.userName)">
+                <span nz-icon nzType="lock"></span>
+              </button>
+              <button nz-button nzType="default" nzSize="small"
+                (click)="mainDevice(device.id,device.userName)">
+                <span nz-icon nzType="check-square"></span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </div>
   </ng-container>
 </nz-modal>
