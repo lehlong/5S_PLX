@@ -217,3 +217,6 @@ ion-alert::part(button) {
   display: flex !important;
   gap: 25px !important;
 }
+.alert-button-group.sc-ion-alert-md {
+  margin-top: 20px !important;
+}

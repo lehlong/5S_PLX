@@ -74,13 +74,13 @@ export class LoginComponent implements OnInit {
   async processLogin() {
     this.isLogin = true;
     const { value } = await Preferences.get({ key: 'apiUrl' });
-    if (this.customUrl === '' || this.customUrl === '/api'){
-       this.messageService.show(
+    if (this.customUrl === '' || this.customUrl === '/api') {
+      this.messageService.show(
         'Vui lòng nhập cấu hình đường dẫn url',
         'danger'
       );
-       this.isLogin = false;
-       return
+      this.isLogin = false;
+      return;
     }
     if (value && value.trim() !== '') {
       this.configService.setApiUrl(value.trim());
@@ -99,7 +99,7 @@ export class LoginComponent implements OnInit {
     if (this.model.userName == '' || this.model.password == '') {
       this.messageService.show(
         'Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!',
-        'danger'
+        'warning'
       );
       this.isLogin = false;
       return;
@@ -143,7 +143,8 @@ export class LoginComponent implements OnInit {
           });
       },
       error: (error) => {
-        this.messageService.show(`${error}`, 'warning');
+        // this.messageService.show(`${error}`, 'warning');
+        this.messageService.show('Đường dẫn API bị sai !', 'warning');
         console.log(error);
         this.isLogin = false;
       },
