@@ -11,8 +11,9 @@ export class StartupGuard implements CanActivate {
   canActivate(): UrlTree {
     if (this.authService.isLoggedIn()) {
       return this.router.parseUrl('/home');
-    } else {
-      return this.router.parseUrl('/news-v2');
+    }
+    else {
+      return this.router.parseUrl('/login');
     }
   }
 }

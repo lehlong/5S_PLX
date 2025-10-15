@@ -204,6 +204,10 @@ export class AccountIndexComponent {
   //   });
   // }
 
+  getChucVu(id: string){
+    return this.lstChucVu.find(x => x.id == id)?.name
+  }
+
   reset() {
     this.filter = new AccountFilter()
     this.loadInit()

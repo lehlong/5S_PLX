@@ -198,33 +198,9 @@
   </ion-accordion-group>
 </ion-content>
 
-<!-- <ion-progress-bar type="indeterminate" color="tertiary"></ion-progress-bar> -->
-<!-- <ion-footer
-  class="d-flex"
-  style="height: 60px; justify-content: space-around"
-  *ngIf="isEdit"
->
-  <ion-button
-    fill="clear"
-    color="dark"
-    expand="full"
-    style="width: auto; font-weight: 700"
-  >
-    <p style="margin-right: 5px">Lưu</p>
-    <ion-icon name="save-outline"></ion-icon>
-  </ion-button>
-  <ion-button
-    color="tertiary"
-    (click)="onSubmit()"
-    style="width: 15vh; justify-content: center"
-  >
-    <p style="font-weight: 600">NỘP</p>
-    <ion-icon name="paper-plane-outline"></ion-icon>
-  </ion-button>
-</ion-footer> -->
 <ion-footer *ngIf="isEdit">
   <ion-tab-bar slot="bottom" style="height: 60px; border-top: 1px solid #e0e0e0">
-    <ion-tab-button>
+    <ion-tab-button (click)="handleSave()">
       <ion-icon name="save-outline"></ion-icon>
       <ion-label>LƯU</ion-label>
     </ion-tab-button>
@@ -260,22 +236,9 @@
           </ion-label>
         </ion-item>
       </ion-list>
-      <!-- <ion-grid>
-          <ion-row>
-
-            <ion-col size="6" style="display: flex; align-items: center">
-              <span style="background-color: green"  class="circle"></span><span class="font-12">Đang chọn</span></ion-col>
-            <ion-col size="6" style="display: flex; align-items: center"><span
-                style="background-color: rgb(220, 220, 220)" class="circle"></span><span class="font-12">Chưa trả
-                lời</span></ion-col>
-            <ion-col size="6" style="display: flex; align-items: center"><span style="background-color: #1890ff"
-                class="circle"></span><span class="font-12">Đã trả lời</span></ion-col>
-            <ion-col size="6" style="display: flex; align-items: center"><span style="background-color: #ff4d4f"
-                class="circle"></span><span class="font-12">Không đạt</span></ion-col>
-          </ion-row>
-        </ion-grid> -->
     </ion-toolbar>
   </ion-header>
+
   <ion-content class="ion-padding">
     <div style="gap: 10px; display: flex; flex-wrap: wrap" class="div-dem">
       <a style="padding-left: 5px; width: 35px; height: 35px"
@@ -335,21 +298,21 @@
     <ion-content class="full-image-content">
       <ion-button style="
           background-color: #fff;
-          position: absolute;
+          position: fixed;
           top: 50%;
           transform: translateY(-50%);
           left: 10px;
-          z-index: 100;
+          z-index: 1000;
         " class="delete-button" fill="clear" color="danger" *ngIf="isEdit" (click)="confirmDeleteImage()">
         <ion-icon name="trash-outline" slot="end"></ion-icon>
       </ion-button>
       <ion-button style="
           background-color: #fff;
-          position: absolute;
+          position: fixed;
           top: 50%;
           transform: translateY(-50%);
           right: 10px;
-          z-index: 100;
+          z-index: 1000;
         " (click)="closeFullScreen()" fill="clear" color="dark"><ion-icon name="close"></ion-icon></ion-button>
       <div *ngIf="selectedImage.type === 'img'" class="zoom-wrapper" (mousedown)="onDragStart($event)"
         (mousemove)="onDragMove($event)" (mouseup)="onDragEnd()" (mouseleave)="onDragEnd()"

@@ -79,7 +79,7 @@ export class EvaluateComponent implements OnInit {
   daCham: any = 0;
   chuaCham: any = 0;
   lstHisEvaluate: any = [];
-  environment = environment;
+  apiFile = environment.apiFile;
   lstAccout: any = [];
   evaluate: any = {
     header: {},
@@ -102,9 +102,13 @@ export class EvaluateComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private renderer: Renderer2,
     private router: Router
-  ) {}
+  ) { }
 
   async ngOnInit() {
+    const api = localStorage.getItem('CapacitorStorage.apiUrl') ?? '';
+    this.apiFile = api.replace(/\/api$/, '/');
+
+    // CapacitorStorage.apiUrl
     this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
     this.route.paramMap.subscribe({
       next: async (params) => {
@@ -270,9 +274,8 @@ export class EvaluateComponent implements OnInit {
 
   applyTransform() {
     const imgEl = this.zoomImg.nativeElement as HTMLElement;
-    imgEl.style.transform = `scale(${this.currentScale}) translate(${
-      this.currentX / this.currentScale
-    }px, ${this.currentY / this.currentScale}px)`;
+    imgEl.style.transform = `scale(${this.currentScale}) translate(${this.currentX / this.currentScale
+      }px, ${this.currentY / this.currentScale}px)`;
   }
 
   //Hàm search
@@ -688,6 +691,14 @@ export class EvaluateComponent implements OnInit {
     this.evaluate.lstEvaluate[idx].pointId = selected;
     this._storageService.set(this.doiTuong.id, this.evaluate);
   }
+
+  handleSave() {
+    this.messageService.show(
+      `Lưu bản nháp thành công`,
+      'success'
+    );
+  }
+
   async onSubmit() {
     if (!this.isEdit) return;
 
@@ -736,9 +747,8 @@ export class EvaluateComponent implements OnInit {
         message: `<div class="alert-header-evaluate">
     <div class="alert-icon-evaluate"><ion-icon name="warning"></ion-icon></div>
       <div class="title-evaluate">Đánh giá chưa hoàn tất</div>
-      <div class="subtitle-evaluate">Bạn đã bỏ sót <b class="highlight">${
-        errorMessage.length
-      }</b> tiêu chí quan trọng</div>
+      <div class="subtitle-evaluate">Bạn đã bỏ sót <b class="highlight">${errorMessage.length
+          }</b> tiêu chí quan trọng</div>
   </div>
   <div class="alert-body">
     ${errorMessage.join('<br/>')}
@@ -830,7 +840,7 @@ export class EvaluateComponent implements OnInit {
   openFullScreen(img: any) {
     let filePath = { ...img };
     if (this.isEdit == false) {
-      filePath.filePath = this.environment.apiFile + img.filePath;
+      filePath.filePath = this.apiFile + img.filePath;
     }
     this.longitude = img.kinhDo;
     this.latitude = img.viDo;
@@ -847,7 +857,7 @@ export class EvaluateComponent implements OnInit {
   filePath(filePath: string) {
     if (this.isEdit) return filePath;
 
-    return this.environment.apiFile + filePath;
+    return this.apiFile + filePath;
   }
 
   closeFullScreen() {
@@ -867,9 +877,9 @@ export class EvaluateComponent implements OnInit {
       this.doiTuong.id + '_' + this.kiKhaoSat.code,
       this.evaluate
     );
+    this.closeFullScreen();
     this.cdr.detectChanges();
 
-    this.closeFullScreen();
   }
 
   deleteImage2(img: any) {
