@@ -24,6 +24,7 @@ export class ConfigService {
   async setApiUrl(url: string) {
     await Preferences.set({ key: 'apiUrl', value: url });
     this.apiUrlSubject.next(url);
+    localStorage.setItem('CapacitorStorage.apiUrl', url);
   }
 
   getApiUrlSync(): string {
