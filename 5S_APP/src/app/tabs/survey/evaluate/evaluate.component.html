@@ -18,16 +18,11 @@
   </ion-toolbar>
 </ion-header>
 
-<div *ngIf="isSearchVisible" style="margin: 10px; display: flex; flex-direction: column; gap: 5px">
-  <ion-input style="
-      border: 1px solid #d9d9d9;
-      border-radius: 4px;
-      --padding-end: 10px;
-      --padding-start: 10px;
-    " label="Tìm kiếm" fill="outline" placeholder="Nhập từ tìm kiếm" [(ngModel)]="searchKeyword"
+<div *ngIf="isSearchVisible" class="search" >
+  <ion-input class="input"  label="Tìm kiếm" fill="outline" placeholder="Nhập từ tìm kiếm" [(ngModel)]="searchKeyword"
     (ionInput)="onSearchChange()"></ion-input>
   <div class="result-search" *ngIf="searchKeyword.trim() !== ''">
-    <span style="padding: 0px 10px; width: 70%">{{ currentIndex + 1 }} of {{ searchResults.length }}</span>
+    <span >{{ currentIndex + 1 }} of {{ searchResults.length }}</span>
     <div class="btn-group">
       <ion-button (click)="goPrev()" [disabled]="currentIndex === 0">
         <ion-icon style="color: #000" name="arrow-up-outline"></ion-icon></ion-button>
@@ -72,11 +67,7 @@
                       </ion-item>
                     </ng-container>
                   </ion-radio-group>
-                  <ion-item lines="none" class="custom-input-box" style="
-                      border-radius: 4px;
-                      border: 1px solid #d7d7d7;
-                      margin-top: 10px;
-                    ">
+                  <ion-item lines="none" class="custom-input-box" >
                     <ng-container *ngFor="
                         let i of evaluate?.lstEvaluate;
                         trackBy: trackByKey
@@ -103,7 +94,8 @@
                 </p>
 
                 <div *ngIf="node.isImg" style="margin-top: 10px">
-                  <label style="color: #ffc409">[Chú ý: Tối thiểu {{ node.numberImg }} ảnh]</label>
+                  <label style="color: #ffc409">{{ node.report }}</label>
+                  <!-- <label style="color: #ffc409">[Chú ý: Tối thiểu {{ node.numberImg }} ảnh]</label> -->
                   <p *ngIf="hasEnoughImages(node.code, node)" style="color: #c5000f">
                     (*) Tiêu chí này bắt buộc chọn {{ node.numberImg }} hình ảnh
                   </p>
@@ -133,53 +125,28 @@
                 <!-- Hiển thị tài liệu -->
                 <div *ngIf="
                     !node.isGroup && filterImage(node)?.documents.length > 0
-                  " class="file-wrapper d-flex" style="width: 100vw">
+                  " class="file-wrapper" style="width: 100%">
                   <div class="image-preview" *ngFor="
                       let doc of filterImage(node)?.documents;
                       trackBy: trackByKey
-                    " style="height: 50px; width: 100vw">
+                    " style="height: 50px; width: 100%">
                     <div class="file-preview">
-                      <ion-chip style="
-                          width: 90vw;
-                          display: flex;
-                          align-items: center;
-                          justify-content: space-between;
-                          padding: 4px 8px;
-                          border-radius: 8px;
-                        ">
+                      <ion-chip class="chip">
                         <!-- Icon tài liệu -->
-                        <ion-icon name="document-outline" size="large"
-                          style="margin-right: 8px; color: #3c3c3c"></ion-icon>
+                        <ion-icon name="document-outline" size="large" class="icon"></ion-icon>
 
                         <!-- Tên file + ngày tạo -->
-                        <div style="
-                            display: flex;
-                            flex-direction: column;
-                            flex: 1;
-                            overflow: hidden;
-                          ">
-                          <a [href]="filePath(doc.filePath)" target="_blank" download style="
-                              text-decoration: none;
-                              color: #000;
-                              font-weight: 500;
-                              white-space: nowrap;
-                              overflow: hidden;
-                              text-overflow: ellipsis;
-                            ">
+                        <div class="fileName">
+                          <a [href]="filePath(doc.filePath)" target="_blank" download>
                             {{ doc.fileName }}
                           </a>
-                          <span style="
-                              font-size: 12px;
-                              opacity: 0.6;
-                              margin-top: 2px;
-                            ">
-                            {{ doc.createDate | date : "dd/MM/yyyy" }}
+                          <span class="date">
+                            {{ doc.createDate | date : "HH:mm dd/MM/yyyy" }}
                           </span>
                         </div>
 
                         <!-- Nút xóa -->
-                        <ion-button fill="clear" size="small" (click)="deleteImage2(doc)"
-                          style="margin-left: 8px; color: #d9534f">
+                        <ion-button fill="clear" class="delete-btn-file"  *ngIf="isEdit" size="small" (click)="deleteImage2(doc)">
                           <ion-icon name="close-circle" slot="icon-only"></ion-icon>
                         </ion-button>
                       </ion-chip>
@@ -239,10 +206,9 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-content class="ion-padding">
-    <div style="gap: 10px; display: flex; flex-wrap: wrap" class="div-dem">
-      <a style="padding-left: 5px; width: 35px; height: 35px"
-        *ngFor="let item of lstTieuChi; trackBy: trackByKey; let i = index" class="custom-button"
+  <ion-content class="ion-paddingg">
+    <div class="div-dem">
+      <a *ngFor="let item of lstTieuChi; trackBy: trackByKey; let i = index" class="custom-button"
         [ngClass]="{ 'active-link': isActive(item.id),  }" [class]="isAnswered(item)" (click)="setItem(item.id)">
         {{ i + 1 }}
       </a>
@@ -287,15 +253,40 @@
   <!-- </div> -->
 </ion-menu>
 
+
+
+<!-- View image full screen modal -->
 <ion-modal [backdropDismiss]="false" [isOpen]="isImageModalOpen" [canDismiss]="true">
   <ng-template>
-    <!-- <div class="d-flex justify-space-between">
+    <ion-content class="full-image-content">
+      <ion-button class="btnLeft" fill="clear" color="danger" *ngIf="isEdit" (click)="confirmDeleteImage()">
+        <ion-icon name="trash-outline" slot="end"></ion-icon>
+      </ion-button>
+      <ion-button class="btnRight" (click)="closeFullScreen()" fill="clear" color="dark"><ion-icon
+          name="close"></ion-icon></ion-button>
+      <div *ngIf="selectedImage.type === 'img'" class="zoom-wrapper" (mousedown)="onDragStart($event)"
+        (mousemove)="onDragMove($event)" (mouseup)="onDragEnd()" (mouseleave)="onDragEnd()"
+        (touchstart)="onDragStart($event)" (touchmove)="onDragMove($event)" (touchend)="onDragEnd()">
+        <div class="full-image-container">
+          <img #zoomImg [src]="selectedImage.filePath" class="full-image" (click)="zoomOnClick($event)"
+            draggable="false" />
+        </div>
+      </div>
+      <div id="map" style="height: 75vh"></div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+
+<!-- <ion-content fullscreen *ngIf="isImageModalOpen">
+  <ng-template> -->
+<!-- <div class="d-flex justify-space-between">
       <ion-button class="delete-button" fill="clear" color="danger" *ngIf="isEdit" (click)="confirmDeleteImage()">
         <ion-icon name="trash-outline" slot="end"></ion-icon>
       </ion-button>
       <ion-button (click)="closeFullScreen()" fill="clear" color="dark"><ion-icon name="close"></ion-icon></ion-button>
     </div> -->
-    <ion-content class="full-image-content">
+<!-- <ion-content class="full-image-content">
       <ion-button style="
           background-color: #fff;
           position: fixed;
@@ -322,7 +313,7 @@
             draggable="false" />
         </div>
       </div>
-      <div id="map" style="height: 400px"></div>
+      <div id="map" style="height: 75vh"></div>
     </ion-content>
   </ng-template>
-</ion-modal>
+</ion-content> -->

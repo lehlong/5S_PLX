@@ -36,8 +36,12 @@ import { image } from 'ionicons/icons';
 })
 export class EvaluateComponent implements OnInit {
   @ViewChild('zoomImg') zoomImg!: ElementRef;
-  private currentScale = 1;
+  @ViewChild('accordionGroup', { static: true })
+  private currentScale = 1
+  @ViewChild('fileInput', { static: false })
   private lastTapTime = 0;
+  @Input() treeData: any = [];
+  @Input() lstTreeOpen!: string[];
   private doubleTapThreshold = 300;
   private isZoomed = false;
   private isDragging = false;
@@ -45,16 +49,12 @@ export class EvaluateComponent implements OnInit {
   private lastY = 0;
   private currentX = 0;
   private currentY = 0;
-  ////---------------
   private map: L.Map | undefined;
   private highlightClass = 'highlight-search';
   private currentHighlights: HTMLElement[] = [];
-  @ViewChild('accordionGroup', { static: true })
+  ////---------------
   accordionGroup!: IonAccordionGroup;
-  @ViewChild('fileInput', { static: false })
   fileInput!: ElementRef<HTMLInputElement>;
-  @Input() treeData: any = [];
-  @Input() lstTreeOpen!: string[];
   isSearchVisible: boolean = false;
   searchKeyword = '';
   searchResults: { id: string; type: string }[] = [];
@@ -78,6 +78,8 @@ export class EvaluateComponent implements OnInit {
   latitude: number = 10.8231;
   daCham: any = 0;
   chuaCham: any = 0;
+  isImageModalOpen = false;
+  selectedImage: any = {};
   lstHisEvaluate: any = [];
   apiFile = environment.apiFile;
   lstAccout: any = [];
@@ -626,7 +628,6 @@ export class EvaluateComponent implements OnInit {
     const documents = data.filter((x: any) =>
       ['docx', 'xlsx', 'xlsm', 'pdf'].includes(x.type)
     );
-
     // videos: videos,
     return {
       images: images,
@@ -834,9 +835,6 @@ export class EvaluateComponent implements OnInit {
     return `${currentUrl}#${itemId}`;
   }
 
-  isImageModalOpen = false;
-  selectedImage: any = {};
-
   openFullScreen(img: any) {
     let filePath = { ...img };
     if (this.isEdit == false) {
@@ -859,6 +857,7 @@ export class EvaluateComponent implements OnInit {
 
     return this.apiFile + filePath;
   }
+
 
   closeFullScreen() {
     this.isImageModalOpen = false;
@@ -905,6 +904,7 @@ export class EvaluateComponent implements OnInit {
           role: 'destructive',
           handler: () => {
             this.deleteImage();
+            this.closeFullScreen()
           },
         },
       ],

@@ -21,7 +21,7 @@ export const routes: Routes = [
   //       (m) => m.NewsDetailComponent
   //     ),
   // },
-  { path: '', component: LoginComponent },
+  // { path: '', component: LoginComponent },
   { path: 'login', component: LoginComponent },
 
   {

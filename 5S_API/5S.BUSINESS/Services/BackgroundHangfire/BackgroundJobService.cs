@@ -51,11 +51,12 @@ namespace PLX5S.BUSINESS.Services.BackgroundHangfire
                 {
                     var check = _dbContext.TblBuKiKhaoSat
                         .FirstOrDefault(x =>
-                            x.EndDate.Month == now.Month &&
-                            x.EndDate.Year == now.Year &&
+                            x.StartDate.Month == now.Month &&
+                            x.StartDate.Year == now.Year &&
+                            x.TrangThaiKi == "1" &&
                             x.SurveyMgmtId == item.Id);
 
-                    if (check == null || check.TrangThaiKi == "2" || check.TrangThaiKi == "0")
+                    if (check == null)
                     {
                         continue;
                     }

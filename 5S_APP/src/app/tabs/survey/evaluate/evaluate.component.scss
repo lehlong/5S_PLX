@@ -1,10 +1,3 @@
-.full-image-content {
-  --background: black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .full-image {
   width: 100%;
   max-width: 50vh;
@@ -21,6 +14,34 @@
   align-items: center;
   position: relative;
   padding: 0;
+
+  .btnLeft {
+    background-color: #fff;
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 10px;
+    z-index: 1000;
+
+  }
+
+  .btnRight {
+
+    background-color: #fff;
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 10px;
+    z-index: 1000;
+  }
+
+  // .delete-button {
+  //   position: absolute;
+  //   top: 20px;
+  //   right: 20px;
+  //   z-index: 1000;
+  //   font-size: 24px;
+  // }
 }
 
 .image-container {
@@ -37,12 +58,24 @@
     object-fit: contain;
   }
 
-  .delete-button {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    z-index: 1000;
-    font-size: 24px;
+}
+
+.search {
+  margin: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  .input {
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    --padding-end: 10px;
+    --padding-start: 10px;
+  }
+
+  span {
+    padding: 0px 10px;
+    width: 70%;
   }
 }
 
@@ -53,6 +86,13 @@
 
 ::ng-deep .textarea-wrapper.sc-ion-textarea-ios textarea.sc-ion-textarea-ios {
   padding: 17px 0px 0px;
+}
+
+.custom-input-box {
+
+  border-radius: 4px;
+  border: 1px solid #d7d7d7;
+  margin-top: 10px;
 }
 
 .circle {
@@ -140,10 +180,20 @@
   }
 }
 
+.delete-btn-file {
+  // position: absolute;
+  // top: -6px;
+  // right: -6px;
+  // margin-right: 10px;
+  z-index: 10;
+  color: rgba(0, 0, 0, 0.468);
+  font-size: 18px;
+}
+
 .file-wrapper {
   position: relative;
   display: inline-block;
-  margin: 3px;
+  // margin: 3px;
 
   .image-preview {
     width: 60px;
@@ -164,8 +214,31 @@
   }
 }
 
+.ion-paddingg {
+  padding: 5px !important;
+
+  .div-dem {
+    gap: 10px;
+    display: flex;
+    flex-wrap: wrap
+  }
+
+  a {
+    padding-left: 5px;
+    width: 35px;
+    height: 35px
+  }
+}
+
 .ion-padding {
   padding: 5px !important;
+
+
+  a {
+    padding-left: 5px;
+    width: 100%;
+    // height: 20px
+  }
 }
 
 .file {
@@ -210,20 +283,27 @@
 //css zoom
 .zoom-wrapper {
   width: 100%;
-  height: calc(100vh - 400px); /* trừ phần map */
-  overflow: auto; /* 👈 Cho phép scroll/pan */
-  touch-action: auto; /* 👈 Cho phép kéo bằng cảm ứng */
-  -webkit-overflow-scrolling: touch; /* Cho mượt trên iOS */
+  height: calc(100vh - 400px);
+  /* trừ phần map */
+  overflow: auto;
+  /* 👈 Cho phép scroll/pan */
+  touch-action: auto;
+  /* 👈 Cho phép kéo bằng cảm ứng */
+  -webkit-overflow-scrolling: touch;
+  /* Cho mượt trên iOS */
 }
 
 .full-image-container {
-  position: relative; /* ✅ Cho phép translate */
-  overflow: hidden; /* ✅ Ẩn phần ngoài khi kéo */
+  position: relative;
+  /* ✅ Cho phép translate */
+  overflow: hidden;
+  /* ✅ Ẩn phần ngoài khi kéo */
   max-width: 100%;
   max-height: 100%;
   width: 100%;
   height: 100%;
-  touch-action: none; /* ✅ Tránh zoom/pan mặc định trên di động */
+  touch-action: none;
+  /* ✅ Tránh zoom/pan mặc định trên di động */
 }
 
 .full-image {
@@ -237,4 +317,46 @@
 
 .full-image.zoomed {
   cursor: grab;
+}
+
+.file-preview {
+  // width: 93vw;
+
+  .chip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 8px;
+    border-radius: 8px;
+    background: #f5f5f5;
+    margin: 5px 0;
+  }
+
+  .icon {
+    margin: 0 2px;
+    color: #3c3c3c
+  }
+
+  .fileName {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  a {
+    text-decoration: none;
+    color: #000;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .date {
+    font-size: 12px;
+    opacity: 0.6;
+    margin-top: 2px;
+    margin-left: 5px;
+  }
 }
