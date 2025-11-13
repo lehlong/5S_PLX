@@ -13,7 +13,8 @@ export class StartupGuard implements CanActivate {
       return this.router.parseUrl('/home');
     }
     else {
-      return this.router.parseUrl('/login');
+      // return this.router.parseUrl('/login');
+      return this.router.parseUrl('/news-v2');
     }
   }
 }

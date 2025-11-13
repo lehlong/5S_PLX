@@ -13,14 +13,14 @@ export const routes: Routes = [
     children: [],
   },
 
-  // { path: 'news-v2', component: NewsV2Component },
-  // {
-  //   path: 'news/:id',
-  //   loadComponent: () =>
-  //     import('./tabs/news-detail/news-detail.component').then(
-  //       (m) => m.NewsDetailComponent
-  //     ),
-  // },
+  { path: 'news-v2', component: NewsV2Component },
+  {
+    path: 'news/:id',
+    loadComponent: () =>
+      import('./tabs/news-detail/news-detail.component').then(
+        (m) => m.NewsDetailComponent
+      ),
+  },
   // { path: '', component: LoginComponent },
   { path: 'login', component: LoginComponent },
 

@@ -40,6 +40,7 @@
     "@ionic/storage-angular": "^4.0.0",
     "ionicons": "^7.0.0",
     "leaflet": "^1.9.4",
+    "leaflet-routing-machine": "^3.2.12",
     "medium-zoom": "^1.1.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",

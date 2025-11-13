@@ -1,46 +1,100 @@
-<ion-content class="ion-padding">
-  <div class="header">
-    <div class="trademark">
-      <img
-        class="logo"
-        src="../../../assets/img/logo-petrolimex.png"
-        alt="Logo"
-      />
-      <h3 class="petrolimex-text">PETROLIMEX</h3>
+<ion-tabs>
+  <ion-tab-bar slot="bottom">
+    <ion-tab-button tab="home" (click)="setTab('home')">
+      <ion-icon name="home"></ion-icon>
+      <ion-label>Trang chủ</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="map" (click)="setTab('map')">
+      <ion-icon name="map"></ion-icon>
+      <ion-label>Bản đồ</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="setting" (click)="setTab('setting')">
+      <ion-icon name="settings"></ion-icon>
+      <ion-label>Cài đặt</ion-label>
+    </ion-tab-button>
+  </ion-tab-bar>
+
+  <ion-tab tab="home" class="tab">
+    <div class="header">
+      <div class="trademark">
+        <!-- <img class="logo" src="../../../assets/img/logo-petrolimex.png" alt="Logo" /> -->
+        <h3 class="petrolimex-text">Tình hình giá xăng dầu</h3>
+      </div>
+      <div class="login-cham-diem">
+        <ion-button class="btn-login" (click)="goToLogin()">Chấm điểm 5s</ion-button>
+      </div>
     </div>
-    <div class="login-cham-diem">
-      <ion-button class="btn-login" (click)="goToLogin()">Chấm điểm 5s</ion-button>
+    <div class="content" style="height: 90vh">
+      <div class="fuel-price fuel-price--highlight">
+        <!-- <h2 class="fuel-price__header">Tình hình giá xăng dầu</h2> -->
+        <ion-list class="fuel-price__list" lines="full">
+          <ion-item *ngFor="let fuel of fuelPrices"> <ion-label>
+              <h2>{{ fuel.name }}</h2>
+              <p>{{ fuel.price | number }} {{ fuel.unit }}</p>
+            </ion-label>
+          </ion-item> </ion-list>
+      </div>
+      <!-- <div class="map">
+        <div id="map" style="height: 75vh"></div>
+      </div> -->
+      <!-- <div class="news">
+          <h2 class="news__header">Tin tức</h2> <ng-container *ngFor="let news of newsList"> <ion-card>
+            <img alt="ảnh" src="assets/img/1.webp" /> <ion-card-header>
+               <ion-card-title class="card-title">{{ news.title }}</ion-card-title>
+                <ion-card-subtitle>{{ news.createdDate | date : "dd/MM/yyyy HH:mm:ss" }}</ion-card-subtitle>
+              </ion-card-header> <ion-card-content> {{ news.summary }} </ion-card-content> <div class="btn-card">
+                <ion-button fill="clear" (click)="goToDetail(news.id)">Xem thêm</ion-button> </div> </ion-card>
+              </ng-container>
+            </div> -->
     </div>
-  </div>
-  <div class="content">
-    <div class="fuel-price fuel-price--highlight">
-      <h2 class="fuel-price__header">Tình hình giá xăng dầu</h2>
-      <ion-list class="fuel-price__list" lines="full">
-        <ion-item *ngFor="let fuel of fuelPrices">
-          <ion-label>
-            <h2>{{ fuel.name }}</h2>
-            <p>{{ fuel.price | number }} {{ fuel.unit }}</p>
-          </ion-label>
-        </ion-item>
-      </ion-list>
-    </div>
-    <div class="news">
-      <h2 class="news__header">Tin tức</h2>
-      <ng-container *ngFor="let news of newsList">
-        <ion-card>
-          <img alt="ảnh" src="assets/img/1.webp" />
-          <ion-card-header>
-            <ion-card-title class="card-title">{{ news.title }}</ion-card-title>
-            <ion-card-subtitle>{{ news.createdDate | date : "dd/MM/yyyy HH:mm:ss" }}</ion-card-subtitle>
-          </ion-card-header>
-          <ion-card-content>
-            {{ news.summary }}
-          </ion-card-content>
-          <div class="btn-card">
-            <ion-button fill="clear" (click)="goToDetail(news.id)">Xem thêm</ion-button>
+  </ion-tab>
+
+  <ion-tab tab="map" class="tab">
+
+    <div id="map" class="map" style="height: 100vh"></div>
+    <ion-modal *ngIf="activeTab == 'map'" #myModal [isOpen]="true" [initialBreakpoint]="0.08" [breakpoints]="[0.08, 0.49, 0.75, 0.9]"
+      [backdropBreakpoint]="0.08" [backdropDismiss]="true" handleBehavior="cycle"
+      (ionBreakpointDidChange)="onBreakpointChange($event)" (didDismiss)="onModalDismiss()"
+      [cssClass]="[currentBreakpoint < 0.5 ? 'transparent-modal' : '']" style="margin-bottom: 58px">
+      <ng-template>
+        <ion-content>
+
+          <ion-searchbar [debounce]="1000" (ionInput)="handleInput($event)"
+            (click)="onSearchbarClick()"></ion-searchbar>
+
+          <ion-list class="input-s" *ngIf="isLstS">
+            @for (result of lstAddress; track result) {
+            <ion-item>
+              <ion-label (click)="setDestination(result.latitude, result.longitude)">{{ result.displayName
+                }}</ion-label>
+            </ion-item>
+            }
+          </ion-list>
+
+          <div class="directions-panel" *ngIf="directions && directions.length">
+            <ion-list>
+              <ion-item *ngFor="let step of directions">
+                <ion-icon [name]="getDirectionIcon(step.modifier)" slot="start"></ion-icon>
+                <ion-label>
+                  <h3>{{ step.text }}</h3>
+                  <p>{{ step.distance | number:'1.0-0' }} m</p>
+                </ion-label>
+              </ion-item>
+            </ion-list>
           </div>
-        </ion-card>
-      </ng-container>
-    </div>
-  </div>
-</ion-content>
+          <br>
+          <br>
+          <br>
+          <br>
+        </ion-content>
+      </ng-template>
+    </ion-modal>
+  </ion-tab>
+
+  <ion-tab tab="setting" class="tab">
+
+    <!-- <app-setting></app-setting> -->
+  </ion-tab>
+</ion-tabs>

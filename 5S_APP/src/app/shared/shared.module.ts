@@ -211,6 +211,7 @@ import {
   personCircleOutline,
   callOutline,
   shieldHalf,
+  locationOutline,
 } from 'ionicons/icons';
 
 const IONIC_COMPONENTS = [
@@ -436,7 +437,8 @@ export class SharedModule {
       ellipse,
       personCircleOutline,
       callOutline,
-      shieldHalf
+      shieldHalf,
+      locationOutline,
     });
   }
 }

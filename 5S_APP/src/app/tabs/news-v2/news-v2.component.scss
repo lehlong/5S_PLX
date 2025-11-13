@@ -1,12 +1,18 @@
+.tab {
+  padding: 0 10px;
+}
+
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   .trademark {
     display: flex;
     align-items: center;
-    .logo {
-    }
+
+    .logo {}
+
     .petrolimex-text {
       font-family: "Roboto", sans-serif;
       font-weight: 700;
@@ -18,18 +24,26 @@
     }
   }
 }
+
+ion-content {
+  height: 100%;
+}
+
 .btn-login {
   background-color: #003da5;
   border-radius: 12px !important;
 }
+
 .fuel-price__header {
   color: #003da5;
 }
+
 .fuel-price__list ion-label {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
+
 .fuel-price__list ion-label h2 {
   font-size: 16px;
   font-weight: 600;
@@ -46,18 +60,122 @@
 .news__header {
   color: #003da5;
 }
-ion-card{
+
+ion-card {
   margin-bottom: 15px;
 }
+
 .btn-card {
   display: flex;
   justify-content: end;
   align-items: center;
+
   ion-button {
     color: #003da5;
   }
 }
-.card-title{
+
+.card-title {
   font-weight: 400;
   font-size: 1rem;
+}
+
+
+ion-tab-button.active ion-icon,
+ion-tab-button.active ion-label {
+  color: var(--ion-color-primary);
+}
+
+.input-s {
+  z-index: 1234;
+  position: absolute;
+  width: 100%;
+  top: 50px;
+}
+
+.directions-panel {
+  overflow-y: auto;
+  z-index: 1000;
+  background-color: #fff;
+  padding: 10px;
+}
+
+ion-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.directions-panel {
+  flex: 1 1 auto;
+  /* chiếm phần còn lại */
+  overflow-y: scroll;
+  /* scroll nếu vượt */
+}
+
+::ng-deep .leaflet-routing-container {
+  display: none !important;
+}
+
+.tab .modal-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+// .transparent-modal {
+//   --backdrop-opacity: 0 !important;
+//   /* loại bỏ nền mờ */
+//   pointer-events: none !important;
+
+//   /* không chặn sự kiện click */
+//   ion-backdrop {
+//     pointer-events: none !important;
+//   }
+// }
+
+// .transparent-modal ion-content {
+//   pointer-events: auto;
+//   /* nhưng vẫn click được bên trong modal */
+// }
+
+
+
+// .transparent-modal {
+//   --backdrop-opacity: 0 !important;
+
+// }
+
+// /* Bỏ lớp mờ và cho phép click xuyên qua khi modal thấp */
+// .transparent-modal.modal-breakpoint-0,
+// .transparent-modal.modal-breakpoint-01,
+// .transparent-modal.modal-breakpoint-05 {
+//   pointer-events: none !important;
+// }
+
+// .transparent-modal.modal-breakpoint-1 {
+//   pointer-events: auto !important;
+// }
+
+// .transparent-modal ion-content {
+//   background: white;
+//   border-radius: 16px 16px 0 0;
+//   box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+// }
+
+
+.transparent-modal {
+  --backdrop-opacity: 0 !important; /* loại bỏ nền mờ */
+  // pointer-events: none !important; /* modal không chặn sự kiện */
+}
+
+.transparent-modal ion-backdrop {
+  pointer-events: none !important;
+}
+
+.transparent-modal ion-content {
+  pointer-events: auto; /* vẫn tương tác được bên trong modal */
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
 }

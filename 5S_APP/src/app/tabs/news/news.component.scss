@@ -37,9 +37,11 @@ h4 {
   font-weight: 600;
   margin-bottom: 6px;
 }
+
 ::ng-deep .news-type .item-native {
   padding: 0;
 }
+
 .news-time,
 .news-content {
   font-size: small;
@@ -86,10 +88,12 @@ ion-button.custom {
   --color: #000000;
   width: calc(100% / 4 - 5px);
   --box-shadow: none;
-  button.button-native{
+
+  button.button-native {
     padding: 0
   }
 }
+
 ion-button.active {
   width: calc(100% / 4 - 5px);
   border: none;
@@ -98,6 +102,7 @@ ion-button.active {
   color: #fff;
   --box-shadow: none
 }
+
 // ion-segment-content:nth-of-type(1) {
 //   background: lightpink;
 // }
@@ -114,10 +119,12 @@ ion-searchbar.custom {
 .text-bold {
   font-weight: 700;
 }
+
 .text-italic {
   font-style: italic;
   color: #555;
 }
+
 ion-col[size="7"] {
   text-align: left;
 }
@@ -145,38 +152,45 @@ ion-col[size="5"] {
   flex-direction: column;
   border-radius: 10px;
   gap: 8px;
+
   // border: 1px solid #ccc;
-  h5{
+  h5 {
     font-size: 18px;
     margin: 0px;
     padding-top: 7px
   }
+
   p {
     font-size: 14px;
     margin: 0px;
   }
 }
+
 .avatar {
   width: 48px;
   height: 48px;
   color: #ffff;
 }
+
 ion-col {
   margin-bottom: 5px;
   display: flex;
   flex-direction: column;
   gap: 6px;
+
   .user-name {
     font-weight: 700;
     font-size: 18px;
     color: #f4f4f5;
   }
+
   .user-position {
     font-weight: 500;
     font-size: 14px;
     color: #f4f4f5;
   }
 }
+
 ion-list {
   ion-item {
     width: 100%;
@@ -185,24 +199,28 @@ ion-list {
     --inner-border-width: 0;
   }
 }
-.text-segment-content{
-  p{
+
+.text-segment-content {
+  p {
     font-weight: 700;
     font-size: 18px;
     color: #fff
   }
-  a{
+
+  a {
     font-size: 16px;
     font-weight: 500;
     color: #fff;
     text-decoration: none;
     display: flex;
     align-items: center;
-    ion-icon{
+
+    ion-icon {
       margin-left: 8px;
     }
   }
 }
+
 ion-item.highlight-score {
   --background: #e6f7ff;
 }
