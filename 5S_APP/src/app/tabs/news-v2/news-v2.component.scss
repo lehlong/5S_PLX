@@ -124,58 +124,9 @@ ion-content {
   height: 100%;
 }
 
-// .transparent-modal {
-//   --backdrop-opacity: 0 !important;
-//   /* loại bỏ nền mờ */
-//   pointer-events: none !important;
-
-//   /* không chặn sự kiện click */
-//   ion-backdrop {
-//     pointer-events: none !important;
-//   }
-// }
-
-// .transparent-modal ion-content {
-//   pointer-events: auto;
-//   /* nhưng vẫn click được bên trong modal */
-// }
-
-
-
-// .transparent-modal {
-//   --backdrop-opacity: 0 !important;
-
-// }
-
-// /* Bỏ lớp mờ và cho phép click xuyên qua khi modal thấp */
-// .transparent-modal.modal-breakpoint-0,
-// .transparent-modal.modal-breakpoint-01,
-// .transparent-modal.modal-breakpoint-05 {
-//   pointer-events: none !important;
-// }
-
-// .transparent-modal.modal-breakpoint-1 {
-//   pointer-events: auto !important;
-// }
-
-// .transparent-modal ion-content {
-//   background: white;
-//   border-radius: 16px 16px 0 0;
-//   box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
-// }
-
 
 .transparent-modal {
+  margin-bottom: 0 !important;
   --backdrop-opacity: 0 !important; /* loại bỏ nền mờ */
   // pointer-events: none !important; /* modal không chặn sự kiện */
-}
-
-.transparent-modal ion-backdrop {
-  pointer-events: none !important;
-}
-
-.transparent-modal ion-content {
-  pointer-events: auto; /* vẫn tương tác được bên trong modal */
-  border-radius: 16px 16px 0 0;
-  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
 }

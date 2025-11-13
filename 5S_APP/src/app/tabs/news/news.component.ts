@@ -9,6 +9,7 @@ import {
 import { HomeService } from 'src/app/service/home.service';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ConfigService } from 'src/app/service/config.service';
+import { PaginationResult } from 'src/app/models/base.model';
 interface UserInfo {
   fullName: string;
   phoneNumber: string;
@@ -32,6 +33,7 @@ export class NewsComponent implements OnInit {
   dataHome: any;
   dataHomeChuaCham: any;
   dataChucVu: any;
+  paginationResult = new PaginationResult()
   formattedDate: string = '';
   storeLength: string = '(0)';
   wareHouseLength: string = '(0)';
@@ -66,20 +68,17 @@ export class NewsComponent implements OnInit {
     private _service: HomeService,
     private router: Router,
     private loadingController: LoadingController,
-    private toastController: ToastController,
     private configService: ConfigService
   ) {}
 
   ngOnInit() {
     this.loadUserInfo();
     this.configService.apiUrl$.subscribe((url) => {
-      // Khi URL thay đổi, gọi lại API
       this.getChucVu();
       this.getDataHome();
+      this.search();
     });
-    // this.getChucVu();
     this.formatToday();
-    // this.getDataHome();
   }
 
   slideOpts = {
@@ -90,6 +89,19 @@ export class NewsComponent implements OnInit {
       delay: 3000,
     },
   };
+
+  search() {
+    this._service.search(this.filter).subscribe({
+      next: (data) => {
+        this.paginationResult = data
+        console.log(this.paginationResult);
+
+      },
+      error: (response) => {
+        console.log(response)
+      },
+    })
+  }
 
   loadUserInfo() {
     const userInfoString = localStorage.getItem('UserInfo');

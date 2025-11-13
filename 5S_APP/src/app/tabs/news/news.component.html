@@ -127,20 +127,11 @@
     </ng-container>
     <!-- store -->
     <ion-segment-view style="padding: 0 15px">
-      <ion-segment-content id="second" style="
+      <ion-segment-content *ngFor="let item of paginationResult.data" id="second" class="item-survey" style="
           background-image: url('../../../assets/img/bg-store.jpeg');
-          background-size: cover;
-          background-repeat: no-repeat;
-          background-position: center;
-          display: flex;
-          align-items: center;
-          justify-content: space-around;
-          cursor: pointer;
-          height: 110px;
-           border-radius: 16px;
-        " (click)="navigateTo('03805572-e6b7-4455-90fe-9b6584eef46f')">
+        " (click)="navigateTo(item.id)">
         <div class="text-segment-content">
-          <p style="font-size: 14px;">Chấm điểm 5s cửa hàng</p>
+          <p style="font-size: 14px;">{{ item.name }}</p>
           <span style="font-size: 14px; color: white;  opacity: 0.8">
             Đánh giá ngay <ion-icon name="arrow-forward-outline"></ion-icon>
           </span>
@@ -150,16 +141,8 @@
         </div>
       </ion-segment-content>
 
-      <ion-segment-content id="third" style="
+      <!-- <ion-segment-content id="third" class="item-survey" style="
           background-image: url('../../../assets/img/bg-ware-house.jpeg');
-          background-size: cover;
-          background-repeat: no-repeat;
-          background-position: center;
-          display: flex;
-          align-items: center;
-          justify-content: space-around;
-          height: 110px;
-          border-radius: 16px;
         " (click)="navigateTo('16d30d78-0b80-4323-bd86-2498aae676a1')">
         <div class="text-segment-content">
           <p style="font-size: 14px;">Chấm điểm 5s kho</p>
@@ -168,9 +151,24 @@
           </a>
         </div>
         <div class="logo">
-          <!-- <img style="width: 74px; height: 62px" src="../../../assets/img/Logo_of_Petrolimex.svg.png" alt="" /> -->
+          <img style="width: 74px; height: 62px" src="../../../assets/img/Logo_of_Petrolimex.svg.png" alt="" />
         </div>
       </ion-segment-content>
+
+
+      <ion-segment-content id="four" class="item-survey" style="
+          background-image: url('../../../assets/img/bg-ware-house.jpeg');
+        " (click)="navigateTo('6ce4b2ad-dfc4-4a17-8182-1cc5ca183839')">
+        <div class="text-segment-content">
+          <p style="font-size: 14px;">Chấm điểm 5s kho</p>
+          <a style="font-size: 14px; opacity: 0.8;" href="">
+            Đánh giá ngay <ion-icon name="arrow-forward-outline"></ion-icon>
+          </a>
+        </div>
+        <div class="logo">
+          <img style="width: 74px; height: 62px" src="../../../assets/img/Logo_of_Petrolimex.svg.png" alt="" />
+        </div>
+      </ion-segment-content> -->
     </ion-segment-view>
   </div>
 </ion-content>
