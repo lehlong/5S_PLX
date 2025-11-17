@@ -4,8 +4,8 @@ export const environment = {
 
   // baseApiUrl: 'http://sso.d2s.com.vn:1347/api',
 
-  //  apiUrl: 'http://http://192.168.110.12:1234/api',
-  //  urlFiles: 'http://http://192.168.110.12:1234',
+  //  apiUrl: 'https://5s.plxna.com.vn/api',
+  //  urlFiles: 'https://5s.plxna.com.vn/',
 
   //  apiUrl: 'http://sso.d2s.com.vn:1347/api',
   //  urlFiles: 'http://sso.d2s.com.vn:1347',

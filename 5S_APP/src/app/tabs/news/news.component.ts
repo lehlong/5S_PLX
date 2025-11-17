@@ -278,6 +278,7 @@ export class NewsComponent implements OnInit {
     try {
       this.getDataHome();
       this.getChucVu();
+      this.search()
     } catch (error) {
       console.error('❌ Lỗi khi làm mới dữ liệu:', error);
     } finally {

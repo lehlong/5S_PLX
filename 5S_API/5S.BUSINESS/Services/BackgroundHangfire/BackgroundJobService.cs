@@ -40,7 +40,7 @@ namespace PLX5S.BUSINESS.Services.BackgroundHangfire
         {
             try
             {
-                var now = DateTime.Now;
+                var now = DateTime.Today;
 
                 var lstSurvey = _dbContext.TblBuSurveyMgmt
                     .Where(x => x.IsActive == true)
@@ -51,6 +51,7 @@ namespace PLX5S.BUSINESS.Services.BackgroundHangfire
                 {
                     var check = _dbContext.TblBuKiKhaoSat
                         .FirstOrDefault(x =>
+                            x.StartDate.Day == now.Day &&
                             x.StartDate.Month == now.Month &&
                             x.StartDate.Year == now.Year &&
                             x.TrangThaiKi == "1" &&
@@ -68,7 +69,6 @@ namespace PLX5S.BUSINESS.Services.BackgroundHangfire
             }
             catch (Exception ex)
             {
-                //this.Status = false;
             }
         }
 
