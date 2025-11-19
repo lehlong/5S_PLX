@@ -27,4 +27,20 @@ export class NewsService {
   delete(id: string): Observable<any> {
     return this.commonService.delete(`News/Delete/${id}`)
   }
+
+  searchTms(): Observable<any> {
+    return this.commonService.getTms('CalculateDiscount/Search?currentPage=1&pageSize=20&keyWord=')
+  }
+
+  getCalculateTms(param: string): Observable<any> {
+    return this.commonService.getTms(`CalculateDiscount/GetOutput?id=${param}`)
+  }
+
+  insertMap(params: any): Observable<any> {
+    return this.commonService.postMap('Map/Insert', params)
+  }
+
+  getNearbyStations(lat: number, lng: number): Observable<any> {
+    return this.commonService.getMap(`Map/GetNearbyStations?lat=${lat}&lng=${lng}`)
+  }
 }

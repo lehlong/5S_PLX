@@ -25,6 +25,8 @@ import { ConfigService } from './config.service';
 })
 export class CommonService {
   private baseUrl = environment.apiUrl;
+  private urlMap = environment.apiMap;
+  private tmsUrl = environment.tmsUrl;
   private refreshTokenInProgress = false;
   private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(
     null
@@ -41,6 +43,115 @@ export class CommonService {
     });
   }
 
+
+  getMap<T>(
+    endpoint: string,
+    params?: { [key: string]: any },
+    showLoading: boolean = true
+  ): Observable<T> {
+    let httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach((key) => {
+        if (params[key] !== null && params[key] !== undefined) {
+          if (Array.isArray(params[key])) {
+            params[key].forEach((value: any) => {
+              httpParams = httpParams.append(key, value);
+            });
+          } else {
+            httpParams = httpParams.append(key, params[key]);
+          }
+        }
+      });
+    }
+    if (showLoading) {
+      this.globalService.incrementApiCallCount(); // Tăng bộ đếm
+    }
+    return this.http
+      .get<any>(`${this.urlMap}/${endpoint}`, { params: httpParams })
+      .pipe(
+        tap((response) => {
+          if (response.status == false) {
+            this.showError(response.messageObject.message);
+          }
+        }), // Log phản hồi API
+        map(this.handleApiResponse),
+        catchError((error) => {
+          return this.handleError(error, () =>
+            this.get<T>(endpoint, params, showLoading)
+          );
+        }),
+        finalize(() => {
+          this.globalService.decrementApiCallCount();
+        })
+      );
+  }
+
+  postMap<T>(
+    endpoint: string,
+    data: any,
+    showSuccess: boolean = true,
+    showLoading: boolean = true
+  ): Observable<T> {
+    if (showLoading) {
+      this.globalService.incrementApiCallCount(); // Tăng bộ đếm
+    }
+    return this.http.post<any>(`${this.urlMap}/${endpoint}`, data).pipe(
+      map(this.handleApiResponse),
+      tap(() => {
+        if (showSuccess) {
+          this.showSuccess('Thêm mới thông tin thành công');
+        }
+      }),
+      catchError((error) =>
+        this.handleError(error, () =>
+          this.post<T>(endpoint, data, showSuccess, showLoading)
+        )
+      ),
+      finalize(() => this.globalService.decrementApiCallCount()) // Giảm bộ đếm khi hoàn thành
+    );
+  }
+
+  getTms<T>(
+    endpoint: string,
+    params?: { [key: string]: any },
+    showLoading: boolean = true
+  ): Observable<T> {
+    let httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach((key) => {
+        if (params[key] !== null && params[key] !== undefined) {
+          if (Array.isArray(params[key])) {
+            params[key].forEach((value: any) => {
+              httpParams = httpParams.append(key, value);
+            });
+          } else {
+            httpParams = httpParams.append(key, params[key]);
+          }
+        }
+      });
+    }
+    if (showLoading) {
+      this.globalService.incrementApiCallCount(); // Tăng bộ đếm
+    }
+    return this.http
+      .get<any>(`${this.tmsUrl}/${endpoint}`, { params: httpParams })
+      .pipe(
+        tap((response) => {
+          if (response.status == false) {
+            this.showError(response.messageObject.message);
+          }
+        }), // Log phản hồi API
+        map(this.handleApiResponse),
+        catchError((error) => {
+          return this.handleError(error, () =>
+            this.get<T>(endpoint, params, showLoading)
+          );
+        }),
+        finalize(() => {
+          this.globalService.decrementApiCallCount();
+        })
+      );
+  }
   get<T>(
     endpoint: string,
     params?: { [key: string]: any },

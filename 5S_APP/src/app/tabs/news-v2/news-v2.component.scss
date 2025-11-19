@@ -11,8 +11,6 @@
     display: flex;
     align-items: center;
 
-    .logo {}
-
     .petrolimex-text {
       font-family: "Roboto", sans-serif;
       font-weight: 700;
@@ -90,14 +88,18 @@ ion-tab-button.active ion-label {
   z-index: 1234;
   position: absolute;
   width: 100%;
-  top: 50px;
+  top: 60px;
 }
 
 .directions-panel {
-  overflow-y: auto;
   z-index: 1000;
   background-color: #fff;
   padding: 10px;
+
+  .list-md {
+    overflow-y: scroll;
+    height: 80%;
+  }
 }
 
 ion-content {
@@ -127,6 +129,26 @@ ion-content {
 
 .transparent-modal {
   margin-bottom: 0 !important;
-  --backdrop-opacity: 0 !important; /* loại bỏ nền mờ */
+  --backdrop-opacity: 0 !important;
+  /* loại bỏ nền mờ */
   // pointer-events: none !important; /* modal không chặn sự kiện */
+}
+
+.icon-null {
+  font-size: 140px;
+  text-align: center;
+  opacity: 0.6;
+  padding-top: 65px;
+}
+
+
+.icon-share{
+  font-size: 140px;
+  text-align: center;
+  opacity: 0.6;
+  padding-top: 200px;
+}
+.btn-share{
+  text-align: center;
+  opacity: 0.6;
 }

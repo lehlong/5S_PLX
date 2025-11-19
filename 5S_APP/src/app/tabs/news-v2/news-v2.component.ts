@@ -1,4 +1,3 @@
-import { routes } from './../../app.routes';
 import { IonModal } from '@ionic/angular';
 import { Geolocation } from '@capacitor/geolocation';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
@@ -8,8 +7,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import 'leaflet';
 import 'leaflet-routing-machine'
 import { IonTab } from "@ionic/angular/standalone";
-import { Capacitor } from '@capacitor/core';
-// import { Capacitor } from '@capacitor/core/types/global';
+import { MessageService } from 'src/app/service/message.service';
 
 declare let L: any;
 
@@ -27,34 +25,51 @@ export class NewsV2Component implements OnInit {
 
   private locationPermissionGranted: boolean = false;
 
+  presentingElement!: HTMLElement | null;
   map!: L.Map;
   routingControl: any;
   userMarker: L.Marker | null = null;
   destMarker: L.Marker | null = null;
+  tempMarker: L.Marker | null = null;
+
   activeTab: string = 'home';
   showFooter = true;
   lstAddress: any[] = [];
   isOpen = true
   newsList: any = [];
   isLstS = false;
-
-  fuelPrices = [
-    { name: 'Xăng RON 95-IV', price: 24500, unit: 'đ/lít' },
-    { name: 'Xăng E5 RON 92-II', price: 23600, unit: 'đ/lít' },
-    { name: 'Dầu DO 0,05S-II', price: 21300, unit: 'đ/lít' },
-    { name: 'Dầu hỏa', price: 20900, unit: 'đ/lít' },
-  ];
+  directions: any[] = [];
+  routeLayer: any;
+  dataTms: any
+  isModalShare = false;
+  dataInsert: any = {
+    isActive: true,
+    id: "",
+    name: "",
+    address: "",
+    description: "",
+    kinhDo: "",
+    viDo: ""
+  }
+  isMap2 = false;
 
   constructor(
     private router: Router,
+    private messageService: MessageService,
     private service: NewsService
   ) { }
 
   async ngOnInit() {
     try {
-      const loc = await this.getCurrentLocationFast();
+      this.getDotTinhTms()
 
+      const loc = await this.getCurrentLocationFast();
       this.initMap(loc.latitude, loc.longitude);
+      this.dataInsert.kinhDo = loc.longitude;
+      this.dataInsert.viDo = loc.latitude;
+      this.getNearbyStations()
+
+      this.presentingElement = document.querySelector('.ion-page');
     } catch (err) {
       console.warn('⚠️ Không lấy được vị trí, dùng mặc định', err);
       this.initMap(10.762622, 106.660172); // VD: TP.HCM
@@ -62,15 +77,22 @@ export class NewsV2Component implements OnInit {
   }
 
   async initMap(lat: number, lng: number) {
-    // Cấu hình icon mặc định
+
+    if (this.map) {
+      this.map.remove();
+    }
+
     L.Icon.Default.mergeOptions({
-      iconRetinaUrl: 'media/marker-icon-2V3QKKVC.png',
+      iconRetinaUrl: 'marker-icon-2V3QKKVC.png',
       iconUrl: 'media/marker-icon-2V3QKKVC.png',
       shadowUrl: 'media/marker-shadow.png',
+      // gasIcon: 'gasIcon.png'
     });
 
     // Khởi tạo map
-    this.map = L.map('map').setView([lat, lng], 15);
+    this.map = L.map('map', {
+      doubleClickZoom: false
+    }).setView([lat, lng], 15);
 
     // Thêm tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -84,10 +106,66 @@ export class NewsV2Component implements OnInit {
       .openPopup();
 
     // Bắt sự kiện click lên bản đồ để đặt điểm đến
-    this.map.on('click', (e: L.LeafletMouseEvent) => {
+    this.map.on('dblclick', (e: L.LeafletMouseEvent) => {
       const { lat, lng } = e.latlng;
-      console.log('Clicked at:', lat, lng);
+      console.log('Double clicked at:', lat, lng);
       this.setDestination(lat, lng);
+    });
+  }
+
+  async canDismiss(data?: undefined, role?: string) {
+    return role !== 'gesture';
+  }
+
+  getNearbyStations() {
+    this.service.getNearbyStations(this.dataInsert.viDo, this.dataInsert.kinhDo).subscribe({
+      next: (data) => {
+        // this.data = data.data;
+        console.log('data', data);
+
+        this.renderStationsOnMap(data);
+      },
+      error: (response) => {
+        console.log(response)
+      },
+    });
+  }
+
+  getDotTinhTms() {
+    this.service.searchTms().subscribe({
+      next: (data) => {
+        //lấy đợt tính mới nhất có được phê duyệt
+        const c = data.data
+          .filter((x: any) => x.status === "04")
+          .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]
+
+        this.getCalculateDotTms(c.id)
+      },
+      error: (err) => {
+        console.error('Lỗi khi gọi getAll:', err);
+      },
+    });
+  }
+
+  getCalculateDotTms(param: string) {
+    this.service.getCalculateTms(param).subscribe({
+      next: (data) => {
+        this.dataTms = data
+        // console.log('Kết quả tính toán:', data);
+      },
+      error: (err) => {
+        console.error('Lỗi khi gọi getAll:', err);
+      },
+    });
+  }
+
+  getLatestStatus04(list: any[]) {
+    const filtered = list.filter(item => item.status === "04");
+
+    if (filtered.length === 0) return null; // không có bản ghi nào
+
+    return filtered.reduce((latest, item) => {
+      return new Date(item.date) > new Date(latest.date) ? item : latest;
     });
   }
 
@@ -119,24 +197,6 @@ export class NewsV2Component implements OnInit {
   currentBreakpoint = 0.08;
   private reopening = false;
 
-  // onBreakpointChange(ev: any) {
-  //   this.currentBreakpoint = ev.detail.breakpoint;
-
-  //   const modalEl = this.modalRef.nativeElement as HTMLElement;    // nếu modal thấp hơn 0.5 thì cho phép click xuyên qua
-  //   modalEl.style.pointerEvents = this.currentBreakpoint < 0.5 ? 'none' : 'auto';
-  //   console.log(this.currentBreakpoint);
-
-  // }
-
-  // async onModalDismiss() {
-  //   // Khi modal đóng do click ra ngoài → mở lại và co về 0.1
-  //   if (this.reopening) return;
-  //   this.reopening = true;
-  //   await this.modal.present();
-  //   await this.modal.setCurrentBreakpoint(0.08);
-  //   this.reopening = false;
-  //   this.isLstS = false;
-  // }
 
   onBreakpointChange(ev: any) {
     this.currentBreakpoint = ev.detail.breakpoint;
@@ -165,8 +225,6 @@ export class NewsV2Component implements OnInit {
   }
 
 
-  directions: any[] = [];
-  routeLayer: any;
   showRoute(destLat: number, destLng: number) {
     if (!this.userMarker) return;
 
@@ -189,7 +247,6 @@ export class NewsV2Component implements OnInit {
       const route = e.routes[0];
       this.directions = route.instructions; // hoặc route.legs[0].steps map như trước
       console.log(this.directions);
-
     });
   }
 
@@ -274,6 +331,131 @@ export class NewsV2Component implements OnInit {
       },
     });
   }
+
+
+  async initMap2(lat: number, lng: number) {
+
+    // Nếu map đã tồn tại → remove để tạo map mới
+    // if (this.map) {
+    //   this.map.remove();
+    // }
+
+    // Cấu hình icon mặc định
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: 'media/marker-icon-2V3QKKVC.png',
+      iconUrl: 'media/marker-icon-2V3QKKVC.png',
+      shadowUrl: 'media/marker-shadow.png',
+    });
+
+    // Khởi tạo map
+    this.map = L.map('map2', {
+      doubleClickZoom: false
+    }).setView([lat, lng], 15);
+    console.log(this.map);
+
+    // Thêm tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+    }).addTo(this.map);
+
+    // Marker vị trí người dùng
+    this.tempMarker = L.marker([lat, lng])
+      .addTo(this.map)
+      .bindPopup('Vị trí của bạn')
+      .openPopup();
+
+
+    this.map.on('dblclick', (e: L.LeafletMouseEvent) => {
+      const { lat, lng } = e.latlng;
+
+      // Xóa marker cũ nếu có
+      if (this.tempMarker) {
+        this.map.removeLayer(this.tempMarker);
+      }
+      this.dataInsert.viDo = lat;
+      this.dataInsert.kinhDo = lng;
+      // Tạo marker mới
+      this.tempMarker = L.marker([lat, lng], {
+        draggable: true  // cho phép kéo nếu muốn
+      }).addTo(this.map);
+
+      console.log('Selected:', lat, lng);
+    });
+
+  }
+
+  openSelectMap() {
+    this.isMap2 = true;
+    setTimeout(() => {
+      this.initMap2(this.dataInsert.viDo, this.dataInsert.kinhDo);
+    }, 200);
+  }
+
+  insertMap() {
+    if (this.dataInsert.name == null || this.dataInsert.name == '') {
+      this.messageService.show(
+        `Không được bỏ trống tên trạm xăng`,
+        'warning'
+      );
+      return;
+    }
+    this.service.insertMap(this.dataInsert).subscribe({
+      next: (data) => {
+        this.messageService.show(
+          `Thêm trạm xăng thành công`,
+          'success'
+        );
+      }, error: (err) => {
+
+        console.error('Lỗi khi gọi insertMap:', err);
+        this.messageService.show(
+          `Đã có trạm xăng được thêm trong phạm vi này`,
+          'danger'
+        );
+      },
+    });
+    console.log('dataInsert', this.dataInsert);
+  }
+
+
+  getDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371e3; // bán kính Trái Đất (m)
+    const toRad = (x: number) => (x * Math.PI) / 180;
+
+    const φ1 = toRad(lat1);
+    const φ2 = toRad(lat2);
+    const Δφ = toRad(lat2 - lat1);
+    const Δλ = toRad(lon2 - lon1);
+
+    const a =
+      Math.sin(Δφ / 2) ** 2 +
+      Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c; // khoảng cách tính bằng mét
+  }
+  stationMarkers: any[] = [];
+
+  renderStationsOnMap(stations: any[]) {
+    const gasIcon = L.icon({
+      iconUrl: 'media/gasIcon.png',
+      iconSize: [35, 35],
+    });
+    stations.forEach(st => {
+      const marker = L.marker([st.viDo, st.kinhDo],
+        { icon: gasIcon }
+      )
+        .addTo(this.map)
+        .bindPopup(`
+        <b>${st.name}</b><br>
+        Khoảng cách: ${st.khoangCach.toFixed(0)} m
+      `);
+
+      this.stationMarkers.push(marker);
+    });
+  }
+
   setTab(tab: string) {
     this.activeTab = tab;
   }

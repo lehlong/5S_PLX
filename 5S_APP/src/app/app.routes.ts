@@ -13,7 +13,7 @@ export const routes: Routes = [
     children: [],
   },
 
-  { path: 'news-v2', component: NewsV2Component, canActivate: [StartupGuard] },
+  { path: 'news-v2', component: NewsV2Component},
   {
     path: 'news/:id',
     loadComponent: () =>

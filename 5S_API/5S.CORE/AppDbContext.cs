@@ -134,6 +134,7 @@ namespace PLX5S.CORE
         public DbSet<TblMdAtvsv> tblMdAtvsv { get; set; }
         public DbSet<TblMdDevice> tblMdDevice { get; set; }
         public DbSet<TblMdNews> tblMdNews { get; set; }
+        public DbSet<TblMdMap> TblMdMap { get; set; }
 
         #endregion
 

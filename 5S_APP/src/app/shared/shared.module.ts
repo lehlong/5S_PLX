@@ -212,6 +212,12 @@ import {
   callOutline,
   shieldHalf,
   locationOutline,
+  golfOutline,
+  arrowUndoOutline,
+  closeOutline,
+  arrowRedoOutline,
+  checkmarkOutline
+
 } from 'ionicons/icons';
 
 const IONIC_COMPONENTS = [
@@ -439,6 +445,11 @@ export class SharedModule {
       callOutline,
       shieldHalf,
       locationOutline,
+      golfOutline,
+      arrowUndoOutline,
+      closeOutline,
+      arrowRedoOutline,
+      checkmarkOutline
     });
   }
 }
