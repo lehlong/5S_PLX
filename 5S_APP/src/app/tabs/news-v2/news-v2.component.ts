@@ -110,7 +110,7 @@ export class NewsV2Component implements OnInit {
       .openPopup();
 
     // DOUBLE CLICK để chọn điểm đến
-    this.map.on('dblclick', (e: any) => {
+    this.map.on('click', (e: any) => {
       const latlng = e.latlng;
       this.setDestination(latlng.lat, latlng.lng);
       console.log('Điểm đến', latlng.lat, latlng.lng);
