@@ -8,7 +8,6 @@ import 'leaflet';
 import 'leaflet-routing-machine'
 import { IonTab } from "@ionic/angular/standalone";
 import { MessageService } from 'src/app/service/message.service';
-import { App } from '@capacitor/app';
 
 declare let L: any;
 
@@ -58,7 +57,6 @@ export class NewsV2Component implements OnInit {
     private router: Router,
     private messageService: MessageService,
     private service: NewsService,
-    private alertCtrl: AlertController,
   ) { }
 
   async ngOnInit() {
@@ -82,23 +80,7 @@ export class NewsV2Component implements OnInit {
       this.initMap(10.762622, 106.660172); // VD: TP.HCM
     }
   }
-  pressTimer: any;
   async initMap(lat: number, lng: number) {
-    // Chờ router-outlet không còn aria-hidden
-    const outlet = document.querySelector('ion-router-outlet') as HTMLElement;
-    if (outlet && outlet.hasAttribute('aria-hidden')) {
-      await new Promise(resolve => {
-        const observer = new MutationObserver((mutations) => {
-          for (let m of mutations) {
-            if (!outlet.hasAttribute('aria-hidden')) {
-              observer.disconnect();
-              resolve(true);
-            }
-          }
-        });
-        observer.observe(outlet, { attributes: true, attributeFilter: ['aria-hidden'] });
-      });
-    }
 
     if (this.map) {
       this.map.remove();
@@ -110,42 +92,29 @@ export class NewsV2Component implements OnInit {
       shadowUrl: 'assets/media/marker-shadow.png',
     });
 
+    // Khởi tạo map
     this.map = L.map('map', {
-      // loại bỏ tabindex để không nhận focus khi không cần
-      keyboard: false
+      keyboard: false,  // tránh tabindex gây focus ARIA
+      doubleClickZoom: false
     }).setView([lat, lng], 15);
 
+    // Tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors',
     }).addTo(this.map);
 
+    // Marker vị trí người dùng
     this.userMarker = L.marker([lat, lng])
       .addTo(this.map)
       .bindPopup('Vị trí của bạn')
       .openPopup();
 
-    // LONG PRESS 0.5s
-    const startPress = (e: any) => {
-      let latlng;
-      if (e.type.startsWith('touch')) {
-        const touch = e.originalEvent.touches[0];
-        latlng = this.map.containerPointToLatLng(this.map.mouseEventToContainerPoint(touch));
-      } else {
-        latlng = e.latlng;
-      }
-
-      this.pressTimer = setTimeout(() => {
-        this.setDestination(latlng.lat, latlng.lng);
-        console.log('Điểm đến', latlng.lat, latlng.lng);
-      }, 500);
-    };
-
-    const cancelPress = () => {
-      clearTimeout(this.pressTimer);
-    };
-
-    this.map.on("mousedown touchstart", startPress);
-    this.map.on("mouseup touchend touchcancel", cancelPress);
+    // DOUBLE CLICK để chọn điểm đến
+    this.map.on('dblclick', (e: any) => {
+      const latlng = e.latlng;
+      this.setDestination(latlng.lat, latlng.lng);
+      console.log('Điểm đến', latlng.lat, latlng.lng);
+    });
   }
 
 
