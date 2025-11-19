@@ -1,4 +1,4 @@
-import { IonModal } from '@ionic/angular';
+import { IonModal, AlertController } from '@ionic/angular';
 import { Geolocation } from '@capacitor/geolocation';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
@@ -8,6 +8,7 @@ import 'leaflet';
 import 'leaflet-routing-machine'
 import { IonTab } from "@ionic/angular/standalone";
 import { MessageService } from 'src/app/service/message.service';
+import { App } from '@capacitor/app';
 
 declare let L: any;
 
@@ -56,26 +57,32 @@ export class NewsV2Component implements OnInit {
   constructor(
     private router: Router,
     private messageService: MessageService,
-    private service: NewsService
+    private service: NewsService,
+    private alertCtrl: AlertController,
   ) { }
 
   async ngOnInit() {
+    this.getDotTinhTms()
     try {
-      this.getDotTinhTms()
-
       const loc = await this.getCurrentLocationFast();
       this.initMap(loc.latitude, loc.longitude);
       this.dataInsert.kinhDo = loc.longitude;
       this.dataInsert.viDo = loc.latitude;
+
       this.getNearbyStations()
 
       this.presentingElement = document.querySelector('.ion-page');
     } catch (err) {
+      this.dataInsert.kinhDo = 10.762622;
+      this.dataInsert.viDo = 106.660172;
+
+      this.getNearbyStations()
+
       console.warn('⚠️ Không lấy được vị trí, dùng mặc định', err);
       this.initMap(10.762622, 106.660172); // VD: TP.HCM
     }
   }
-
+  pressTimer: any;
   async initMap(lat: number, lng: number) {
 
     if (this.map) {
@@ -91,7 +98,6 @@ export class NewsV2Component implements OnInit {
 
     // Khởi tạo map
     this.map = L.map('map', {
-      doubleClickZoom: false
     }).setView([lat, lng], 15);
 
     // Thêm tile layer
@@ -105,11 +111,20 @@ export class NewsV2Component implements OnInit {
       .bindPopup('Vị trí của bạn')
       .openPopup();
 
-    // Bắt sự kiện click lên bản đồ để đặt điểm đến
-    this.map.on('dblclick', (e: L.LeafletMouseEvent) => {
-      const { lat, lng } = e.latlng;
-      console.log('Double clicked at:', lat, lng);
-      this.setDestination(lat, lng);
+    this.map.on("mousedown", (e: any) => {
+      this.pressTimer = setTimeout(() => {
+        this.setDestination(e.latlng.lat, e.latlng.lng);
+        console.log('Điểm đến', lat, lng);
+
+      }, 500); // giữ 500ms để chọn điểm
+    });
+
+    this.map.on("mouseup", () => {
+      clearTimeout(this.pressTimer);
+    });
+
+    this.map.on("mouseout", () => {
+      clearTimeout(this.pressTimer);
     });
   }
 
@@ -118,11 +133,11 @@ export class NewsV2Component implements OnInit {
   }
 
   getNearbyStations() {
+    console.log('aaaaaaaaaaaaaaaa');
+
     this.service.getNearbyStations(this.dataInsert.viDo, this.dataInsert.kinhDo).subscribe({
       next: (data) => {
-        // this.data = data.data;
         console.log('data', data);
-
         this.renderStationsOnMap(data);
       },
       error: (response) => {
@@ -131,43 +146,6 @@ export class NewsV2Component implements OnInit {
     });
   }
 
-  getDotTinhTms() {
-    this.service.searchTms().subscribe({
-      next: (data) => {
-        //lấy đợt tính mới nhất có được phê duyệt
-        const c = data.data
-          .filter((x: any) => x.status === "04")
-          .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]
-
-        this.getCalculateDotTms(c.id)
-      },
-      error: (err) => {
-        console.error('Lỗi khi gọi getAll:', err);
-      },
-    });
-  }
-
-  getCalculateDotTms(param: string) {
-    this.service.getCalculateTms(param).subscribe({
-      next: (data) => {
-        this.dataTms = data
-        // console.log('Kết quả tính toán:', data);
-      },
-      error: (err) => {
-        console.error('Lỗi khi gọi getAll:', err);
-      },
-    });
-  }
-
-  getLatestStatus04(list: any[]) {
-    const filtered = list.filter(item => item.status === "04");
-
-    if (filtered.length === 0) return null; // không có bản ghi nào
-
-    return filtered.reduce((latest, item) => {
-      return new Date(item.date) > new Date(latest.date) ? item : latest;
-    });
-  }
 
   // Đặt điểm đến và vẽ route
   setDestination(destLat: number, destLng: number) {
@@ -287,7 +265,6 @@ export class NewsV2Component implements OnInit {
       }
       this.locationPermissionGranted = true;
     }
-
     const position = await Geolocation.getCurrentPosition({
       enableHighAccuracy: true,
       timeout: 5000,
@@ -299,7 +276,6 @@ export class NewsV2Component implements OnInit {
       longitude: position.coords.longitude,
     };
   }
-
 
   async handleInput(event: Event) {
     const target = event.target as HTMLIonSearchbarElement;
@@ -334,17 +310,10 @@ export class NewsV2Component implements OnInit {
 
 
   async initMap2(lat: number, lng: number) {
-
-    // Nếu map đã tồn tại → remove để tạo map mới
-    // if (this.map) {
-    //   this.map.remove();
-    // }
-
-    // Cấu hình icon mặc định
     L.Icon.Default.mergeOptions({
-      iconRetinaUrl: 'media/marker-icon-2V3QKKVC.png',
-      iconUrl: 'media/marker-icon-2V3QKKVC.png',
-      shadowUrl: 'media/marker-shadow.png',
+      iconRetinaUrl: 'assets/media/marker-icon.png',
+      iconUrl: 'assets/media/marker-icon.png',
+      shadowUrl: 'assets/media/marker-shadow.png',
     });
 
     // Khởi tạo map
@@ -440,7 +409,7 @@ export class NewsV2Component implements OnInit {
   renderStationsOnMap(stations: any[]) {
     const gasIcon = L.icon({
       iconUrl: 'assets/media/gasIcon2.png',
-      iconSize: [35, 35],
+      iconSize: [25, 25],
     });
     stations.forEach(st => {
       const marker = L.marker([st.viDo, st.kinhDo],
@@ -452,9 +421,53 @@ export class NewsV2Component implements OnInit {
         Khoảng cách: ${st.khoangCach.toFixed(0)} m
       `);
 
+      marker.on('click', () => {
+        this.showRoute(st.viDo, st.kinhDo);
+      });
       this.stationMarkers.push(marker);
     });
   }
+
+  //TMS lấy giá xăng dầu
+
+  getDotTinhTms() {
+    this.service.searchTms().subscribe({
+      next: (data) => {
+        //lấy đợt tính mới nhất có được phê duyệt
+        const c = data.data
+          .filter((x: any) => x.status === "04")
+          .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]
+
+        this.getCalculateDotTms(c.id)
+      },
+      error: (err) => {
+        console.error('Lỗi khi gọi getAll:', err);
+      },
+    });
+  }
+
+  getCalculateDotTms(param: string) {
+    this.service.getCalculateTms(param).subscribe({
+      next: (data) => {
+        this.dataTms = data
+        // console.log('Kết quả tính toán:', data);
+      },
+      error: (err) => {
+        console.error('Lỗi khi gọi getAll:', err);
+      },
+    });
+  }
+
+  getLatestStatus04(list: any[]) {
+    const filtered = list.filter(item => item.status === "04");
+
+    if (filtered.length === 0) return null; // không có bản ghi nào
+
+    return filtered.reduce((latest, item) => {
+      return new Date(item.date) > new Date(latest.date) ? item : latest;
+    });
+  }
+
 
   setTab(tab: string) {
     this.activeTab = tab;
