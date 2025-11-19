@@ -83,9 +83,9 @@ export class NewsV2Component implements OnInit {
     }
 
     L.Icon.Default.mergeOptions({
-      iconRetinaUrl: 'marker-icon-2V3QKKVC.png',
-      iconUrl: 'media/marker-icon-2V3QKKVC.png',
-      shadowUrl: 'media/marker-shadow.png',
+      iconRetinaUrl: 'assets/media/marker-icon.png',
+      iconUrl: 'assets/media/marker-icon.png',
+      shadowUrl: 'assets/media/marker-shadow.png',
       // gasIcon: 'gasIcon.png'
     });
 
@@ -439,7 +439,7 @@ export class NewsV2Component implements OnInit {
 
   renderStationsOnMap(stations: any[]) {
     const gasIcon = L.icon({
-      iconUrl: 'media/gasIcon.png',
+      iconUrl: 'assets/media/gasIcon2.png',
       iconSize: [35, 35],
     });
     stations.forEach(st => {
