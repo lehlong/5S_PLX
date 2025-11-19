@@ -84,6 +84,21 @@ export class NewsV2Component implements OnInit {
   }
   pressTimer: any;
   async initMap(lat: number, lng: number) {
+    // Chờ router-outlet không còn aria-hidden
+    const outlet = document.querySelector('ion-router-outlet') as HTMLElement;
+    if (outlet && outlet.hasAttribute('aria-hidden')) {
+      await new Promise(resolve => {
+        const observer = new MutationObserver((mutations) => {
+          for (let m of mutations) {
+            if (!outlet.hasAttribute('aria-hidden')) {
+              observer.disconnect();
+              resolve(true);
+            }
+          }
+        });
+        observer.observe(outlet, { attributes: true, attributeFilter: ['aria-hidden'] });
+      });
+    }
 
     if (this.map) {
       this.map.remove();
@@ -93,40 +108,46 @@ export class NewsV2Component implements OnInit {
       iconRetinaUrl: 'assets/media/marker-icon.png',
       iconUrl: 'assets/media/marker-icon.png',
       shadowUrl: 'assets/media/marker-shadow.png',
-      // gasIcon: 'gasIcon.png'
     });
 
-    // Khởi tạo map
     this.map = L.map('map', {
+      // loại bỏ tabindex để không nhận focus khi không cần
+      keyboard: false
     }).setView([lat, lng], 15);
 
-    // Thêm tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors',
     }).addTo(this.map);
 
-    // Marker vị trí người dùng
     this.userMarker = L.marker([lat, lng])
       .addTo(this.map)
       .bindPopup('Vị trí của bạn')
       .openPopup();
 
-    this.map.on("mousedown", (e: any) => {
+    // LONG PRESS 0.5s
+    const startPress = (e: any) => {
+      let latlng;
+      if (e.type.startsWith('touch')) {
+        const touch = e.originalEvent.touches[0];
+        latlng = this.map.containerPointToLatLng(this.map.mouseEventToContainerPoint(touch));
+      } else {
+        latlng = e.latlng;
+      }
+
       this.pressTimer = setTimeout(() => {
-        this.setDestination(e.latlng.lat, e.latlng.lng);
-        console.log('Điểm đến', lat, lng);
+        this.setDestination(latlng.lat, latlng.lng);
+        console.log('Điểm đến', latlng.lat, latlng.lng);
+      }, 500);
+    };
 
-      }, 500); // giữ 500ms để chọn điểm
-    });
-
-    this.map.on("mouseup", () => {
+    const cancelPress = () => {
       clearTimeout(this.pressTimer);
-    });
+    };
 
-    this.map.on("mouseout", () => {
-      clearTimeout(this.pressTimer);
-    });
+    this.map.on("mousedown touchstart", startPress);
+    this.map.on("mouseup touchend touchcancel", cancelPress);
   }
+
 
   async canDismiss(data?: undefined, role?: string) {
     return role !== 'gesture';
