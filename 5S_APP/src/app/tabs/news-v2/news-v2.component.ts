@@ -103,7 +103,6 @@ export class NewsV2Component implements AfterViewInit {
     if (!this.lstMapShare) {
       this.lstMapShare = [];
     }
-    console.log(this.lstMapShare);
   }
 
   async initMap(lat: number, lng: number) {
@@ -321,7 +320,6 @@ export class NewsV2Component implements AfterViewInit {
     }
 
     this.mapInsert = L.map('map2', {
-      doubleClickZoom: false
     }).setView([lat, lng], 15);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -392,6 +390,7 @@ export class NewsV2Component implements AfterViewInit {
       kinhDo: "",
       viDo: ""
     }
+    this.getNearbyStations()
     this.isModalShare = false;
   }
 

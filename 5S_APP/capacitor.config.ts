@@ -13,10 +13,7 @@ const config: CapacitorConfig = {
       presentationOptions: ['badge', 'sound', 'alert'],
     }
   },
-  server: {
-    cleartext: true, // Cho phép gọi HTTP
-    androidScheme: 'http' // Không ép dùng HTTPS
-  }
+  server: {}
 };
 
 export default config;
