@@ -51,9 +51,14 @@ export class NewsV2Component implements AfterViewInit {
     name: "",
     address: "",
     description: "",
-    kinhDo: "",
-    viDo: ""
+    kinhDo: 105.7954488,
+    viDo: 21.0291806
   }
+  myLocation: any = {
+    kinhDo: 105.7954488,
+    viDo: 21.0291806
+  }
+
   isMap2 = false;
   lstMapShare: any[] = [];
   heightTabBar = 0;
@@ -71,21 +76,15 @@ export class NewsV2Component implements AfterViewInit {
 
     try {
       const loc = await this.getCurrentLocationFast();
-      this.initMap(loc.latitude, loc.longitude);
       this.dataInsert.kinhDo = loc.longitude;
       this.dataInsert.viDo = loc.latitude;
-
+      this.myLocation.kinhDo = loc.longitude;
+      this.myLocation.viDo = loc.latitude;
       this.getNearbyStations()
-
       this.presentingElement = document.querySelector('.ion-page');
+
     } catch (err) {
-      this.dataInsert.kinhDo = 106.660172 ;
-      this.dataInsert.viDo = 10.762622;
-
       this.getNearbyStations()
-
-      console.warn('⚠️ Không lấy được vị trí, dùng mặc định', err);
-      this.initMap(10.762622, 106.660172); // VD: TP.HCM
     }
   }
 
@@ -94,6 +93,7 @@ export class NewsV2Component implements AfterViewInit {
     setTimeout(() => {
       this.heightTabBar = this.tabBar.nativeElement.offsetHeight;
       console.log('Chiều cao tabBar (sau delay):', this.heightTabBar);
+      this.initMap(this.myLocation.viDo, this.myLocation.kinhDo);
 
     }, 500);
   }
@@ -140,7 +140,7 @@ export class NewsV2Component implements AfterViewInit {
   }
 
   getNearbyStations() {
-    this.service.getNearbyStations(this.dataInsert.viDo, this.dataInsert.kinhDo).subscribe({
+    this.service.getNearbyStations(this.myLocation.viDo, this.myLocation.kinhDo).subscribe({
       next: (data) => {
         console.log('data', data);
 
@@ -206,19 +206,6 @@ export class NewsV2Component implements AfterViewInit {
   currentBreakpoint = 0.08;
   private reopening = false;
 
-
-  // onBreakpointChange(ev: any) {
-  //   this.currentBreakpoint = ev.detail.breakpoint;
-  //   const modalEl = this.modalRef.nativeElement;
-
-  //   // Khi modal thấp hơn 0.5 → cho phép click xuyên qua (trừ phần nội dung modal)
-  //   if (this.currentBreakpoint < 0.5) {
-  //     modalEl.style.pointerEvents = 'none';
-  //     modalEl.querySelector('ion-content')!.style.pointerEvents = 'auto';
-  //   } else {
-  //     modalEl.style.pointerEvents = 'auto';
-  //   }
-  // }
 
   // 🟩 Khi modal bị đóng do backdrop hoặc vuốt xuống
   async onModalDismiss() {
@@ -301,7 +288,6 @@ export class NewsV2Component implements AfterViewInit {
       timeout: 5000,
       maximumAge: 60000,
     });
-
     return {
       latitude: position.coords.latitude,
       longitude: position.coords.longitude,
@@ -415,6 +401,8 @@ export class NewsV2Component implements AfterViewInit {
       name: "",
       address: "",
       description: "",
+      kinhDo: this.myLocation.kinhDo,
+      viDo: this.myLocation.viDo
     }
     this.isModalShare = false;
   }
@@ -437,7 +425,6 @@ export class NewsV2Component implements AfterViewInit {
         <b>${st.name}</b><br>
         Khoảng cách: ${st.khoangCach.toFixed(0)} m
       `);
-      console.log(marker);
 
       marker.on('click', () => {
         this.showRoute(st.viDo, st.kinhDo);
