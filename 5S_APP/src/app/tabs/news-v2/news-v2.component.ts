@@ -79,8 +79,8 @@ export class NewsV2Component implements AfterViewInit {
 
       this.presentingElement = document.querySelector('.ion-page');
     } catch (err) {
-      this.dataInsert.kinhDo = 10.762622;
-      this.dataInsert.viDo = 106.660172;
+      this.dataInsert.kinhDo = 106.660172 ;
+      this.dataInsert.viDo = 10.762622;
 
       this.getNearbyStations()
 
@@ -104,7 +104,7 @@ export class NewsV2Component implements AfterViewInit {
       this.lstMapShare = [];
     }
 
-    this.renderStationsOnMap(this.lstMapShare);
+    // this.renderStationsOnMap(this.lstMapShare);
   }
 
   async initMap(lat: number, lng: number) {
@@ -140,7 +140,7 @@ export class NewsV2Component implements AfterViewInit {
   }
 
   getNearbyStations() {
-    this.service.getNearbyStations(this.dataInsert.kinhDo, this.dataInsert.viDo).subscribe({
+    this.service.getNearbyStations(this.dataInsert.viDo, this.dataInsert.kinhDo).subscribe({
       next: (data) => {
         console.log('data', data);
 
@@ -157,7 +157,7 @@ export class NewsV2Component implements AfterViewInit {
 
 
   // Đặt điểm đến và vẽ route
-  setDestination(destLat: number, destLng: number) {
+  async setDestination(destLat: number, destLng: number) {
     this.isLstS = false;
     if (!this.userMarker) {
       alert('Chưa có vị trí hiện tại!');
@@ -167,14 +167,36 @@ export class NewsV2Component implements AfterViewInit {
     // Xóa marker điểm đến cũ nếu có
     if (this.destMarker) this.mapMain.removeLayer(this.destMarker);
 
+    // 🔥 Tính khoảng cách
+    const userLatLng = this.userMarker.getLatLng();
+    const distance = this.getDistance(userLatLng.lat, userLatLng.lng, destLat, destLng);
+
+    // Marker mới
     this.destMarker = L.marker([destLat, destLng])
       .addTo(this.mapMain)
-      .bindPopup('Điểm đến')
+      .bindPopup(`<b>Điểm đến</b><br>${distance} km`)
       .openPopup();
 
+    // Vẽ route
     this.showRoute(destLat, destLng);
   }
 
+
+  getDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371; // bán kính trái đất (km)
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) *
+      Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return Number((R * c).toFixed(2)); // làm tròn 2 số lẻ
+  }
 
   onSearchbarClick() {
     this.isLstS = true;
@@ -351,7 +373,7 @@ export class NewsV2Component implements AfterViewInit {
   openSelectMap() {
     this.isMap2 = true;
     setTimeout(() => {
-      this.initMap2(this.dataInsert.viDo, this.dataInsert.kinhDo);
+      this.initMap2(this.dataInsert.kinhDo, this.dataInsert.viDo);
     }, 200);
   }
 
@@ -393,8 +415,6 @@ export class NewsV2Component implements AfterViewInit {
       name: "",
       address: "",
       description: "",
-      kinhDo: "",
-      viDo: ""
     }
     this.isModalShare = false;
   }
