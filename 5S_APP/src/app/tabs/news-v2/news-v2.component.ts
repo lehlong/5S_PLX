@@ -1,6 +1,6 @@
 import { IonModal, AlertController } from '@ionic/angular';
 import { Geolocation } from '@capacitor/geolocation';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { NewsService } from 'src/app/service/news.service';
 import { SharedModule } from 'src/app/shared/shared.module';
@@ -8,6 +8,7 @@ import 'leaflet';
 import 'leaflet-routing-machine'
 import { IonTab } from "@ionic/angular/standalone";
 import { MessageService } from 'src/app/service/message.service';
+import { StorageService } from 'src/app/service/storage.service';
 
 declare let L: any;
 
@@ -17,7 +18,8 @@ declare let L: any;
   styleUrls: ['./news-v2.component.scss'],
   imports: [IonTab, SharedModule],
 })
-export class NewsV2Component implements OnInit {
+export class NewsV2Component implements AfterViewInit {
+  @ViewChild('tabBar') tabBar!: ElementRef;
   @ViewChild('myModal') modal!: IonModal;
   @ViewChild('tab', { read: ElementRef }) tab!: ElementRef;
   @ViewChild('myModal', { read: ElementRef }) modalRef!: ElementRef<HTMLIonModalElement>;
@@ -26,7 +28,8 @@ export class NewsV2Component implements OnInit {
   private locationPermissionGranted: boolean = false;
 
   presentingElement!: HTMLElement | null;
-  map!: L.Map;
+  mapMain!: L.Map;
+  mapInsert!: L.Map;
   routingControl: any;
   userMarker: L.Marker | null = null;
   destMarker: L.Marker | null = null;
@@ -52,15 +55,20 @@ export class NewsV2Component implements OnInit {
     viDo: ""
   }
   isMap2 = false;
+  lstMapShare: any[] = [];
+  heightTabBar = 0;
 
   constructor(
     private router: Router,
     private messageService: MessageService,
     private service: NewsService,
+    private _storageService: StorageService,
   ) { }
 
   async ngOnInit() {
     this.getDotTinhTms()
+    this.getListMapShare()
+
     try {
       const loc = await this.getCurrentLocationFast();
       this.initMap(loc.latitude, loc.longitude);
@@ -80,10 +88,28 @@ export class NewsV2Component implements OnInit {
       this.initMap(10.762622, 106.660172); // VD: TP.HCM
     }
   }
+
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.heightTabBar = this.tabBar.nativeElement.offsetHeight;
+      console.log('Chiều cao tabBar (sau delay):', this.heightTabBar);
+
+    }, 500);
+  }
+
+  async getListMapShare() {
+    this.lstMapShare = await this._storageService.get('mapShareList')
+    if (!this.lstMapShare) {
+      this.lstMapShare = [];
+    }
+    console.log(this.lstMapShare);
+  }
+
   async initMap(lat: number, lng: number) {
 
-    if (this.map) {
-      this.map.remove();
+    if (this.mapMain) {
+      this.mapMain.remove();
     }
 
     L.Icon.Default.mergeOptions({
@@ -92,39 +118,27 @@ export class NewsV2Component implements OnInit {
       shadowUrl: 'assets/media/marker-shadow.png',
     });
 
-    // Khởi tạo map
-    this.map = L.map('map', {
-      keyboard: false,  // tránh tabindex gây focus ARIA
+    this.mapMain = L.map('map', {
+      keyboard: false,
       doubleClickZoom: false
     }).setView([lat, lng], 15);
 
-    // Tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
-    }).addTo(this.map);
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(this.mapMain);
 
-    // Marker vị trí người dùng
-    this.userMarker = L.marker([lat, lng])
-      .addTo(this.map)
-      .bindPopup('Vị trí của bạn')
-      .openPopup();
+    this.userMarker = L.marker([lat, lng]).addTo(this.mapMain);
 
-    // DOUBLE CLICK để chọn điểm đến
-    this.map.on('click', (e: any) => {
-      const latlng = e.latlng;
-      this.setDestination(latlng.lat, latlng.lng);
-      console.log('Điểm đến', latlng.lat, latlng.lng);
+    this.mapMain.on('click', (e: any) => {
+      const { lat, lng } = e.latlng;
+      this.setDestination(lat, lng);
     });
   }
-
-
   async canDismiss(data?: undefined, role?: string) {
     return role !== 'gesture';
   }
 
   getNearbyStations() {
-    console.log('aaaaaaaaaaaaaaaa');
-
     this.service.getNearbyStations(this.dataInsert.viDo, this.dataInsert.kinhDo).subscribe({
       next: (data) => {
         console.log('data', data);
@@ -146,10 +160,10 @@ export class NewsV2Component implements OnInit {
     }
 
     // Xóa marker điểm đến cũ nếu có
-    if (this.destMarker) this.map.removeLayer(this.destMarker);
+    if (this.destMarker) this.mapMain.removeLayer(this.destMarker);
 
     this.destMarker = L.marker([destLat, destLng])
-      .addTo(this.map)
+      .addTo(this.mapMain)
       .bindPopup('Điểm đến')
       .openPopup();
 
@@ -199,17 +213,18 @@ export class NewsV2Component implements OnInit {
     const userLatLng = this.userMarker.getLatLng();
     const from = L.latLng(userLatLng.lat, userLatLng.lng);
     const to = L.latLng(destLat, destLng);
+    console.log(from, to);
 
-    if (this.routingControl) this.map.removeControl(this.routingControl);
+    if (this.routingControl) this.mapMain.removeControl(this.routingControl);
 
     this.routingControl = L.Routing.control({
       waypoints: [from, to],
       router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1/' }),
-      lineOptions: { styles: [{ color: '#0d6efd', weight: 5 }] },
+      lineOptions: { styles: [{ color: '#7045ff', weight: 5 }] },
       routeWhileDragging: false,
       show: false,  // ẩn danh sách cũ
       addWaypoints: false,
-    }).addTo(this.map);
+    }).addTo(this.mapMain);
 
     this.routingControl.on('routesfound', (e: any) => {
       const route = e.routes[0];
@@ -300,47 +315,34 @@ export class NewsV2Component implements OnInit {
 
 
   async initMap2(lat: number, lng: number) {
-    L.Icon.Default.mergeOptions({
-      iconRetinaUrl: 'assets/media/marker-icon.png',
-      iconUrl: 'assets/media/marker-icon.png',
-      shadowUrl: 'assets/media/marker-shadow.png',
-    });
 
-    // Khởi tạo map
-    this.map = L.map('map2', {
+    if (this.mapInsert) {
+      this.mapInsert.remove();
+    }
+
+    this.mapInsert = L.map('map2', {
       doubleClickZoom: false
     }).setView([lat, lng], 15);
-    console.log(this.map);
 
-    // Thêm tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
-    }).addTo(this.map);
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(this.mapInsert);
 
-    // Marker vị trí người dùng
-    this.tempMarker = L.marker([lat, lng])
-      .addTo(this.map)
-      .bindPopup('Vị trí của bạn')
-      .openPopup();
+    // marker tạm
+    this.tempMarker = L.marker([lat, lng]).addTo(this.mapInsert);
 
-
-    this.map.on('dblclick', (e: L.LeafletMouseEvent) => {
+    this.mapInsert.on('click', (e: any) => {
       const { lat, lng } = e.latlng;
 
-      // Xóa marker cũ nếu có
       if (this.tempMarker) {
-        this.map.removeLayer(this.tempMarker);
+        this.mapInsert.removeLayer(this.tempMarker);
       }
+
+      this.tempMarker = L.marker([lat, lng]).addTo(this.mapInsert);
+
       this.dataInsert.viDo = lat;
       this.dataInsert.kinhDo = lng;
-      // Tạo marker mới
-      this.tempMarker = L.marker([lat, lng], {
-        draggable: true  // cho phép kéo nếu muốn
-      }).addTo(this.map);
-
-      console.log('Selected:', lat, lng);
     });
-
   }
 
   openSelectMap() {
@@ -360,10 +362,14 @@ export class NewsV2Component implements OnInit {
     }
     this.service.insertMap(this.dataInsert).subscribe({
       next: (data) => {
+        console.log(data);
+        this.lstMapShare.push(data);
+        this._storageService.set('mapShareList', this.lstMapShare)
         this.messageService.show(
           `Thêm trạm xăng thành công`,
           'success'
         );
+        this.closeModalShare();
       }, error: (err) => {
 
         console.error('Lỗi khi gọi insertMap:', err);
@@ -376,24 +382,19 @@ export class NewsV2Component implements OnInit {
     console.log('dataInsert', this.dataInsert);
   }
 
-
-  getDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    const R = 6371e3; // bán kính Trái Đất (m)
-    const toRad = (x: number) => (x * Math.PI) / 180;
-
-    const φ1 = toRad(lat1);
-    const φ2 = toRad(lat2);
-    const Δφ = toRad(lat2 - lat1);
-    const Δλ = toRad(lon2 - lon1);
-
-    const a =
-      Math.sin(Δφ / 2) ** 2 +
-      Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
-
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    return R * c; // khoảng cách tính bằng mét
+  closeModalShare() {
+    this.dataInsert = {
+      isActive: true,
+      id: "",
+      name: "",
+      address: "",
+      description: "",
+      kinhDo: "",
+      viDo: ""
+    }
+    this.isModalShare = false;
   }
+
   stationMarkers: any[] = [];
 
   renderStationsOnMap(stations: any[]) {
@@ -405,7 +406,7 @@ export class NewsV2Component implements OnInit {
       const marker = L.marker([st.viDo, st.kinhDo],
         { icon: gasIcon }
       )
-        .addTo(this.map)
+        .addTo(this.mapInsert)
         .bindPopup(`
         <b>${st.name}</b><br>
         Khoảng cách: ${st.khoangCach.toFixed(0)} m
@@ -461,6 +462,15 @@ export class NewsV2Component implements OnInit {
 
   setTab(tab: string) {
     this.activeTab = tab;
+    if (tab === 'map') {
+      setTimeout(() => {
+        const modalEl = document.getElementById('myModal');
+        if (modalEl) {
+          modalEl.style.marginBottom = `${this.heightTabBar}px`;
+        }
+
+      }, 500);
+    }
   }
   goToLogin() {
     this.router.navigate(['/login'], { replaceUrl: true });
@@ -468,5 +478,23 @@ export class NewsV2Component implements OnInit {
   }
   goToDetail(newsId: any) {
     this.router.navigate(['/news', newsId]);
+  }
+
+  clickCount = 0;
+  clickTimeout: any;
+  showUrl() {
+    this.clickCount++;
+    console.log('click', this.clickCount);
+    if (this.clickTimeout) {
+      clearTimeout(this.clickTimeout);
+    }
+    this.clickTimeout = setTimeout(() => {
+      this.clickCount = 0;
+    }, 3000);
+    if (this.clickCount >= 5) {
+      this.router.navigate(['/login'], { replaceUrl: true });
+      this.clickCount = 0;
+      clearTimeout(this.clickTimeout);
+    }
   }
 }

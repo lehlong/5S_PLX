@@ -216,7 +216,10 @@ import {
   arrowUndoOutline,
   closeOutline,
   arrowRedoOutline,
-  checkmarkOutline
+  checkmarkOutline,
+  location,
+  fileTrayFullOutline,
+  locateOutline
 
 } from 'ionicons/icons';
 
@@ -449,7 +452,11 @@ export class SharedModule {
       arrowUndoOutline,
       closeOutline,
       arrowRedoOutline,
-      checkmarkOutline
+      checkmarkOutline,
+      location,
+      fileTrayFullOutline,
+      locateOutline
+
     });
   }
 }

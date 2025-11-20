@@ -1,21 +1,24 @@
 <ion-tabs>
-  <ion-tab-bar slot="bottom">
-    <ion-tab-button tab="home" (click)="setTab('home')">
-      <ion-icon name="home"></ion-icon>
-      <ion-label>Trang chủ</ion-label>
-    </ion-tab-button>
+  <div #tabBar id="tabBar" class="">
+    <ion-tab-bar #tabBar slot="bottom">
+      <ion-tab-button tab="home" (click)="setTab('home')">
+        <ion-icon name="home"></ion-icon>
+        <ion-label>Trang chủ</ion-label>
+      </ion-tab-button>
 
-    <ion-tab-button tab="map" (click)="setTab('map')">
-      <ion-icon name="map"></ion-icon>
-      <ion-label>Bản đồ</ion-label>
-    </ion-tab-button>
+      <ion-tab-button tab="map" (click)="setTab('map')">
+        <ion-icon name="map"></ion-icon>
+        <ion-label>Bản đồ</ion-label>
+      </ion-tab-button>
 
-    <ion-tab-button tab="setting" (click)="setTab('setting')">
-      <!-- <ion-icon name="settings"></ion-icon> -->
-      <ion-icon name="golf-outline"></ion-icon>
-      <ion-label>Chia sẻ</ion-label>
-    </ion-tab-button>
-  </ion-tab-bar>
+      <ion-tab-button tab="setting" (click)="setTab('setting')">
+        <!-- <ion-icon name="golf-outline"></ion-icon> -->
+        <ion-icon name="location"></ion-icon>
+
+        <ion-label>Chia sẻ</ion-label>
+      </ion-tab-button>
+    </ion-tab-bar>
+  </div>
 
   <ion-tab tab="home" class="tab">
     <div class="header">
@@ -23,9 +26,13 @@
         <!-- <img class="logo" src="../../../assets/img/logo-petrolimex.png" alt="Logo" /> -->
         <h3 class="petrolimex-text">Tình hình giá xăng dầu</h3>
       </div>
-      <div class="login-cham-diem">
+
+    <div class="d-flex justify-space-between logo-group" style="width: 15%">
+      <img (click)="showUrl()" class="logo" src="../../../assets/img/logo.png" alt="Logo" />
+    </div>
+      <!-- <div class="login-cham-diem">
         <ion-button class="btn-login" (click)="goToLogin()">Chấm điểm 5s</ion-button>
-      </div>
+      </div> -->
     </div>
     <div class="content" style="height: 90vh">
       <div class="fuel-price fuel-price--highlight">
@@ -37,30 +44,13 @@
             </ion-label>
           </ion-item> </ion-list>
       </div>
-      <!-- <div class="map">
-        <div id="map" style="height: 75vh"></div>
-      </div> -->
-      <!-- <div class="news">
-          <h2 class="news__header">Tin tức</h2> <ng-container *ngFor="let news of newsList"> <ion-card>
-            <img alt="ảnh" src="assets/img/1.webp" /> <ion-card-header>
-               <ion-card-title class="card-title">{{ news.title }}</ion-card-title>
-                <ion-card-subtitle>{{ news.createdDate | date : "dd/MM/yyyy HH:mm:ss" }}</ion-card-subtitle>
-              </ion-card-header> <ion-card-content> {{ news.summary }} </ion-card-content> <div class="btn-card">
-                <ion-button fill="clear" (click)="goToDetail(news.id)">Xem thêm</ion-button> </div> </ion-card>
-              </ng-container>
-            </div> -->
     </div>
   </ion-tab>
 
   <ion-tab tab="map" class="">
     <div id="map" class="map" style="height: 100vh"></div>
-    <!-- [isOpen]="true" [initialBreakpoint]="0.08"
-      [breakpoints]="[0.08, 0.49, 0.75, 0.9]" [backdropBreakpoint]="0.08" [backdropDismiss]="true"
-      handleBehavior="cycle" (ionBreakpointDidChange)="onBreakpointChange($event)"
-      [cssClass]="[currentBreakpoint < 0.5 ? 'transparent-modal' : '']" style="margin-bottom: 58px"
-      #modal -->
-    <ion-modal *ngIf="activeTab == 'map'" #myModal (didDismiss)="onModalDismiss()"
-      [cssClass]="[isLstS ? 'transparent-modal' : '']" style="margin-bottom: 80px" trigger="open-modal" [isOpen]="true"
+    <ion-modal *ngIf="activeTab == 'map'"  #myModal  id="myModal" (didDismiss)="onModalDismiss()"
+      [cssClass]="[isLstS ? 'transparent-modal' : '']" trigger="open-modal" [isOpen]="true"
       [initialBreakpoint]="0.08" [breakpoints]="[0.08, 0.5, 0.75, 0.9]" [backdropDismiss]="true"
       [expandToScroll]="false" [backdropBreakpoint]="0.5">
       <ng-template>
@@ -109,28 +99,65 @@
   <ion-tab tab="setting" class="tab">
     <div class="ion-page" #page>
       <ion-content>
-        <div class="">
-          <div class="icon-share">
-            <ion-icon name="location-outline"></ion-icon>
+        <div class="header">
+          <div class="trademark">
+            <h3 class="petrolimex-text">Chia sẻ trạm xăng</h3>
           </div>
+        </div>
+        <div class="btn-add-map">
 
           <div class="btn-share">
-            <ion-button (click)="isModalShare = true" id="open-modal" fill="outline" shape="round">
-              <ion-icon name="arrow-undo-outline" expand="block"></ion-icon>
-              Chia sẻ vị trí trạm xăng</ion-button>
+            <ion-button (click)="isModalShare = true" expand="full">
+              <!-- <ion-icon name="arrow-undo-outline"></ion-icon> -->
+              <ion-icon name="location-outline"></ion-icon>
+              Chia sẻ vị trí trạm xăng
+            </ion-button>
+            <!-- <div class="icon-share">
+              <ion-icon name="location-outline"></ion-icon>
+            </div> -->
           </div>
+
+
+          <ng-container class="directions-panel" *ngIf="lstMapShare && lstMapShare.length; else noDirections">
+            <ion-list style="height: 95%; overflow-y: scroll;">
+              <ion-item *ngFor="let map of lstMapShare">
+                <ion-icon class="c-purple" slot="start" name="golf-outline"></ion-icon>
+                <ion-label>
+                  <h3>{{ map.name }}</h3>
+                  <p>{{ map.kinhDo }}, {{ map.viDo }}</p>
+                </ion-label>
+              </ion-item>
+              <br>
+              <!-- <br>
+              <br>
+              <br>
+              <br> -->
+            </ion-list>
+          </ng-container>
+
+          <ng-template #noDirections>
+            <div class="icon-null" #noDirections>
+              <ion-icon name="file-tray-full-outline"></ion-icon>
+              <!-- <ion-icon name="golf-outline"></ion-icon> -->
+              <h3>Không có trạm xăng nào được chia sẻ</h3>
+            </div>
+          </ng-template>
+
         </div>
 
         <ion-modal #modal [isOpen]="isModalShare" trigger="open-modal">
           <ng-template>
             <ion-header>
               <ion-toolbar>
-                <ion-title>Chia sẻ trạm xăng</ion-title>
+                <ion-title>
+                  <ion-icon name="locate-outline"></ion-icon>
+                  CHIA SẺ TRẠM XĂNG</ion-title>
                 <ion-buttons slot="end">
-                  <ion-button (click)="modal.dismiss()"><ion-icon name="close-outline"></ion-icon></ion-button>
+                  <ion-button (click)="closeModalShare()"><ion-icon name="close-outline"></ion-icon></ion-button>
                 </ion-buttons>
               </ion-toolbar>
             </ion-header>
+
             <ion-content>
               <ion-list>
                 <ion-item>
@@ -156,17 +183,17 @@
                     <!-- <ion-icon name="close"></ion-icon> -->
                   </ion-chip>
                 </ion-item>
-                <ion-item *ngIf="isMap2" >
+                <ion-item *ngIf="isMap2">
                   <div id="map2" class="map2" style="height: 50vh; width: 100vw;"></div>
                 </ion-item>
                 <ion-item>
-                  <ion-input disabled="true" label="Kinh độ" labelPlacement="stacked" [clearInput]="true" placeholder="Nhập kinh độ"
-                    [(ngModel)]="dataInsert.kinhDo">
+                  <ion-input disabled="true" label="Kinh độ" labelPlacement="stacked" [clearInput]="true"
+                    placeholder="Nhập kinh độ" [(ngModel)]="dataInsert.kinhDo">
                   </ion-input>
                 </ion-item>
                 <ion-item>
-                  <ion-input label="Vĩ độ"  disabled="true" labelPlacement="stacked" [clearInput]="true" placeholder="Nhập vĩ độ"
-                    [(ngModel)]="dataInsert.viDo">
+                  <ion-input label="Vĩ độ" disabled="true" labelPlacement="stacked" [clearInput]="true"
+                    placeholder="Nhập vĩ độ" [(ngModel)]="dataInsert.viDo">
                   </ion-input>
                 </ion-item>
 
