@@ -144,21 +144,39 @@ ion-content {
 }
 
 
-.icon-share{
+.icon-share {
   font-size: 140px;
   text-align: center;
   // opacity: 0.6;
   padding-top: 0px;
 }
-.btn-share{
-  // border: blue 2px solid;
-  // border-radius: 4px ;
+
+.btn-share {
   text-align: center;
   opacity: 0.8;
-  // margin: 0 15%;
+
+  display: flex;
+  justify-content: flex-end;
+  margin: 20px 0;
 }
 
+.btn-share2 {
+  text-align: center;
+  opacity: 0.8;
+}
+
+
 #map {
-  touch-action: manipulation; /* hoặc auto */
+  touch-action: manipulation;
+  /* hoặc auto */
   -webkit-tap-highlight-color: transparent;
+}
+
+
+.about {
+  padding-left: 15px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }

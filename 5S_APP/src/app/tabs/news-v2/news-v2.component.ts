@@ -1,4 +1,4 @@
-import { IonModal, AlertController } from '@ionic/angular';
+import { IonModal, IonTabs } from '@ionic/angular';
 import { Geolocation } from '@capacitor/geolocation';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
@@ -23,6 +23,7 @@ export class NewsV2Component implements AfterViewInit {
   @ViewChild('tabBar') tabBar!: ElementRef;
   @ViewChild('myModal') modal!: IonModal;
   @ViewChild('tab', { read: ElementRef }) tab!: ElementRef;
+  @ViewChild('tabs', { static: false }) tabs!: IonTabs;
 
 
   private locationPermissionGranted: boolean = false;
@@ -62,6 +63,7 @@ export class NewsV2Component implements AfterViewInit {
   isMap2 = false;
   lstMapShare: any[] = [];
   heightTabBar = 0;
+  petroRecently: any[] = [];
 
   constructor(
     private router: Router,
@@ -142,8 +144,7 @@ export class NewsV2Component implements AfterViewInit {
   getNearbyStations() {
     this.service.getNearbyStations(this.myLocation.viDo, this.myLocation.kinhDo).subscribe({
       next: (data) => {
-        console.log('data', data);
-
+        this.petroRecently = data;
         setTimeout(() => {
           this.renderStationsOnMap(data);
 
@@ -272,8 +273,6 @@ export class NewsV2Component implements AfterViewInit {
   private async getCurrentLocationFast(): Promise<{ latitude: number; longitude: number }> {
     if (!this.locationPermissionGranted) {
       const perm = await Geolocation.checkPermissions();
-      console.log(perm);
-
       if (perm.location !== 'granted') {
         const requestPerm = await Geolocation.requestPermissions();
         console.log(requestPerm);
@@ -410,8 +409,6 @@ export class NewsV2Component implements AfterViewInit {
   stationMarkers: any[] = [];
 
   renderStationsOnMap(stations: any[]) {
-    console.log(stations);
-
     const gasIcon = L.icon({
       iconUrl: 'assets/media/gasIcon2.png',
       iconSize: [25, 25],
@@ -434,7 +431,7 @@ export class NewsV2Component implements AfterViewInit {
   }
 
   //TMS lấy giá xăng dầu
-  date : any
+  date: any
   getDotTinhTms() {
     this.service.searchTms().subscribe({
       next: (data) => {
@@ -486,6 +483,20 @@ export class NewsV2Component implements AfterViewInit {
 
       }, 500);
     }
+  }
+
+  goToMap() {
+    this.activeTab = 'map';
+
+    this.tabs.select('map');
+    setTimeout(() => {
+      this.mapMain.invalidateSize();
+      const modalEl = document.getElementById('myModal');
+      if (modalEl) {
+        modalEl.style.marginBottom = `${this.heightTabBar}px`;
+      }
+
+    }, 500);
   }
   goToLogin() {
     this.router.navigate(['/login'], { replaceUrl: true });
