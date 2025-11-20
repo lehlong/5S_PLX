@@ -478,6 +478,7 @@ export class NewsV2Component implements AfterViewInit {
     this.activeTab = tab;
     if (tab === 'map') {
       setTimeout(() => {
+        this.mapMain.invalidateSize();
         const modalEl = document.getElementById('myModal');
         if (modalEl) {
           modalEl.style.marginBottom = `${this.heightTabBar}px`;
