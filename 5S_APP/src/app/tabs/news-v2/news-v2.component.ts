@@ -9,6 +9,7 @@ import 'leaflet-routing-machine'
 import { IonTab } from "@ionic/angular/standalone";
 import { MessageService } from 'src/app/service/message.service';
 import { StorageService } from 'src/app/service/storage.service';
+import { max } from 'rxjs';
 
 declare let L: any;
 
@@ -22,7 +23,6 @@ export class NewsV2Component implements AfterViewInit {
   @ViewChild('tabBar') tabBar!: ElementRef;
   @ViewChild('myModal') modal!: IonModal;
   @ViewChild('tab', { read: ElementRef }) tab!: ElementRef;
-  @ViewChild('myModal', { read: ElementRef }) modalRef!: ElementRef<HTMLIonModalElement>;
 
 
   private locationPermissionGranted: boolean = false;
@@ -103,6 +103,8 @@ export class NewsV2Component implements AfterViewInit {
     if (!this.lstMapShare) {
       this.lstMapShare = [];
     }
+
+    this.renderStationsOnMap(this.lstMapShare);
   }
 
   async initMap(lat: number, lng: number) {
@@ -138,10 +140,14 @@ export class NewsV2Component implements AfterViewInit {
   }
 
   getNearbyStations() {
-    this.service.getNearbyStations(this.dataInsert.viDo, this.dataInsert.kinhDo).subscribe({
+    this.service.getNearbyStations(this.dataInsert.kinhDo, this.dataInsert.viDo).subscribe({
       next: (data) => {
         console.log('data', data);
-        this.renderStationsOnMap(data);
+
+        setTimeout(() => {
+          this.renderStationsOnMap(data);
+
+        }, 600);
       },
       error: (response) => {
         console.log(response)
@@ -179,27 +185,26 @@ export class NewsV2Component implements AfterViewInit {
   private reopening = false;
 
 
-  onBreakpointChange(ev: any) {
-    this.currentBreakpoint = ev.detail.breakpoint;
-    const modalEl = this.modalRef.nativeElement;
+  // onBreakpointChange(ev: any) {
+  //   this.currentBreakpoint = ev.detail.breakpoint;
+  //   const modalEl = this.modalRef.nativeElement;
 
-    // Khi modal thấp hơn 0.5 → cho phép click xuyên qua (trừ phần nội dung modal)
-    if (this.currentBreakpoint < 0.5) {
-      modalEl.style.pointerEvents = 'none';
-      modalEl.querySelector('ion-content')!.style.pointerEvents = 'auto';
-    } else {
-      modalEl.style.pointerEvents = 'auto';
-    }
-  }
+  //   // Khi modal thấp hơn 0.5 → cho phép click xuyên qua (trừ phần nội dung modal)
+  //   if (this.currentBreakpoint < 0.5) {
+  //     modalEl.style.pointerEvents = 'none';
+  //     modalEl.querySelector('ion-content')!.style.pointerEvents = 'auto';
+  //   } else {
+  //     modalEl.style.pointerEvents = 'auto';
+  //   }
+  // }
 
   // 🟩 Khi modal bị đóng do backdrop hoặc vuốt xuống
   async onModalDismiss() {
     if (this.reopening) return;
     this.reopening = true;
 
-    const modalEl = this.modalRef.nativeElement;
-    await modalEl.present();
-    await modalEl.setCurrentBreakpoint(0.08);
+    await this.modal.present();
+    await this.modal.setCurrentBreakpoint(0.08);
 
     this.reopening = false;
     this.isLstS = false;
@@ -313,7 +318,7 @@ export class NewsV2Component implements AfterViewInit {
   }
 
 
-  async initMap2(lat: number, lng: number) {
+  async initMap2(lng: number, lat: number) {
 
     if (this.mapInsert) {
       this.mapInsert.remove();
@@ -323,7 +328,7 @@ export class NewsV2Component implements AfterViewInit {
     }).setView([lat, lng], 15);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
+      maxZoom: 19,
     }).addTo(this.mapInsert);
 
     // marker tạm
@@ -381,6 +386,7 @@ export class NewsV2Component implements AfterViewInit {
   }
 
   closeModalShare() {
+    this.getNearbyStations()
     this.dataInsert = {
       isActive: true,
       id: "",
@@ -390,13 +396,14 @@ export class NewsV2Component implements AfterViewInit {
       kinhDo: "",
       viDo: ""
     }
-    this.getNearbyStations()
     this.isModalShare = false;
   }
 
   stationMarkers: any[] = [];
 
   renderStationsOnMap(stations: any[]) {
+    console.log(stations);
+
     const gasIcon = L.icon({
       iconUrl: 'assets/media/gasIcon2.png',
       iconSize: [25, 25],
@@ -405,11 +412,12 @@ export class NewsV2Component implements AfterViewInit {
       const marker = L.marker([st.viDo, st.kinhDo],
         { icon: gasIcon }
       )
-        .addTo(this.mapInsert)
+        .addTo(this.mapMain)
         .bindPopup(`
         <b>${st.name}</b><br>
         Khoảng cách: ${st.khoangCach.toFixed(0)} m
       `);
+      console.log(marker);
 
       marker.on('click', () => {
         this.showRoute(st.viDo, st.kinhDo);
