@@ -434,7 +434,7 @@ export class NewsV2Component implements AfterViewInit {
   }
 
   //TMS lấy giá xăng dầu
-
+  date : any
   getDotTinhTms() {
     this.service.searchTms().subscribe({
       next: (data) => {
@@ -442,7 +442,7 @@ export class NewsV2Component implements AfterViewInit {
         const c = data.data
           .filter((x: any) => x.status === "04")
           .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]
-
+        this.date = c.date
         this.getCalculateDotTms(c.id)
       },
       error: (err) => {
