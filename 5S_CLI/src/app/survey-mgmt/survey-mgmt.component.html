@@ -20,7 +20,7 @@
   </nz-page-header-extra>
   <nz-page-header-content class="main-content">
     <nz-table class="auto-scroll-table" #headerTable [nzData]="paginationResult.data" [nzFrontPagination]="false"
-      [nzScroll]="{ y: 'calc(100vh - 244px)' }">
+      [nzScroll]="{x: '1000px', y: 'calc(100vh - 244px)' }">
       <thead>
         <tr>
           <th nzWidth="60px">STT</th>
@@ -78,9 +78,10 @@
 </nz-page-header>
 
 <!--Create Update-->
-<nz-drawer [nzMask]="!edit" nzWidth="60%" nzSize="default" [nzVisible]="visible" nzPlacement="right"
+<nz-drawer [nzMask]="!edit" [nzWidth]="drawerWidth" nzSize="default" [nzVisible]="visible" nzPlacement="right"
   [nzTitle]="edit ? ' CHỈNH SỬA CUỘC KHẢO SÁT  ' : ' THÊM MỚI CUỘC KHẢO SÁT '" [nzExtra]="extra" (nzOnClose)="close()">
-  <ng-container *nzDrawerContent>
+  <ng-container *nzDrawerContent >
+    <div class="p-10">
     <div nz-row [nzGutter]="12">
       <div nz-col [nzXs]="24" [nzMd]="12">
         <div class="inner-box">
@@ -186,6 +187,7 @@
           </nz-radio-group>
         </nz-form-control>
       </nz-form-item> -->
+    </div>
   </ng-container>
 </nz-drawer>
 <ng-template #extra>

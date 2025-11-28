@@ -1,21 +1,55 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&display=swap");
 .login {
-    background-image: url(/img/bg-auth.png);
-    height: 100vh;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  background-image: url(/img/bg-auth.png);
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 20px;
 }
-.login-form{
-    width: 16%;
+.login-form {
+  width: 20%;
 }
-.btn-login{
-    width: 100%;
-    margin-top: 12px;
+.btn-login {
+  width: 100%;
+  margin-top: 12px;
 }
-nz-input-group{
-    margin-bottom: 12px;
+nz-input-group {
+  margin-bottom: 12px;
+}
+.logo {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+}
+.copy-right {
+  position: absolute;
+  bottom: 20px;
+  font-size: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  text-align: center;
+}
+@media (max-width: 767px) {
+  .login-form {
+    width: 70%;
+  }
+  .login {
+    h1 {
+      font-family: "Montserrat", sans-serif;
+      font-size: 24px;
+      color: #0074C8;
+      font-weight: bold;
+    }
+  }
+  .logo {
+    left: 50%;
+    transform: translateX(-50%);
+  }
 }

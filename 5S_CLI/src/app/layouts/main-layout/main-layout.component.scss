@@ -3,7 +3,7 @@ nz-header {
   gap: 24px;
 }
 
-nz-header>div {
+nz-header > div {
   cursor: pointer;
 }
 
@@ -54,6 +54,24 @@ nz-breadcrumb {
   margin: 12px 24px;
 }
 .btn-excel[_ngcontent-ng-c45787901] {
-    background-color: #008b45;
-    border-color: #008b45;
+  background-color: #008b45;
+  border-color: #008b45;
+}
+.menu-mobile {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .logo {
+    display: none;
+  }
+  .menu-item-desktop {
+    display: none;
+  }
+  ::ng-deep .ant-drawer-body {
+    padding: 0 !important;
+  }
+  .menu-mobile {
+    display: block;
+  }
 }

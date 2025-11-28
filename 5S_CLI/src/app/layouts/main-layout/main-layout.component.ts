@@ -31,7 +31,7 @@ import { environment } from '../../../environments/environment';
   animations:[]
 })
 export class MainLayoutComponent implements OnInit {
-
+  menuMobileVisible: boolean = false;
   isCollapsed: boolean = false;
   loading: boolean = false
   user: any = {}
@@ -112,5 +112,11 @@ export class MainLayoutComponent implements OnInit {
   logOut() {
     localStorage.clear();
     this.router.navigate(['/login'])
+  }
+  openMenuMobile(){
+    this.menuMobileVisible = !this.menuMobileVisible;
+  }
+  closeMenuMobile(){
+    this.menuMobileVisible = false;
   }
 }

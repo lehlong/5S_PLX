@@ -70,6 +70,7 @@
   <nz-drawer [nzMask]="!edit" nzSize="default" [nzVisible]="visible" nzPlacement="right"
     [nzTitle]="edit ? ' Chỉnh sửa  ' : ' Tạo mới  '" [nzExtra]="extra" (nzOnClose)="close()">
     <ng-container *nzDrawerContent>
+      <div class="p-10">
       <form nz-form nzLayout="vertical" [formGroup]="validateForm" (ngSubmit)="submitForm()">
         <app-input-clear placeholder="Nhập tên đối tượng" [required]="true" label="Tên đối tượng"
           [control]="$any(validateForm).controls['name']"></app-input-clear>
@@ -84,6 +85,7 @@
           </nz-form-control>
         </nz-form-item>
       </form>
+      </div>
     </ng-container>
   </nz-drawer>
   <ng-template #extra>

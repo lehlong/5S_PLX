@@ -25,6 +25,9 @@ import { ChucVuService } from '../../../service/master-data/chuc-vu.service'
   styleUrl: './account-index.component.scss',
 })
 export class AccountIndexComponent {
+  isVisibleFilterMobile: boolean = false
+
+
   filter = new AccountFilter()
   paginationResult = new PaginationResult()
   showCreate: boolean = false
@@ -258,7 +261,7 @@ export class AccountIndexComponent {
   }
 
   handleCancel(): void {
-
+    this.isVisibleFilterMobile = false;
     this.isVisibleModal = false;
   }
   enableDevice(id: string, Username: string) {
@@ -284,5 +287,7 @@ export class AccountIndexComponent {
       },
     })
   }
-
+  openFilterMobile(){
+    this.isVisibleFilterMobile = true
+  }
 }

@@ -69,11 +69,124 @@
     <div class="logo">
       <img src="img/logo.png" alt="Logo" />
     </div>
-    <div [routerLink]="'/'">
+    <!-- region menu mobile-->
+    <div (click)="openMenuMobile()" class="menu-mobile">
+      <nz-icon nzType="menu" nzTheme="outline" />
+    </div>
+    <nz-drawer
+      [nzClosable]="false"
+      [nzVisible]="menuMobileVisible"
+      (nzOnClose)="closeMenuMobile()"
+      [nzPlacement]="'left'"
+      nzWidth="70%"
+      nzTitle="Danh mục hệ thống"
+    >
+      <ng-container *nzDrawerContent>
+        <ul nz-menu nzMode="inline" [nzInlineCollapsed]="isCollapsed">
+          <li
+            nz-menu-item
+            nz-tooltip
+            nzTooltipPlacement="right"
+            [routerLink]="'/'"
+          >
+            <nz-icon nzType="home" />
+            <span>Trang chủ</span>
+          </li>
+          <li nz-submenu nzTitle="Quản trị hệ thống" nzIcon="setting">
+            <ul>
+              <li nz-menu-item [routerLink]="'master-data/chuc-vu'">Chức vụ</li>
+              <li nz-menu-item [routerLink]="'system-manager/organize'">
+                Cấu trúc tổ chức
+              </li>
+              <li nz-menu-item [routerLink]="'system-manager/role'">
+                Danh sách quyền
+              </li>
+              <li nz-menu-item [routerLink]="'system-manager/account-group'">
+                Nhóm người dùng
+              </li>
+              <li nz-menu-item [routerLink]="'system-manager/account'">
+                Danh sách người dùng
+              </li>
+            </ul>
+          </li>
+          <li nz-submenu nzTitle="Danh mục" nzIcon="unordered-list">
+            <ul>
+              <li nz-menu-item [routerLink]="'master-data/store'">
+                Danh sách cửa hàng Xăng Dầu
+              </li>
+              <li nz-menu-item [routerLink]="'master-data/ware-house'">
+                Danh sách kho Xăng Dầu
+              </li>
+              <li nz-menu-item [routerLink]="'master-data/doi-tuong'">
+                Danh sách đối tượng
+              </li>
+            </ul>
+          </li>
+          <li
+            nz-menu-item
+            nz-tooltip
+            nzTooltipPlacement="right"
+            [routerLink]="'/survey-mgmt'"
+          >
+            <nz-icon nzType="container" />
+            <span>Quản lý khảo sát</span>
+          </li>
+          <li nz-submenu nzTitle="Báo cáo" nzIcon="pie-chart">
+            <ul>
+              <li nz-menu-item [routerLink]="'survey-report/ket-qua-cham-diem'">
+                Báo Cáo Kết Quả Chấm Điểm 5S
+              </li>
+              <li
+                nz-menu-item
+                [routerLink]="'survey-report/cham-diem-theo-khung-thoi-gian'"
+              >
+                Báo Cáo Lần Chấm Điểm Theo Khung Thời Gian
+              </li>
+              <li
+                nz-menu-item
+                [routerLink]="'survey-report/thoi-gian-cham-diem'"
+              >
+                Báo Cáo Thời Gian Chấm Điểm
+              </li>
+              <li
+                nz-menu-item
+                [routerLink]="'survey-report/thiet-bi-cham-diem'"
+              >
+                Báo Cáo Thiết Bị Chấm Điểm
+              </li>
+              <li
+                nz-menu-item
+                [routerLink]="'survey-report/hinh-anh-cham-diem'"
+              >
+                Báo Cáo Hình Ảnh Chấm Điểm
+              </li>
+              <li
+                nz-menu-item
+                [routerLink]="'survey-report/tong-hop-y-kien-de-xuat'"
+              >
+                Báo Cáo Tổng Hợp Ý Kiến Đề Xuất
+              </li>
+            </ul>
+          </li>
+          <li
+            nz-menu-item
+            nz-tooltip
+            nzTooltipPlacement="right"
+            [routerLink]="'/news'"
+          >
+            <nz-icon nzType="file" />
+            <span>Tin tức</span>
+          </li>
+        </ul>
+      </ng-container>
+    </nz-drawer>
+    <!-- endregion-->
+    <!-- region menu desktop-->
+    <div class="menu-item-desktop" [routerLink]="'/'">
       <nz-icon nzType="home" nzTheme="outline" /> Trang chủ
     </div>
 
-    <div nz-dropdown [nzDropdownMenu]="setting">
+    <div class="menu-item-desktop" nz-dropdown [nzDropdownMenu]="setting">
       <nz-icon nzType="setting" />
       Quản trị hệ thống
       <nz-icon nzType="down" />
@@ -96,7 +209,7 @@
       </ul>
     </nz-dropdown-menu>
 
-    <div nz-dropdown [nzDropdownMenu]="masterdata">
+    <div class="menu-item-desktop" nz-dropdown [nzDropdownMenu]="masterdata">
       <nz-icon nzType="unordered-list" nzTheme="outline" />
       Danh mục
       <nz-icon nzType="down" />
@@ -115,13 +228,13 @@
       </ul>
     </nz-dropdown-menu>
 
-    <div [routerLink]="'/survey-mgmt'">
+    <div class="menu-item-desktop" [routerLink]="'/survey-mgmt'">
       <nz-icon nzType="container" nzTheme="outline" /> Quản lý khảo sát
     </div>
 
     <!-- <div><nz-icon nzType="form" nzTheme="outline" /> Quản lý tin tức </div> -->
 
-    <div nz-dropdown [nzDropdownMenu]="report">
+    <div class="menu-item-desktop" nz-dropdown [nzDropdownMenu]="report">
       <nz-icon nzType="pie-chart" nzTheme="outline" />
       Báo cáo
       <nz-icon nzType="down" />
@@ -151,11 +264,11 @@
         </li>
       </ul>
     </nz-dropdown-menu>
-    <div [routerLink]="'/news'" nz-dropdown>
+    <div class="menu-item-desktop" [routerLink]="'/news'" nz-dropdown>
       <nz-icon nzType="file" nzTheme="outline" />
       Tin tức
     </div>
-
+    <!-- endregion-->
     <div nz-dropdown [nzDropdownMenu]="dropdownUser" class="user">
       <div class="circle">
         <img [src]="'img/profile.png'" alt="Avatar User" />

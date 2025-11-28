@@ -1,0 +1,16 @@
+.filterInMobile {
+  display: none;
+}
+@media (max-width: 768px) {
+  .filterInDesktop {
+    display: none;
+  }
+  .filterInMobile {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .ant-page-header-heading-extra {
+    display: flex;
+  }
+}

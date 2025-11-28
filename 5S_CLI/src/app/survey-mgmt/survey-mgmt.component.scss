@@ -1,0 +1,8 @@
+@media (max-width: 768px) {
+  .p-10 {
+    padding: 10px !important;
+  }
+  ::ng-deep .ant-drawer-header {
+    padding: 10px !important;
+  }
+}
