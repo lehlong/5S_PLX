@@ -606,11 +606,14 @@ export class EvaluateComponent implements OnInit {
     return 'other';
   }
 
+  index: number = 0;
   filterDiem(code: any) {
     const item = this.evaluate?.lstEvaluate?.find(
       (x: any) => x.tieuChiCode === code
     );
+    console.log(this.index++);
     return item?.pointId || null;
+
   }
 
   filterImage(node: any) {
@@ -645,15 +648,12 @@ export class EvaluateComponent implements OnInit {
     const idx = this.evaluate.lstEvaluate.findIndex(
       (i: any) => i.tieuChiCode === data.code
     );
-    // console.log(data.diemTieuChi.filter((i: any) => i.id == selected)[0].diem);
-
     if (idx === -1) return;
 
     this.evaluate.lstEvaluate[idx].point = data.diemTieuChi.filter(
       (i: any) => i.id == selected
     )[0].diem;
     this.evaluate.lstEvaluate[idx].pointId = selected;
-    // console.log(this.evaluate);
 
     this.tinhTong();
   }
@@ -910,13 +910,10 @@ export class EvaluateComponent implements OnInit {
         },
       ],
     });
-
     await alert.present();
   }
 
   feedback: string = '';
-  // 🚀 Thêm queue xử lý ảnh và debounceprivate
-
   imageProcessingQueue: any[] = [];
   private isProcessingQueue = false;
   private pendingStorageSave: any;
@@ -947,19 +944,13 @@ export class EvaluateComponent implements OnInit {
         type: "img",
         isProcessing: true
       };
-
-      // Push vào UI
       this.evaluate.lstImages.push(imgObj);
 
       // 🔥 Giới hạn RAM cho UI (chỉ giữ 10 ảnh)
       this.limitRamUIImages();
 
       this.cdr.detectChanges();
-
-      // Thêm vào queue xử lý
       this.addToQueue(imgObj, photo.base64String);
-
-      // Load vị trí nền
       this.updateLocationAsync(imgObj);
 
     } catch (err) {
@@ -967,10 +958,6 @@ export class EvaluateComponent implements OnInit {
       this.showError("Không thể chụp ảnh");
     }
   }
-
-  /* -------------------------------------------------------
-     🧵 QUEUE XỬ LÝ ẢNH – batch 3 ảnh, tránh nghẽn JS thread
-  ----------------------------------------------------------*/
 
   private addToQueue(imageObj: any, base64: string) {
     this.imageProcessingQueue.push({ imageObj, base64 });
@@ -1010,9 +997,6 @@ export class EvaluateComponent implements OnInit {
     setTimeout(() => this.processQueue(), 80);
   }
 
-  /* -------------------------------------------------------
-     🪶 XỬ LÝ ẢNH NHẸ – auto thumbnail + auto giảm RAM
-  ----------------------------------------------------------*/
   private async processImage(imgObj: any, base64: string) {
     try {
       const sizeKB = base64.length * 0.75 / 1024;
@@ -1034,9 +1018,6 @@ export class EvaluateComponent implements OnInit {
     }
   }
 
-  /* -------------------------------------------------------
-     🖼️ TẠO THUMBNAIL NHANH – 50×50
-  ----------------------------------------------------------*/
   private makeThumb(base64: string): Promise<string> {
     return new Promise(resolve => {
       const img = new Image();
@@ -1060,9 +1041,6 @@ export class EvaluateComponent implements OnInit {
     });
   }
 
-  /* -------------------------------------------------------
-     📍 GPS CACHE – giảm timeout
-  ----------------------------------------------------------*/
   private async updateLocationAsync(obj: any) {
     try {
       // Cache 30s
@@ -1091,9 +1069,6 @@ export class EvaluateComponent implements OnInit {
     }
   }
 
-  /* -------------------------------------------------------
-     💾 DEBOUNCE LƯU STORAGE – giảm I/O 95%
-  ----------------------------------------------------------*/
   private debounceStorage() {
     clearTimeout(this.pendingStorageSave);
 
@@ -1110,10 +1085,7 @@ export class EvaluateComponent implements OnInit {
     }, 1200);
   }
 
-  /* -------------------------------------------------------
-     🧹 DỌN RAM – giữ tối đa 18 ảnh trong bộ nhớ
-  ----------------------------------------------------------*/
-  private releaseOldImages() {
+  releaseOldImages() {
     const list = this.evaluate.lstImages;
     if (list.length <= 18) return;
 
@@ -1124,10 +1096,6 @@ export class EvaluateComponent implements OnInit {
       }
     });
   }
-
-  /* -------------------------------------------------------
-     🧨 CLEANUP
-  ----------------------------------------------------------*/
   ngOnDestroy() {
     this.imageProcessingQueue = [];
     clearTimeout(this.pendingStorageSave);
@@ -1163,98 +1131,6 @@ export class EvaluateComponent implements OnInit {
       this.evaluate.lstImages.shift();
     }
   }
-
-
-
-
-
-
-
-
-  // async openCamera(code: any) {
-  //   if (!this.isEdit) {
-  //     console.warn('isEdit = false → không mở camera');
-  //     return;
-  //   }
-
-  //   try {
-  //     // 1️⃣ Mở camera
-  //     const photo = await Camera.getPhoto({
-  //       quality: 80,
-  //       resultType: CameraResultType.Uri,
-  //       source: CameraSource.Camera
-  //     });
-
-  //     // 2️⃣ Lưu file thật vào Filesystem
-  //     const fileUri = await this.saveToFileSystem(photo);
-
-  //     // 3️⃣ Lấy vị trí (không block camera)
-  //     let latitude = 0, longitude = 0;
-  //     try {
-  //       const location = await this.getCurrentLocationFast();
-  //       latitude = location.latitude;
-  //       longitude = location.longitude;
-  //     } catch { }
-
-  //     // 4️⃣ Tạo thumbnail nhỏ để hiển thị UI
-  //     const thumbnail = await this.generateThumbnail(photo.webPath!, 120, 120);
-
-  //     // 5️⃣ Object ảnh nhẹ
-  //     const imageObj = {
-  //       code: "-1",
-  //       fileName: "",
-  //       evaluateHeaderCode: this.headerId,
-  //       filePath: fileUri,       // 📌 LƯU URI, không lưu base64
-  //       pathThumbnail: thumbnail,
-  //       tieuChiCode: code,
-  //       viDo: latitude,
-  //       kinhDo: longitude,
-  //       type: "img"
-  //     };
-
-  //     // 6️⃣ Đẩy vào danh sách và update UI
-  //     this.evaluate.lstImages.push(imageObj);
-  //     this.cdr.detectChanges();
-
-  //     // 7️⃣ Lưu storage nhanh
-  //     this._storageService.set(this.doiTuong.id + "_" + this.kiKhaoSat.code, this.evaluate);
-
-  //   } catch (err) {
-  //     console.error("Lỗi openCamera:", err);
-  //   }
-  // }
-
-  // private async saveToFileSystem(photo: any): Promise<string> {
-  //   const response = await fetch(photo.webPath!);
-  //   const blob = await response.blob();
-
-  //   const base64Data = await this.blobToBase64(blob);
-
-  //   const fileName = `img_${Date.now()}.jpeg`;
-
-  //   const saved = await Filesystem.writeFile({
-  //     path: fileName,
-  //     data: base64Data,
-  //     directory: Directory.Data
-  //   });
-
-  //   return saved.uri; // 📌 Trả về URI
-  // }
-
-  // private blobToBase64(blob: Blob): Promise<string> {
-  //   return new Promise((resolve, reject) => {
-  //     const reader = new FileReader();
-  //     reader.onload = () => resolve((reader.result as string).split(",")[1]);
-  //     reader.onerror = reject;
-  //     reader.readAsDataURL(blob);
-  //   });
-  // }
-
-
-
-
-
-
 
 
 
