@@ -26,6 +26,7 @@ import { AuthService } from 'src/app/service/auth.service';
 import { Capacitor } from '@capacitor/core';
 import mediumZoom from 'medium-zoom';
 import { image } from 'ionicons/icons';
+import { Filesystem, Directory } from '@capacitor/filesystem';
 
 @Component({
   imports: [SharedModule, HighlightSearchPipe],
@@ -916,10 +917,15 @@ export class EvaluateComponent implements OnInit {
   }
 
   feedback: string = '';
+  // 🚀 Thêm queue xử lý ảnh và debounce
+  private imageProcessingQueue: any[] = [];
+  private isProcessingQueue = false;
+  private pendingStorageSave: any;
+  // 🚀 Thêm queue xử lý ảnh và debounce
+  private cachedLocation: any = null;
 
   async openCamera(code: any) {
     console.log('🚀 Đã gọi openCamera()');
-    console.log('✳️ isEdit:', this.isEdit);
 
     if (!this.isEdit) {
       console.warn('⚠️ isEdit = false, không mở camera');
@@ -927,117 +933,345 @@ export class EvaluateComponent implements OnInit {
     }
 
     try {
-      console.log('📱 Nền tảng:', Capacitor.getPlatform());
-      console.log('🎯 Mở camera ngay lập tức');
-
-      // 🚀 Tối ưu 1: Mở camera trước (quan trọng nhất với user)
+      // 🎯 1. MỞ CAMERA NGAY LẬP TỨC (ưu tiên UX)
       const image = await Camera.getPhoto({
-        quality: 80, // 🚀 Tối ưu 2: Giảm quality từ 90 xuống 80
+        quality: 70, // ⚡ Giảm xuống 70 để nhanh hơn
         resultType: CameraResultType.Base64,
         source: CameraSource.Camera,
+        correctOrientation: false, // ⚡ Tắt xoay ảnh tự động
+        saveToGallery: false, // ⚡ Không lưu vào gallery
       });
 
-      console.log('📷 Ảnh đã chụp, đang xử lý...');
-      const base64Image = `data:image/jpeg;base64,${image.base64String}`;
+      console.log('📷 Ảnh đã chụp');
 
-      // 🚀 Tối ưu 3: Lấy vị trí sau khi đã chụp ảnh (không block camera)
-      let latitude = 0,
-        longitude = 0;
-      try {
-        const location = await this.getCurrentLocationFast();
-        latitude = location.latitude;
-        longitude = location.longitude;
-        console.log('📍 Vị trí:', { latitude, longitude });
-      } catch (locationErr) {
-        console.warn(
-          '⚠️ Không lấy được vị trí, tiếp tục với vị trí mặc định:',
-          locationErr
-        );
+      // ✅ KIỂM TRA base64String
+      if (!image.base64String) {
+        console.error('❌ Không có dữ liệu ảnh');
+        throw new Error('Không thể lấy dữ liệu ảnh');
       }
 
-      // 🚀 Tối ưu 4: Tạo object ảnh và thêm vào danh sách ngay
+      // 🎯 2. TẠO OBJECT VÀ HIỂN THỊ NGAY (không chờ xử lý)
       const imageObj = {
-        code: '-1',
+        code: `-${Date.now()}`, // Dùng timestamp làm ID tạm
         fileName: '',
         evaluateHeaderCode: this.headerId,
-        filePath: base64Image,
-        pathThumbnail: '', // Sẽ được cập nhật sau
+        filePath: `data:image/jpeg;base64,${image.base64String}`,
+        pathThumbnail: 'assets/img/loading-thumb.png', // ⚡ Placeholder tạm
         tieuChiCode: code,
-        viDo: latitude,
-        kinhDo: longitude,
+        viDo: 0,
+        kinhDo: 0,
         type: 'img',
+        isProcessing: true // ⚡ Flag đang xử lý
       };
 
+      // Thêm vào danh sách và cập nhật UI NGAY
       this.evaluate.lstImages.push(imageObj);
-      console.log('✅ Ảnh đã được thêm vào danh sách');
-
-      // Cập nhật UI ngay lập tức
       this.cdr.detectChanges();
 
-      // 🚀 Tối ưu 5: Xử lý thumbnail và storage bất đồng bộ (không block UI)
-      this.processImageAsync(imageObj, base64Image);
+      // 🎯 3. ĐƯA VÀO QUEUE XỬ LÝ BACKGROUND
+      this.addToProcessingQueue(imageObj, image.base64String);
+
+      // 🎯 4. LẤY VỊ TRÍ ASYNC (không block)
+      this.updateLocationAsync(imageObj);
+
     } catch (err) {
       console.error('❌ Lỗi openCamera:', err);
-      throw err;
+      this.showError('Không thể chụp ảnh');
     }
   }
 
-  // 🚀 Hàm xử lý ảnh bất đồng bộ
-  private async processImageAsync(imageObj: any, base64Image: string) {
+  // ⚡ QUEUE XỬ LÝ ẢNH TUẦN TỰ (tránh tràn RAM)
+  private addToProcessingQueue(imageObj: any, base64String: string) {
+    this.imageProcessingQueue.push({ imageObj, base64String });
+
+    if (!this.isProcessingQueue) {
+      this.processQueueBatch();
+    }
+  }
+
+  // ⚡ XỬ LÝ BATCH (3 ảnh một lúc)
+  private async processQueueBatch() {
+    if (this.imageProcessingQueue.length === 0) {
+      this.isProcessingQueue = false;
+      return;
+    }
+
+    this.isProcessingQueue = true;
+
+    // Lấy tối đa 3 ảnh để xử lý
+    const batch = this.imageProcessingQueue.splice(0, 3);
+
     try {
-      // Tạo thumbnail với kích thước nhỏ hơn
-      const thumbnail = await this.generateThumbnail(base64Image, 80, 80);
-      imageObj.pathThumbnail = thumbnail;
-
-      // Lưu vào storage
-      this._storageService.set(
-        this.doiTuong.id + '_' + this.kiKhaoSat.code,
-        this.evaluate
+      // Xử lý song song trong batch nhỏ
+      await Promise.all(
+        batch.map(item => this.processImageLightweight(item.imageObj, item.base64String))
       );
+    } catch (err) {
+      console.error('❌ Lỗi xử lý batch:', err);
+    }
 
-      console.log('✅ Thumbnail và storage đã được cập nhật');
+    // Lưu storage theo batch (giảm I/O)
+    this.debouncedStorageSave();
+
+    // Xử lý batch tiếp theo sau 100ms
+    setTimeout(() => this.processQueueBatch(), 100);
+  }
+
+  // ⚡ XỬ LÝ ẢNH NHẸ HƠN
+  private async processImageLightweight(imageObj: any, base64String: string) {
+    try {
+      // Chỉ tạo thumbnail nếu ảnh < 500KB
+      const imageSize = base64String.length * 0.75 / 1024; // KB
+
+      if (imageSize < 500) {
+        // Thumbnail nhỏ và nhanh
+        const thumbnail = await this.generateThumbnailFast(base64String);
+        imageObj.pathThumbnail = thumbnail;
+      } else {
+        // Ảnh lớn: dùng placeholder
+        imageObj.pathThumbnail = 'assets/img/image-placeholder.png';
+      }
+
+      imageObj.isProcessing = false;
       this.cdr.detectChanges();
+
     } catch (err) {
       console.warn('⚠️ Lỗi xử lý thumbnail:', err);
-      // Vẫn lưu storage dù không có thumbnail
+      imageObj.pathThumbnail = 'assets/img/error-thumb.png';
+      imageObj.isProcessing = false;
+    }
+  }
+
+  // ⚡ TẠO THUMBNAIL NHANH HƠN
+  private generateThumbnailFast(base64: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      try {
+        const img = new Image();
+
+        img.onload = () => {
+          try {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            if (!ctx) {
+              resolve('assets/img/error-thumb.png');
+              return;
+            }
+
+            // Thumbnail cực nhỏ 50x50
+            canvas.width = 50;
+            canvas.height = 50;
+
+            // Dùng image smoothing thấp
+            ctx.imageSmoothingEnabled = false;
+            ctx.drawImage(img, 0, 0, 50, 50);
+
+            // JPEG quality thấp cho thumbnail
+            resolve(canvas.toDataURL('image/jpeg', 0.3));
+          } catch (err) {
+            console.error('❌ Lỗi canvas:', err);
+            resolve('assets/img/error-thumb.png');
+          }
+        };
+
+        img.onerror = () => {
+          resolve('assets/img/error-thumb.png');
+        };
+
+        img.src = `data:image/jpeg;base64,${base64}`;
+
+      } catch (err) {
+        console.error('❌ Lỗi tạo thumbnail:', err);
+        resolve('assets/img/error-thumb.png');
+      }
+    });
+  }
+
+  // ⚡ CẬP NHẬT VỊ TRÍ ASYNC
+  private async updateLocationAsync(imageObj: any) {
+    try {
+      // Dùng cache vị trí nếu có
+      if (this.cachedLocation &&
+        Date.now() - this.cachedLocation.timestamp < 30000) {
+        imageObj.viDo = this.cachedLocation.latitude;
+        imageObj.kinhDo = this.cachedLocation.longitude;
+        return;
+      }
+
+      const position = await Geolocation.getCurrentPosition({
+        enableHighAccuracy: false,
+        timeout: 2000, // 2s timeout
+        maximumAge: 30000, // Cache 30s
+      });
+
+      imageObj.viDo = position.coords.latitude;
+      imageObj.kinhDo = position.coords.longitude;
+
+      // Cache vị trí
+      this.cachedLocation = {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        timestamp: Date.now()
+      };
+
+    } catch (err) {
+      console.warn('⚠️ Không lấy được vị trí:', err);
+      // Vẫn giữ vị trí mặc định 0,0
+    }
+  }
+
+  // ⚡ DEBOUNCE LƯU STORAGE (giảm I/O)
+  private debouncedStorageSave() {
+    if (this.pendingStorageSave) {
+      clearTimeout(this.pendingStorageSave);
+    }
+
+    this.pendingStorageSave = setTimeout(() => {
+      try {
+        this._storageService.set(
+          this.doiTuong.id + '_' + this.kiKhaoSat.code,
+          this.evaluate
+        );
+        console.log('💾 Đã lưu storage');
+      } catch (err) {
+        console.error('❌ Lỗi lưu storage:', err);
+      }
+    }, 1000); // Đợi 1s rồi mới lưu
+  }
+
+  // ⚡ CLEAR MEMORY KHI DESTROY
+  ngOnDestroy() {
+    // Clear queue
+    this.imageProcessingQueue = [];
+
+    // Clear pending saves
+    if (this.pendingStorageSave) {
+      clearTimeout(this.pendingStorageSave);
+    }
+
+    // Clear cached location
+    this.cachedLocation = null;
+
+    // Force save cuối cùng
+    try {
       this._storageService.set(
         this.doiTuong.id + '_' + this.kiKhaoSat.code,
         this.evaluate
       );
+    } catch (err) {
+      console.error('❌ Lỗi save final:', err);
     }
   }
 
-  // 🚀 Hàm lấy vị trí nhanh với timeout ngắn
-  private async getCurrentLocationFast(): Promise<{
-    latitude: number;
-    longitude: number;
-  }> {
-    // Kiểm tra quyền nhanh
-    if (!this.locationPermissionGranted) {
-      const perm = await Geolocation.checkPermissions();
-      if (perm.location !== 'granted') {
-        const requestPerm = await Geolocation.requestPermissions();
-        if (requestPerm.location !== 'granted') {
-          throw new Error('Không có quyền truy cập vị trí');
+  // ⚡ HELPER: GIẢI PHÓNG MEMORY ẢNH CŨ
+  private releaseOldImages() {
+    // Giữ tối đa 20 ảnh gần nhất trong memory
+    if (this.evaluate.lstImages.length > 20) {
+      const oldImages = this.evaluate.lstImages.slice(0, -20);
+      oldImages.forEach((img: any) => {
+        // Giải phóng base64 string lớn
+        if (img.filePath && img.filePath.length > 1000) {
+          img.filePath = 'released'; // Đánh dấu đã giải phóng
         }
-      }
-      this.locationPermissionGranted = true;
+      });
     }
-
-    const position = await Geolocation.getCurrentPosition({
-      enableHighAccuracy: false, // 🚀 Nhanh hơn
-      timeout: 3000, // 🚀 Timeout rất ngắn 3s
-      maximumAge: 60000, // 🚀 Cho phép dùng cache 1 phút
-    });
-
-    return {
-      latitude: position.coords.latitude,
-      longitude: position.coords.longitude,
-    };
   }
 
-  // 🚀 Cache permission
-  private locationPermissionGranted: boolean = false;
+  // ⚡ HELPER: HIỂN THỊ LỖI (nếu chưa có)
+  private showError(message: string) {
+    // Thêm toast hoặc alert ở đây
+    console.error('❌', message);
+    // Ví dụ: this.toastr.error(message);
+  }
+
+
+  // async openCamera(code: any) {
+  //   if (!this.isEdit) {
+  //     console.warn('isEdit = false → không mở camera');
+  //     return;
+  //   }
+
+  //   try {
+  //     // 1️⃣ Mở camera
+  //     const photo = await Camera.getPhoto({
+  //       quality: 80,
+  //       resultType: CameraResultType.Uri,
+  //       source: CameraSource.Camera
+  //     });
+
+  //     // 2️⃣ Lưu file thật vào Filesystem
+  //     const fileUri = await this.saveToFileSystem(photo);
+
+  //     // 3️⃣ Lấy vị trí (không block camera)
+  //     let latitude = 0, longitude = 0;
+  //     try {
+  //       const location = await this.getCurrentLocationFast();
+  //       latitude = location.latitude;
+  //       longitude = location.longitude;
+  //     } catch { }
+
+  //     // 4️⃣ Tạo thumbnail nhỏ để hiển thị UI
+  //     const thumbnail = await this.generateThumbnail(photo.webPath!, 120, 120);
+
+  //     // 5️⃣ Object ảnh nhẹ
+  //     const imageObj = {
+  //       code: "-1",
+  //       fileName: "",
+  //       evaluateHeaderCode: this.headerId,
+  //       filePath: fileUri,       // 📌 LƯU URI, không lưu base64
+  //       pathThumbnail: thumbnail,
+  //       tieuChiCode: code,
+  //       viDo: latitude,
+  //       kinhDo: longitude,
+  //       type: "img"
+  //     };
+
+  //     // 6️⃣ Đẩy vào danh sách và update UI
+  //     this.evaluate.lstImages.push(imageObj);
+  //     this.cdr.detectChanges();
+
+  //     // 7️⃣ Lưu storage nhanh
+  //     this._storageService.set(this.doiTuong.id + "_" + this.kiKhaoSat.code, this.evaluate);
+
+  //   } catch (err) {
+  //     console.error("Lỗi openCamera:", err);
+  //   }
+  // }
+
+  // private async saveToFileSystem(photo: any): Promise<string> {
+  //   const response = await fetch(photo.webPath!);
+  //   const blob = await response.blob();
+
+  //   const base64Data = await this.blobToBase64(blob);
+
+  //   const fileName = `img_${Date.now()}.jpeg`;
+
+  //   const saved = await Filesystem.writeFile({
+  //     path: fileName,
+  //     data: base64Data,
+  //     directory: Directory.Data
+  //   });
+
+  //   return saved.uri; // 📌 Trả về URI
+  // }
+
+  // private blobToBase64(blob: Blob): Promise<string> {
+  //   return new Promise((resolve, reject) => {
+  //     const reader = new FileReader();
+  //     reader.onload = () => resolve((reader.result as string).split(",")[1]);
+  //     reader.onerror = reject;
+  //     reader.readAsDataURL(blob);
+  //   });
+  // }
+
+
+
+
+
+
+
+
+
 
   openMenu() {
     if (this.lstTieuChi.length == 0) {
