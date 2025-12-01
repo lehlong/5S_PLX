@@ -20,7 +20,7 @@
     </div> -->
   </nz-page-header-extra>
 
-  <nz-page-header-content class="main-content">
+  <nz-page-header-content class="main-content2">
     <ng-container>
       <div nz-row [nzGutter]="12">
         <div nz-col [nzXs]="24" [nzMd]="6">
@@ -75,7 +75,7 @@
       </div>
     </ng-container>
 
-    <nz-table class="auto-scroll-table" #headerTable [nzData]="paginationResult.data" [nzFrontPagination]="false"
+    <nz-table class="auto-scroll-table" #headerTable [nzData]="lstData" [nzFrontPagination]="false"
       [nzScroll]="{ y: 'calc(100vh - 276px)' }">
       <thead>
         <tr>
@@ -98,7 +98,6 @@
             <nz-tag *ngIf="data.point <= 30" nzColor="red">Kém</nz-tag>
             <nz-tag *ngIf="data.point > 30 && data.point <= 80" nzColor="orange">Khá</nz-tag>
           </td>
-          <td></td>
         </tr>
       </tbody>
     </nz-table>

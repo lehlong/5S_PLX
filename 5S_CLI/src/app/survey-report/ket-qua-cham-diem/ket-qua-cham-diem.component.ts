@@ -125,10 +125,10 @@ export class KetQuaChamDiemComponent {
       next: (data) => {
         console.log(data);
         if (data) {
-          const downloadUrl = `${environment.urlFiles}/${data}`; // hoặc cấu hình phù hợp với backend của bạn
+          const downloadUrl = `${environment.urlFiles}${data}`; // hoặc cấu hình phù hợp với backend của bạn
           const a = document.createElement('a');
           a.href = downloadUrl;
-          a.download = `KetQuaChamDiem_${this.survey.name}_${this.kiKhaosatId}.xlsx`;
+          // a.download = `KetQuaChamDiem_${this.survey.name}_${this.kiKhaosatId}.xlsx`;
           a.target = '_blank'; // mở tab mới (tùy chọn)
           a.click();
            this.message.success('Xuất dữ liệu thành công');

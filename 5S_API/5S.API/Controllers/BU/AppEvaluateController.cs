@@ -117,6 +117,8 @@ namespace PLX5S.API.Controllers.BU
 
 
         [HttpPost("InsertEvaluate")]
+        [RequestSizeLimit(int.MaxValue)]
+        [RequestFormLimits(MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<IActionResult> InsertEvaluate([FromBody] EvaluateModel data)
         {
             var transferObject = new TransferObject();

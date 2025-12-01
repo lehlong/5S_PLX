@@ -160,9 +160,10 @@ namespace PLX5S.BUSINESS.Services.Auth
                     }
                     else
                     {
-                        Status = false;
-                        Mess = "Thiết bị không có quyền đăng nhập";
+                        //Status = false; 
+                        Status = true;
 
+                        Mess = "Thiết bị không có quyền đăng nhập";
                     }
                 }
                 else if (devicewrongip?.Id != null)
@@ -191,7 +192,8 @@ namespace PLX5S.BUSINESS.Services.Auth
                         EnableLogin = false
                     };
                     _dbContext.tblMdDevice.Add(newDevice);
-                    Status = false;
+                    Status = true;
+                    //Status = false;
                     Mess = "Thiết bị không có quyền đăng nhập";
                     _dbContext.SaveChanges();
 

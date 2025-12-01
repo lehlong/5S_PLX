@@ -2,7 +2,7 @@
   <nz-page-header-title>BÁO CÁO</nz-page-header-title>
   <nz-page-header-subtitle>Thời Gian Chấm Điểm</nz-page-header-subtitle>
 
-  <nz-page-header-content class="main-content">
+  <nz-page-header-content class="main-content2">
     <ng-container>
       <div nz-row [nzGutter]="12">
         <div nz-col [nzXs]="24" [nzMd]="6">
@@ -57,8 +57,8 @@
       </div>
     </ng-container>
     <div class="table-wrapper">
-      <nz-table class="auto-scroll-table" #headerTable nzBordered [nzData]="paginationResult.data"
-        [nzScroll]="{ x: 'max-content' }" [nzFrontPagination]="false">
+      <nz-table class="auto-scroll-table" #headerTable nzBordered [nzData]="lstData"
+        [nzScroll]="{ y: 'calc(100vh - 276px)' }" [nzFrontPagination]="false">
         <thead>
           <tr>
             <th rowspan="2" class="col-small">STT</th>
@@ -117,13 +117,6 @@
           </tr>
         </tbody>
       </nz-table>
-    </div>
-  </nz-page-header-content>
-  <nz-page-header-content class="footer-content">
-    <div *ngIf="paginationResult?.data" class="flex justify-end p-[10px] border-t border-custom-gray border-solid">
-      <nz-pagination nzShowSizeChanger [nzPageIndex]="filter.currentPage" [nzTotal]="paginationResult.totalRecord"
-        [nzPageSize]="filter.pageSize" (nzPageIndexChange)="pageIndexChange($event)"
-        (nzPageSizeChange)="pageSizeChange($event)"></nz-pagination>
     </div>
   </nz-page-header-content>
 </nz-page-header>

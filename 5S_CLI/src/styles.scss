@@ -4,6 +4,15 @@
   overflow: auto;
   padding: 0px 16px 0px 0px;
 }
+
+.main-content2 {
+  width: 100%;
+  height: calc(-135px + 100vh);
+  overflow: hidden;
+
+  padding: 0px 16px 0px 0px;
+}
+
 .footer-content {
   height: 56px;
   width: 100%;
@@ -61,28 +70,34 @@ th {
   margin: 6px 12px 0px 0px;
   flex-flow: column;
 }
+
 .upload-avatar:hover {
   border: 1px dashed hsl(209, 100%, 55%);
   color: hsl(209, 100%, 55%);
 }
+
 .main-upload {
   display: flex;
   align-items: center;
 }
+
 .avatar-preview {
   margin: 6px 12px 0px 0px;
 }
+
 .btn-excel {
   background-color: #008b45;
   border-color: #008b45;
   color: white;
 }
+
 @media (max-width: 768px) {
   .p-10 {
     padding: 10px !important;
   }
+
   ::ng-deep .ant-drawer-header {
     padding: 10px !important;
   }
- 
+
 }

@@ -36,9 +36,9 @@
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('name', $event)">
             ĐỐI TƯỢNG CHẤM ĐIỂM
           </th>
-          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('name', $event)">
+          <!-- <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('name', $event)">
             THỜI GIAN GẦN NHẤT
-          </th>
+          </th> -->
           <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('isActive', $event)" nzAlign="center">
             THAO TÁC
           </th>
@@ -57,7 +57,7 @@
           <ng-container *ngFor="let i of lstDoiTuong">
             <td *ngIf="i.id == data.doiTuongId">{{ i.name }}</td>
           </ng-container>
-          <td>{{ data.name }}</td>
+          <!-- <td>{{ data.name }}</td> -->
           <td nzAlign="center">
 
             <button class="!flex !items-center" nzType="default" nz-button (click)="getInput(data.id)">

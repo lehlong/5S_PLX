@@ -21,7 +21,7 @@
     </nz-page-header-extra>
     <nz-page-header-content class="main-content">
       <nz-table class="auto-scroll-table" #headerTable [nzData]="paginationResult.data" [nzFrontPagination]="false"
-        [nzScroll]="{ y: 'calc(100vh - 244px)' }">
+        [nzScroll]="{ y: 'calc(100vh - 275px)' }">
         <thead>
           <tr>
             <th nzWidth="60px">STT</th>
@@ -71,7 +71,7 @@
       </div>
     </nz-page-header-content>
   </nz-page-header>
-  
+
   <!--Create Update-->
   <nz-drawer [nzMask]="!edit" nzSize="default" [nzVisible]="visible" nzPlacement="right"
     [nzTitle]="edit ? ' Chỉnh sửa  ' : ' Tạo mới  '" [nzExtra]="extra" (nzOnClose)="close()">
@@ -80,7 +80,7 @@
       <form nz-form nzLayout="vertical" [formGroup]="validateForm" (ngSubmit)="submitForm()">
         <app-input-clear placeholder="Nhập tên chức vụ" [required]="true" label="Tên chức vụ"
           [control]="$any(validateForm).controls['name']"></app-input-clear>
-  
+
         <nz-form-item>
           <nz-form-label>Trạng thái</nz-form-label>
           <nz-form-control>

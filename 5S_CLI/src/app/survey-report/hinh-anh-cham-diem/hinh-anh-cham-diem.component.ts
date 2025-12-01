@@ -29,7 +29,7 @@ export class HinhAnhChamDiemComponent {
   lstATVSV = [];
   lstAccount: any = [];
   text: any = '';
-
+  urlFiles: string = environment.urlFiles;
   lstSurvey: any = [];
   lstKiKhaoSat: any = [];
   lstAllKiKhaoSat: any = [];
@@ -116,41 +116,6 @@ export class HinhAnhChamDiemComponent {
     return this.paginationResult.data?.some(
       (accType: any) => accType.id === code
     );
-  }
-  submitForm(): void {
-    console.log(this.validateForm.valid);
-    console.log(this.validateForm.getRawValue());
-    this.isSubmit = true;
-    if (this.validateForm.valid) {
-      if (this.edit) {
-        this._service.update(this.validateForm.getRawValue()).subscribe({
-          next: (data) => {
-            this.search();
-          },
-          error: (response) => {
-            console.log(response);
-          },
-        });
-      } else {
-        const formData = this.validateForm.getRawValue();
-        console.log('create');
-        this._service.create(this.validateForm.getRawValue()).subscribe({
-          next: (data) => {
-            this.search();
-          },
-          error: (response) => {
-            console.log(response);
-          },
-        });
-      }
-    } else {
-      Object.values(this.validateForm.controls).forEach((control) => {
-        if (control.invalid) {
-          control.markAsDirty();
-          control.updateValueAndValidity({ onlySelf: true });
-        }
-      });
-    }
   }
 
   close() {
@@ -300,7 +265,7 @@ export class HinhAnhChamDiemComponent {
       return;
     } else {
       this._appReportService
-        .ExportExcel('ChamTheoYkienDeXuat', {
+        .ExportExcel('ChamTheoHinhAnh', {
           surveyId: this.survey.doiTuongId,
           kiKhaoSatId: this.kiKhaosatId,
           doiTuongId: this.doiTuongId,
@@ -309,10 +274,10 @@ export class HinhAnhChamDiemComponent {
           next: (data) => {
             console.log(data);
             if (data) {
-              const downloadUrl = `${environment.urlFiles}/${data}`; // hoặc cấu hình phù hợp với backend của bạn
+              const downloadUrl = `${environment.urlFiles}${data}`; // hoặc cấu hình phù hợp với backend của bạn
               const a = document.createElement('a');
               a.href = downloadUrl;
-              a.download = `BaoCaoHinhAnh${this.survey.name}_${this.kiKhaosatId}.xlsx`;
+              // a.download = `BaoCaoHinhAnh${this.survey.name}_${this.kiKhaosatId}.xlsx`;
               a.target = '_blank'; // mở tab mới (tùy chọn)
               a.click();
               this.message.success('Xuất dữ liệu thành công');
@@ -327,7 +292,7 @@ export class HinhAnhChamDiemComponent {
     if (!path) return '';
 
     const cleanPath = path.replace(/\\/g, '/');
-    return `http://sso.d2s.com.vn:1347/${encodeURI(cleanPath)}`;
+    return `${this.urlFiles}${encodeURI(cleanPath)}`;
   }
   viewDetailImage(imagePath: string | null | undefined): void {
     if (!imagePath) return;

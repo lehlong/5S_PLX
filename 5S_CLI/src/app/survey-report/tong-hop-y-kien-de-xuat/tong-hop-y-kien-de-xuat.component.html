@@ -20,26 +20,16 @@
     </div> -->
   </nz-page-header-extra>
 
-  <nz-page-header-content class="main-content">
+  <nz-page-header-content class="main-content2">
     <ng-container>
       <div nz-row [nzGutter]="12">
         <div nz-col [nzXs]="24" [nzMd]="6">
           <nz-form-item style="display: block">
             <h4>Cuộc Khảo Sát</h4>
             <nz-form-control nzErrorTip="Không được để trống">
-              <nz-select
-                nzShowSearch
-                nzAllowClear
-                nzPlaceHolder="Chọn cuộc khảo sát"
-                [(ngModel)]="survey"
-                (ngModelChange)="searchKiKhaoSat()"
-              >
-                <nz-option
-                  cdkScrollable
-                  *ngFor="let item of lstSurvey"
-                  [nzLabel]="item?.name"
-                  [nzValue]="item"
-                >
+              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Chọn cuộc khảo sát" [(ngModel)]="survey"
+                (ngModelChange)="searchKiKhaoSat()">
+                <nz-option cdkScrollable *ngFor="let item of lstSurvey" [nzLabel]="item?.name" [nzValue]="item">
                 </nz-option>
               </nz-select>
             </nz-form-control>
@@ -50,19 +40,9 @@
           <nz-form-item style="display: block">
             <h4>Kỳ Chấm Điểm</h4>
             <nz-form-control nzErrorTip="Không được để trống">
-              <nz-select
-                nzShowSearch
-                nzAllowClear
-                nzPlaceHolder="Chọn kỳ chấm điểm"
-                [(ngModel)]="kiKhaosatId"
-                (ngModelChange)="searchDoiTuong()"
-              >
-                <nz-option
-                  cdkScrollable
-                  *ngFor="let item of lstKiKhaoSat"
-                  [nzLabel]="item?.name"
-                  [nzValue]="item?.id"
-                >
+              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Chọn kỳ chấm điểm" [(ngModel)]="kiKhaosatId"
+                (ngModelChange)="searchDoiTuong()">
+                <nz-option cdkScrollable *ngFor="let item of lstKiKhaoSat" [nzLabel]="item?.name" [nzValue]="item?.id">
                 </nz-option>
               </nz-select>
             </nz-form-control>
@@ -73,18 +53,8 @@
           <nz-form-item style="display: block">
             <h4>Đối tượng</h4>
             <nz-form-control nzErrorTip="Không được để trống">
-              <nz-select
-                nzShowSearch
-                nzAllowClear
-                nzPlaceHolder="Chọn cửa hàng"
-                [(ngModel)]="doiTuongId"
-              >
-                <nz-option
-                  cdkScrollable
-                  *ngFor="let item of lstDoiTuong"
-                  [nzLabel]="item.name"
-                  [nzValue]="item.id"
-                >
+              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Chọn cửa hàng" [(ngModel)]="doiTuongId">
+                <nz-option cdkScrollable *ngFor="let item of lstDoiTuong" [nzLabel]="item.name" [nzValue]="item.id">
                 </nz-option>
               </nz-select>
             </nz-form-control>
@@ -94,19 +64,10 @@
         <div nz-col [nzXs]="24" [nzMd]="6">
           <h4>'</h4>
           <div class="">
-            <button
-              (click)="getReport()"
-              class="!flex !items-center space-btn"
-              nzType="primary"
-              nz-button
-            >
+            <button (click)="getReport()" class="!flex !items-center space-btn" nzType="primary" nz-button>
               <span nz-icon nzType="snippets"></span> Xem Báo Cáo
             </button>
-            <button
-              (click)="exportExcel()"
-              class="!flex !items-center space-btn btn-excel"
-              nz-button
-            >
+            <button (click)="exportExcel()" class="!flex !items-center space-btn btn-excel" nz-button>
               <span nz-icon nzType="file-excel"></span> Xuất Excel
             </button>
           </div>
@@ -114,13 +75,8 @@
       </div>
     </ng-container>
 
-    <nz-table
-      class="auto-scroll-table"
-      #headerTable
-      [nzData]="paginationResult.data"
-      [nzFrontPagination]="false"
-      [nzScroll]="{ y: 'calc(100vh - 276px)' }"
-    >
+    <nz-table class="auto-scroll-table" #headerTable [nzData]="lstData" [nzFrontPagination]="false"
+      [nzScroll]="{ y: 'calc(100vh - 276px)' }">
       <thead>
         <tr>
           <th nzWidth="60px">STT</th>
@@ -134,9 +90,7 @@
       </thead>
       <tbody>
         <ng-container *ngFor="let data of lstData; let a = index">
-          <ng-container
-            *ngFor="let item of data.lstTieuChiDeXuat; let i = index"
-          >
+          <ng-container *ngFor="let item of data.lstTieuChiDeXuat; let i = index">
             <tr>
               <td *ngIf="i === 0" [attr.rowspan]="data.lstTieuChiDeXuat.length">
                 {{ a + 1 }}
@@ -155,20 +109,5 @@
         </ng-container>
       </tbody>
     </nz-table>
-  </nz-page-header-content>
-  <nz-page-header-content class="footer-content">
-    <div
-      *ngIf="paginationResult?.data"
-      class="flex justify-end p-[10px] border-t border-custom-gray border-solid"
-    >
-      <nz-pagination
-        nzShowSizeChanger
-        [nzPageIndex]="filter.currentPage"
-        [nzTotal]="paginationResult.totalRecord"
-        [nzPageSize]="filter.pageSize"
-        (nzPageIndexChange)="pageIndexChange($event)"
-        (nzPageSizeChange)="pageSizeChange($event)"
-      ></nz-pagination>
-    </div>
   </nz-page-header-content>
 </nz-page-header>

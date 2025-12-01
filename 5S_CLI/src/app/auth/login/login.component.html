@@ -3,37 +3,34 @@
 </div>
 
 <div class="login">
-    <h1>HỆ THỐNG QUẢN TRỊ</h1>
+  <!-- <h1>HỆ THỐNG QUẢN TRỊ</h1> -->
   <div class="login-form">
     <nz-input-group nzPrefixIcon="user">
-      <input
-        type="text"
-        nz-input
-        placeholder="Tên đăng nhập"
-        [(ngModel)]="model.userName"
-        (keydown.enter)="processLogin()"
-      />
+      <input type="text" nz-input placeholder="Tên đăng nhập" [(ngModel)]="model.userName"
+        (keydown.enter)="processLogin()" />
     </nz-input-group>
     <nz-input-group nzPrefixIcon="lock">
-      <input
-        type="password"
-        nz-input
-        placeholder="Mật khẩu"
-        [(ngModel)]="model.password"
-        (keydown.enter)="processLogin()"
-      />
+      <input type="password" nz-input placeholder="Mật khẩu" [(ngModel)]="model.password"
+        (keydown.enter)="processLogin()" />
     </nz-input-group>
-    <button
-      nz-button
-      class="btn-login"
-      [nzType]="'primary'"
-      (click)="processLogin()"
-    >
+    <div nz-row class="mb-[16px]">
+      <div nz-col [nzSpan]="12">
+        <label nz-checkbox formControlName="remember">
+          <span>Lưu mật khẩu</span>
+        </label>
+      </div>
+      <div nz-col [nzSpan]="12" style="text-align: right;">
+        <a class="float-right">Quên mật khẩu</a>
+      </div>
+    </div>
+    <button nz-button class="btn-login" [nzType]="'primary'" (click)="processLogin()">
       Đăng nhập
     </button>
+    Hoặc
+    <a>Đăng ký ngay!</a>
   </div>
 </div>
 
 <div class="copy-right">
-    <nz-icon nzType="copyright" nzTheme="outline" /> Bản quyền thuộc về Công ty Cổ phần D2S 
+  <nz-icon nzType="copyright" nzTheme="outline" />2025 d2s.com.vn
 </div>

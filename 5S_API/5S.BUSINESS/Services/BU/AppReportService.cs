@@ -6,11 +6,13 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using NPOI.HPSF;
 using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
+using NPOI.Util;
 using NPOI.XSSF.UserModel;
 using PLX5S.BUSINESS.Common;
 using PLX5S.BUSINESS.Dtos.BU;
@@ -21,7 +23,9 @@ using PLX5S.CORE.Entities.BU;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection.Metadata.Ecma335;
+using System.Security.Principal;
 using System.Threading.Tasks;
 
 namespace PLX5S.BUSINESS.Services.BU
@@ -33,7 +37,6 @@ namespace PLX5S.BUSINESS.Services.BU
         Task<List<ThoiGianChamDiem>> ThietBiChamDiem(FilterReport filterReport);
         Task<List<TheoKhungThoiGian>> TheoKhungThoiGian(FilterReport filterReport);
         Task<List<TongHopYKienDeXuat>> TongHopYKienDeXuat(FilterReport filterReport);
-
         Task<List<BaoCaoHinhAnh>> BaoCaoHinhAnh(FilterReport filterReport);
         Task<string> ExportExcel(string ReportName, FilterReport filterReport);
     }
@@ -43,12 +46,14 @@ namespace PLX5S.BUSINESS.Services.BU
         private readonly IWebHostEnvironment _environment;
         private readonly IKikhaosatService _kiKhaoSatService;
         private readonly ITieuChiService _tieuChiService;
+        private readonly IConfiguration _config;
 
-        public AppReportService(AppDbContext dbContext, IMapper mapper, IWebHostEnvironment environment, IKikhaosatService KiKhaoSatService, ITieuChiService TieuChiService) : base(dbContext, mapper)
+        public AppReportService(AppDbContext dbContext, IMapper mapper, IWebHostEnvironment environment, IKikhaosatService KiKhaoSatService, ITieuChiService TieuChiService, IConfiguration configuration) : base(dbContext, mapper)
         {
             _environment = environment;
             _kiKhaoSatService = KiKhaoSatService;
             _tieuChiService = TieuChiService;
+            _config = configuration;
         }
 
         public async Task<List<KetQuaChamDiem>> KetQuaChamDiem(FilterReport filterReport)
@@ -319,7 +324,9 @@ namespace PLX5S.BUSINESS.Services.BU
                 var lstTieuChi = _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId && x.IsGroup == false).ToList();
                 var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
                 var lstEvaValue = _dbContext.TblBuEvaluateValue.Where(x => x.FeedBack != "").ToList();
+                var lstChucVu = _dbContext.tblMdChucVu.OrderBy(x => x.Id).ToList();
                 var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                var lstAccount = _dbContext.TblAdAccount.OrderBy(x => x.UserName).ToList();
                 var result = new List<TongHopYKienDeXuat>();
 
                 if (filterReport.SurveyId == "DT1")
@@ -343,8 +350,8 @@ namespace PLX5S.BUSINESS.Services.BU
                             {
                                 TieuChi = lstTieuChi.FirstOrDefault(b => b.Code == x.TieuChiCode)?.Name,
                                 DeXuat = x.FeedBack,
-                                CanBo = item.AccountUserName,
-                                ChucVu = item?.ChucVuId,
+                                CanBo = lstAccount.FirstOrDefault(x => x.UserName == item.AccountUserName)?.FullName,
+                                ChucVu = lstChucVu.FirstOrDefault(x => x.Id == item?.ChucVuId)?.Name,
                                 ThoiGian = i.UpdateDate?.ToString("HH:mm dd/MM/yyyy")
                             }).ToList();
 
@@ -381,8 +388,8 @@ namespace PLX5S.BUSINESS.Services.BU
                             {
                                 TieuChi = lstTieuChi.FirstOrDefault(b => b.Code == x.TieuChiCode).Name,
                                 DeXuat = x.FeedBack,
-                                CanBo = item.AccountUserName,
-                                ChucVu = item.ChucVuId,
+                                CanBo = lstAccount.FirstOrDefault(x => x.UserName == item.AccountUserName)?.FullName,
+                                ChucVu = lstChucVu.FirstOrDefault(x => x.Id == item?.ChucVuId)?.Name,
                                 ThoiGian = i.UpdateDate?.ToString("HH:mm dd/MM/yyyy")
                             }).ToList();
 
@@ -417,6 +424,8 @@ namespace PLX5S.BUSINESS.Services.BU
                 var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
                 var lstEvaValue = _dbContext.TblBuEvaluateImage.Where(x => x.FilePath != "").ToList();
                 var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                var lstChucVu = _dbContext.tblMdChucVu.OrderBy(x => x.Id).ToList();
+                var lstAccount = _dbContext.TblAdAccount.OrderBy(x => x.UserName).ToList();
                 var result = new List<BaoCaoHinhAnh>();
 
                 if (filterReport.SurveyId == "DT1")
@@ -441,8 +450,8 @@ namespace PLX5S.BUSINESS.Services.BU
                                 TieuChi = lstTieuChi.FirstOrDefault(b => b.Code == x.TieuChiCode)?.Name,
                                 HinhAnh = x.FilePath,
                                 Thumbnail = x.PathThumbnail,
-                                CanBo = item.AccountUserName,
-                                ChucVu = item?.ChucVuId,
+                                CanBo = lstAccount.FirstOrDefault(x => x.UserName == item.AccountUserName)?.FullName,
+                                ChucVu = lstChucVu.FirstOrDefault(x => x.Id == item?.ChucVuId)?.Name,
                                 ThoiGian = i.UpdateDate?.ToString("HH:mm dd/MM/yyyy")
                             }).ToList();
 
@@ -480,8 +489,8 @@ namespace PLX5S.BUSINESS.Services.BU
                                 TieuChi = lstTieuChi.FirstOrDefault(b => b.Code == x.TieuChiCode).Name,
                                 HinhAnh = x.FilePath,
                                 Thumbnail = x.PathThumbnail,
-                                CanBo = item.AccountUserName,
-                                ChucVu = item.ChucVuId,
+                                CanBo = lstAccount.FirstOrDefault(x => x.UserName == item.AccountUserName)?.FullName,
+                                ChucVu = lstChucVu.FirstOrDefault(x => x.Id == item?.ChucVuId)?.Name,
                                 ThoiGian = i.UpdateDate?.ToString("HH:mm dd/MM/yyyy")
                             }).ToList();
 
@@ -543,6 +552,7 @@ namespace PLX5S.BUSINESS.Services.BU
 
                 IWorkbook workbook = new XSSFWorkbook();
 
+
                 if (ReportName == "KetQuaChamDiem")
                 {
                     var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Template", "KetQuaChamDiem.xlsx");
@@ -552,24 +562,21 @@ namespace PLX5S.BUSINESS.Services.BU
                         throw new FileNotFoundException("Không tìm thấy template Excel.", templatePath);
                     }
 
-
-
-
                     using var file = new FileStream(templatePath, FileMode.Open, FileAccess.Read, FileShare.Read);
                     workbook = new XSSFWorkbook(file);
 
                     var styles = new
                     {
-
-
-                        Text = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Left, true),
+                        Text = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Left, true, wrap: true),
                         TextRight = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Right, true),
                         TextBold = ExcelNPOIExtention.SetCellStyleText(workbook, true, HorizontalAlignment.Left, true),
                         TextCenter = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Center, false),
                         TextCenterBold = SetCellStyleTextCenter(workbook, true, HorizontalAlignment.Center, VerticalAlignment.Center, false),
                         Number = ExcelNPOIExtention.SetCellStyleNumber(workbook, false, HorizontalAlignment.Right, true),
                         NumberBold = ExcelNPOIExtention.SetCellStyleNumber(workbook, true, HorizontalAlignment.Right, true),
+                        DecimalNumber = ExcelNPOIExtention.SetCellStyleDecimalNumber(workbook, false, HorizontalAlignment.Right, true)
                     };
+
                     var data = await KetQuaChamDiem(filterReport);
                     var sheet = workbook.GetSheetAt(0);
                     var startIndex = 1;
@@ -600,20 +607,18 @@ namespace PLX5S.BUSINESS.Services.BU
                     using var file = new FileStream(templatePath, FileMode.Open, FileAccess.Read, FileShare.Read);
                     workbook = new XSSFWorkbook(file);
 
-
                     var styles = new
                     {
-
-
-                        Text = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Left, true),
+                        Text = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Left, true, wrap: true),
                         TextRight = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Right, true),
                         TextBold = ExcelNPOIExtention.SetCellStyleText(workbook, true, HorizontalAlignment.Left, true),
                         TextCenter = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Center, false),
-                        TextCenterBold = ExcelNPOIExtention.SetCellStyleText(workbook, true, HorizontalAlignment.Center, true),
+                        TextCenterBold = SetCellStyleTextCenter(workbook, true, HorizontalAlignment.Center, VerticalAlignment.Center, false),
                         Number = ExcelNPOIExtention.SetCellStyleNumber(workbook, false, HorizontalAlignment.Right, true),
                         NumberBold = ExcelNPOIExtention.SetCellStyleNumber(workbook, true, HorizontalAlignment.Right, true),
-
+                        DecimalNumber = ExcelNPOIExtention.SetCellStyleDecimalNumber(workbook, false, HorizontalAlignment.Right, true)
                     };
+
                     var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
                     var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.IsActive == true && x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
                     var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
@@ -699,10 +704,6 @@ namespace PLX5S.BUSINESS.Services.BU
                     sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(0, 2, maxCellCHt + maxCellATVSV + maxCellTCG5s + 2, maxCellCHt + maxCellATVSV + maxCellTCG5s + 2));
                     sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(0, 2, maxCellCHt + maxCellATVSV + maxCellTCG5s + 3, maxCellCHt + maxCellATVSV + maxCellTCG5s + 3));
                     sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(0, 2, maxCellCHt + maxCellATVSV + maxCellTCG5s + 4, maxCellCHt + maxCellATVSV + maxCellTCG5s + 4));
-                    //
-
-                    // row rowend cot so cot
-
 
                     // Áp dụng cho các vùng merge
                     SetStyleForMergedRegion(sheet, 0, 2, 0, 0, styles.TextCenterBold);
@@ -744,8 +745,6 @@ namespace PLX5S.BUSINESS.Services.BU
                         ExcelNPOIExtention.SetCellValueText(row3, 2 + maxCellCHt + maxCellATVSV + i, $"Lần {i + 1}", styles.TextCenterBold);
                     }
 
-                    // data
-
                     var startIndex = 3;
 
                     foreach (var i in result)
@@ -775,9 +774,8 @@ namespace PLX5S.BUSINESS.Services.BU
 
                         startIndex++;
                     }
-
-
                 }
+
                 else if (ReportName == "ChamTheokhungThoiGian")
                 {
                     var data = await TheoKhungThoiGian(filterReport);
@@ -788,16 +786,11 @@ namespace PLX5S.BUSINESS.Services.BU
                         throw new FileNotFoundException("Không tìm thấy template Excel.", templatePath);
                     }
 
-
-
-
                     using var file = new FileStream(templatePath, FileMode.Open, FileAccess.Read, FileShare.Read);
                     workbook = new XSSFWorkbook(file);
 
                     var styles = new
                     {
-
-
                         Text = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Left, true),
                         TextRight = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Right, true),
                         TextBold = ExcelNPOIExtention.SetCellStyleText(workbook, true, HorizontalAlignment.Left, true),
@@ -830,6 +823,7 @@ namespace PLX5S.BUSINESS.Services.BU
 
 
                 }
+
                 else if (ReportName == "ChamTheoYkienDeXuat")
                 {
                     var data = await TongHopYKienDeXuat(filterReport);
@@ -840,17 +834,12 @@ namespace PLX5S.BUSINESS.Services.BU
                         throw new FileNotFoundException("Không tìm thấy template Excel.", templatePath);
                     }
 
-
-
-
                     using var file = new FileStream(templatePath, FileMode.Open, FileAccess.Read, FileShare.Read);
                     workbook = new XSSFWorkbook(file);
 
                     var styles = new
                     {
-
-
-                        Text = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Left, true),
+                        Text = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Left, true, wrap: true),
                         TextRight = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Right, true),
                         TextBold = ExcelNPOIExtention.SetCellStyleText(workbook, true, HorizontalAlignment.Left, true),
                         TextCenter = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Center, false),
@@ -888,11 +877,81 @@ namespace PLX5S.BUSINESS.Services.BU
                         }
                         startIndex = startIndex + i.lstTieuChiDeXuat.Count();
                         merge++;
-
-
-
                     }
                 }
+
+                else if (ReportName == "ChamTheoHinhAnh")
+                {
+                    var data = await BaoCaoHinhAnh(filterReport);
+                    var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Template", "ChamDiemHinhAnh.xlsx");
+
+                    if (!File.Exists(templatePath))
+                    {
+                        throw new FileNotFoundException("Không tìm thấy template Excel.", templatePath);
+                    }
+
+                    using var file = new FileStream(templatePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    workbook = new XSSFWorkbook(file);
+
+                    var styles = new
+                    {
+                        Text = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Left, true, wrap: true),
+                        TextRight = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Right, true),
+                        TextBold = ExcelNPOIExtention.SetCellStyleText(workbook, true, HorizontalAlignment.Left, true),
+                        TextCenter = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Center, false),
+                        TextCenterBold = SetCellStyleTextCenter(workbook, true, HorizontalAlignment.Center, VerticalAlignment.Center, false),
+                        Number = ExcelNPOIExtention.SetCellStyleNumber(workbook, false, HorizontalAlignment.Right, true),
+                        NumberBold = ExcelNPOIExtention.SetCellStyleNumber(workbook, true, HorizontalAlignment.Right, true),
+                        DecimalNumber = ExcelNPOIExtention.SetCellStyleDecimalNumber(workbook, false, HorizontalAlignment.Right, true)
+                    };
+
+                    var sheet = workbook.GetSheetAt(0);
+                    var _urlFile = _config["UrlFile"];
+
+                    var startIndex = 1;
+                    var merge = 0;
+
+                    using var httpClient = new HttpClient();
+                    httpClient.Timeout = TimeSpan.FromSeconds(30);
+
+                    foreach (var i in data)
+                    {
+                        var row = sheet.GetRow(startIndex) ?? sheet.CreateRow(startIndex);
+
+                        ExcelNPOIExtention.SetCellValueText(row, 0, i.stt, styles.Text);
+                        sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(startIndex, startIndex + i.lstHinhAnhBaoCao.Count() - 1, 0, 0));
+                        SetStyleForMergedRegion(sheet, startIndex, startIndex + i.lstHinhAnhBaoCao.Count() - 1, 0, 0, styles.Text);
+
+                        ExcelNPOIExtention.SetCellValueText(row, 1, i.Name, styles.Text);
+                        sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(startIndex, startIndex + i.lstHinhAnhBaoCao.Count() - 1, 1, 1));
+                        SetStyleForMergedRegion(sheet, startIndex, startIndex + i.lstHinhAnhBaoCao.Count() - 1, 1, 1, styles.Text);
+
+                        var startrow = startIndex;
+                        foreach (var item in i.lstHinhAnhBaoCao)
+                        {
+                            var rowitem = sheet.GetRow(startrow) ?? sheet.CreateRow(startrow);
+                            ExcelNPOIExtention.SetCellValueText(rowitem, 2, item.TieuChi, styles.Text);
+
+                            byte[] imgBytes = null;
+                            // Tải ảnh từ URL
+                            imgBytes = await httpClient.GetByteArrayAsync(_urlFile + item.HinhAnh);
+                            // Chèn ảnh vào cell nếu tải được
+                            if (imgBytes != null && imgBytes.Length > 0)
+                            {
+                                InsertImageIntoCell((XSSFWorkbook)workbook, sheet, startrow, 3, imgBytes);
+                            }
+
+                            ExcelNPOIExtention.SetCellValueText(rowitem, 4, item.CanBo, styles.Text);
+                            ExcelNPOIExtention.SetCellValueText(rowitem, 5, item.ChucVu, styles.Text);
+                            ExcelNPOIExtention.SetCellValueText(rowitem, 6, item.ThoiGian, styles.Text);
+                            startrow++;
+
+                        }
+                        startIndex = startIndex + i.lstHinhAnhBaoCao.Count();
+                        merge++;
+                    }
+                }
+
                 else if (ReportName == "ChamTheoThoigian")
                 {
                     var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Template", "ChamDiemTheoThietbi.xlsx");
@@ -905,20 +964,18 @@ namespace PLX5S.BUSINESS.Services.BU
                     using var file = new FileStream(templatePath, FileMode.Open, FileAccess.Read, FileShare.Read);
                     workbook = new XSSFWorkbook(file);
 
-
                     var styles = new
                     {
-
-
-                        Text = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Left, true),
+                        Text = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Left, true, wrap: true),
                         TextRight = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Right, true),
                         TextBold = ExcelNPOIExtention.SetCellStyleText(workbook, true, HorizontalAlignment.Left, true),
                         TextCenter = ExcelNPOIExtention.SetCellStyleText(workbook, false, HorizontalAlignment.Center, false),
-                        TextCenterBold = ExcelNPOIExtention.SetCellStyleText(workbook, true, HorizontalAlignment.Center, true),
+                        TextCenterBold = SetCellStyleTextCenter(workbook, true, HorizontalAlignment.Center, VerticalAlignment.Center, false),
                         Number = ExcelNPOIExtention.SetCellStyleNumber(workbook, false, HorizontalAlignment.Right, true),
                         NumberBold = ExcelNPOIExtention.SetCellStyleNumber(workbook, true, HorizontalAlignment.Right, true),
-
+                        DecimalNumber = ExcelNPOIExtention.SetCellStyleDecimalNumber(workbook, false, HorizontalAlignment.Right, true)
                     };
+
                     var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
                     var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.IsActive == true && x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
                     var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
@@ -1097,6 +1154,7 @@ namespace PLX5S.BUSINESS.Services.BU
 
 
                 }
+
                 else
                 {
                     this.Status = false;
@@ -1112,20 +1170,62 @@ namespace PLX5S.BUSINESS.Services.BU
                 using var outFile = new FileStream(outputPath, FileMode.Create, FileAccess.Write);
                 workbook.Write(outFile);
 
-
-
                 return $"{folderPath}/{fileName}";
             }
             catch (Exception ex)
             {
-                {
-                    this.Status = false;
-                    return null;
-                }
+                Exception = ex;
+                this.Status = false;
+                return null;
             }
         }
+        public static void InsertImageIntoCell(XSSFWorkbook workbook, ISheet sheet, int row, int col, byte[] imageBytes)
+        {
+            // Xác định loại ảnh tự động
+            var pictureType = GetPictureType(imageBytes);
+            int pictureIdx = workbook.AddPicture(imageBytes, pictureType);
 
+            var helper = workbook.GetCreationHelper();
+            var drawing = sheet.CreateDrawingPatriarch();
+            var anchor = helper.CreateClientAnchor();
 
+            // Set vị trí và kích thước
+            anchor.Col1 = col;
+            anchor.Row1 = row;
+            anchor.Col2 = col + 1;
+            anchor.Row2 = row + 1;
+
+            // Căn giữa ảnh trong cell
+            anchor.Dx1 = Units.ToEMU(5); // padding left 5 pixels
+            anchor.Dy1 = Units.ToEMU(5); // padding top 5 pixels
+            anchor.Dx2 = Units.ToEMU(-5); // padding right 5 pixels
+            anchor.Dy2 = Units.ToEMU(-5); // padding bottom 5 pixels
+
+            anchor.AnchorType = AnchorType.MoveAndResize;
+
+            var pict = drawing.CreatePicture(anchor, pictureIdx);
+
+            // Không dùng Resize(1.0) vì nó có thể làm méo ảnh
+            // Thay vào đó, set kích thước row/column phù hợp
+            sheet.GetRow(row).Height = (short)(100 * 20); // 100 pixels
+            sheet.SetColumnWidth(col, 15 * 256); // 15 ký tự
+        }
+
+        // Helper method để xác định loại ảnh
+        private static PictureType GetPictureType(byte[] imageBytes)
+        {
+            if (imageBytes.Length < 4) return PictureType.PNG;
+
+            // Check PNG signature
+            if (imageBytes[0] == 0x89 && imageBytes[1] == 0x50 && imageBytes[2] == 0x4E && imageBytes[3] == 0x47)
+                return PictureType.PNG;
+
+            // Check JPEG signature
+            if (imageBytes[0] == 0xFF && imageBytes[1] == 0xD8)
+                return PictureType.JPEG;
+
+            return PictureType.PNG; // Default
+        }
 
     }
 }
