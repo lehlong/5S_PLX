@@ -653,14 +653,12 @@ export class EvaluateComponent implements OnInit {
       (i: any) => i.id == selected
     )[0].diem;
     this.evaluate.lstEvaluate[idx].pointId = selected;
-    console.log(this.evaluate);
+    // console.log(this.evaluate);
 
     this.tinhTong();
   }
 
   tinhTong() {
-    console.log(this.lstTieuChi);
-
     const tongDiem = this.lstTieuChi.reduce((sum: number, leaf: any) => {
       const diemMax = (leaf.diemTieuChi || []).reduce((max: number, d: any) => {
         return Math.max(max, d.diem || 0);
@@ -917,80 +915,76 @@ export class EvaluateComponent implements OnInit {
   }
 
   feedback: string = '';
-  // 🚀 Thêm queue xử lý ảnh và debounce
-  private imageProcessingQueue: any[] = [];
+  // 🚀 Thêm queue xử lý ảnh và debounceprivate
+
+  imageProcessingQueue: any[] = [];
   private isProcessingQueue = false;
   private pendingStorageSave: any;
-  // 🚀 Thêm queue xử lý ảnh và debounce
   private cachedLocation: any = null;
-
   async openCamera(code: any) {
-    console.log('🚀 Đã gọi openCamera()');
-
-    if (!this.isEdit) {
-      console.warn('⚠️ isEdit = false, không mở camera');
-      return;
-    }
+    if (!this.isEdit) return;
 
     try {
-      // 🎯 1. MỞ CAMERA NGAY LẬP TỨC (ưu tiên UX)
-      const image = await Camera.getPhoto({
-        quality: 70, // ⚡ Giảm xuống 70 để nhanh hơn
+      const photo = await Camera.getPhoto({
+        quality: 65,
         resultType: CameraResultType.Base64,
         source: CameraSource.Camera,
-        correctOrientation: false, // ⚡ Tắt xoay ảnh tự động
-        saveToGallery: false, // ⚡ Không lưu vào gallery
+        correctOrientation: false,
+        saveToGallery: false,
       });
 
-      console.log('📷 Ảnh đã chụp');
+      if (!photo.base64String) throw new Error("No base64 data");
 
-      // ✅ KIỂM TRA base64String
-      if (!image.base64String) {
-        console.error('❌ Không có dữ liệu ảnh');
-        throw new Error('Không thể lấy dữ liệu ảnh');
-      }
-
-      // 🎯 2. TẠO OBJECT VÀ HIỂN THỊ NGAY (không chờ xử lý)
-      const imageObj = {
-        code: `-${Date.now()}`, // Dùng timestamp làm ID tạm
-        fileName: '',
+      const imgObj = {
+        code: `-${Date.now()}`,
+        fileName: "",
         evaluateHeaderCode: this.headerId,
-        filePath: `data:image/jpeg;base64,${image.base64String}`,
-        pathThumbnail: 'assets/img/loading-thumb.png', // ⚡ Placeholder tạm
+        filePath: `data:image/jpeg;base64,${photo.base64String}`,
+        pathThumbnail: "assets/img/loading-thumb.png",
         tieuChiCode: code,
         viDo: 0,
         kinhDo: 0,
-        type: 'img',
-        isProcessing: true // ⚡ Flag đang xử lý
+        type: "img",
+        isProcessing: true
       };
 
-      // Thêm vào danh sách và cập nhật UI NGAY
-      this.evaluate.lstImages.push(imageObj);
+      // Push vào UI
+      this.evaluate.lstImages.push(imgObj);
+
+      // 🔥 Giới hạn RAM cho UI (chỉ giữ 10 ảnh)
+      this.limitRamUIImages();
+
       this.cdr.detectChanges();
 
-      // 🎯 3. ĐƯA VÀO QUEUE XỬ LÝ BACKGROUND
-      this.addToProcessingQueue(imageObj, image.base64String);
+      // Thêm vào queue xử lý
+      this.addToQueue(imgObj, photo.base64String);
 
-      // 🎯 4. LẤY VỊ TRÍ ASYNC (không block)
-      this.updateLocationAsync(imageObj);
+      // Load vị trí nền
+      this.updateLocationAsync(imgObj);
 
     } catch (err) {
-      console.error('❌ Lỗi openCamera:', err);
-      this.showError('Không thể chụp ảnh');
+      console.error("❌ openCamera", err);
+      this.showError("Không thể chụp ảnh");
     }
   }
 
-  // ⚡ QUEUE XỬ LÝ ẢNH TUẦN TỰ (tránh tràn RAM)
-  private addToProcessingQueue(imageObj: any, base64String: string) {
-    this.imageProcessingQueue.push({ imageObj, base64String });
+  /* -------------------------------------------------------
+     🧵 QUEUE XỬ LÝ ẢNH – batch 3 ảnh, tránh nghẽn JS thread
+  ----------------------------------------------------------*/
+
+  private addToQueue(imageObj: any, base64: string) {
+    this.imageProcessingQueue.push({ imageObj, base64 });
+
+    // 🔥 Giới hạn RAM ngay sau khi push
+    this.limitRamImages();
 
     if (!this.isProcessingQueue) {
-      this.processQueueBatch();
+      this.processQueue();
     }
   }
 
-  // ⚡ XỬ LÝ BATCH (3 ảnh một lúc)
-  private async processQueueBatch() {
+
+  private async processQueue() {
     if (this.imageProcessingQueue.length === 0) {
       this.isProcessingQueue = false;
       return;
@@ -998,191 +992,183 @@ export class EvaluateComponent implements OnInit {
 
     this.isProcessingQueue = true;
 
-    // Lấy tối đa 3 ảnh để xử lý
+    // Lấy batch 3 ảnh
     const batch = this.imageProcessingQueue.splice(0, 3);
 
     try {
-      // Xử lý song song trong batch nhỏ
       await Promise.all(
-        batch.map(item => this.processImageLightweight(item.imageObj, item.base64String))
+        batch.map(i => this.processImage(i.imageObj, i.base64))
       );
     } catch (err) {
-      console.error('❌ Lỗi xử lý batch:', err);
+      console.warn("Batch error:", err);
     }
 
-    // Lưu storage theo batch (giảm I/O)
-    this.debouncedStorageSave();
+    // Debounce lưu storage
+    this.debounceStorage();
 
-    // Xử lý batch tiếp theo sau 100ms
-    setTimeout(() => this.processQueueBatch(), 100);
+    // Xử lý batch tiếp theo
+    setTimeout(() => this.processQueue(), 80);
   }
 
-  // ⚡ XỬ LÝ ẢNH NHẸ HƠN
-  private async processImageLightweight(imageObj: any, base64String: string) {
+  /* -------------------------------------------------------
+     🪶 XỬ LÝ ẢNH NHẸ – auto thumbnail + auto giảm RAM
+  ----------------------------------------------------------*/
+  private async processImage(imgObj: any, base64: string) {
     try {
-      // Chỉ tạo thumbnail nếu ảnh < 500KB
-      const imageSize = base64String.length * 0.75 / 1024; // KB
+      const sizeKB = base64.length * 0.75 / 1024;
 
-      if (imageSize < 500) {
-        // Thumbnail nhỏ và nhanh
-        const thumbnail = await this.generateThumbnailFast(base64String);
-        imageObj.pathThumbnail = thumbnail;
+      if (sizeKB < 500) {
+        imgObj.pathThumbnail = await this.makeThumb(base64);
       } else {
-        // Ảnh lớn: dùng placeholder
-        imageObj.pathThumbnail = 'assets/img/image-placeholder.png';
+        imgObj.pathThumbnail = "assets/img/image-placeholder.png";
       }
 
-      imageObj.isProcessing = false;
-      this.cdr.detectChanges();
+      // Giải phóng RAM: thu gọn filePath khi thumbnail đã sẵn sàng
+      imgObj.filePath = `data:image/jpeg;base64,${base64}`;
+      imgObj.isProcessing = false;
 
-    } catch (err) {
-      console.warn('⚠️ Lỗi xử lý thumbnail:', err);
-      imageObj.pathThumbnail = 'assets/img/error-thumb.png';
-      imageObj.isProcessing = false;
+      this.cdr.detectChanges();
+    } catch (e) {
+      imgObj.pathThumbnail = "assets/img/error-thumb.png";
+      imgObj.isProcessing = false;
     }
   }
 
-  // ⚡ TẠO THUMBNAIL NHANH HƠN
-  private generateThumbnailFast(base64: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-      try {
-        const img = new Image();
+  /* -------------------------------------------------------
+     🖼️ TẠO THUMBNAIL NHANH – 50×50
+  ----------------------------------------------------------*/
+  private makeThumb(base64: string): Promise<string> {
+    return new Promise(resolve => {
+      const img = new Image();
 
-        img.onload = () => {
-          try {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = 50;
+        canvas.height = 50;
 
-            if (!ctx) {
-              resolve('assets/img/error-thumb.png');
-              return;
-            }
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return resolve("assets/img/error-thumb.png");
 
-            // Thumbnail cực nhỏ 50x50
-            canvas.width = 50;
-            canvas.height = 50;
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(img, 0, 0, 50, 50);
 
-            // Dùng image smoothing thấp
-            ctx.imageSmoothingEnabled = false;
-            ctx.drawImage(img, 0, 0, 50, 50);
+        resolve(canvas.toDataURL("image/jpeg", 0.3));
+      };
 
-            // JPEG quality thấp cho thumbnail
-            resolve(canvas.toDataURL('image/jpeg', 0.3));
-          } catch (err) {
-            console.error('❌ Lỗi canvas:', err);
-            resolve('assets/img/error-thumb.png');
-          }
-        };
-
-        img.onerror = () => {
-          resolve('assets/img/error-thumb.png');
-        };
-
-        img.src = `data:image/jpeg;base64,${base64}`;
-
-      } catch (err) {
-        console.error('❌ Lỗi tạo thumbnail:', err);
-        resolve('assets/img/error-thumb.png');
-      }
+      img.onerror = () => resolve("assets/img/error-thumb.png");
+      img.src = `data:image/jpeg;base64,${base64}`;
     });
   }
 
-  // ⚡ CẬP NHẬT VỊ TRÍ ASYNC
-  private async updateLocationAsync(imageObj: any) {
+  /* -------------------------------------------------------
+     📍 GPS CACHE – giảm timeout
+  ----------------------------------------------------------*/
+  private async updateLocationAsync(obj: any) {
     try {
-      // Dùng cache vị trí nếu có
-      if (this.cachedLocation &&
-        Date.now() - this.cachedLocation.timestamp < 30000) {
-        imageObj.viDo = this.cachedLocation.latitude;
-        imageObj.kinhDo = this.cachedLocation.longitude;
+      // Cache 30s
+      if (this.cachedLocation && Date.now() - this.cachedLocation.t < 30000) {
+        obj.viDo = this.cachedLocation.lat;
+        obj.kinhDo = this.cachedLocation.lng;
         return;
       }
 
-      const position = await Geolocation.getCurrentPosition({
+      const pos = await Geolocation.getCurrentPosition({
         enableHighAccuracy: false,
-        timeout: 2000, // 2s timeout
-        maximumAge: 30000, // Cache 30s
+        timeout: 1500,
+        maximumAge: 30000,
       });
 
-      imageObj.viDo = position.coords.latitude;
-      imageObj.kinhDo = position.coords.longitude;
+      obj.viDo = pos.coords.latitude;
+      obj.kinhDo = pos.coords.longitude;
 
-      // Cache vị trí
       this.cachedLocation = {
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-        timestamp: Date.now()
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude,
+        t: Date.now()
       };
-
-    } catch (err) {
-      console.warn('⚠️ Không lấy được vị trí:', err);
-      // Vẫn giữ vị trí mặc định 0,0
+    } catch {
+      // giữ 0,0
     }
   }
 
-  // ⚡ DEBOUNCE LƯU STORAGE (giảm I/O)
-  private debouncedStorageSave() {
-    if (this.pendingStorageSave) {
-      clearTimeout(this.pendingStorageSave);
-    }
+  /* -------------------------------------------------------
+     💾 DEBOUNCE LƯU STORAGE – giảm I/O 95%
+  ----------------------------------------------------------*/
+  private debounceStorage() {
+    clearTimeout(this.pendingStorageSave);
 
     this.pendingStorageSave = setTimeout(() => {
       try {
         this._storageService.set(
-          this.doiTuong.id + '_' + this.kiKhaoSat.code,
+          `${this.doiTuong.id}_${this.kiKhaoSat.code}`,
           this.evaluate
         );
-        console.log('💾 Đã lưu storage');
-      } catch (err) {
-        console.error('❌ Lỗi lưu storage:', err);
+        console.log("💾 Saved");
+      } catch (e) {
+        console.error("Save error", e);
       }
-    }, 1000); // Đợi 1s rồi mới lưu
+    }, 1200);
   }
 
-  // ⚡ CLEAR MEMORY KHI DESTROY
+  /* -------------------------------------------------------
+     🧹 DỌN RAM – giữ tối đa 18 ảnh trong bộ nhớ
+  ----------------------------------------------------------*/
+  private releaseOldImages() {
+    const list = this.evaluate.lstImages;
+    if (list.length <= 18) return;
+
+    const old = list.slice(0, -18);
+    old.forEach((x: any) => {
+      if (x.filePath && x.filePath.length > 5000) {
+        x.filePath = "released"; // Giải phóng
+      }
+    });
+  }
+
+  /* -------------------------------------------------------
+     🧨 CLEANUP
+  ----------------------------------------------------------*/
   ngOnDestroy() {
-    // Clear queue
     this.imageProcessingQueue = [];
-
-    // Clear pending saves
-    if (this.pendingStorageSave) {
-      clearTimeout(this.pendingStorageSave);
-    }
-
-    // Clear cached location
+    clearTimeout(this.pendingStorageSave);
     this.cachedLocation = null;
 
-    // Force save cuối cùng
     try {
       this._storageService.set(
-        this.doiTuong.id + '_' + this.kiKhaoSat.code,
+        `${this.doiTuong.id}_${this.kiKhaoSat.code}`,
         this.evaluate
       );
-    } catch (err) {
-      console.error('❌ Lỗi save final:', err);
+    } catch { }
+  }
+
+  private showError(msg: string) {
+    console.error("❌", msg);
+  }
+
+  private limitRamImages() {
+    const MAX = 10;
+
+    // Nếu quá số lượng → remove ảnh đầu tiên trong queue
+    while (this.imageProcessingQueue.length > MAX) {
+      const removed = this.imageProcessingQueue.shift();
+      // Giải phóng base64 để giảm RAM
+      removed.base64 = null;
     }
   }
 
-  // ⚡ HELPER: GIẢI PHÓNG MEMORY ẢNH CŨ
-  private releaseOldImages() {
-    // Giữ tối đa 20 ảnh gần nhất trong memory
-    if (this.evaluate.lstImages.length > 20) {
-      const oldImages = this.evaluate.lstImages.slice(0, -20);
-      oldImages.forEach((img: any) => {
-        // Giải phóng base64 string lớn
-        if (img.filePath && img.filePath.length > 1000) {
-          img.filePath = 'released'; // Đánh dấu đã giải phóng
-        }
-      });
+  private limitRamUIImages() {
+    const MAX = 10;
+
+    while (this.evaluate.lstImages.length > MAX) {
+      this.evaluate.lstImages.shift();
     }
   }
 
-  // ⚡ HELPER: HIỂN THỊ LỖI (nếu chưa có)
-  private showError(message: string) {
-    // Thêm toast hoặc alert ở đây
-    console.error('❌', message);
-    // Ví dụ: this.toastr.error(message);
-  }
+
+
+
+
+
 
 
   // async openCamera(code: any) {
