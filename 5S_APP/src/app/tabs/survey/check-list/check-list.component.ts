@@ -170,6 +170,9 @@ export class CheckListComponent implements OnInit {
     await this._storageService.remove(
       this.doiTuong.id + '_' + this.kiKhaoSat.code
     );
+    this._storageService.remove(
+      'allImages_' + this.doiTuong.id + '_' + this.kiKhaoSat.code
+    ) 
     localStorage.removeItem(this.doiTuong.id + '_' + this.kiKhaoSat.code);
     this.lstHisEvaluate.shift();
   }

@@ -18,11 +18,11 @@
   </ion-toolbar>
 </ion-header>
 
-<div *ngIf="isSearchVisible" class="search" >
-  <ion-input class="input"  label="Tìm kiếm" fill="outline" placeholder="Nhập từ tìm kiếm" [(ngModel)]="searchKeyword"
+<div *ngIf="isSearchVisible" class="search">
+  <ion-input class="input" label="Tìm kiếm" fill="outline" placeholder="Nhập từ tìm kiếm" [(ngModel)]="searchKeyword"
     (ionInput)="onSearchChange()"></ion-input>
   <div class="result-search" *ngIf="searchKeyword.trim() !== ''">
-    <span >{{ currentIndex + 1 }} of {{ searchResults.length }}</span>
+    <span>{{ currentIndex + 1 }} of {{ searchResults.length }}</span>
     <div class="btn-group">
       <ion-button (click)="goPrev()" [disabled]="currentIndex === 0">
         <ion-icon style="color: #000" name="arrow-up-outline"></ion-icon></ion-button>
@@ -57,7 +57,7 @@
             <ng-template #Child>
               <div class="ion-padding" slot="content">
                 <p style="color: red; margin: 0">
-                  <ion-radio-group [value]="filterDiem(node.code)" (ionChange)="setDiem(node, $event)">
+                  <ion-radio-group [(ngModel)]="node.pointId" (ionChange)="setDiem(node, $event)">
                     <ng-container *ngFor="let diem of node.diemTieuChi; trackBy: trackByKey">
                       <ion-item>
                         <ion-label style="pointer-events: none">{{
@@ -67,7 +67,8 @@
                       </ion-item>
                     </ng-container>
                   </ion-radio-group>
-                  <ion-item lines="none" class="custom-input-box" >
+
+                  <ion-item lines="none" class="custom-input-box">
                     <ng-container *ngFor="
                         let i of evaluate?.lstEvaluate;
                         trackBy: trackByKey
@@ -95,7 +96,6 @@
 
                 <div *ngIf="node.isImg" style="margin-top: 10px">
                   <label style="color: #ffc409">{{ node.report }}</label>
-                  <!-- <label style="color: #ffc409">[Chú ý: Tối thiểu {{ node.numberImg }} ảnh]</label> -->
                   <p *ngIf="hasEnoughImages(node.code, node)" style="color: #c5000f">
                     (*) Tiêu chí này bắt buộc chọn {{ node.numberImg }} hình ảnh
                   </p>
@@ -146,7 +146,8 @@
                         </div>
 
                         <!-- Nút xóa -->
-                        <ion-button fill="clear" class="delete-btn-file"  *ngIf="isEdit" size="small" (click)="deleteImage2(doc)">
+                        <ion-button fill="clear" class="delete-btn-file" *ngIf="isEdit" size="small"
+                          (click)="deleteImage2(doc)">
                           <ion-icon name="close-circle" slot="icon-only"></ion-icon>
                         </ion-button>
                       </ion-chip>
@@ -256,7 +257,7 @@
 
 
 <!-- View image full screen modal -->
-<ion-modal [backdropDismiss]="false" [isOpen]="isImageModalOpen" [canDismiss]="true">
+<ion-modal [backdropDismiss]="false" [isOpen]="isImageModalOpen" (ionModalDidPresent)="onModalReady()" [canDismiss]="true">
   <ng-template>
     <ion-content class="full-image-content">
       <ion-button class="btnLeft" fill="clear" color="danger" *ngIf="isEdit" (click)="confirmDeleteImage()">
