@@ -22,7 +22,6 @@ import * as L from 'leaflet';
 import { HighlightSearchPipe } from '../../../shared/pipes/highlight-search.pipe';
 import { AuthService } from 'src/app/service/auth.service';
 import mediumZoom from 'medium-zoom';
-import { warning } from 'ionicons/icons';
 
 @Component({
   imports: [SharedModule, HighlightSearchPipe],
@@ -151,6 +150,8 @@ export class EvaluateComponent implements OnInit {
           }
         } else {
           this.isEdit = false;
+          console.log("Xem");
+          
           this.getResultEvaluate();
           this.getAllAccount();
         }
@@ -540,7 +541,6 @@ export class EvaluateComponent implements OnInit {
 
     this.evaluate.lstEvaluate[idx].point = found?.diem ?? 0;
     this.evaluate.lstEvaluate[idx].pointId = selected;
-    console.log(this.evaluate);
 
     this.autoSave()
   }
@@ -566,6 +566,8 @@ export class EvaluateComponent implements OnInit {
   }
 
   autoSave() {
+    console.log('autoSave');
+    
     this._storageService.set(
       this.doiTuong.id + '_' + this.kiKhaoSat.code,
       this.evaluate
@@ -681,17 +683,15 @@ export class EvaluateComponent implements OnInit {
                   `Chấm điểm Cửa hàng thành công`,
                   'success'
                 );
-                this._storageService.remove(
-                  this.doiTuong.id + '_' + this.kiKhaoSat.code
-                );
-                this._storageService.remove(
-                  'allImages_' + this.doiTuong.id + '_' + this.kiKhaoSat.code
-                );
-                localStorage.removeItem(
+                await this._storageService.remove(
                   this.doiTuong.id + '_' + this.kiKhaoSat.code
                 );
 
-                this.router.navigate([
+                await localStorage.removeItem(
+                  this.doiTuong.id + '_' + this.kiKhaoSat.code
+                );
+
+                await this.router.navigate([
                   `/survey/check-list/${this.doiTuong.id}`,
                 ]);
               },
@@ -751,22 +751,22 @@ export class EvaluateComponent implements OnInit {
   }
 
   async getFilePath(img: any) {
-    const key = 'allImages_' + this.doiTuong.id + '_' + this.kiKhaoSat.code;
+    // const key = 'allImages_' + this.doiTuong.id + '_' + this.kiKhaoSat.code;
 
-    // Lấy full list từ storage
-    let allImg = await this._storageService.get(key) ?? [];
+    // // Lấy full list từ storage
+    // let allImg = await this._storageService.get(key) ?? [];
 
-    // Tìm ảnh theo code
-    const found = allImg.find((x: any) => x.code === img.code);
+    // // Tìm ảnh theo code
+    // const found = allImg.find((x: any) => x.code === img.code);
 
-    // Giải phóng RAM ngay lập tức
-    allImg.length = 0;
-    allImg = null;
+    // // Giải phóng RAM ngay lập tức
+    // allImg.length = 0;
+    // allImg = null;
 
-    // Nếu không có ảnh → return null
-    if (!found) return null;
+    // // Nếu không có ảnh → return null
+    // if (!found) return null;
 
-    return { ...found };
+    // return { ...found };
   }
 
   filePath(file: any) {
@@ -983,48 +983,48 @@ export class EvaluateComponent implements OnInit {
   }
 
 
-  releaseOldImages() {
-    const list = this.evaluate.lstImages;
-    if (list.length <= 18) return;
+  // releaseOldImages() {
+  //   const list = this.evaluate.lstImages;
+  //   if (list.length <= 18) return;
 
-    const old = list.slice(0, -18);
-    old.forEach((x: any) => {
-      if (x.filePath && x.filePath.length > 5000) {
-        x.filePath = "released"; // Giải phóng
-      }
-    });
-  }
-  ngOnDestroy() {
-    this.imageProcessingQueue = [];
-    clearTimeout(this.pendingStorageSave);
-    this.cachedLocation = null;
+  //   const old = list.slice(0, -18);
+  //   old.forEach((x: any) => {
+  //     if (x.filePath && x.filePath.length > 5000) {
+  //       x.filePath = "released"; // Giải phóng
+  //     }
+  //   });
+  // }
+  // ngOnDestroy() {
+  //   this.imageProcessingQueue = [];
+  //   clearTimeout(this.pendingStorageSave);
+  //   this.cachedLocation = null;
 
-    try {
-      this.autoSave()
-    } catch { }
-  }
+  //   try {
+  //     this.autoSave()
+  //   } catch { }
+  // }
 
-  private showError(msg: string) {
-    console.error("❌", msg);
-  }
+  // private showError(msg: string) {
+  //   console.error("❌", msg);
+  // }
 
   async saveAllImage(imgObj: any) {
     // console.log(imgObj);
     // this._storageService.remove(
     //   'allImages_' + this.doiTuong.id + '_' + this.kiKhaoSat.code
     // ) 
-    var allImg = await this._storageService.get(
-      'allImages_' + this.doiTuong.id + '_' + this.kiKhaoSat.code
-    ) ?? [];
+    // var allImg = await this._storageService.get(
+    //   'allImages_' + this.doiTuong.id + '_' + this.kiKhaoSat.code
+    // ) ?? [];
 
-    allImg.push(imgObj)
-    console.log(allImg);
+    // allImg.push(imgObj)
+    // console.log(allImg);
 
-    this._storageService.set(
-      'allImages_' + this.doiTuong.id + '_' + this.kiKhaoSat.code,
-      allImg
-    );
-    allImg = []
+    // this._storageService.set(
+    //   'allImages_' + this.doiTuong.id + '_' + this.kiKhaoSat.code,
+    //   allImg
+    // );
+    // allImg = []
   }
 
 
