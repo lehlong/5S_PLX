@@ -106,10 +106,10 @@
                       let img of filterImage(node)?.images;
                       trackBy: trackByKey
                     ">
-                    <ion-img *ngIf="img.type == 'img'" [src]="filePath(img.pathThumbnail)" class="image-preview"
+                    <ion-img *ngIf="img.type !== 'mp4'" [src]="filePath(img)" class="image-preview"
                       (click)="openFullScreen(img)"></ion-img>
 
-                    <video *ngIf="img.type == 'mp4'" [src]="filePath(img.filePath)" class="image-preview"
+                    <video *ngIf="img.type == 'mp4'" [src]="filePath(img)" class="image-preview"
                       (click)="openFullScreen(img)" controls style="max-width: 100%"></video>
 
                     <div style="opacity: 0.5; text-align: center; font-size: 13px">
@@ -137,7 +137,7 @@
 
                         <!-- Tên file + ngày tạo -->
                         <div class="fileName">
-                          <a [href]="filePath(doc.filePath)" target="_blank" download>
+                          <a [href]="filePath(doc)" target="_blank" download>
                             {{ doc.fileName }}
                           </a>
                           <span class="date">
@@ -257,7 +257,7 @@
 
 
 <!-- View image full screen modal -->
-<ion-modal [backdropDismiss]="false" [isOpen]="isImageModalOpen" (ionModalDidPresent)="onModalReady()" [canDismiss]="true">
+<ion-modal [backdropDismiss]="false" [isOpen]="isImageModalOpen"  [canDismiss]="true">
   <ng-template>
     <ion-content class="full-image-content">
       <ion-button class="btnLeft" fill="clear" color="danger" *ngIf="isEdit" (click)="confirmDeleteImage()">
@@ -265,7 +265,7 @@
       </ion-button>
       <ion-button class="btnRight" (click)="closeFullScreen()" fill="clear" color="dark"><ion-icon
           name="close"></ion-icon></ion-button>
-      <div *ngIf="selectedImage.type === 'img'" class="zoom-wrapper" (mousedown)="onDragStart($event)"
+      <div class="zoom-wrapper" (mousedown)="onDragStart($event)"
         (mousemove)="onDragMove($event)" (mouseup)="onDragEnd()" (mouseleave)="onDragEnd()"
         (touchstart)="onDragStart($event)" (touchmove)="onDragMove($event)" (touchend)="onDragEnd()">
         <div class="full-image-container">

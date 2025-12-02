@@ -1,11 +1,12 @@
 ﻿using Common;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PLX5S.API.AppCode.Enum;
+using PLX5S.API.AppCode.Extensions;
 using PLX5S.BUSINESS.Dtos.BU;
+using PLX5S.BUSINESS.Models;
 //using PlX5S.BUSINESS.Services.BU;
 using PLX5S.BUSINESS.Services.BU;
-using PLX5S.API.AppCode.Extensions;
-using PLX5S.BUSINESS.Models;
 using PLX5S.CORE.Entities.BU;
 
 namespace PLX5S.API.Controllers.BU
@@ -136,6 +137,45 @@ namespace PLX5S.API.Controllers.BU
             return Ok(transferObject);
         }
 
+
+        [HttpPost("InsertEvaluate2")]
+        [RequestSizeLimit(int.MaxValue)]
+        [RequestFormLimits(MultipartBodyLengthLimit = int.MaxValue)]
+        public async Task<IActionResult> InsertEvaluate2([FromBody] EvaluateModel data)
+        {
+            var transferObject = new TransferObject();
+            await _service.InsertEvaluate2(data);
+            if (_service.Status)
+            {
+                transferObject.Status = true;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
+
+        [HttpPost("UploadFile")]
+        public async Task<IActionResult> UploadFile(IFormFile file)
+        {
+            var transferObject = new TransferObject();
+            var data = await _service.UploadFile(file);
+            if (_service.Status)
+            {
+                transferObject.Data = data;
+                transferObject.Status = true;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
 
 
         [HttpGet("GetResultEvaluate")]

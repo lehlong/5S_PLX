@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Common;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
@@ -11,6 +12,8 @@ using PLX5S.BUSINESS.Dtos.BU;
 using PLX5S.BUSINESS.Models;
 using PLX5S.CORE;
 using PLX5S.CORE.Entities.BU;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -27,7 +30,9 @@ namespace PLX5S.BUSINESS.Services.BU
         Task<TieuChiDto> BuildDataTreeForApp(string kiKhaoSatId, string storeId);
         Task<List<TieuChiDto>> GetAllTieuChiLeaves(string kiKhaoSatId, string doiTuongId);
         Task<EvaluateModel> BuildInputEvaluate(string kiKhaoSatId, string doiTuongId, string deviceId);
-        Task InsertEvaluate(EvaluateModel data);
+        Task<object> UploadFile(IFormFile request);
+        Task InsertEvaluate(EvaluateModel data); 
+        Task InsertEvaluate2(EvaluateModel data);
         Task<TblBuEvaluateImage> HandelFile(TblBuEvaluateImage request);
         Task<EvaluateModel> GetResultEvaluate(string code);
         Task TinhTongLanCham(TblBuPoint point);
@@ -242,6 +247,7 @@ namespace PLX5S.BUSINESS.Services.BU
         }
 
 
+
         public async Task<TblBuEvaluateImage> HandelFile(TblBuEvaluateImage request)
         {
             if (string.IsNullOrEmpty(request.FilePath))
@@ -309,6 +315,101 @@ namespace PLX5S.BUSINESS.Services.BU
             }
         }
 
+        public async Task<object> UploadFile(IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                    return null;
+
+                string extension = Path.GetExtension(file.FileName);
+                string folder = GetFolderByExtension(extension);
+
+                // Tạo tên file
+                string newFileName = $"{Guid.NewGuid()}{extension}";
+                string thumbFileName = $"{Guid.NewGuid()}_thumb{extension}";
+
+                // Đường dẫn vật lý
+                string fullFolderPath = Path.Combine(folder.Replace("/", "\\"));
+
+                if (!Directory.Exists(fullFolderPath))
+                    Directory.CreateDirectory(fullFolderPath);
+
+                // Đường dẫn file gốc
+                string filePath = Path.Combine(fullFolderPath, newFileName);
+
+                // Ghi file gốc
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                string thumbPath = null;
+
+                // === TẠO THUMBNAIL nếu là file ảnh ===
+                if (folder.Contains("Images"))
+                {
+                    try
+                    {
+                        thumbPath = Path.Combine(fullFolderPath, thumbFileName);
+
+                        using (var img = await SixLabors.ImageSharp.Image.LoadAsync(file.OpenReadStream()))
+                        {
+                            img.Mutate(x => x
+                                .Resize(new SixLabors.ImageSharp.Processing.ResizeOptions
+                                {
+                                    Size = new SixLabors.ImageSharp.Size(100, 100),
+                                    Mode = SixLabors.ImageSharp.Processing.ResizeMode.Crop
+                                })
+                            );
+
+                            await img.SaveAsync(thumbPath);
+                        }
+                    }
+                    catch { }
+                }
+
+                // Trả về URL public
+                //string baseUrl = $"{Request.Scheme}://{Request.Host}/";
+
+                return new TblBuEvaluateImage {
+                    Code = Guid.NewGuid().ToString(),
+                    FilePath = $"{folder}/{newFileName}",
+                    FileName = newFileName,
+                    NameThumbnail = thumbFileName,
+                    PathThumbnail = thumbPath != null ? $"{folder}/{thumbFileName}" : null,
+                    Type = extension,
+                    KinhDo = 0,
+                    ViDo = 0
+                };
+            }
+            catch (Exception ex)
+            {
+                this.Status = false;
+                return null;
+            }
+        }
+        private string GetFolderByExtension(string extension)
+        {
+            extension = extension.ToLower();
+
+            if (new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp" }.Contains(extension))
+                return "Uploads/Images";
+
+            if (new[] { ".doc", ".docx" }.Contains(extension))
+                return "Uploads/Word";
+
+            if (new[] { ".xls", ".xlsx" }.Contains(extension))
+                return "Uploads/Excel";
+
+            if (extension == ".pdf")
+                return "Uploads/Pdf";
+
+            if (new[] { ".mp4", ".mov", ".avi", ".mkv" }.Contains(extension))
+                return "Uploads/Videos";
+
+            return "Uploads/Others";
+        }
         public byte[] GenerateThumbnailBytes(byte[] originalBytes, int maxWidth, int maxHeight)
         {
             using (var inputStream = new MemoryStream(originalBytes))
@@ -379,16 +480,16 @@ namespace PLX5S.BUSINESS.Services.BU
             return null; // không hỗ trợ
         }
 
-        private string GetFolderByExtension(string ext)
-        {
-            if (ext.StartsWith(".jpg") || ext.StartsWith(".png") || ext.StartsWith(".webp"))
-                return "Uploads/Images";
+        //private string GetFolderByExtension(string ext)
+        //{
+        //    if (ext.StartsWith(".jpg") || ext.StartsWith(".png") || ext.StartsWith(".webp"))
+        //        return "Uploads/Images";
 
-            if (ext.StartsWith(".mp4") || ext.StartsWith(".webm"))
-                return "Uploads/Videos";
+        //    if (ext.StartsWith(".mp4") || ext.StartsWith(".webm"))
+        //        return "Uploads/Videos";
 
-            return "Uploads/Files"; // mặc định cho .docx, .xlsx, .pdf, ...
-        }
+        //    return "Uploads/Files"; // mặc định cho .docx, .xlsx, .pdf, ...
+        //}
 
 
         public async Task TinhTongLanCham(TblBuPoint point)
@@ -490,6 +591,78 @@ namespace PLX5S.BUSINESS.Services.BU
             }
         }
 
+
+
+        public async Task InsertEvaluate2(EvaluateModel data)
+        {
+            try
+            {
+                var dateNow = DateTime.Now;
+                if (_dbContext.TblBuKiKhaoSat.Any(x => x.Id == data.Header.KiKhaoSatId && x.EndDate <= dateNow))
+                {
+                    this.Status = false;
+                    return;
+                }
+                ;
+
+                var lstImage = new List<TblBuEvaluateImage>();
+
+                var lstHeader = _dbContext.TblBuEvaluateHeader.Where(x =>
+                                    x.KiKhaoSatId == data.Header.KiKhaoSatId &&
+                                    x.DoiTuongId == data.Header.DoiTuongId &&
+                                    x.IsActive == true).ToList();
+                var header = lstHeader.OrderByDescending(x => x.Order).FirstOrDefault();
+
+
+                bool dot1 = lstHeader.Any(x =>
+                    x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 1) &&
+                    x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 7));
+
+                bool dot2 = lstHeader.Any(x =>
+                    x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 8) &&
+                    x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 15));
+
+                bool dot3 = lstHeader.Any(x =>
+                    x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 16) &&
+                    x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 23));
+
+                if (data.Header.ChucVuId == "CHT" || data.Header.ChucVuId == "TK")
+                {
+                    if (((dateNow.Day >= 08 && dateNow.Day <= 15) || (dateNow.Day >= 16 && dateNow.Day <= 23)) && !dot1)
+                    {
+                        data.Header.IsActive = false;
+                    }
+                    else if ((!dot1 && !dot3) && (dateNow.Day > 23))
+                    {
+                        data.Header.IsActive = false;
+                    }
+                }
+                else if (data.Header.ChucVuId == "ATVSV" && dateNow.Day >= 16 && !dot2)
+                {
+                    data.Header.IsActive = false;
+                }
+
+                data.Header.Name = "Lần chấm thứ " + (header != null ? header.Order + 1 : 1).ToString();
+                data.Header.Order = header != null ? header.Order + 1 : 1;
+                data.Header.UpdateDate = DateTime.Now;
+
+
+                _dbContext.TblBuEvaluateHeader.Add(data.Header);
+
+                _dbContext.TblBuEvaluateImage.AddRange(data.LstImages);
+                _dbContext.TblBuEvaluateValue.AddRange(data.LstEvaluate);
+
+                await _dbContext.SaveChangesAsync();
+                this.Status = true;
+            }
+            catch (Exception ex)
+            {
+                this.Status = false;
+            }
+        }
+
+
+
         public async Task HandlePointStore(EvaluateFilter param)
         {
             try
@@ -512,7 +685,6 @@ namespace PLX5S.BUSINESS.Services.BU
                 {
                     foreach (var item in lstUser)
                     {
-
                         if (item.ChucVuId == "CHT" || item.ChucVuId == "TK")
                         {
                             bool dot1 = lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList().Any(x =>
