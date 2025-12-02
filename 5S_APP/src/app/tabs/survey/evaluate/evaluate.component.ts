@@ -22,7 +22,6 @@ import * as L from 'leaflet';
 import { HighlightSearchPipe } from '../../../shared/pipes/highlight-search.pipe';
 import { AuthService } from 'src/app/service/auth.service';
 import mediumZoom from 'medium-zoom';
-import { Filesystem, FilesystemDirectory, FilesystemEncoding } from '@capacitor/filesystem';
 
 @Component({
   imports: [SharedModule, HighlightSearchPipe],
@@ -108,7 +107,6 @@ export class EvaluateComponent implements OnInit {
     const api = localStorage.getItem('CapacitorStorage.apiUrl') ?? '';
     this.apiFile = api.replace(/\/api$/, '/');
 
-    // CapacitorStorage.apiUrl
     this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
     this.route.paramMap.subscribe({
       next: async (params) => {
@@ -121,7 +119,6 @@ export class EvaluateComponent implements OnInit {
 
         setTimeout(async () => {
           if (this.evaluate != null) {
-            // console.log(this.evaluate);
 
             let data = localStorage.getItem(
               this.doiTuong.id + '_' + this.kiKhaoSat.code
@@ -165,7 +162,8 @@ export class EvaluateComponent implements OnInit {
   }
 
 
-  //Hàm search
+  /////////Hàm search
+
   openSearchInput() {
     this.isSearchVisible = !this.isSearchVisible;
   }
@@ -586,7 +584,10 @@ export class EvaluateComponent implements OnInit {
       // Trường hợp đủ
       this.evaluate.header.accountUserName = this.account.userName;
       this.evaluate.header.chucVuId = this.account.chucVuId;
-      console.log(this.kiKhaoSat);
+
+      this.evaluate.lstImages = await this._storageService.get('allImages_' + this.doiTuong.id + '_' + this.kiKhaoSat.code)
+
+      console.log(this.evaluate);
 
       await this._service.insertEvaluate(this.evaluate).subscribe({
         next: async (data) => {
@@ -611,6 +612,9 @@ export class EvaluateComponent implements OnInit {
                 );
                 this._storageService.remove(
                   this.doiTuong.id + '_' + this.kiKhaoSat.code
+                );
+                this._storageService.remove(
+                  'allImages_' + this.doiTuong.id + '_' + this.kiKhaoSat.code
                 );
                 localStorage.removeItem(
                   this.doiTuong.id + '_' + this.kiKhaoSat.code
@@ -651,6 +655,7 @@ export class EvaluateComponent implements OnInit {
 
 
   //////// Views ảnh
+
   async openFullScreen(img: any) {
     this.selectedImage = await this.getFilePath(img);
     if (this.isEdit == false) {
@@ -669,17 +674,25 @@ export class EvaluateComponent implements OnInit {
     setTimeout(() => {
       this.initMap();
     }, 10);
-  }
+  } 
+  
   async getFilePath(img: any) {
+    const key = 'allImages_' + this.doiTuong.id + '_' + this.kiKhaoSat.code;
 
-    var allImg = await this._storageService.get(
-      'allImages_' + this.doiTuong.id + '_' + this.kiKhaoSat.code
-    ) ?? [];
-    console.log(allImg);
+    // Lấy full list từ storage
+    let allImg = await this._storageService.get(key) ?? [];
 
-    console.log(allImg.find((x: any) => x.code === img.code));
+    // Tìm ảnh theo code
+    const found = allImg.find((x: any) => x.code === img.code);
 
-    return allImg.find((x: any) => x.code === img.code);
+    // Giải phóng RAM ngay lập tức
+    allImg.length = 0;   
+    allImg = null;     
+
+    // Nếu không có ảnh → return null
+    if (!found) return null;
+
+    return { ...found };
   }
 
   filePath(filePath: string) {
@@ -770,27 +783,19 @@ export class EvaluateComponent implements OnInit {
         type: "img",
         isProcessing: true
       };
+      this.updateLocationAsync(imgObj);
 
-      // 🔹 Lưu vào storage
       await this.saveAllImage(imgObj);
 
-      // 🔹 tạo thumbnail ngay lập tức
       imgObj.pathThumbnail = await this.makeThumb(photo.base64String);
 
-      // 🔹 Giải phóng RAM: chỉ giữ thumbnail, loại bỏ filePath nếu muốn
       imgObj.filePath = '';
 
-      // 🔹 Giới hạn RAM cho UI
-      // this.limitRamUIImages();
       this.evaluate.lstImages.push(imgObj);
-
-      // 🔹 Cập nhật vị trí
-      this.updateLocationAsync(imgObj);
 
       this.autoSave()
 
       this.cdr.detectChanges();
-
     } catch (err) {
       console.error("❌ openCamera", err);
       this.showError("Không thể chụp ảnh");
@@ -823,7 +828,6 @@ export class EvaluateComponent implements OnInit {
 
   private async updateLocationAsync(obj: any) {
     try {
-      // Cache 30s
       if (this.cachedLocation && Date.now() - this.cachedLocation.t < 30000) {
         obj.viDo = this.cachedLocation.lat;
         obj.kinhDo = this.cachedLocation.lng;
@@ -845,6 +849,7 @@ export class EvaluateComponent implements OnInit {
         t: Date.now()
       };
     } catch {
+
     }
   }
 
@@ -874,26 +879,6 @@ export class EvaluateComponent implements OnInit {
     console.error("❌", msg);
   }
 
-  private limitRamImages() {
-    const MAX = 10;
-
-    // Nếu quá số lượng → remove ảnh đầu tiên trong queue
-    while (this.imageProcessingQueue.length > MAX) {
-      const removed = this.imageProcessingQueue.shift();
-      // Giải phóng base64 để giảm RAM
-      removed.base64 = null;
-    }
-  }
-
-  private limitRamUIImages() {
-    const MAX = 10;
-
-    while (this.evaluate.lstImages.length > MAX) {
-      this.evaluate.lstImages.shift();
-    }
-  }
-
-
   async saveAllImage(imgObj: any) {
     // console.log(imgObj);
     // this._storageService.remove(
@@ -902,10 +887,10 @@ export class EvaluateComponent implements OnInit {
     var allImg = await this._storageService.get(
       'allImages_' + this.doiTuong.id + '_' + this.kiKhaoSat.code
     ) ?? [];
-    console.log(allImg);
-
+    
     allImg.push(imgObj)
-
+    console.log(allImg);
+    
     this._storageService.set(
       'allImages_' + this.doiTuong.id + '_' + this.kiKhaoSat.code,
       allImg
@@ -915,215 +900,8 @@ export class EvaluateComponent implements OnInit {
 
 
   imageProcessingQueue: any[] = [];
-  // private isProcessingQueue = false;
   private pendingStorageSave: any;
   private cachedLocation: any = null;
-
-  // async openCamera(code: any) {
-  //   if (!this.isEdit) return;
-
-  //   try {
-  //     const photo = await Camera.getPhoto({
-  //       quality: 65,
-  //       resultType: CameraResultType.Base64,
-  //       source: CameraSource.Camera,
-  //       correctOrientation: false,
-  //       saveToGallery: false,
-  //     });
-
-  //     if (!photo.base64String) throw new Error("No base64 data");
-
-  //     const imgObj = {
-  //       code: `-${Date.now()}`,
-  //       fileName: "",
-  //       evaluateHeaderCode: this.headerId,
-  //       filePath: `data:image/jpeg;base64,${photo.base64String}`,
-  //       pathThumbnail: '',
-  //       tieuChiCode: code,
-  //       viDo: 0,
-  //       kinhDo: 0,
-  //       type: "img",
-  //       isProcessing: true
-  //     };
-  //      this.evaluate.lstImages.push(imgObj);
-
-  //     // 🔥 Giới hạn RAM cho UI (chỉ giữ 10 ảnh)
-  //     this.limitRamUIImages();
-
-  //     this.cdr.detectChanges();
-  //     this.addToQueue(imgObj, photo.base64String);
-  //     this.updateLocationAsync(imgObj);
-
-  //   } catch (err) {
-  //     console.error("❌ openCamera", err);
-  //     this.showError("Không thể chụp ảnh");
-  //   }
-  // }
-
-  // private addToQueue(imageObj: any, base64: string) {
-  //   this.imageProcessingQueue.push({ imageObj, base64 });
-
-  //   // 🔥 Giới hạn RAM ngay sau khi push
-  //   this.limitRamImages();
-
-  //   if (!this.isProcessingQueue) {
-  //     this.processQueue();
-  //   }
-  // }
-
-
-  // private async processQueue() {
-  //   if (this.imageProcessingQueue.length === 0) {
-  //     this.isProcessingQueue = false;
-  //     return;
-  //   }
-
-  //   this.isProcessingQueue = true;
-
-  //   // Lấy batch 3 ảnh
-  //   const batch = this.imageProcessingQueue.splice(0, 3);
-
-  //   try {
-  //     await Promise.all(
-  //       batch.map(i => this.processImage(i.imageObj, i.base64))
-  //     );
-  //   } catch (err) {
-  //     console.warn("Batch error:", err);
-  //   }
-
-  //   // Debounce lưu storage
-  //   this.debounceStorage();
-
-  //   // Xử lý batch tiếp theo
-  //   setTimeout(() => this.processQueue(), 80);
-  // }
-
-  // private async processImage(imgObj: any, base64: string) {
-  //   try {
-  //     const sizeKB = base64.length * 0.75 / 1024;
-
-  //     if (sizeKB < 500) {
-  //       imgObj.pathThumbnail = await this.makeThumb(base64);
-  //     } else {
-  //       imgObj.pathThumbnail = "assets/img/image-placeholder.png";
-  //     }
-
-  //     // Giải phóng RAM: thu gọn filePath khi thumbnail đã sẵn sàng
-  //     imgObj.filePath = `data:image/jpeg;base64,${base64}`;
-  //     imgObj.isProcessing = false;
-
-  //     this.cdr.detectChanges();
-  //   } catch (e) {
-  //     imgObj.pathThumbnail = "assets/img/error-thumb.png";
-  //     imgObj.isProcessing = false;
-  //   }
-  // }
-
-  // private makeThumb(base64: string): Promise<string> {
-  //   return new Promise(resolve => {
-  //     const img = new Image();
-
-  //     img.onload = () => {
-  //       const canvas = document.createElement("canvas");
-  //       canvas.width = 50;
-  //       canvas.height = 50;
-
-  //       const ctx = canvas.getContext("2d");
-  //       if (!ctx) return resolve("assets/img/error-thumb.png");
-
-  //       ctx.imageSmoothingEnabled = false;
-  //       ctx.drawImage(img, 0, 0, 50, 50);
-
-  //       resolve(canvas.toDataURL("image/jpeg", 0.3));
-  //     };
-
-  //     img.onerror = () => resolve("assets/img/error-thumb.png");
-  //     img.src = `data:image/jpeg;base64,${base64}`;
-  //   });
-  // }
-
-  // private async updateLocationAsync(obj: any) {
-  //   try {
-  //     // Cache 30s
-  //     if (this.cachedLocation && Date.now() - this.cachedLocation.t < 30000) {
-  //       obj.viDo = this.cachedLocation.lat;
-  //       obj.kinhDo = this.cachedLocation.lng;
-  //       return;
-  //     }
-
-  //     const pos = await Geolocation.getCurrentPosition({
-  //       enableHighAccuracy: false,
-  //       timeout: 1500,
-  //       maximumAge: 30000,
-  //     });
-
-  //     obj.viDo = pos.coords.latitude;
-  //     obj.kinhDo = pos.coords.longitude;
-
-  //     this.cachedLocation = {
-  //       lat: pos.coords.latitude,
-  //       lng: pos.coords.longitude,
-  //       t: Date.now()
-  //     };
-  //   } catch {
-  //   }
-  // }
-
-  // private debounceStorage() {
-  //   clearTimeout(this.pendingStorageSave);
-
-  //   this.pendingStorageSave = setTimeout(() => {
-  //     try {
-  //       this.autoSave()
-  //     } catch (e) {
-  //     }
-  //   }, 1200);
-  // }
-
-  // releaseOldImages() {
-  //   const list = this.evaluate.lstImages;
-  //   if (list.length <= 18) return;
-
-  //   const old = list.slice(0, -18);
-  //   old.forEach((x: any) => {
-  //     if (x.filePath && x.filePath.length > 5000) {
-  //       x.filePath = "released"; // Giải phóng
-  //     }
-  //   });
-  // }
-  // ngOnDestroy() {
-  //   this.imageProcessingQueue = [];
-  //   clearTimeout(this.pendingStorageSave);
-  //   this.cachedLocation = null;
-
-  //   try {
-  //     this.autoSave()
-  //   } catch { }
-  // }
-
-  // private showError(msg: string) {
-  //   console.error("❌", msg);
-  // }
-
-  // private limitRamImages() {
-  //   const MAX = 10;
-
-  //   // Nếu quá số lượng → remove ảnh đầu tiên trong queue
-  //   while (this.imageProcessingQueue.length > MAX) {
-  //     const removed = this.imageProcessingQueue.shift();
-  //     // Giải phóng base64 để giảm RAM
-  //     removed.base64 = null;
-  //   }
-  // }
-
-  // private limitRamUIImages() {
-  //   const MAX = 10;
-
-  //   while (this.evaluate.lstImages.length > MAX) {
-  //     this.evaluate.lstImages.shift();
-  //   }
-  // }
-
 
 
   ////////////////////Zoom
@@ -1246,8 +1024,6 @@ export class EvaluateComponent implements OnInit {
   }
 
 
-
-
   // search
 
   getAllAccount() {
@@ -1326,8 +1102,6 @@ export class EvaluateComponent implements OnInit {
   }
 
   //////////
-
-
 
   openMenu() {
     if (this.lstTieuChi.length == 0) {
