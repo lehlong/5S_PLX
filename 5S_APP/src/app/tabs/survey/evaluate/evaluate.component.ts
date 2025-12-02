@@ -781,7 +781,7 @@ export class EvaluateComponent implements OnInit {
       imgObj.filePath = '';
 
       // 🔹 Giới hạn RAM cho UI
-      this.limitRamUIImages();
+      // this.limitRamUIImages();
       this.evaluate.lstImages.push(imgObj);
 
       // 🔹 Cập nhật vị trí
