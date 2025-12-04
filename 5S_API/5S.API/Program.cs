@@ -1,237 +1,4 @@
-﻿//using Microsoft.AspNetCore.Authentication.JwtBearer;
-//using Microsoft.AspNetCore.Http.Features;
-//using Microsoft.IdentityModel.Tokens;
-//using PLX5S.BUSINESS;
-//using System.Text;
-//using Microsoft.OpenApi.Any;
-//using Microsoft.OpenApi.Models;
-//using PLX5S.API.AppCode.Extensions;
-//using NLog;
-//using NLog.Extensions.Logging;
-//using PLX5S.API.Middleware;
-//using PLX5S.BUSINESS.Models;
-//using Hangfire;
-//using Hangfire.Oracle.Core;
-//using PLX5S.BUSINESS.Services.AD;
-//using PLX5S.BUSINESS.Services.HUB;
-//using PLX5S.API.AppCode.Util;
-//using PLX5S.CORE;
-//using Common;
-//using Microsoft.Extensions.FileProviders;
-//using PLX5S.BUSINESS.Services.BackgroundHangfire;
-//using PLX5S.BUSINESS.Services.BU;
-
-//var config = new ConfigurationBuilder()
-//                .SetBasePath(Directory.GetCurrentDirectory())
-//                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-//                .AddJsonFile($"appsettings.json", optional: true)
-//                .AddEnvironmentVariables().Build();
-//var logger = LogManager.Setup()
-//                       .LoadConfiguration(new NLogLoggingConfiguration(config.GetSection("NLog")))
-//                       .GetCurrentClassLogger();
-
-
-//var builder = WebApplication.CreateBuilder(args);
-////builder.Services.AddHangfire(configuration =>
-////            configuration.UseStorage(new OracleStorage(config.GetConnectionString("Connection"), new OracleStorageOptions())));
-
-//// Thêm dịch vụ Hangfire
-////builder.Services.AddHangfireServer();
-
-//// Cấu hình Hangfire với SQL Server (hoặc bất kỳ backend nào khác bạn đang sử dụng)
-//builder.Services.AddHangfire(config =>
-//{
-//    config.UseSqlServerStorage(builder.Configuration.GetConnectionString("HangfireConnection"));
-//});
-
-//// Thêm Hangfire server để chạy các công việc nền
-//builder.Services.AddHangfireServer();
-//builder.Services.AddSingleton<IRecurringJobManager, RecurringJobManager>();
-
-
-
-
-//builder.Services.AddControllers();
-//builder.Services.AddDIServices(builder.Configuration);
-
-//builder.Services.Configure<FirebaseSettings>(builder.Configuration.GetSection("Firebase"));
-////builder.Services.AddDIXHTDServices(builder.Configuration);
-//builder.Services.AddHttpContextAccessor();
-//builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddMvc();
-//builder.Services.AddSwaggerGen(options =>
-//{
-//    options.SwaggerDoc("V1", new OpenApiInfo
-//    {
-//        Version = "V1",
-//        Title = "WebAPI",
-//        Description = "<a href='/log' target = '_blank'>Bấm vào đây để xem log file</a>",
-//    });
-//    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-//    {
-//        Scheme = "Bearer",
-//        BearerFormat = "JWT",
-//        In = ParameterLocation.Header,
-//        Name = "Authorization",
-//        Description = "Bearer Authentication with JWT Token",
-//        Type = SecuritySchemeType.Http
-//    });
-//    options.AddSecurityRequirement(new OpenApiSecurityRequirement {
-//        {
-//            new OpenApiSecurityScheme {
-//                Reference = new OpenApiReference {
-//                    Id = "Bearer",
-//                        Type = ReferenceType.SecurityScheme
-//                }
-//            },
-//            new List < string > ()
-//        }
-//    });
-//    options.MapType<TimeSpan>(() => new OpenApiSchema
-//    {
-//        Type = "string",
-//        Example = new OpenApiString("00:00:00")
-//    });
-//});
-
-//builder.Services.AddAuthentication(opt =>
-//{
-//    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//    opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//}).AddJwtBearer(options =>
-//{
-//    options.TokenValidationParameters = new TokenValidationParameters
-//    {
-//        ValidateIssuer = true,
-//        ValidateAudience = true,
-//        ValidateLifetime = true,
-//        ValidateIssuerSigningKey = true,
-//        ValidIssuer = config.GetSection("JWT:Issuer").Value,
-//        ValidAudience = config.GetSection("JWT:Audience").Value,
-//        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.GetSection("JWT:Key").Value)),
-//        ClockSkew = TimeSpan.Zero
-//    };
-//});
-
-//builder.Services.Configure<FormOptions>(o =>
-//{
-//    o.ValueLengthLimit = int.MaxValue;
-//    o.MultipartBodyLengthLimit = int.MaxValue;
-//    o.MemoryBufferThreshold = int.MaxValue;
-//});
-
-//builder.Services.AddSignalR(options =>
-//{
-//    options.EnableDetailedErrors = true;
-//});
-
-//builder.Services.AddMemoryCache();
-
-////builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
-////        builder =>
-////        {
-////            builder.AllowAnyHeader()
-////                    .AllowAnyMethod()
-////                    .AllowCredentials()
-////                    .SetIsOriginAllowed((host) => true);
-////        }));
-//builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
-//        builder =>
-//        {
-//            builder.WithOrigins("*")
-//           .AllowAnyMethod()
-//           .AllowAnyHeader();
-//        }));
-
-//var app = builder.Build();
-
-////if (!app.Environment.IsDevelopment())
-////{
-////    //app.UseHangfireDashboard();
-////   // using var scope = app.Services.CreateScope();
-////   // using var server = new BackgroundJobServer();
-////   // await scope.ServiceProvider.GetRequiredService<ISystemTraceService>().StartService();
-////   // var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-////   // var lstMessage = dbContext.TblAdMessage.ToList();
-////    foreach (var message in lstMessage)
-////    {
-////        MessageUtil.AddToCache(new MessageObject()
-////        {
-////            Code = message.Code,
-////            Language = message.Lang,
-////            Message = message.Value
-////        });
-////    }
-////}
-
-//// Configure the HTTP request pipeline.
-////if (app.Environment.IsDevelopment())
-////{
-////    app.UseSwagger();
-////    app.UseSwaggerUI(options =>
-////    {
-////        options.SwaggerEndpoint("/swagger/V1/swagger.json", "PROJECT WebAPI");
-////    });
-////}
-
-//app.UseHangfireDashboard("/hangfire");
-//app.UseSwagger();
-//app.UseSwaggerUI(options =>
-//{
-//    options.SwaggerEndpoint("/swagger/V1/swagger.json", "PROJECT WebAPI");
-//});
-
-//TransferObjectExtension.SetHttpContextAccessor(app.Services.GetRequiredService<IHttpContextAccessor>());
-//app.EnableRequestBodyRewind();
-
-////app.UseHttpsRedirection();
-
-
-//app.UseRouting();
-//app.UseCors("CorsPolicy");
-
-//app.UseAuthentication();
-
-//app.UseAuthorization();
-
-
-
-//using var scope = app.Services.CreateScope();
-//using var server = new BackgroundJobServer();
-//await scope.ServiceProvider.GetRequiredService<ISystemTraceService>().StartService();
-//var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-//var kikhaosatService = scope.ServiceProvider.GetRequiredService<IKikhaosatService>();
-
-//var backgroundJobService = new BackgroundJobService(dbContext, kikhaosatService);
-//var recurringJobManager = app.Services.GetRequiredService<IRecurringJobManager>();
-//recurringJobManager.AddOrUpdate("AutoCreate", () => backgroundJobService.AutoCreateKy(), "0 0 */1 27 * *");
-//recurringJobManager.AddOrUpdate("AutoStart", () => backgroundJobService.AutoStartKy(), "0 0 */1 28 * *");
-//recurringJobManager.AddOrUpdate("AutoClose", () => backgroundJobService.AutoCloseKy(), "0 0 */1 1 * *");
-////recurringJobManager.AddOrUpdate("AutoCreate", () => backgroundJobService.AutoCreateKy(), "*/59 * * * * *");
-
-
-//app.UseMiddleware<ActionLoggingMiddleware>();
-//app.MapHub<SystemTraceServiceHub>("/SystemTrace");
-//app.MapHub<RefreshServiceHub>("/Refresh");
-
-//app.UseStaticFiles(new StaticFileOptions
-//{
-//    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads")),
-//    RequestPath = "/Uploads"
-//});
-
-//app.MapControllers();
-//app.Run();
-
-
-
-
-//----------------------------------------
-
-
-
-
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.IdentityModel.Tokens;
 using PLX5S.BUSINESS;
@@ -265,6 +32,11 @@ var logger = LogManager.Setup()
 
 
 var builder = WebApplication.CreateBuilder(args);
+//builder.Services.AddHangfire(configuration =>
+//            configuration.UseStorage(new OracleStorage(config.GetConnectionString("Connection"), new OracleStorageOptions())));
+
+// Thêm dịch vụ Hangfire
+//builder.Services.AddHangfireServer();
 
 // Cấu hình Hangfire với SQL Server (hoặc bất kỳ backend nào khác bạn đang sử dụng)
 builder.Services.AddHangfire(config =>
@@ -278,21 +50,12 @@ builder.Services.AddSingleton<IRecurringJobManager, RecurringJobManager>();
 
 
 
-builder.WebHost.ConfigureKestrel(options =>
-{
-    var port = Convert.ToInt32(config.GetSection("PortPublish").Value);
-    options.ListenAnyIP(port);
-});
 
 builder.Services.AddControllers();
-
-builder.Services.AddSpaStaticFiles(configuration =>
-{
-    configuration.RootPath = "wwwroot";
-});
-
 builder.Services.AddDIServices(builder.Configuration);
+
 builder.Services.Configure<FirebaseSettings>(builder.Configuration.GetSection("Firebase"));
+//builder.Services.AddDIXHTDServices(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddMvc();
@@ -363,18 +126,53 @@ builder.Services.AddSignalR(options =>
 });
 
 builder.Services.AddMemoryCache();
+
+//builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
+//        builder =>
+//        {
+//            builder.AllowAnyHeader()
+//                    .AllowAnyMethod()
+//                    .AllowCredentials()
+//                    .SetIsOriginAllowed((host) => true);
+//        }));
 builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
-    policy =>
-    {
-        policy.SetIsOriginAllowed(_ => true)
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials()
-            .WithExposedHeaders("Accept-Ranges", "Content-Range", "Content-Length", "Content-Disposition");
-    }));
+        builder =>
+        {
+            builder.WithOrigins("*")
+           .AllowAnyMethod()
+           .AllowAnyHeader();
+        }));
 
 var app = builder.Build();
 
+//if (!app.Environment.IsDevelopment())
+//{
+//    //app.UseHangfireDashboard();
+//   // using var scope = app.Services.CreateScope();
+//   // using var server = new BackgroundJobServer();
+//   // await scope.ServiceProvider.GetRequiredService<ISystemTraceService>().StartService();
+//   // var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+//   // var lstMessage = dbContext.TblAdMessage.ToList();
+//    foreach (var message in lstMessage)
+//    {
+//        MessageUtil.AddToCache(new MessageObject()
+//        {
+//            Code = message.Code,
+//            Language = message.Lang,
+//            Message = message.Value
+//        });
+//    }
+//}
+
+// Configure the HTTP request pipeline.
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI(options =>
+//    {
+//        options.SwaggerEndpoint("/swagger/V1/swagger.json", "PROJECT WebAPI");
+//    });
+//}
 
 app.UseHangfireDashboard("/hangfire");
 app.UseSwagger();
@@ -423,35 +221,249 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.MapControllers();
-
-
-app.MapWhen(context => context.Request.Path.StartsWithSegments("/admin"), adminApp =>
-{
-    adminApp.UseStaticFiles(new StaticFileOptions
-    {
-        FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "admin")),
-        RequestPath = "/admin"
-    });
-
-    adminApp.UseSpa(spa =>
-    {
-        spa.Options.SourcePath = "wwwroot/admin";
-        spa.Options.DefaultPageStaticFileOptions = new StaticFileOptions
-        {
-            FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "admin")),
-            OnPrepareResponse = ctx =>
-            {
-                ctx.Context.Response.Headers.Append("Cache-Control", "no-cache, no-store");
-                ctx.Context.Response.Headers.Append("Expires", "-1");
-            }
-        };
-    });
-});
-
-app.UseSpa(spa =>
-{
-    spa.Options.SourcePath = "wwwroot";
-});
-
-
 app.Run();
+
+
+
+
+
+// CẤU HÌNH SERVER PRODUCT PLXNA --------------------------------------------
+
+
+
+
+//using Microsoft.AspNetCore.Authentication.JwtBearer;
+//using Microsoft.AspNetCore.Http.Features;
+//using Microsoft.IdentityModel.Tokens;
+//using Microsoft.OpenApi.Any;
+//using Microsoft.OpenApi.Models;
+//using Microsoft.Extensions.FileProviders;
+//using NLog;
+//using NLog.Extensions.Logging;
+//using PLX5S.API.AppCode.Extensions;
+//using PLX5S.API.Middleware;
+//using PLX5S.BUSINESS;
+//using PLX5S.BUSINESS.Models;
+//using PLX5S.BUSINESS.Services.AD;
+//using PLX5S.BUSINESS.Services.HUB;
+//using PLX5S.BUSINESS.Services.BackgroundHangfire;
+//using PLX5S.BUSINESS.Services.BU;
+//using PLX5S.CORE;
+//using Common;
+//using Hangfire;
+//using Hangfire.Oracle.Core;
+//using System.Text;
+
+//var config = new ConfigurationBuilder()
+//    .SetBasePath(Directory.GetCurrentDirectory())
+//    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+//    .AddEnvironmentVariables()
+//    .Build();
+
+//var logger = LogManager.Setup()
+//    .LoadConfiguration(new NLogLoggingConfiguration(config.GetSection("NLog")))
+//    .GetCurrentClassLogger();
+
+//var builder = WebApplication.CreateBuilder(args);
+
+//// -------------------- Hangfire --------------------
+//builder.Services.AddHangfire(cfg =>
+//{
+//    cfg.UseSqlServerStorage(builder.Configuration.GetConnectionString("HangfireConnection"));
+//});
+//builder.Services.AddHangfireServer();
+//builder.Services.AddSingleton<IRecurringJobManager, RecurringJobManager>();
+
+//// -------------------- Kestrel --------------------
+//builder.WebHost.ConfigureKestrel(options =>
+//{
+//    var port = Convert.ToInt32(config.GetSection("PortPublish").Value);
+//    options.ListenAnyIP(port);
+
+
+//    options.Limits.MaxRequestBodySize = int.MaxValue; // Bắt buộc!!
+//});
+
+//// -------------------- Services --------------------
+//builder.Services.AddControllers();
+//builder.Services.AddSpaStaticFiles(configuration =>
+//{
+//    configuration.RootPath = "wwwroot"; // Angular build copy vào đây
+//});
+
+//builder.Services.AddDIServices(builder.Configuration);
+//builder.Services.Configure<FirebaseSettings>(builder.Configuration.GetSection("Firebase"));
+//builder.Services.AddHttpContextAccessor();
+//builder.Services.AddEndpointsApiExplorer();
+//builder.Services.AddMvc();
+
+//// -------------------- Swagger --------------------
+//builder.Services.AddSwaggerGen(options =>
+//{
+//    options.SwaggerDoc("V1", new OpenApiInfo
+//    {
+//        Version = "V1",
+//        Title = "WebAPI",
+//        Description = "<a href='/log' target = '_blank'>Bấm vào đây để xem log file</a>"
+//    });
+
+//    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+//    {
+//        Scheme = "Bearer",
+//        BearerFormat = "JWT",
+//        In = ParameterLocation.Header,
+//        Name = "Authorization",
+//        Description = "Bearer Authentication with JWT Token",
+//        Type = SecuritySchemeType.Http
+//    });
+
+//    options.AddSecurityRequirement(new OpenApiSecurityRequirement {
+//        {
+//            new OpenApiSecurityScheme {
+//                Reference = new OpenApiReference {
+//                    Id = "Bearer",
+//                    Type = ReferenceType.SecurityScheme
+//                }
+//            },
+//            new List<string>()
+//        }
+//    });
+
+//    options.MapType<TimeSpan>(() => new OpenApiSchema
+//    {
+//        Type = "string",
+//        Example = new OpenApiString("00:00:00")
+//    });
+//});
+
+//// -------------------- Auth --------------------
+//builder.Services.AddAuthentication(opt =>
+//{
+//    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+//    opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+//}).AddJwtBearer(options =>
+//{
+//    options.TokenValidationParameters = new TokenValidationParameters
+//    {
+//        ValidateIssuer = true,
+//        ValidateAudience = true,
+//        ValidateLifetime = true,
+//        ValidateIssuerSigningKey = true,
+//        ValidIssuer = config.GetSection("JWT:Issuer").Value,
+//        ValidAudience = config.GetSection("JWT:Audience").Value,
+//        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.GetSection("JWT:Key").Value)),
+//        ClockSkew = TimeSpan.Zero
+//    };
+//});
+
+//// -------------------- Form Options --------------------
+//builder.Services.Configure<FormOptions>(o =>
+//{
+//    o.ValueLengthLimit = int.MaxValue;
+//    o.MultipartBodyLengthLimit = int.MaxValue;
+//    o.MemoryBufferThreshold = int.MaxValue;
+//});
+
+//// Thêm dòng này sau builder.Services.Configure<FormOptions>
+//builder.Services.Configure<IISServerOptions>(options =>
+//{
+//    options.MaxRequestBodySize = int.MaxValue;
+//});
+
+
+//// -------------------- SignalR --------------------
+//builder.Services.AddSignalR(options =>
+//{
+//    options.EnableDetailedErrors = true;
+//});
+
+//// -------------------- CORS --------------------
+//builder.Services.AddMemoryCache();
+//builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
+//    policy =>
+//    {
+//        policy.SetIsOriginAllowed(_ => true)
+//            .AllowAnyMethod()
+//            .AllowAnyHeader()
+//            .AllowCredentials()
+//            .WithExposedHeaders("Accept-Ranges", "Content-Range", "Content-Length", "Content-Disposition");
+//    }));
+
+//// -------------------- Build app --------------------
+//var app = builder.Build();
+
+//// -------------------- Middleware --------------------
+//app.UseHangfireDashboard("/hangfire");
+
+//app.UseSwagger();
+//app.UseSwaggerUI(options =>
+//{
+//    options.SwaggerEndpoint("/swagger/V1/swagger.json", "PROJECT WebAPI");
+//});
+
+//TransferObjectExtension.SetHttpContextAccessor(app.Services.GetRequiredService<IHttpContextAccessor>());
+//app.EnableRequestBodyRewind();
+
+//app.UseRouting();
+//app.UseCors("CorsPolicy");
+//app.UseAuthentication();
+//app.UseAuthorization();
+
+//// -------------------- Static files --------------------
+//// Angular & các file build nằm trong wwwroot
+//app.UseStaticFiles();
+//app.UseSpaStaticFiles();
+
+//// Thư mục Uploads riêng
+//app.UseStaticFiles(new StaticFileOptions
+//{
+//    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads")),
+//    RequestPath = "/Uploads"
+//});
+
+//// -------------------- API + Hub --------------------
+//app.MapControllers();
+//app.MapHub<SystemTraceServiceHub>("/SystemTrace");
+//app.MapHub<RefreshServiceHub>("/Refresh");
+
+//// -------------------- Background Jobs --------------------
+//using (var scope = app.Services.CreateScope())
+//{
+//    using var server = new BackgroundJobServer();
+//    await scope.ServiceProvider.GetRequiredService<ISystemTraceService>().StartService();
+//    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+//    var kikhaosatService = scope.ServiceProvider.GetRequiredService<IKikhaosatService>();
+//    var backgroundJobService = new BackgroundJobService(dbContext, kikhaosatService);
+//    var recurringJobManager = app.Services.GetRequiredService<IRecurringJobManager>();
+
+//    recurringJobManager.AddOrUpdate("AutoCreate",
+//        () => backgroundJobService.AutoCreateKy(),
+//        "0 */15 * 27 * *");
+//    recurringJobManager.AddOrUpdate("AutoStart",
+//        () => backgroundJobService.AutoStartKy(),
+//        "0 */15 * 28,29,30,31 * *");
+
+//    recurringJobManager.AddOrUpdate("AutoClose",
+//        () => backgroundJobService.AutoCloseKy(),
+//        "0 */15 * 1 * *");
+//}
+
+//// -------------------- Logging Middleware --------------------
+//app.UseMiddleware<ActionLoggingMiddleware>();
+
+//// -------------------- Fallback về Angular --------------------
+//app.UseSpa(spa =>
+//{
+//    spa.Options.SourcePath = "wwwroot"; // Angular build copy vào đây
+//    spa.Options.DefaultPageStaticFileOptions = new StaticFileOptions
+//    {
+//        FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
+//        OnPrepareResponse = ctx =>
+//        {
+//            ctx.Context.Response.Headers.Append("Cache-Control", "no-cache, no-store");
+//            ctx.Context.Response.Headers.Append("Expires", "-1");
+//        }
+//    };
+//});
+
+//app.Run();
