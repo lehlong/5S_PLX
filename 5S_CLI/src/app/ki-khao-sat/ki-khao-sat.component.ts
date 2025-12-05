@@ -168,7 +168,6 @@ export class KiKhaoSatComponent {
         })
       }
     });
-
   }
 
   onUpdateKiKhaoSat() {
@@ -307,9 +306,7 @@ export class KiKhaoSatComponent {
     this._treeTieuChiService.GetTreeLeaves(this.treeId, this.kiKhaoSatId).subscribe({
       next: (data) => {
         console.log(data.result);
-
         this.selectedNodeDetails = data.result;
-
       },
       error: (response) => {
         console.log(response);
@@ -712,45 +709,46 @@ export class KiKhaoSatComponent {
   onAllCheckedObject(checked: boolean) {
     this.checkedAllObject = checked;
     this.inputKi.lstInputStore.forEach((store: any) => {
-      const idx = this.lstCheckedObject.findIndex(
-        (i: any) => i.storeId === store.id && i.tieuChiCode === this.leavesNode.code
-      );
 
-      if (idx !== -1) {
-        this.lstCheckedObject[idx].isDeleted = !checked && this.lstCheckedObject[idx].code !== '-1';
-        if (!checked && this.lstCheckedObject[idx].code === '-1') this.lstCheckedObject.splice(idx, 1);
-      } else if (checked) {
-        this.lstCheckedObject.push({
-          code: "-1",
-          doiTuongId: store.id,
-          tieuChiCode: this.leavesNode.code,
-          isDeleted: false
-        });
+      var check = this.lstCheckedObject.find((i: any) => store.id == i.doiTuongId && i.tieuChiCode == this.leavesNode.code)
+      
+      if (check) {
+        if (check.code != '-1') {
+          check.isDeleted = !this.checkedAllObject
+        } else {
+          this.lstCheckedObject = this.lstCheckedObject.filter((x: any) => x !== check)
+        }
+      } else {
+        if (checked)
+          this.lstCheckedObject.push({
+            code: "-1",
+            doiTuongId: store.id,
+            tieuChiCode: this.leavesNode.code,
+            isDeleted: false
+          })
       }
     });
     console.log(this.lstCheckedObject);
   }
 
   onItemCheckedObject(store: any, checked: boolean) {
-    const idx = this.lstCheckedObject.findIndex(
-      (i: any) => i.storeId === store.id && i.tieuChiCode === this.leavesNode.code
-    );
+    var check = this.lstCheckedObject.find((i: any) => store.id == i.doiTuongId && i.tieuChiCode == this.leavesNode.code)
 
-    if (idx !== -1) {
-      if (checked) this.lstCheckedObject[idx].isDeleted = false;
-      else this.lstCheckedObject[idx].code !== '-1'
-        ? this.lstCheckedObject[idx].isDeleted = true
-        : this.lstCheckedObject.splice(idx, 1);
-    } else if (checked) {
-      this.lstCheckedObject.push({
-        code: "-1",
-        doiTuongId: store.id,
-        tieuChiCode: this.leavesNode.code,
-        isDeleted: false
-      });
+    if (check) {
+      if (check.code != '-1') {
+        check.isDeleted = !checked
+      } else {
+        this.lstCheckedObject = this.lstCheckedObject.filter((x: any) => x !== check)
+      }
+    } else {
+      if (checked)
+        this.lstCheckedObject.push({
+          code: "-1",
+          doiTuongId: store.id,
+          tieuChiCode: this.leavesNode.code,
+          isDeleted: false
+        })
     }
-    console.log(this.lstCheckedObject);
-
   }
 
   isCheckedObject = (id: string) =>

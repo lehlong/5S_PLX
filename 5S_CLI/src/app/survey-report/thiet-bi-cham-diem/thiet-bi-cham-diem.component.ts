@@ -238,13 +238,13 @@ export class ThietBiChamDiemComponent {
   }
 
   searchKiKhaoSat() {
-    console.log(this.survey.id);
     this.lstKiKhaoSat = this.lstAllKiKhaoSat.filter(
       (x: any) => x.surveyMgmtId == this.survey.id
     );
     this.kiKhaosatId = this.lstKiKhaoSat.reduce((a: any, b: any) =>
       new Date(a.endDate) > new Date(b.endDate) ? a.id : b.id
     );
+    this.searchDoiTuong()
   }
   searchDoiTuong() {
     this._kiKhaoSatService.getInputKiKhaoSat(this.kiKhaosatId).subscribe({
@@ -315,31 +315,32 @@ export class ThietBiChamDiemComponent {
     });
   }
 
- exportExcel() {
-  console.log(this.survey.doiTuongId, this.kiKhaosatId, this.doiTuongId);
-  if( !this.survey.doiTuongId && !this.kiKhaosatId ) {
-        this.message.error('Vui lòng chọn đầy đủ thông tin trước khi xuất file');
-        return;
+  exportExcel() {
+    console.log(this.survey.doiTuongId, this.kiKhaosatId, this.doiTuongId);
+    if (!this.survey.doiTuongId && !this.kiKhaosatId) {
+      this.message.error('Vui lòng chọn đầy đủ thông tin trước khi xuất file');
+      return;
 
-  }else{
+    } else {
       this._appReportService.ExportExcel("ChamTheoThietBi", { surveyId: this.survey.doiTuongId, kiKhaoSatId: this.kiKhaosatId, doiTuongId: this.doiTuongId })
-      .subscribe({
-        next: (data) => {
-          console.log(data);
-          if (data) {
-            const downloadUrl = `${environment.urlFiles}${data}`; // hoặc cấu hình phù hợp với backend của bạn
-            const a = document.createElement('a');
-            a.href = downloadUrl;
-            // a.download = `ChamTheoThietBi${this.survey.name}_${this.kiKhaosatId}.xlsx`;
-            a.target = '_blank'; // mở tab mới (tùy chọn)
-            a.click();
-             this.message.success('Xuất file thành công');
-          } else {
-            this.message.error('Không có dữ liệu để xuất');
+        .subscribe({
+          next: (data) => {
+            console.log(data);
+            if (data) {
+              const downloadUrl = `${environment.urlFiles}${data}`; // hoặc cấu hình phù hợp với backend của bạn
+              const a = document.createElement('a');
+              a.href = downloadUrl;
+              // a.download = `ChamTheoThietBi${this.survey.name}_${this.kiKhaosatId}.xlsx`;
+              a.target = '_blank'; // mở tab mới (tùy chọn)
+              a.click();
+              this.message.success('Xuất file thành công');
+            } else {
+              this.message.error('Không có dữ liệu để xuất');
+            }
           }
-        }
-    })}
+        })
     }
+  }
   getRange(n: number): number[] {
     return Array.from({ length: n > 0 ? n : 1 }, (_, i) => i);
   }

@@ -103,7 +103,7 @@ namespace PLX5S.BUSINESS.Services.BU
                             Length = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Length ?? 0,
                             point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
                         };
-
+                        
                         result.Add(report);
                     }
 
@@ -139,7 +139,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         {
                             stt = item.StoreId,
                             Name = item.Name,
-                            Cht = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "CHT").Select((x, index) => "L" + (index + 1) + " " + x.UpdateDate).ToList(),
+                            Cht = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "CHT").Select((x, index) => "L" + (index + 1) + " " + x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
                             Atvsv = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV").Select((x, index) => "L" + (index + 1) + " " + x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
                             ChuyenGia = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT").Select((x, index) => "L" + (index + 1) + "  " + x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
                             Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
@@ -162,7 +162,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         {
                             stt = item.WareHouseId,
                             Name = item.Name,
-                            Cht = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "CHT").Select((x, index) => "L" + (index + 1) + " " + x.UpdateDate).ToList(),
+                            Cht = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "CHT").Select((x, index) => "L" + (index + 1) + " " + x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
                             Atvsv = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV").Select((x, index) => "L" + (index + 1) + " " + x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
                             ChuyenGia = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT").Select((x, index) => "L" + (index + 1) + "  " + x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
                             Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,

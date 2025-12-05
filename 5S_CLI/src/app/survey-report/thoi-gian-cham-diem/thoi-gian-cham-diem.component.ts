@@ -236,13 +236,13 @@ export class ThoiGianChamDiemComponent {
 
   //update
   searchKiKhaoSat() {
-    console.log(this.survey.id);
     this.lstKiKhaoSat = this.lstAllKiKhaoSat.filter(
       (x: any) => x.surveyMgmtId == this.survey.id
     );
     this.kiKhaosatId = this.lstKiKhaoSat.reduce((a: any, b: any) =>
       new Date(a.endDate) > new Date(b.endDate) ? a.id : b.id
     );
+    this.searchDoiTuong()
   }
   searchDoiTuong() {
     this._kiKhaoSatService.getInputKiKhaoSat(this.kiKhaosatId).subscribe({

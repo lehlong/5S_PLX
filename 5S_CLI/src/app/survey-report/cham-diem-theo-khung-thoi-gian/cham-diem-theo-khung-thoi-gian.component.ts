@@ -86,7 +86,6 @@ export class ChamDiemTheoKhungThoiGianComponent {
   searchDoiTuong() {
     this._kiKhaoSatService.getInputKiKhaoSat(this.kiKhaosatId).subscribe({
       next: (data) => {
-        console.log(data);
         if (data.lstInputStore?.length != 0) {
           this.lstDoiTuong = data.lstInputStore
         } else {
@@ -100,11 +99,11 @@ export class ChamDiemTheoKhungThoiGianComponent {
   }
 
   searchKiKhaoSat() {
-    console.log(this.survey.id);
     this.lstKiKhaoSat = this.lstAllKiKhaoSat.filter((x: any) => x.surveyMgmtId == this.survey.id)
     this.kiKhaosatId = this.lstKiKhaoSat.reduce((a: any, b: any) =>
       new Date(a.endDate) > new Date(b.endDate) ? a.id : b.id
     )
+    this.searchDoiTuong()
   }
 
   close() {

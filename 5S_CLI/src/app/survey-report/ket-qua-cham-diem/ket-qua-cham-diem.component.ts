@@ -89,8 +89,6 @@ export class KetQuaChamDiemComponent {
   searchDoiTuong() {
     this._kiKhaoSatService.getInputKiKhaoSat(this.kiKhaosatId).subscribe({
       next: (data) => {
-        console.log(data);
-
         if (data.lstInputStore?.length != 0) {
           this.lstDoiTuong = data.lstInputStore
         } else {
@@ -104,11 +102,12 @@ export class KetQuaChamDiemComponent {
   }
 
   searchKiKhaoSat() {
-    console.log(this.survey.id);
     this.lstKiKhaoSat = this.lstAllKiKhaoSat.filter((x: any) => x.surveyMgmtId == this.survey.id)
     this.kiKhaosatId = this.lstKiKhaoSat.reduce((a: any, b: any) =>
       new Date(a.endDate) > new Date(b.endDate) ? a.id : b.id
     )
+    this.searchDoiTuong()
+
   }
 
   close() {
@@ -121,22 +120,23 @@ export class KetQuaChamDiemComponent {
 
   exportExcel() {
     this._appReportService.ExportExcel("KetQuaChamDiem", { surveyId: this.survey.doiTuongId, kiKhaoSatId: this.kiKhaosatId, doiTuongId: this.doiTuongId })
-    .subscribe({
-      next: (data) => {
-        console.log(data);
-        if (data) {
-          const downloadUrl = `${environment.urlFiles}${data}`; // hoặc cấu hình phù hợp với backend của bạn
-          const a = document.createElement('a');
-          a.href = downloadUrl;
-          // a.download = `KetQuaChamDiem_${this.survey.name}_${this.kiKhaosatId}.xlsx`;
-          a.target = '_blank'; // mở tab mới (tùy chọn)
-          a.click();
-           this.message.success('Xuất dữ liệu thành công');
-        } else {
-          this.message.error('Không có dữ liệu để xuất');
+      .subscribe({
+        next: (data) => {
+          console.log(data);
+          if (data) {
+            const downloadUrl = `${environment.urlFiles}${data}`; // hoặc cấu hình phù hợp với backend của bạn
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            // a.download = `KetQuaChamDiem_${this.survey.name}_${this.kiKhaosatId}.xlsx`;
+            a.target = '_blank'; // mở tab mới (tùy chọn)
+            a.click();
+            this.message.success('Xuất dữ liệu thành công');
+          } else {
+            this.message.error('Không có dữ liệu để xuất');
+          }
         }
-      }
-  })}
+      })
+  }
 
   resetForm() {
   }
