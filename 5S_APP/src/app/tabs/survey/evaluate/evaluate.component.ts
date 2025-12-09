@@ -391,7 +391,7 @@ export class EvaluateComponent implements OnInit {
   }
 
   autoSave() {
-    console.log('autoSave');
+    console.log('autoSave', this.evaluate);
 
     this._storageService.set(
       this.doiTuong.id + '_' + this.kiKhaoSat.code,
@@ -572,7 +572,7 @@ export class EvaluateComponent implements OnInit {
     if (this.isEdit && file?.isBase64) {
       const fileUri = await Filesystem.getUri({
         directory: Directory.Data,
-        path: file.filePath
+        path: file.thumbPath
       });
 
       return Capacitor.convertFileSrc(fileUri.uri);
@@ -680,82 +680,86 @@ export class EvaluateComponent implements OnInit {
   }
 
   ////////// Camera chụp ảnh
-
-
   async openCamera(code: any) {
     try {
-      // Chụp ảnh
       const photo = await Camera.getPhoto({
         quality: 65,
-        resultType: CameraResultType.Uri || CameraResultType.Base64,  // Dùng Uri để lấy file gốc
+        resultType: CameraResultType.Uri,
         source: CameraSource.Camera,
         correctOrientation: true,
       });
 
-      if (!photo || !photo.webPath) throw new Error("Không có ảnh");
+      if (!photo?.webPath) throw new Error("Không có ảnh");
 
-      // Chuyển ảnh sang file Blob
-      const response = await fetch(photo.webPath!);
-      const blob = await response.blob();
+      const blob = await (await fetch(photo.webPath)).blob();
 
-      // Tạo FormData để upload
-      const formData = new FormData();
-      formData.append('file', blob, 'image.jpg');
+      if (navigator.onLine) {
+        // ======= CÓ MẠNG → upload =======
+        console.log("Có mạng → Upload server");
 
-      this._service.uploadFile(formData).subscribe({
-        next: (resp: any) => {
-          resp.evaluateHeaderCode = this.headerId
-          resp.tieuChiCode = code
-          resp.isBase64 = false
+        const formData = new FormData();
+        formData.append('file', blob, 'image.jpg');
 
-          this.updateLocationAsync(resp);
+        this._service.uploadFile(formData).subscribe({
+          next: (resp: any) => {
+            resp.evaluateHeaderCode = this.headerId;
+            resp.tieuChiCode = code;
+            resp.isBase64 = false;
 
-          this.evaluate.lstImages.push(resp)
-          this.autoSave()
+            this.updateLocationAsync(resp);
 
-          this.cdr.detectChanges();
-        },
-        error: async (err) => {
-          this.messageService.show("Đường truyền mạng không ổn định!!!", "warning")
+            this.evaluate.lstImages.push(resp);
+            this.autoSave();
+            this.cdr.detectChanges();
+          },
+          error: async () => {
+            console.warn("Upload lỗi → Lưu offline");
+            await this.saveFileToFilesystem(blob, code);
+          }
+        });
 
-          // Lưu ảnh vào Filesystem
-          const savedFile = await this.saveFileToFilesystem(blob, code);
+      } else {
+        // ======= KHÔNG MẠNG → lưu offline =======
+        console.log("Không có mạng → Lưu offline");
+        await this.saveFileToFilesystem(blob, code);
+      }
 
-          console.log("Ảnh đã lưu:", savedFile);
-        }
-      })
     } catch (err) {
-      console.error('Lỗi khi chụp hoặc upload', err);
+      console.error("Lỗi openCamera:", err);
     }
   }
 
   async saveFileToFilesystem(blob: Blob, tieuChiCode: string) {
     const folder = `${this.doiTuong.id}_${this.kiKhaoSat.code}`;
 
-    const ext = this.getFileExtension(blob);  // <--- ĐÚNG ĐUÔI FILE
-    const fileName = `${Date.now()}.${ext}`;
-    const thumbName = `thumb_${Date.now()}.${ext}`;
-
+    // Lấy đuôi file chính xác
+    const ext = this.getFileExtension(blob);
     const fileType = this.getFileType(blob);
 
-    // Convert file -> base64
+    const timestamp = Date.now();
+    const fileName = `${timestamp}.${ext}`;
+    const thumbName = `thumb_${timestamp}.${ext}`;
+
+    // Convert blob → base64
     const base64 = await this.blobToBase64(blob);
 
-    // Tạo thumbnail (chỉ áp dụng cho ảnh)
+    // Tạo thumbnail nếu là ảnh
     let thumbBase64 = "";
     if (fileType === "img") {
-      thumbBase64 = await this.createThumbnail(blob);  // <--- THUMB 100x100
+      thumbBase64 = await this.createThumbnail(blob, 100, 100);
     }
 
+    // Lấy tọa độ
     const location = await this.getLocation();
-    // Lưu file gốc
+
+    // Tạo folder và lưu file gốc
     const result = await Filesystem.writeFile({
       path: `images/${folder}/${fileName}`,
       data: base64,
       directory: Directory.Data
     });
 
-    // Lưu thumbnail
+    // Lưu thumbnail (nếu có)
     if (thumbBase64) {
       await Filesystem.writeFile({
         path: `images/${folder}/${thumbName}`,
@@ -763,9 +767,10 @@ export class EvaluateComponent implements OnInit {
         directory: Directory.Data
       });
     }
+
     const resp = {
       uri: result.uri,
-      code: Date.now(),
+      code: timestamp,
       evaluateHeaderCode: this.headerId,
       tieuChiCode: tieuChiCode,
       fileName: fileName,
@@ -775,17 +780,35 @@ export class EvaluateComponent implements OnInit {
       type: ext,
       viDo: location.lat,
       kinhDo: location.lng,
+      isBase64: true,
       isActive: null,
-      isDeleted: null,
-      isBase64: true
-    }
-    this.evaluate.lstImages.push(resp)
-    this.autoSave()
+      isDeleted: null
+    };
 
+    this.evaluate.lstImages.push(resp);
+    this.autoSave();
     this.cdr.detectChanges();
 
     return resp;
   }
+  async createThumbnail(blob: Blob, maxWidth = 100, maxHeight = 100): Promise<string> {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = maxWidth;
+        canvas.height = maxHeight;
+
+        const ctx = canvas.getContext("2d");
+        ctx!.drawImage(img, 0, 0, maxWidth, maxHeight);
+
+        resolve(canvas.toDataURL("image/jpeg", 0.7));
+      };
+
+      img.src = URL.createObjectURL(blob);
+    });
+  }
+
 
   getFileType(blob: Blob): "img" | "video" | "pdf" | "doc" | "excel" | "other" {
     const type = blob.type;
@@ -799,45 +822,36 @@ export class EvaluateComponent implements OnInit {
     return "other";
   }
 
-  async createThumbnail(blob: Blob): Promise<string> {
-    return new Promise((resolve) => {
-      const img = new Image();
-      const url = URL.createObjectURL(blob);
 
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = 100;
-        canvas.height = 100;
+  // getFileExtension(blob: Blob): string {
+  //   const mime = blob.type;
 
-        const ctx = canvas.getContext("2d")!;
+  //   if (mime.includes("jpeg")) return "jpg";
+  //   if (mime.includes("png")) return "png";
+  //   if (mime.includes("mp4")) return "mp4";
+  //   if (mime.includes("pdf")) return "pdf";
+  //   if (mime.includes("msword")) return "doc";
+  //   if (mime.includes("spreadsheet") || mime.includes("excel")) return "xlsx";
 
-        const { width, height } = img;
+  //   return mime.split("/")[1];
+  // }
+  // async getLocation() {
+  //   try {
+  //     const pos = await Geolocation.getCurrentPosition({
+  //       enableHighAccuracy: false,
+  //       timeout: 2000,
+  //       maximumAge: 60000
+  //     });
 
-        // Tính crop từ giữa ảnh
-        const minSide = Math.min(width, height);
-        const startX = (width - minSide) / 2;
-        const startY = (height - minSide) / 2;
-
-        // Vẽ crop -> scale về 100x100
-        ctx.drawImage(
-          img,
-          startX,
-          startY,
-          minSide,
-          minSide,
-          0,
-          0,
-          100,
-          100
-        );
-
-        resolve(canvas.toDataURL("image/jpeg", 0.8));
-        URL.revokeObjectURL(url);
-      };
-
-      img.src = url;
-    });
-  }
+  //     return {
+  //       lat: pos.coords.latitude,
+  //       lng: pos.coords.longitude
+  //     };
+  //   }
+  //   catch {
+  //     return { lat: null, lng: null };
+  //   }
+  // }
 
   blobToBase64(blob: Blob): Promise<string> {
     return new Promise((resolve, reject) => {
