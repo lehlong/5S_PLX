@@ -483,8 +483,6 @@ export class EvaluateComponent implements OnInit {
       this.evaluate.header.accountUserName = this.account.userName;
       this.evaluate.header.chucVuId = this.account.chucVuId;
 
-      // this.evaluate.lstImages = await this._storageService.get('allImages_' + this.doiTuong.id + '_' + this.kiKhaoSat.code)
-
       console.log(this.evaluate);
 
       await this._service.insertEvaluate2(this.evaluate).subscribe({
@@ -577,8 +575,9 @@ export class EvaluateComponent implements OnInit {
 
       return Capacitor.convertFileSrc(fileUri.uri);
     }
-
-    return this.apiFile + file.filePath;
+    return ''
+    // console.log(this.apiFile + file.pathThumbnail);
+    // return this.apiFile + file.pathThumbnail;
   }
 
 
@@ -692,37 +691,38 @@ export class EvaluateComponent implements OnInit {
       if (!photo?.webPath) throw new Error("Không có ảnh");
 
       const blob = await (await fetch(photo.webPath)).blob();
-
-      if (navigator.onLine) {
-        // ======= CÓ MẠNG → upload =======
-        console.log("Có mạng → Upload server");
-
-        const formData = new FormData();
-        formData.append('file', blob, 'image.jpg');
-
-        this._service.uploadFile(formData).subscribe({
-          next: (resp: any) => {
-            resp.evaluateHeaderCode = this.headerId;
-            resp.tieuChiCode = code;
-            resp.isBase64 = false;
-
-            this.updateLocationAsync(resp);
-
-            this.evaluate.lstImages.push(resp);
-            this.autoSave();
-            this.cdr.detectChanges();
-          },
-          error: async () => {
-            console.warn("Upload lỗi → Lưu offline");
-            await this.saveFileToFilesystem(blob, code);
-          }
-        });
-
-      } else {
-        // ======= KHÔNG MẠNG → lưu offline =======
-        console.log("Không có mạng → Lưu offline");
         await this.saveFileToFilesystem(blob, code);
-      }
+
+      // if (navigator.onLine) {
+      //   // ======= CÓ MẠNG → upload =======
+      //   console.log("Có mạng → Upload server");
+
+      //   const formData = new FormData();
+      //   formData.append('file', blob, 'image.jpg');
+
+      //   this._service.uploadFile(formData).subscribe({
+      //     next: (resp: any) => {
+      //       resp.evaluateHeaderCode = this.headerId;
+      //       resp.tieuChiCode = code;
+      //       resp.isBase64 = false;
+
+      //       this.updateLocationAsync(resp);
+
+      //       this.evaluate.lstImages.push(resp);
+      //       this.autoSave();
+      //       this.cdr.detectChanges();
+      //     },
+      //     error: async () => {
+      //       console.warn("Upload lỗi → Lưu offline");
+      //       await this.saveFileToFilesystem(blob, code);
+      //     }
+      //   });
+
+      // } else {
+      //   // ======= KHÔNG MẠNG → lưu offline =======
+      //   console.log("Không có mạng → Lưu offline");
+      //   await this.saveFileToFilesystem(blob, code);
+      // }
 
     } catch (err) {
       console.error("Lỗi openCamera:", err);
@@ -775,8 +775,8 @@ export class EvaluateComponent implements OnInit {
       tieuChiCode: tieuChiCode,
       fileName: fileName,
       filePath: `images/${folder}/${fileName}`,
-      thumbFileName: thumbName,
-      thumbPath: thumbBase64 ? `images/${folder}/${thumbName}` : null,
+      nameThumbnail: thumbName,
+      pathThumbnail: thumbBase64 ? `images/${folder}/${thumbName}` : null,
       type: ext,
       viDo: location.lat,
       kinhDo: location.lng,
