@@ -80,7 +80,7 @@
 
                     <ion-buttons slot="end">
                       <input [disabled]="!isEdit" class="file" #fileInput type="file"
-                        (change)="onImageSelected($event, node.code)"
+                        (change)="onFileSelected($event, node.code)"
                         accept="image/*,video/*,.pdf,.doc,.docx,.xlsx,.txt" />
                       <ion-button fill="clear" [disabled]="!isEdit">
                         <ion-icon name="document-outline" slot="icon-only"></ion-icon>
