@@ -8,6 +8,7 @@ using PLX5S.BUSINESS.Models;
 //using PlX5S.BUSINESS.Services.BU;
 using PLX5S.BUSINESS.Services.BU;
 using PLX5S.CORE.Entities.BU;
+using System.Collections.Generic;
 
 namespace PLX5S.API.Controllers.BU
 {
@@ -177,6 +178,23 @@ namespace PLX5S.API.Controllers.BU
             return Ok(transferObject);
         }
 
+        [HttpPost("UploadFileOffline")]
+        public async Task<IActionResult> UploadFileOffline(List<IFormFile> files, List<TblBuEvaluateImage> lstFile)
+        {
+            var transferObject = new TransferObject();
+            await _service.UploadFileOffline(files, lstFile);
+            if (_service.Status)
+            {
+                transferObject.Status = true;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
 
         [HttpGet("GetResultEvaluate")]
         public async Task<IActionResult> GetResultEvaluate([FromQuery] string code)

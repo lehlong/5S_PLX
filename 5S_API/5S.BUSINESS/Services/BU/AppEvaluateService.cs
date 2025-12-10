@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using NPOI.HPSF;
 using NPOI.SS.Formula.Functions;
 using PLX5S.BUSINESS.Common;
@@ -40,6 +41,7 @@ namespace PLX5S.BUSINESS.Services.BU
         Task <List<TblBuNotification>> GetNotification();
         Task HandlePointStore(EvaluateFilter param);
         Task<HomeModel> GetDataHome(string userName);
+        Task UploadFileOffline(List<IFormFile> files, List<TblBuEvaluateImage> lstFile);
     }
 
     public class AppEvaluateService : GenericService<TblBuEvaluateHeader, EvaluateHeaderDto>, IAppEvaluateService
@@ -389,6 +391,92 @@ namespace PLX5S.BUSINESS.Services.BU
                 return null;
             }
         }
+
+
+        public async Task UploadFileOffline(List<IFormFile> files, List<TblBuEvaluateImage> lstFile)
+        {
+            try
+            {
+                var data = new List<TblBuEvaluateImage>();
+
+                foreach (var file in files)
+                {
+                    if (file == null || file.Length == 0)
+                    {
+                        continue;
+                    }
+
+                    string extension = Path.GetExtension(file.FileName);
+                    string folder = GetFolderByExtension(extension);
+
+                    // Tạo tên file
+                    string newFileName = $"{Guid.NewGuid()}{extension}";
+                    string thumbFileName = $"{Guid.NewGuid()}_thumb{extension}";
+
+                    // Đường dẫn vật lý
+                    string fullFolderPath = Path.Combine(folder.Replace("/", "\\"));
+
+                    if (!Directory.Exists(fullFolderPath))
+                        Directory.CreateDirectory(fullFolderPath);
+
+                    // Đường dẫn file gốc
+                    string filePath = Path.Combine(fullFolderPath, newFileName);
+
+                    // Ghi file gốc
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    string thumbPath = null;
+
+                    // === TẠO THUMBNAIL nếu là file ảnh ===
+                    if (folder.Contains("Images"))
+                    {
+                        try
+                        {
+                            thumbPath = Path.Combine(fullFolderPath, thumbFileName);
+
+                            using (var img = await SixLabors.ImageSharp.Image.LoadAsync(file.OpenReadStream()))
+                            {
+                                img.Mutate(x => x
+                                    .Resize(new SixLabors.ImageSharp.Processing.ResizeOptions
+                                    {
+                                        Size = new SixLabors.ImageSharp.Size(100, 100),
+                                        Mode = SixLabors.ImageSharp.Processing.ResizeMode.Crop
+                                    })
+                                );
+
+                                await img.SaveAsync(thumbPath);
+                            }
+                        }
+                        catch { }
+                    }
+
+                    var meta = lstFile.FirstOrDefault(x => x.FileName == file.FileName);
+
+                    meta.Code = Guid.NewGuid().ToString();
+                    meta.FileName = newFileName;
+                    meta.FilePath = $"{folder}/{newFileName}";
+                    meta.NameThumbnail = thumbFileName;
+                    meta.PathThumbnail = $"{folder}/{thumbFileName}";
+                    meta.Type = extension;
+
+                    data.Add(meta);
+                }
+
+                await _dbContext.TblBuEvaluateImage.AddRangeAsync(data);
+                await _dbContext.SaveChangesAsync();
+
+            }
+            catch (Exception ex)
+            {
+                this.Status = false;
+                this.Exception = ex;
+            }
+        }
+
+
         private string GetFolderByExtension(string extension)
         {
             extension = extension.ToLower();
