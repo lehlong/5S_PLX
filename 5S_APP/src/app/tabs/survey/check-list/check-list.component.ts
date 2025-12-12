@@ -6,6 +6,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AppEvaluateService } from 'src/app/service/app-evaluate.service';
 import { StorageService } from 'src/app/service/storage.service';
 import { AuthService } from 'src/app/service/auth.service';
+import { Directory, Filesystem } from '@capacitor/filesystem';
+import { FileOfflineService } from 'src/app/service/common/systemfile.service';
 
 @Component({
   selector: 'app-check-list',
@@ -34,17 +36,18 @@ export class CheckListComponent implements OnInit {
     private route: ActivatedRoute,
     private _authService: AuthService,
     private _storageService: StorageService,
-    private _service: AppEvaluateService,
+    private _service: AppEvaluateService,    
+    private _systemFileS: FileOfflineService,
+    
   ) {}
 
   ngOnInit() {
     this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
     this.route.paramMap.subscribe({
       next: async (params) => {
-        console.log(this.lstHisEvaluate);
 
         this.lstHisEvaluate = []
-        console.log(this.lstHisEvaluate);
+        // console.log(this.lstHisEvaluate);
 
         const id = params.get('id');
         const filter = JSON.parse(localStorage.getItem('filterCS') ?? '');
@@ -64,7 +67,7 @@ export class CheckListComponent implements OnInit {
           if (this.evaluate.header.kiKhaoSatId == this.kiKhaoSat.id) {
             this.lstHisEvaluate = [this.evaluate.header];
           }
-          console.log(this.lstHisEvaluate);
+          // console.log(this.lstHisEvaluate);
           
         } else {
           this.mode = 'new';
@@ -168,9 +171,7 @@ export class CheckListComponent implements OnInit {
     await this._storageService.remove(
       this.doiTuong.id + '_' + this.kiKhaoSat.code
     );
-    // await this._storageService.remove(
-    //   'allImages_' + this.doiTuong.id + '_' + this.kiKhaoSat.code
-    // ) 
+    await this._systemFileS.deleteFolder(`images/${this.doiTuong.id}_${this.kiKhaoSat.code}`)
     localStorage.removeItem(this.doiTuong.id + '_' + this.kiKhaoSat.code);
     this.lstHisEvaluate.shift();
   }

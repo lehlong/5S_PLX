@@ -9,11 +9,14 @@ const config: CapacitorConfig = {
       overlaysWebView: false,
       style: 'light'
     },
-    PushNotifications:{
+    PushNotifications: {
       presentationOptions: ['badge', 'sound', 'alert'],
     }
   },
-  server: {}
+  server: {
+    cleartext: true,
+    androidScheme: "http"
+  }
 };
 
 export default config;

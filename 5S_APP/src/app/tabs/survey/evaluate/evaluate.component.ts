@@ -24,6 +24,8 @@ import { AuthService } from 'src/app/service/auth.service';
 import mediumZoom from 'medium-zoom';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
+import { FileOfflineService } from 'src/app/service/common/systemfile.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   imports: [SharedModule, HighlightSearchPipe],
@@ -102,14 +104,15 @@ export class EvaluateComponent implements OnInit {
     private loadingController: LoadingController,
     private cdr: ChangeDetectorRef,
     private renderer: Renderer2,
+    private _systemFileS: FileOfflineService,
     private router: Router
   ) { }
 
   async ngOnInit() {
     const api = localStorage.getItem('CapacitorStorage.apiUrl') ?? '';
     this.apiFile = api.replace(/\/api$/, '/');
-
     this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
+
     this.route.paramMap.subscribe({
       next: async (params) => {
         this.headerId = params.get('code') ?? '';
@@ -146,10 +149,10 @@ export class EvaluateComponent implements OnInit {
             this.doiTuong.id + '_' + this.kiKhaoSat.code
           );
           console.log(this.evaluate);
-
           if (this.evaluate === null || this.evaluate === undefined) {
             this.router.navigate([`/survey/check-list/${this.doiTuong.id}`]);
           }
+
         } else {
           this.isEdit = false;
           console.log("Xem");
@@ -164,7 +167,6 @@ export class EvaluateComponent implements OnInit {
   ngAfterViewInit() {
     mediumZoom('.zoom-image');
   }
-
 
   /////////Hàm search
 
@@ -342,7 +344,7 @@ export class EvaluateComponent implements OnInit {
     }));
 
     const images = data.filter((x: any) =>
-      [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", "img", "mp4"].includes(x.type)
+      [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", "img", "mp4", "jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(x.type)
     )
     const documents = data.filter((x: any) =>
       ['docx', 'xlsx', 'xlsm', 'pdf'].includes(x.type)
@@ -391,16 +393,25 @@ export class EvaluateComponent implements OnInit {
   }
 
   autoSave() {
-    console.log('autoSave', this.evaluate);
-
     this._storageService.set(
       this.doiTuong.id + '_' + this.kiKhaoSat.code,
       this.evaluate
     );
   }
 
-  handleSave() {
+  async handleSave() {
+    // let checkUpload = false
+    // const offlineFiles = this.evaluate.lstImages.filter((x: any) => x?.isBase64);
+    // if (offlineFiles?.length > 0) {
+    //   checkUpload = await this.uploadOfflineFiles(offlineFiles)
+
+    //   if (!checkUpload) {
+    //     this.messageService.show('Duy trì mạng ổn định trong quá trình gửi!!!', 'warning');
+    //     return
+    //   }
+    // }
     this.tinhTong()
+    console.log('autoSave', this.evaluate);
     this.messageService.show(
       `Lưu bản nháp thành công`,
       'success'
@@ -409,7 +420,7 @@ export class EvaluateComponent implements OnInit {
 
   async onSubmit() {
     if (!this.isEdit) return;
-
+    let checkUpload: boolean = false
     let allChecksPassed = true;
     let errorMessage: string[] = [];
 
@@ -422,7 +433,6 @@ export class EvaluateComponent implements OnInit {
 
       // 1. Kiểm tra pointId
       if (!evaluateItem || !evaluateItem.pointId) {
-        // errorMessage += `- Tiêu chí "${tieuChi.name}" chưa chấm điểm. `;
         errorMessage.push(`- <b>Câu ${index + 1}</b>: chưa chấm điểm.`);
         allChecksPassed = false;
       }
@@ -443,7 +453,6 @@ export class EvaluateComponent implements OnInit {
         ).length;
 
         if (imagesSelecting < numberImgRequired) {
-          // errorMessage += `- Tiêu chí "${tieuChi.name}" thiếu ảnh. `;
           errorMessage.push(`- <b>Câu ${index + 1}</b>: thiếu ảnh.`);
           allChecksPassed = false;
         }
@@ -455,8 +464,7 @@ export class EvaluateComponent implements OnInit {
         message: `<div class="alert-header-evaluate">
           <div class="alert-icon-evaluate"><ion-icon name="warning"></ion-icon></div>
             <div class="title-evaluate">Đánh giá chưa hoàn tất</div>
-            <div class="subtitle-evaluate">Bạn đã bỏ sót <b class="highlight">${errorMessage.length
-          }</b> tiêu chí quan trọng</div>
+            <div class="subtitle-evaluate">Bạn đã bỏ sót các tiêu chí</div>
           </div>
           <div class="alert-body">
             ${errorMessage.join('<br/>')}
@@ -476,12 +484,24 @@ export class EvaluateComponent implements OnInit {
     });
     await loading.present();
 
+    const offlineFiles = this.evaluate.lstImages.filter((x: any) => x?.isBase64);
+    
+    if (offlineFiles?.length > 0) {
+      const checkUpload = await this.uploadOfflineFiles(offlineFiles);
+      if (!checkUpload) {
+        await loading.dismiss();
+        this.messageService.show('Duy trì mạng ổn định trong quá trình gửi!!!', 'warning');
+        return;
+      }
+    }
+
     try {
       this.tinhTong();
 
       // Trường hợp đủ
       this.evaluate.header.accountUserName = this.account.userName;
       this.evaluate.header.chucVuId = this.account.chucVuId;
+      this.evaluate.lstImages = this.evaluate.lstImages.filter((item: any) => item.isBase64 === undefined);
 
       console.log(this.evaluate);
 
@@ -506,17 +526,7 @@ export class EvaluateComponent implements OnInit {
                   `Chấm điểm Cửa hàng thành công`,
                   'success'
                 );
-                await this._storageService.remove(
-                  this.doiTuong.id + '_' + this.kiKhaoSat.code
-                );
-
-                await localStorage.removeItem(
-                  this.doiTuong.id + '_' + this.kiKhaoSat.code
-                );
-
-                await this.router.navigate([
-                  `/survey/check-list/${this.doiTuong.id}`,
-                ]);
+                await this.removeData()
               },
               error: async (error) => {
                 // Đóng loading khi có lỗi
@@ -541,9 +551,116 @@ export class EvaluateComponent implements OnInit {
     }
   }
 
+  async removeData() {
+    await this._storageService.remove(
+      this.doiTuong.id + '_' + this.kiKhaoSat.code
+    );
+
+    await localStorage.removeItem(
+      this.doiTuong.id + '_' + this.kiKhaoSat.code
+    );
+
+    await this._systemFileS.deleteFolder(`images/${this.doiTuong.id}_${this.kiKhaoSat.code}`)
+
+    await this.router.navigate([
+      `/survey/check-list/${this.doiTuong.id}`,
+    ]);
+  }
+
   navigateTo(itemId: string) {
     const currentUrl = window.location.href.split('#')[0]; // Lấy URL hiện tại mà không có hash
     return `${currentUrl}#${itemId}`;
+  }
+
+  async uploadOfflineFiles(files: any[]) {
+    const batchSize = 10;
+
+    for (let i = 0; i < files.length; i += batchSize) {
+      const chunk = files.slice(i, i + batchSize);
+      const formData = new FormData();
+      let count = 0;
+
+      for (const item of chunk) {
+        try {
+          const mime = this.getMimeType(item.type);
+          const blob = await this._systemFileS.readFileBlob(item.filePath, mime);
+
+          formData.append(`files[${count}].File`, blob, item.fileName);
+          formData.append(`files[${count}].KinhDo`, item.kinhDo);
+          formData.append(`files[${count}].ViDo`, item.viDo);
+          formData.append(`files[${count}].FileName`, item.fileName);
+          formData.append(`files[${count}].Type`, item.type);
+          formData.append(`files[${count}].TieuChiCode`, item.tieuChiCode);
+          formData.append(`files[${count}].EvaluateHeaderCode`, item.evaluateHeaderCode);
+
+          count++;
+        } catch (err) {
+          console.error("Lỗi đọc file offline:", item.fileName, err);
+          return false; // Lỗi đọc file → dừng luôn
+        }
+      }
+
+      try {
+        const resp = await firstValueFrom(this._service.uploadFileOffline(formData));
+        // nếu upload thành công
+        for (const item of chunk) {
+          item.isBase64 = false;
+        }
+      } catch (err) {
+        console.error("Upload batch thất bại:", err);
+        return false; // Lỗi upload → dừng luôn
+      }
+    }
+
+    return true; // Tất cả batch upload thành công
+  }
+
+
+
+  base64ToBlob(base64: any, type: string): Blob {
+    const byteCharacters = atob(base64);
+    const byteArrays = [];
+
+    for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+      const slice = byteCharacters.slice(offset, offset + 512);
+
+      const byteNumbers = new Array(slice.length);
+      for (let i = 0; i < slice.length; i++) {
+        byteNumbers[i] = slice.charCodeAt(i);
+      }
+
+      const byteArray = new Uint8Array(byteNumbers);
+      byteArrays.push(byteArray);
+    }
+
+    return new Blob(byteArrays, { type });
+  }
+
+  getMimeType(ext: string) {
+    const map: any = {
+      jpg: "image/jpeg",
+      jpeg: "image/jpeg",
+      png: "image/png",
+      gif: "image/gif",
+      webp: "image/webp",
+      bmp: "image/bmp",
+
+      pdf: "application/pdf",
+
+      doc: "application/msword",
+      docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+
+      xls: "application/vnd.ms-excel",
+      xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+
+      mp4: "video/mp4",
+      mov: "video/quicktime",
+
+      mp3: "audio/mpeg",
+      wav: "audio/wav",
+    };
+
+    return map[ext.toLowerCase()] || "application/octet-stream";
   }
 
 
@@ -551,13 +668,17 @@ export class EvaluateComponent implements OnInit {
   //////// Views ảnh
 
   async openFullScreen(img: any) {
+    this.isImageModalOpen = true;
     this.selectedImage = { ...img }
-    if (this.isEdit == false || img.name != '') {
+
+    if (this.isEdit && img?.isBase64) {
+      this.selectedImage.filePath = await this._systemFileS.getViewUrl(this.selectedImage.filePath)
+    } else {
       this.selectedImage.filePath = this.apiFile + img.filePath;
     }
+
     this.longitude = img.kinhDo;
     this.latitude = img.viDo;
-    this.isImageModalOpen = true;
 
     // this.selectedImage = filePath;
     console.log(this.selectedImage);
@@ -566,18 +687,13 @@ export class EvaluateComponent implements OnInit {
     }, 300);
   }
 
-  async filePath(file: any) {
-    if (this.isEdit && file?.isBase64) {
-      const fileUri = await Filesystem.getUri({
-        directory: Directory.Data,
-        path: file.thumbPath
-      });
-
-      return Capacitor.convertFileSrc(fileUri.uri);
+  getFilePath(file: any) {
+    if (file?.isBase64) {
+      // offline
+      return file.viewUrl
     }
-    return ''
-    // console.log(this.apiFile + file.pathThumbnail);
-    // return this.apiFile + file.pathThumbnail;
+    // server
+    return this.apiFile + file.pathThumbnail;
   }
 
 
@@ -631,23 +747,6 @@ export class EvaluateComponent implements OnInit {
     await alert.present();
   }
 
-
-
-
-
-  // async onFileSelected(event: any, tieuChiCode: string) {
-  //   const file = event.target.files?.[0];
-  //   if (!file) return;
-
-  //   // file chính là Blob → truyền vào saveFileToFilesystem
-  //   const saved = await this.saveFileToFilesystem(file, tieuChiCode);
-
-  //   console.log("File đã lưu:", saved);
-  // }
-
-
-
-
   onFileSelected(event: any, tieuChiCode: any) {
     if (!this.isEdit) return;
 
@@ -655,7 +754,7 @@ export class EvaluateComponent implements OnInit {
     if (!file) return;
 
     const formData = new FormData();
-    formData.append('file', file, 'image.jpg');
+    formData.append('file', file, file.name);
 
     this._service.uploadFile(formData).subscribe({
       next: (resp: any) => {
@@ -666,11 +765,9 @@ export class EvaluateComponent implements OnInit {
         this.autoSave()
 
         this.cdr.detectChanges();
-      },  //     
+      },
 
       error: async (err) => {
-        this.messageService.show("Đường truyền mạng không ổn định!!!", "warning")
-
         const saved = await this.saveFileToFilesystem(file, tieuChiCode);
 
         console.log("File đã lưu:", saved);
@@ -691,206 +788,70 @@ export class EvaluateComponent implements OnInit {
       if (!photo?.webPath) throw new Error("Không có ảnh");
 
       const blob = await (await fetch(photo.webPath)).blob();
+
+      if (navigator.onLine) {
+        // ======= CÓ MẠNG → upload =======
+        console.log("Có mạng → Upload server");
+
+        const formData = new FormData();
+        const ext = blob.type.split('/')[1];
+        formData.append('file', blob, `${Date.now()}.${ext}`);
+
+        this._service.uploadFile(formData).subscribe({
+          next: async (resp: any) => {
+            const location = await this.getLocation();
+            resp.evaluateHeaderCode = this.headerId;
+            resp.tieuChiCode = code;
+            resp.viDo = location.lat,
+              resp.kinhDo = location.lng,
+
+              this.evaluate.lstImages.push(resp);
+
+            this.autoSave();
+            this.cdr.detectChanges();
+          },
+          error: async () => {
+            console.warn("Upload lỗi → Lưu offline");
+            await this.saveFileToFilesystem(blob, code);
+          }
+        });
+
+      } else {
+        // ======= KHÔNG MẠNG → lưu offline =======
+        console.log("Không có mạng → Lưu offline");
         await this.saveFileToFilesystem(blob, code);
-
-      // if (navigator.onLine) {
-      //   // ======= CÓ MẠNG → upload =======
-      //   console.log("Có mạng → Upload server");
-
-      //   const formData = new FormData();
-      //   formData.append('file', blob, 'image.jpg');
-
-      //   this._service.uploadFile(formData).subscribe({
-      //     next: (resp: any) => {
-      //       resp.evaluateHeaderCode = this.headerId;
-      //       resp.tieuChiCode = code;
-      //       resp.isBase64 = false;
-
-      //       this.updateLocationAsync(resp);
-
-      //       this.evaluate.lstImages.push(resp);
-      //       this.autoSave();
-      //       this.cdr.detectChanges();
-      //     },
-      //     error: async () => {
-      //       console.warn("Upload lỗi → Lưu offline");
-      //       await this.saveFileToFilesystem(blob, code);
-      //     }
-      //   });
-
-      // } else {
-      //   // ======= KHÔNG MẠNG → lưu offline =======
-      //   console.log("Không có mạng → Lưu offline");
-      //   await this.saveFileToFilesystem(blob, code);
-      // }
+      }
 
     } catch (err) {
       console.error("Lỗi openCamera:", err);
     }
   }
 
+
+
+  /////////// lưu file offline ở local
   async saveFileToFilesystem(blob: Blob, tieuChiCode: string) {
     const folder = `${this.doiTuong.id}_${this.kiKhaoSat.code}`;
-
-    // Lấy đuôi file chính xác
-    const ext = this.getFileExtension(blob);
-    const fileType = this.getFileType(blob);
-
-    const timestamp = Date.now();
-    const fileName = `${timestamp}.${ext}`;
-    const thumbName = `thumb_${timestamp}.${ext}`;
-
-    // Convert blob → base64
-    const base64 = await this.blobToBase64(blob);
-
-    // Tạo thumbnail nếu là ảnh
-    let thumbBase64 = "";
-    if (fileType === "img") {
-      thumbBase64 = await this.createThumbnail(blob, 100, 100);
-    }
-
-    // Lấy tọa độ
     const location = await this.getLocation();
 
-    // Tạo folder và lưu file gốc
-    const result = await Filesystem.writeFile({
-      path: `images/${folder}/${fileName}`,
-      data: base64,
-      directory: Directory.Data
-    });
+    const resp = await this._systemFileS.saveFile(blob, `images/${folder}`)
 
-    // Lưu thumbnail (nếu có)
-    if (thumbBase64) {
-      await Filesystem.writeFile({
-        path: `images/${folder}/${thumbName}`,
-        data: thumbBase64,
-        directory: Directory.Data
-      });
-    }
+    resp.evaluateHeaderCode = this.headerId,
+      resp.tieuChiCode = tieuChiCode,
+      resp.viDo = location.lat.toString(),
+      resp.kinhDo = location.lng.toString(),
 
-    const resp = {
-      uri: result.uri,
-      code: timestamp,
-      evaluateHeaderCode: this.headerId,
-      tieuChiCode: tieuChiCode,
-      fileName: fileName,
-      filePath: `images/${folder}/${fileName}`,
-      nameThumbnail: thumbName,
-      pathThumbnail: thumbBase64 ? `images/${folder}/${thumbName}` : null,
-      type: ext,
-      viDo: location.lat,
-      kinhDo: location.lng,
-      isBase64: true,
-      isActive: null,
-      isDeleted: null
-    };
-
-    this.evaluate.lstImages.push(resp);
+      this.evaluate.lstImages.push(resp);
     this.autoSave();
     this.cdr.detectChanges();
 
     return resp;
   }
-  async createThumbnail(blob: Blob, maxWidth = 100, maxHeight = 100): Promise<string> {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = maxWidth;
-        canvas.height = maxHeight;
-
-        const ctx = canvas.getContext("2d");
-        ctx!.drawImage(img, 0, 0, maxWidth, maxHeight);
-
-        resolve(canvas.toDataURL("image/jpeg", 0.7));
-      };
-
-      img.src = URL.createObjectURL(blob);
-    });
-  }
-
-
-  getFileType(blob: Blob): "img" | "video" | "pdf" | "doc" | "excel" | "other" {
-    const type = blob.type;
-
-    if (type.startsWith("image/")) return "img";
-    if (type.startsWith("video/")) return "video";
-    if (type === "application/pdf") return "pdf";
-    if (type.includes("msword") || type.includes("officedocument.word")) return "doc";
-    if (type.includes("excel") || type.includes("spreadsheetml")) return "excel";
-
-    return "other";
-  }
-
-
-  // getFileExtension(blob: Blob): string {
-  //   const mime = blob.type;
-
-  //   if (mime.includes("jpeg")) return "jpg";
-  //   if (mime.includes("png")) return "png";
-  //   if (mime.includes("mp4")) return "mp4";
-  //   if (mime.includes("pdf")) return "pdf";
-  //   if (mime.includes("msword")) return "doc";
-  //   if (mime.includes("spreadsheet") || mime.includes("excel")) return "xlsx";
-
-  //   return mime.split("/")[1];
-  // }
-  // async getLocation() {
-  //   try {
-  //     const pos = await Geolocation.getCurrentPosition({
-  //       enableHighAccuracy: false,
-  //       timeout: 2000,
-  //       maximumAge: 60000
-  //     });
-
-  //     return {
-  //       lat: pos.coords.latitude,
-  //       lng: pos.coords.longitude
-  //     };
-  //   }
-  //   catch {
-  //     return { lat: null, lng: null };
-  //   }
-  // }
-
-  blobToBase64(blob: Blob): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(blob);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
-    });
-  }
-
-  async loadImage(path: string) {
-    const file = await Filesystem.readFile({
-      path,
-      directory: Directory.Data
-    });
-
-    return file.data; // base64 string
-  }
-  getFileExtension(blob: Blob): string {
-    const type = blob.type;
-
-    const map: any = {
-      "image/jpeg": "jpg",
-      "image/png": "png",
-      "image/webp": "webp",
-      "video/mp4": "mp4",
-      "application/pdf": "pdf",
-      "application/msword": "doc",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
-      "application/vnd.ms-excel": "xls",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
-    };
-
-    return map[type] || type.split("/")[1] || "bin";
-  }
 
 
   imageProcessingQueue: any[] = [];
   private cachedLocation: any = null;
+
   private async getLocation(): Promise<{ lat: number, lng: number }> {
     try {
       // Nếu có cache < 150s thì dùng lại
@@ -926,53 +887,6 @@ export class EvaluateComponent implements OnInit {
       };
     }
   }
-
-
-
-
-  async getImageViewPath(filePath: string): Promise<string> {
-    const fileUri = await Filesystem.getUri({
-      directory: Directory.Data,
-      path: filePath
-    });
-
-    return Capacitor.convertFileSrc(fileUri.uri);
-  }
-
-  //////////////////////////////////////// chupj anhr gui lene api
-
-  // imageProcessingQueue: any[] = [];
-  // private cachedLocation: any = null;
-
-
-
-  private async updateLocationAsync(obj: any) {
-    try {
-      if (this.cachedLocation && Date.now() - this.cachedLocation.t < 150000) {
-        obj.viDo = this.cachedLocation.lat;
-        obj.kinhDo = this.cachedLocation.lng;
-        return;
-      }
-
-      const pos = await Geolocation.getCurrentPosition({
-        enableHighAccuracy: false,
-        timeout: 1500,
-        maximumAge: 30000,
-      });
-
-      obj.viDo = pos.coords.latitude;
-      obj.kinhDo = pos.coords.longitude;
-
-      this.cachedLocation = {
-        lat: pos.coords.latitude,
-        lng: pos.coords.longitude,
-        t: Date.now()
-      };
-    } catch {
-
-    }
-  }
-
 
 
   ////////////////////Zoom
