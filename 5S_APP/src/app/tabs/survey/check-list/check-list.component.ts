@@ -36,10 +36,10 @@ export class CheckListComponent implements OnInit {
     private route: ActivatedRoute,
     private _authService: AuthService,
     private _storageService: StorageService,
-    private _service: AppEvaluateService,    
+    private _service: AppEvaluateService,
     private _systemFileS: FileOfflineService,
-    
-  ) {}
+
+  ) { }
 
   ngOnInit() {
     this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
@@ -68,7 +68,7 @@ export class CheckListComponent implements OnInit {
             this.lstHisEvaluate = [this.evaluate.header];
           }
           // console.log(this.lstHisEvaluate);
-          
+
         } else {
           this.mode = 'new';
         }
@@ -174,5 +174,14 @@ export class CheckListComponent implements OnInit {
     await this._systemFileS.deleteFolder(`images/${this.doiTuong.id}_${this.kiKhaoSat.code}`)
     localStorage.removeItem(this.doiTuong.id + '_' + this.kiKhaoSat.code);
     this.lstHisEvaluate.shift();
+  }
+
+  getBottomOffset(): number {
+    if (window.visualViewport) {
+      // visualViewport.height = chiều cao màn hình có thể hiển thị nội dung
+      // window.innerHeight = chiều cao toàn màn hình
+      return window.innerHeight - window.visualViewport.height;
+    }
+    return 0;
   }
 }

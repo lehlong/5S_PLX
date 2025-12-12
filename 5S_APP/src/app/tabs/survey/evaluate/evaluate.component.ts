@@ -485,7 +485,7 @@ export class EvaluateComponent implements OnInit {
     await loading.present();
 
     const offlineFiles = this.evaluate.lstImages.filter((x: any) => x?.isBase64);
-    
+
     if (offlineFiles?.length > 0) {
       const checkUpload = await this.uploadOfflineFiles(offlineFiles);
       if (!checkUpload) {
@@ -747,11 +747,12 @@ export class EvaluateComponent implements OnInit {
     await alert.present();
   }
 
-  onFileSelected(event: any, tieuChiCode: any) {
+  async onFileSelected(event: any, tieuChiCode: any) {
     if (!this.isEdit) return;
 
     const file: File = event.target.files[0];
     if (!file) return;
+    const location = await this.getLocation();
 
     const formData = new FormData();
     formData.append('file', file, file.name);
@@ -768,7 +769,7 @@ export class EvaluateComponent implements OnInit {
       },
 
       error: async (err) => {
-        const saved = await this.saveFileToFilesystem(file, tieuChiCode);
+        const saved = await this.saveOffline(file, tieuChiCode, location);
 
         console.log("File đã lưu:", saved);
       }
@@ -779,48 +780,57 @@ export class EvaluateComponent implements OnInit {
   async openCamera(code: any) {
     try {
       const photo = await Camera.getPhoto({
-        quality: 65,
+        quality: 70,
         resultType: CameraResultType.Uri,
         source: CameraSource.Camera,
         correctOrientation: true,
       });
 
-      if (!photo?.webPath) throw new Error("Không có ảnh");
+      if (!photo?.webPath) {
+        throw new Error("Không chụp được ảnh");
+      }
 
+      // ==== Chuyển ảnh sang Blob ====
       const blob = await (await fetch(photo.webPath)).blob();
 
-      if (navigator.onLine) {
-        // ======= CÓ MẠNG → upload =======
-        console.log("Có mạng → Upload server");
+      // ==== Lấy toạ độ ====
+      const location = await this.getLocation();
 
+      // =================================================
+      // 1. Có mạng → Upload trực tiếp lên server
+      // =================================================
+      if (navigator.onLine) {
         const formData = new FormData();
         const ext = blob.type.split('/')[1];
         formData.append('file', blob, `${Date.now()}.${ext}`);
 
         this._service.uploadFile(formData).subscribe({
           next: async (resp: any) => {
-            const location = await this.getLocation();
+
             resp.evaluateHeaderCode = this.headerId;
             resp.tieuChiCode = code;
-            resp.viDo = location.lat,
-              resp.kinhDo = location.lng,
+            resp.viDo = location.lat;
+            resp.kinhDo = location.lng;
 
-              this.evaluate.lstImages.push(resp);
+            this.evaluate.lstImages.push(resp);
 
             this.autoSave();
             this.cdr.detectChanges();
           },
+
           error: async () => {
             console.warn("Upload lỗi → Lưu offline");
-            await this.saveFileToFilesystem(blob, code);
+            await this.saveOffline(blob, code, location);
           }
         });
 
-      } else {
-        // ======= KHÔNG MẠNG → lưu offline =======
-        console.log("Không có mạng → Lưu offline");
-        await this.saveFileToFilesystem(blob, code);
+        return;
       }
+
+      // =================================================
+      // 2. Không có mạng → Lưu offline
+      // =================================================
+      await this.saveOffline(blob, code, location);
 
     } catch (err) {
       console.error("Lỗi openCamera:", err);
@@ -828,26 +838,26 @@ export class EvaluateComponent implements OnInit {
   }
 
 
-
   /////////// lưu file offline ở local
-  async saveFileToFilesystem(blob: Blob, tieuChiCode: string) {
-    const folder = `${this.doiTuong.id}_${this.kiKhaoSat.code}`;
-    const location = await this.getLocation();
+  
+  async saveOffline(blob: Blob, code: any, location: any) {
+    const folder = `images/${this.doiTuong.id}_${this.kiKhaoSat.code}`;
 
-    const resp = await this._systemFileS.saveFile(blob, `images/${folder}`)
+    const saved = await this._systemFileS.saveFile(blob, folder);
 
-    resp.evaluateHeaderCode = this.headerId,
-      resp.tieuChiCode = tieuChiCode,
-      resp.viDo = location.lat.toString(),
-      resp.kinhDo = location.lng.toString(),
+    // Thêm các trường cần thiết
+    saved.evaluateHeaderCode = this.headerId;
+    saved.tieuChiCode = code;
+    saved.viDo = location.lat.toString();
+    saved.kinhDo = location.lng.toString();
 
-      this.evaluate.lstImages.push(resp);
+    this.evaluate.lstImages.push(saved);
+
     this.autoSave();
     this.cdr.detectChanges();
 
-    return resp;
+    console.log("Đã lưu offline:", saved);
   }
-
 
   imageProcessingQueue: any[] = [];
   private cachedLocation: any = null;
