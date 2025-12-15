@@ -34,8 +34,8 @@
   <ion-item-group style="margin-top: 10px">
     <ion-list class="custom-icon">
       <ion-item *ngFor="let item of lstDoiTuong" (click)="navigateTo(item)">
-        <ion-icon style="color: #d1805f" slot="start" name="home-outline"></ion-icon>
-
+        <!-- <ion-icon style="color: #d1805f" slot="start" name="home-outline"></ion-icon> -->
+        <ion-icon style="color: #d1805f" slot="start" name="storefront-outline"></ion-icon>
         <ion-label>{{ item?.name }}</ion-label>
         <ion-label slot="end">{{ item.point }} điểm</ion-label>
       </ion-item>
@@ -45,7 +45,6 @@
 
 <ion-modal [isOpen]="isOpen" (didDismiss)="closeFilterModal()" [initialBreakpoint]="1" [breakpoints]="[1]"
   cssClass="custom-modal">
-  <!-- <ion-modal trigger="open-modal" [(isOpen)]="isOpen" [initialBreakpoint]="1" [breakpoints]="[1]" cssClass="custom-modal"> -->
   <ng-template>
     <ion-header>
       <ion-toolbar>
@@ -53,8 +52,8 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <ion-accordion-group>
-        <ion-accordion value="first">
+      <ion-accordion-group [value]="accordionValue">
+        <ion-accordion value="first" (click)="openSelect('first')">
           <ion-item slot="header" color="light">
             <ion-label>
               <ion-input label="Kỳ thời gian" labelPlacement="stacked" labelPlacement="floating" [clearInput]="true"
@@ -69,7 +68,7 @@
           </div>
         </ion-accordion>
 
-        <ion-accordion value="second">
+        <ion-accordion value="second"  (click)="openSelect('second')">
           <ion-item slot="header" color="light">
             <ion-label>
               <ion-input [label]="doiTuong" labelPlacement="stacked" labelPlacement="floating" [clearInput]="true"
@@ -89,7 +88,7 @@
           </div>
         </ion-accordion>
 
-        <ion-accordion value="third">
+        <ion-accordion value="third"  (click)="openSelect('third')">
           <ion-item slot="header" color="light">
             <ion-label>
               <ion-input label="Người chấm" labelPlacement="stacked" labelPlacement="floating" [clearInput]="true"

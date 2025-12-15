@@ -54,8 +54,8 @@ namespace PLX5S.API.Middleware
                     };
                     // Lưu log vào cơ sở dữ liệu
                     var dbContext = context.RequestServices.GetService<AppDbContext>();
-                    dbContext.TblActionLogs.Add(actionLog);
-                    await dbContext.SaveChangesAsync();
+                    //dbContext.TblActionLogs.Add(actionLog);
+                    //await dbContext.SaveChangesAsync();
 
                     // Copy the contents of the new memory stream (which contains the response) to the original stream.
                     await responseBody.CopyToAsync(originalResponseBodyStream);

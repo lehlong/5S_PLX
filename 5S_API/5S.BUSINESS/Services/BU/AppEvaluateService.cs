@@ -2,6 +2,7 @@
 using Common;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
@@ -18,6 +19,7 @@ using SixLabors.ImageSharp.Processing;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,7 +43,7 @@ namespace PLX5S.BUSINESS.Services.BU
         Task <List<TblBuNotification>> GetNotification();
         Task HandlePointStore(EvaluateFilter param);
         Task<HomeModel> GetDataHome(string userName);
-        Task UploadFileOffline(List<IFormFile> files, List<TblBuEvaluateImage> lstFile);
+        Task<List<TblBuEvaluateImage>> UploadFileOffline(List<FileModel> files);
     }
 
     public class AppEvaluateService : GenericService<TblBuEvaluateHeader, EvaluateHeaderDto>, IAppEvaluateService
@@ -328,7 +330,8 @@ namespace PLX5S.BUSINESS.Services.BU
                 string folder = GetFolderByExtension(extension);
 
                 // Tạo tên file
-                string newFileName = $"{Guid.NewGuid()}{extension}";
+                    string physicalFileName = BuildFileName(file.FileName, extension);
+                //string newFileName = $"{Guid.NewGuid()}{extension}";
                 string thumbFileName = $"{Guid.NewGuid()}_thumb{extension}";
 
                 // Đường dẫn vật lý
@@ -338,7 +341,7 @@ namespace PLX5S.BUSINESS.Services.BU
                     Directory.CreateDirectory(fullFolderPath);
 
                 // Đường dẫn file gốc
-                string filePath = Path.Combine(fullFolderPath, newFileName);
+                string filePath = Path.Combine(fullFolderPath, physicalFileName);
 
                 // Ghi file gốc
                 using (var stream = new FileStream(filePath, FileMode.Create))
@@ -376,8 +379,8 @@ namespace PLX5S.BUSINESS.Services.BU
 
                 return new TblBuEvaluateImage {
                     Code = Guid.NewGuid().ToString(),
-                    FilePath = $"{folder}/{newFileName}",
-                    FileName = newFileName,
+                    FilePath = $"{folder}/{physicalFileName}",
+                    FileName = file.FileName,
                     NameThumbnail = thumbFileName,
                     PathThumbnail = thumbPath != null ? $"{folder}/{thumbFileName}" : null,
                     Type = extension,
@@ -391,91 +394,138 @@ namespace PLX5S.BUSINESS.Services.BU
                 return null;
             }
         }
-
-
-        public async Task UploadFileOffline(List<IFormFile> files, List<TblBuEvaluateImage> lstFile)
+        public async Task<List<TblBuEvaluateImage>> UploadFileOffline(List<FileModel> files)
         {
+            var result = new List<TblBuEvaluateImage>();
+
             try
             {
-                var data = new List<TblBuEvaluateImage>();
-
                 foreach (var file in files)
                 {
-                    if (file == null || file.Length == 0)
-                    {
+                    if (file == null || file.file == null || file.file.Length == 0)
                         continue;
-                    }
 
-                    string extension = Path.GetExtension(file.FileName);
+                    string code = Guid.NewGuid().ToString();
+                    string extension = Path.GetExtension(file.FileName).ToLower();
                     string folder = GetFolderByExtension(extension);
 
-                    // Tạo tên file
-                    string newFileName = $"{Guid.NewGuid()}{extension}";
-                    string thumbFileName = $"{Guid.NewGuid()}_thumb{extension}";
+                    // --- Tạo tên file ---
+                    string physicalFileName = BuildFileName(file.FileName, extension);
+                    string thumbFileName = $"{code}_thumb{extension}";
 
-                    // Đường dẫn vật lý
+                    // --- Đường dẫn thư mục ---
                     string fullFolderPath = Path.Combine(folder.Replace("/", "\\"));
+                    Directory.CreateDirectory(fullFolderPath);
 
-                    if (!Directory.Exists(fullFolderPath))
-                        Directory.CreateDirectory(fullFolderPath);
+                    // --- Đường dẫn file gốc ---
+                    string filePath = Path.Combine(fullFolderPath, physicalFileName);
 
-                    // Đường dẫn file gốc
-                    string filePath = Path.Combine(fullFolderPath, newFileName);
-
-                    // Ghi file gốc
+                    // --- Ghi file gốc ---
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
-                        await file.CopyToAsync(stream);
+                        await file.file.CopyToAsync(stream);
                     }
 
-                    string thumbPath = null;
+                    string thumbPath = Path.Combine(fullFolderPath, thumbFileName);
 
-                    // === TẠO THUMBNAIL nếu là file ảnh ===
-                    if (folder.Contains("Images"))
+                    // --- Chỉ tạo thumbnail nếu là file ảnh ---
+                    bool isImage = new[] { ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".webp" }.Contains(extension);
+
+                    if (isImage)
                     {
                         try
                         {
-                            thumbPath = Path.Combine(fullFolderPath, thumbFileName);
+                            // Reset stream để load lại ảnh
+                            //file.file.ContentDisposition = 0;
 
-                            using (var img = await SixLabors.ImageSharp.Image.LoadAsync(file.OpenReadStream()))
+                            using (var img = await SixLabors.ImageSharp.Image.LoadAsync(file.file.OpenReadStream()))
                             {
-                                img.Mutate(x => x
-                                    .Resize(new SixLabors.ImageSharp.Processing.ResizeOptions
-                                    {
-                                        Size = new SixLabors.ImageSharp.Size(100, 100),
-                                        Mode = SixLabors.ImageSharp.Processing.ResizeMode.Crop
-                                    })
-                                );
+                                img.Mutate(x => x.Resize(new SixLabors.ImageSharp.Processing.ResizeOptions
+                                {
+                                    Size = new SixLabors.ImageSharp.Size(100, 100),
+                                    Mode = SixLabors.ImageSharp.Processing.ResizeMode.Crop
+                                }));
 
                                 await img.SaveAsync(thumbPath);
                             }
                         }
-                        catch { }
+                        catch (Exception ex)
+                        {
+                            // Xóa file thumb nếu lỗi
+                            if (System.IO.File.Exists(thumbPath))
+                                System.IO.File.Delete(thumbPath);
+
+                            Console.WriteLine("Thumbnail error: " + ex.Message);
+                        }
                     }
 
-                    var meta = lstFile.FirstOrDefault(x => x.FileName == file.FileName);
-
-                    meta.Code = Guid.NewGuid().ToString();
-                    meta.FileName = newFileName;
-                    meta.FilePath = $"{folder}/{newFileName}";
-                    meta.NameThumbnail = thumbFileName;
-                    meta.PathThumbnail = $"{folder}/{thumbFileName}";
-                    meta.Type = extension;
-
-                    data.Add(meta);
+                    result.Add(new TblBuEvaluateImage
+                    {
+                        Code = code,
+                        FileName = file.FileName,
+                        FilePath = $"{folder}/{physicalFileName}",
+                        NameThumbnail = isImage ? thumbFileName : null,
+                        PathThumbnail = isImage ? $"{folder}/{thumbFileName}" : null,
+                        Type = extension,
+                        KinhDo = ToDecimal(file.KinhDo),
+                        ViDo = ToDecimal(file.ViDo),
+                        TieuChiCode = file.TieuChiCode,
+                        EvaluateHeaderCode = file.EvaluateHeaderCode
+                    });
                 }
 
-                await _dbContext.TblBuEvaluateImage.AddRangeAsync(data);
+                await _dbContext.TblBuEvaluateImage.AddRangeAsync(result);
                 await _dbContext.SaveChangesAsync();
 
+                return result;
             }
             catch (Exception ex)
             {
+                // Nếu lỗi → rollback file
+                foreach (var item in result)
+                {
+                    string filePath = item.FilePath?.Replace("/", "\\");
+                    string thumbPath = item.PathThumbnail?.Replace("/", "\\");
+
+                    if (System.IO.File.Exists(filePath))
+                        System.IO.File.Delete(filePath);
+
+                    if (System.IO.File.Exists(thumbPath))
+                        System.IO.File.Delete(thumbPath);
+                }
+
                 this.Status = false;
                 this.Exception = ex;
+                return null;
             }
         }
 
+        private string BuildFileName(string originalFileName, string ext)
+        {
+            var name = Path.GetFileNameWithoutExtension(originalFileName);
+
+            // loại ký tự không hợp lệ
+            foreach (var c in Path.GetInvalidFileNameChars())
+                name = name.Replace(c, '_');
+
+            string time = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+            return $"{name}_{time}{ext}";
+        }
+
+        private decimal? ToDecimal(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return null;
+
+            // Replace comma with dot to avoid culture issues
+            value = value.Replace(",", ".");
+
+            if (decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal result))
+                return result;
+
+            return null;
+        }
 
         private string GetFolderByExtension(string extension)
         {

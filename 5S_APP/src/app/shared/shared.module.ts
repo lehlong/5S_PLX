@@ -72,7 +72,7 @@ import {
   IonSegmentButton,
   IonThumbnail,
   IonFooter,
-  IonImg
+  IonImg,
 } from '@ionic/angular/standalone';
 
 
@@ -219,8 +219,8 @@ import {
   checkmarkOutline,
   location,
   fileTrayFullOutline,
-  locateOutline
-
+  locateOutline,
+  storefrontOutline
 } from 'ionicons/icons';
 
 const IONIC_COMPONENTS = [
@@ -455,8 +455,8 @@ export class SharedModule {
       checkmarkOutline,
       location,
       fileTrayFullOutline,
-      locateOutline
-
+      locateOutline,
+      storefrontOutline
     });
   }
 }

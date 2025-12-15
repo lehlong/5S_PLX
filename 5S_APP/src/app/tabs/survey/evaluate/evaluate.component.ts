@@ -344,10 +344,10 @@ export class EvaluateComponent implements OnInit {
     }));
 
     const images = data.filter((x: any) =>
-      [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", "img", "mp4", "jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(x.type)
+      [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", "img", "mp4", ".mp4", "jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(x.type)
     )
     const documents = data.filter((x: any) =>
-      ['docx', 'xlsx', 'xlsm', 'pdf'].includes(x.type)
+      ['docx', 'xlsx', 'xlsm', 'pdf', 'doc', '.doc', '.docx', '.xlsx', '.xlsm', '.pdf'].includes(x.type)
     );
 
     return {
@@ -490,7 +490,7 @@ export class EvaluateComponent implements OnInit {
       const checkUpload = await this.uploadOfflineFiles(offlineFiles);
       if (!checkUpload) {
         await loading.dismiss();
-        this.messageService.show('Duy trì mạng ổn định trong quá trình gửi!!!', 'warning');
+        this.messageService.show('Vui lòng kết nối mạng để nộp!!!', 'warning');
         return;
       }
     }
@@ -582,8 +582,7 @@ export class EvaluateComponent implements OnInit {
 
       for (const item of chunk) {
         try {
-          const mime = this.getMimeType(item.type);
-          const blob = await this._systemFileS.readFileBlob(item.filePath, mime);
+          const blob = await this._systemFileS.readFileBlob(item.filePath, item.type);
 
           formData.append(`files[${count}].File`, blob, item.fileName);
           formData.append(`files[${count}].KinhDo`, item.kinhDo);
@@ -615,56 +614,6 @@ export class EvaluateComponent implements OnInit {
     return true; // Tất cả batch upload thành công
   }
 
-
-
-  base64ToBlob(base64: any, type: string): Blob {
-    const byteCharacters = atob(base64);
-    const byteArrays = [];
-
-    for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-      const slice = byteCharacters.slice(offset, offset + 512);
-
-      const byteNumbers = new Array(slice.length);
-      for (let i = 0; i < slice.length; i++) {
-        byteNumbers[i] = slice.charCodeAt(i);
-      }
-
-      const byteArray = new Uint8Array(byteNumbers);
-      byteArrays.push(byteArray);
-    }
-
-    return new Blob(byteArrays, { type });
-  }
-
-  getMimeType(ext: string) {
-    const map: any = {
-      jpg: "image/jpeg",
-      jpeg: "image/jpeg",
-      png: "image/png",
-      gif: "image/gif",
-      webp: "image/webp",
-      bmp: "image/bmp",
-
-      pdf: "application/pdf",
-
-      doc: "application/msword",
-      docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-
-      xls: "application/vnd.ms-excel",
-      xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-
-      mp4: "video/mp4",
-      mov: "video/quicktime",
-
-      mp3: "audio/mpeg",
-      wav: "audio/wav",
-    };
-
-    return map[ext.toLowerCase()] || "application/octet-stream";
-  }
-
-
-
   //////// Views ảnh
 
   async openFullScreen(img: any) {
@@ -693,9 +642,17 @@ export class EvaluateComponent implements OnInit {
       return file.viewUrl
     }
     // server
-    return this.apiFile + file.pathThumbnail;
+    return this.apiFile + file.filePath;
   }
 
+  getThumbPath(file: any) {
+    if (file?.isBase64) {
+      // offline
+      return file.viewUrl
+    }
+    // server
+    return this.apiFile + file.pathThumbnail;
+  }
 
   closeFullScreen() {
     this.isImageModalOpen = false;
@@ -749,13 +706,19 @@ export class EvaluateComponent implements OnInit {
 
   async onFileSelected(event: any, tieuChiCode: any) {
     if (!this.isEdit) return;
+    console.log(event);
 
     const file: File = event.target.files[0];
+    if (file.size === 0) {
+      this.messageService.show('File không hợp lệ!!', 'warning');
+      return;
+    }
     if (!file) return;
     const location = await this.getLocation();
 
     const formData = new FormData();
     formData.append('file', file, file.name);
+    // const saved = await this.saveOffline(file, tieuChiCode, location);
 
     this._service.uploadFile(formData).subscribe({
       next: (resp: any) => {
@@ -838,8 +801,22 @@ export class EvaluateComponent implements OnInit {
   }
 
 
+
+  // dowload file về máy 
+  async downloadFile(doc: any) {
+    const url = this.getFilePath(doc); // link server
+    const fileName = doc.fileName;
+    // const mime = this.getMimeType(doc.type);
+
+    await this._systemFileS.downloadFile(url, fileName);
+  }
+
+
+
+
+
   /////////// lưu file offline ở local
-  
+
   async saveOffline(blob: Blob, code: any, location: any) {
     const folder = `images/${this.doiTuong.id}_${this.kiKhaoSat.code}`;
 

@@ -81,7 +81,7 @@
                     <ion-buttons slot="end">
                       <input [disabled]="!isEdit" class="file" #fileInput type="file"
                         (change)="onFileSelected($event, node.code)"
-                        accept="image/*,video/*,.pdf,.doc,.docx,.xlsx,.txt" />
+                        accept="image/*,video/*,.pdf,.doc,.docx,.xlsx,.txt,.mp4" />
                       <ion-button fill="clear" [disabled]="!isEdit">
                         <ion-icon name="document-outline" slot="icon-only"></ion-icon>
                       </ion-button>
@@ -106,10 +106,10 @@
                       let img of filterImage(node)?.images;
                       trackBy: trackByKey
                     ">
-                    <ion-img *ngIf="img.type !== 'mp4'" [src]="getFilePath(img)" class="image-preview"
+                    <ion-img *ngIf="img.type !== 'mp4' && img.type !== '.mp4'" [src]="getThumbPath(img)" class="image-preview"
                       (click)="openFullScreen(img)"></ion-img>
 
-                    <video *ngIf="img.type == 'mp4'" [src]="getFilePath(img)" class="image-preview"
+                    <video *ngIf="img.type == 'mp4' || img.type == '.mp4'" [src]="getFilePath(img)" class="image-preview"
                       (click)="openFullScreen(img)" controls style="max-width: 100%"></video>
 
                     <div style="opacity: 0.5; text-align: center; font-size: 13px">
@@ -123,13 +123,11 @@
                 </div>
 
                 <!-- Hiển thị tài liệu -->
-                <div *ngIf="
-                    !node.isGroup && filterImage(node)?.documents.length > 0
-                  " class="file-wrapper" style="width: 100%">
-                  <div class="image-preview" *ngFor="
-                      let doc of filterImage(node)?.documents;
-                      trackBy: trackByKey
-                    " style="height: 50px; width: 100%">
+                <div *ngIf="!node.isGroup && filterImage(node)?.documents.length > 0" class="file-wrapper"
+                  style="width: 100%">
+                  <div class="image-preview"
+                    *ngFor="let doc of filterImage(node)?.documents;trackBy: trackByKey"
+                    style="height: 50px; width: 100%">
                     <div class="file-preview">
                       <ion-chip class="chip">
                         <!-- Icon tài liệu -->
@@ -149,6 +147,11 @@
                         <ion-button fill="clear" class="delete-btn-file" *ngIf="isEdit" size="small"
                           (click)="deleteImage2(doc)">
                           <ion-icon name="close-circle" slot="icon-only"></ion-icon>
+                        </ion-button>
+                        
+                        <ion-button fill="clear" class="delete-btn-file" *ngIf="!isEdit" size="small"
+                          (click)="downloadFile(doc)">
+                          <ion-icon name="download-outline"></ion-icon>
                         </ion-button>
                       </ion-chip>
                     </div>
@@ -257,7 +260,7 @@
 
 
 <!-- View image full screen modal -->
-<ion-modal [backdropDismiss]="false" [isOpen]="isImageModalOpen"  [canDismiss]="true">
+<ion-modal [backdropDismiss]="false" [isOpen]="isImageModalOpen" [canDismiss]="true">
   <ng-template>
     <ion-content class="full-image-content">
       <ion-button class="btnLeft" fill="clear" color="danger" *ngIf="isEdit" (click)="confirmDeleteImage()">
@@ -265,9 +268,9 @@
       </ion-button>
       <ion-button class="btnRight" (click)="closeFullScreen()" fill="clear" color="dark"><ion-icon
           name="close"></ion-icon></ion-button>
-      <div class="zoom-wrapper" (mousedown)="onDragStart($event)"
-        (mousemove)="onDragMove($event)" (mouseup)="onDragEnd()" (mouseleave)="onDragEnd()"
-        (touchstart)="onDragStart($event)" (touchmove)="onDragMove($event)" (touchend)="onDragEnd()">
+      <div class="zoom-wrapper" (mousedown)="onDragStart($event)" (mousemove)="onDragMove($event)"
+        (mouseup)="onDragEnd()" (mouseleave)="onDragEnd()" (touchstart)="onDragStart($event)"
+        (touchmove)="onDragMove($event)" (touchend)="onDragEnd()">
         <div class="full-image-container">
           <img #zoomImg [src]="selectedImage.filePath" class="full-image" (click)="zoomOnClick($event)"
             draggable="false" />

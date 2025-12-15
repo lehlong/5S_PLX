@@ -20,7 +20,8 @@
       <ion-chip *ngIf="kiKhaoSat?.trangThaiKi === '2'" slot="end" color="success">Đang mở</ion-chip>
     </ion-item>
     <ion-item lines="none">
-      <ion-icon style="color: #D1805F;" slot="start" name="home-outline"></ion-icon>
+        <ion-icon style="color: #D1805F" slot="start" name="storefront-outline"></ion-icon> 
+      <!-- <ion-icon style="color: #D1805F;" slot="start" name="home-outline"></ion-icon> -->
       <p>{{ doiTuong?.name }}</p>
     </ion-item>
   </ion-item-group>
@@ -37,10 +38,7 @@
             </div>
             <div slot="end" style="text-align: right;">
               <p class="mg-0" style="padding-left: 70px;">
-                    <ion-chip *ngIf="item.point >= 95 && item.isActive == true" color="success">{{ item.point }}</ion-chip>
-                    <ion-chip *ngIf="item.point >= 90 && item.point < 95  && item.isActive == true" color="primary">{{ item.point }}</ion-chip>
-                    <ion-chip *ngIf="item.point >= 80 && item.point < 90 && item.isActive == true" color="warning">{{ item.point }}</ion-chip>
-                    <ion-chip *ngIf="item.point < 80" color="tertiary">{{ item.point }}</ion-chip>
+                    <ion-chip *ngIf="item.isActive == true" color="success">{{ item.point }}</ion-chip>
                     <ion-chip *ngIf="item.isActive == false" color="danger">{{ item.point }}</ion-chip>
               </p>
               <span class="text-italic" style="font-size: 12px; padding-right: 7px;">{{ item.updateDate
@@ -53,20 +51,28 @@
             </ion-item-option>
           </ion-item-options>
         </ion-item-sliding>
-
       </ion-grid>
     </ion-item>
   </ion-item-group>
 </ion-content>
 
 <ion-footer *ngIf="checkRightEvaluate()" [style.marginBottom.px]="getBottomOffset()">
-  <ion-button (click)="navigateTo()" expand="full" style="width: 100%;font-weight: 700; height: 12vw;">
-    Chấm điểm
+  <ion-button (click)="navigateTo()" expand="full" style="width: 100%; margin: 0; font-weight: 700; ">
+    <ion-icon style="margin: 15px 5px; margin-bottom: 25px;" name="create-outline"></ion-icon>
+    <h5 style="margin-bottom: 20px;">
+      Chấm điểm
+    </h5>
   </ion-button>
 </ion-footer>
 
-<!-- <ion-alert trigger="present-alert" header="Điểm của {{evaluate.header?.name}} sẽ bị mất"
-  message="Bạn muốn tiếp tục chứ??" [buttons]="alertButtons" (didDismiss)="setResult($event)"></ion-alert> -->
-<!-- <ion-alert trigger="present-alert" header="Điểm của {{ evaluate.header?.name }} sẽ bị mất"
-  message="Bạn muốn tiếp tục chứ??" [buttons]="alertButtons" (didDismiss)="setResult($event)">
-</ion-alert> -->
+
+<!-- <ion-footer *ngIf="checkRightEvaluate()" [style.marginBottom.px]="getBottomOffset()">
+  <ion-tab-bar slot="bottom" style="height: 60px; border-top: 1px solid #e0e0e0">
+    <ion-tab-button (click)="navigateTo()">
+      <ion-button (click)="navigateTo()" expand="full" style="width: 100%; margin: 0; font-weight: 700; ">
+        <ion-icon style="margin: 15px 5px;" name="create-outline"></ion-icon>
+        Chấm điểm
+      </ion-button>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-footer> -->

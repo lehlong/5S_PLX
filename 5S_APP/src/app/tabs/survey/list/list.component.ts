@@ -1,20 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { IonButton } from '@ionic/angular/standalone';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { KyKhaoSatService } from 'src/app/service/ky-khao-sat.service';
 import { AppReportService } from 'src/app/service/app-report.service';
 import { AuthService } from 'src/app/service/auth.service';
+import { IonAccordionGroup } from '@ionic/angular';
 
 @Component({
   selector: 'app-scoring-five-s',
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss'],
   standalone: true,
-  imports: [SharedModule, IonButton],
+  imports: [SharedModule],
 })
 export class ListComponent implements OnInit {
+
+  @ViewChild('accordionGroup', { static: true }) accordionGroup!: IonAccordionGroup;
+
+
   filter: any = {
     filterKiKhaoSat: {},
     filterDoiTuong: {},
@@ -48,7 +52,7 @@ export class ListComponent implements OnInit {
     private _authService: AuthService,
     private router: Router,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('UserInfo') ?? '');
@@ -83,8 +87,6 @@ export class ListComponent implements OnInit {
   getAllKyKhaoSat() {
     this._service.search({ keyWord: this.surveyId }).subscribe({
       next: (data) => {
-        console.log(data);
-
         this.lstKiKhaoSat = data.data;
         const filter = localStorage.getItem('filterLS') ?? '';
         const filter2 = data.data.reduce((a: any, b: any) =>
@@ -132,24 +134,6 @@ export class ListComponent implements OnInit {
     });
   }
 
-  // filterPoint(inStoreId: any) {
-  //   const record = this.lstPointStore.find((x: any) => x.inStoreId === inStoreId);
-
-  //   return record?.point ?? 0;
-  // }
-
-  // getAllAccount() {
-  //   this._authService.(this.filter.filterKiKhaoSat.id).subscribe({
-  //     next: (data) => {
-  //       this.lstDoiTuong = data.lstInputStore;
-  //       this.lstSearchDoiTuong = data.lstInputStore;
-  //     },
-  //     error: (response) => {
-  //       console.log(response);
-  //     },
-  //   });
-  // }
-
   onFilter2() {
     if (this.selectValue === '1') {
       this.lstDoiTuong = this.lstDoiTuong.sort((a: any, b: any) =>
@@ -164,6 +148,11 @@ export class ListComponent implements OnInit {
         (a: any, b: any) => (a.point ?? 0) - (b.point ?? 0)
       );
     }
+  }
+  accordionValue: any
+
+  openSelect(value: any) {
+    this.accordionValue = value
   }
 
   searchDoiTuong(kiKhaoSat: any) {
@@ -192,6 +181,8 @@ export class ListComponent implements OnInit {
         }
         this.lstSearchDoiTuongFiltered = [...this.lstSearchDoiTuong];
         this.lstSearchChamDiemFiltered = [...this.lstSearchChamDiem];
+
+        this.accordionValue = null
       },
       error: (response) => {
         console.log(response);
@@ -202,10 +193,12 @@ export class ListComponent implements OnInit {
     this.filter.filterDoiTuong = item;
     console.log('Selected store:', this.filter.filterDoiTuong);
     this.lstSearchChamDiem = item.lstInChamDiem;
+    this.accordionValue = null
   }
 
   selectSearchChamDiem(item: any) {
     this.filter.filterNguoiCham = item;
+    this.accordionValue = null
   }
 
   openFilterModal() {
@@ -244,8 +237,6 @@ export class ListComponent implements OnInit {
   }
 
   navigateTo(item: any) {
-    console.log(this.filter.filterKiKhaoSat);
-
     localStorage.setItem(
       'filterCS',
       JSON.stringify({ kiKhaoSat: this.filter.filterKiKhaoSat, doiTuong: item })
@@ -279,13 +270,13 @@ export class ListComponent implements OnInit {
     }
   }
   onSearchNguoiChamChange() {
-  const keyword = this.searchNguoiChamKeyword?.toLowerCase() || '';
-  if (!keyword) {
-    this.lstSearchChamDiemFiltered = [...this.lstSearchChamDiem];
-  } else {
-    this.lstSearchChamDiemFiltered = this.lstSearchChamDiem.filter((item: any) =>
-      this.getFullName(item.userName)?.toLowerCase().includes(keyword)
-    );
+    const keyword = this.searchNguoiChamKeyword?.toLowerCase() || '';
+    if (!keyword) {
+      this.lstSearchChamDiemFiltered = [...this.lstSearchChamDiem];
+    } else {
+      this.lstSearchChamDiemFiltered = this.lstSearchChamDiem.filter((item: any) =>
+        this.getFullName(item.userName)?.toLowerCase().includes(keyword)
+      );
+    }
   }
-}
 }

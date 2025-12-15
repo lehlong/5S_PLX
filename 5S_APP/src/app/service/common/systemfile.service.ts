@@ -1,13 +1,17 @@
 import { Injectable } from '@angular/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
+import { MessageService } from '../message.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FileOfflineService {
 
-  constructor() {}
+  constructor(
+    private messageService: MessageService,
+
+  ) { }
 
   // =========================================================
   // 1. Convert Blob → Base64
@@ -38,12 +42,29 @@ export class FileOfflineService {
   // =========================================================
   getFileExtension(blob: Blob): string {
     const mime = blob.type;
-    if (!mime) return 'dat';
+    if (!mime) return '.dat';
 
-    const ext = mime.split('/')[1];
-    return ext.includes('+') ? ext.split('+')[0] : ext;
+    const map: Record<string, string> = {
+      'image/jpeg': '.jpg',
+      'image/png': '.png',
+      'image/webp': '.webp',
+
+      'video/mp4': '.mp4',
+
+      'application/pdf': '.pdf',
+
+      'application/msword': '.doc',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
+
+      'application/vnd.ms-excel': '.xls',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '.xlsx',
+
+      'application/vnd.ms-powerpoint': 'ppt',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation': '.pptx'
+    };
+
+    return map[mime] ?? mime.split('/')[1] ?? '.dat';
   }
-
   // =========================================================
   // 4. Tạo thumbnail ảnh
   // =========================================================
@@ -70,7 +91,7 @@ export class FileOfflineService {
   // =========================================================
   // 5. Lưu file vào Filesystem
   // =========================================================
-  async saveFile(blob: Blob, folder: string) {
+  async saveFile(blob: any, folder: string) {
     // Tạo thư mục nếu chưa có
     try {
       await Filesystem.mkdir({
@@ -84,7 +105,7 @@ export class FileOfflineService {
 
     const ext = this.getFileExtension(blob);
     const timestamp = Date.now();
-    const fileName = `${timestamp}.${ext}`;
+    const fileName = `${blob.name}`;
     const filePath = `${folder}/${fileName}`;
 
     const base64 = await this.blobToBase64(blob);
@@ -103,7 +124,7 @@ export class FileOfflineService {
 
     if (blob.type.startsWith('image/')) {
       const thumbBase64 = await this.createThumbnail(blob, 100, 100);
-      thumbName = `thumb_${timestamp}.${ext}`;
+      thumbName = `thumb_${timestamp}${ext}`;
       thumbPath = `${folder}/${thumbName}`;
 
       await Filesystem.writeFile({
@@ -118,6 +139,14 @@ export class FileOfflineService {
       });
 
       viewUrl = Capacitor.convertFileSrc(thumbUri.uri);
+    } else {
+
+      const fileUri = await Filesystem.getUri({
+        directory: Directory.Data,
+        path: filePath
+      });
+
+      viewUrl = Capacitor.convertFileSrc(fileUri.uri);
     }
 
     return {
@@ -153,9 +182,9 @@ export class FileOfflineService {
   // =========================================================
   // 7. Đọc file → Blob
   // =========================================================
-  async readFileBlob(filePath: string | Blob, mime: string): Promise<Blob> {
+  async readFileBlob(filePath: string | Blob, ext: string): Promise<Blob> {
     if (filePath instanceof Blob) return filePath;
-
+    let mime = this.getMimeType(ext)
     if (typeof filePath === 'string' && filePath.startsWith('data:')) {
       const base64 = filePath.split(',')[1];
       return this.base64ToBlob(base64, mime);
@@ -203,5 +232,68 @@ export class FileOfflineService {
     } catch {
       console.warn('Không thể xóa folder:', folder);
     }
+  }
+
+
+  getMimeType(ext: string) {
+    if (!ext) return "application/octet-stream";
+
+    // 🔥 bỏ dấu . nếu có
+    ext = ext.toLowerCase().replace('.', '');
+
+    const map: any = {
+      jpg: "image/jpeg",
+      jpeg: "image/jpeg",
+      png: "image/png",
+      gif: "image/gif",
+      webp: "image/webp",
+      bmp: "image/bmp",
+
+      pdf: "application/pdf",
+
+      doc: "application/msword",
+      docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+
+      xls: "application/vnd.ms-excel",
+      xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+
+      mp4: "video/mp4",
+      mov: "video/quicktime",
+
+      mp3: "audio/mpeg",
+      wav: "audio/wav",
+    };
+
+    return map[ext] || "application/octet-stream";
+  }
+
+  async downloadFile(url: string, fileName: string) {
+    console.log(url);
+
+    // 1. Fetch file từ server
+    const res = await fetch(url);
+    const blob = await res.blob();
+    console.log(blob);
+
+    // 2. Convert blob → base64
+    const base64 = await this.blobToBase64(blob);
+
+    // 2. Đảm bảo fileName KHÔNG có dấu /
+    fileName = fileName.replace(/[\\/]/g, '_');
+
+    // 3. Ghi file (path PHẢI là file, không phải folder)
+    await Filesystem.writeFile({
+      directory: Directory.Documents,   // ✅ Chuẩn cho Android & iOS
+      path: fileName,                   // ✅ ví dụ: report_20251214.pdf
+      data: base64,
+    });
+
+    // 4. Lấy URL để mở / preview
+    const uri = await Filesystem.getUri({
+      directory: Directory.Documents,
+      path: fileName,
+    });
+    this.messageService.show('Tải file THÀNH CÔNG.', 'success')
+    return Capacitor.convertFileSrc(uri.uri);
   }
 }
