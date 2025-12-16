@@ -618,17 +618,6 @@ namespace PLX5S.BUSINESS.Services.BU
             return null; // không hỗ trợ
         }
 
-        //private string GetFolderByExtension(string ext)
-        //{
-        //    if (ext.StartsWith(".jpg") || ext.StartsWith(".png") || ext.StartsWith(".webp"))
-        //        return "Uploads/Images";
-
-        //    if (ext.StartsWith(".mp4") || ext.StartsWith(".webm"))
-        //        return "Uploads/Videos";
-
-        //    return "Uploads/Files"; // mặc định cho .docx, .xlsx, .pdf, ...
-        //}
-
 
         public async Task TinhTongLanCham(TblBuPoint point)
         {

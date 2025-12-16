@@ -179,12 +179,13 @@ namespace PLX5S.API.Controllers.BU
         }
 
         [HttpPost("UploadFileOffline")]
-        public async Task<IActionResult> UploadFileOffline(List<IFormFile> files, List<TblBuEvaluateImage> lstFile)
+        public async Task<IActionResult> UploadFileOffline([FromForm] List<FileModel> files)
         {
             var transferObject = new TransferObject();
-            await _service.UploadFileOffline(files, lstFile);
+            var data = await _service.UploadFileOffline(files);
             if (_service.Status)
             {
+                transferObject.Data = data;
                 transferObject.Status = true;
             }
             else

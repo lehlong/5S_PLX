@@ -718,25 +718,25 @@ export class EvaluateComponent implements OnInit {
 
     const formData = new FormData();
     formData.append('file', file, file.name);
-    // const saved = await this.saveOffline(file, tieuChiCode, location);
+    const saved = await this.saveOffline(file, tieuChiCode, location);
 
-    this._service.uploadFile(formData).subscribe({
-      next: (resp: any) => {
-        resp.evaluateHeaderCode = this.headerId
-        resp.tieuChiCode = tieuChiCode
+    // this._service.uploadFile(formData).subscribe({
+    //   next: (resp: any) => {
+    //     resp.evaluateHeaderCode = this.headerId
+    //     resp.tieuChiCode = tieuChiCode
 
-        this.evaluate.lstImages.push(resp)
-        this.autoSave()
+    //     this.evaluate.lstImages.push(resp)
+    //     this.autoSave()
 
-        this.cdr.detectChanges();
-      },
+    //     this.cdr.detectChanges();
+    //   },
 
-      error: async (err) => {
-        const saved = await this.saveOffline(file, tieuChiCode, location);
+    //   error: async (err) => {
+    //     const saved = await this.saveOffline(file, tieuChiCode, location);
 
         console.log("File đã lưu:", saved);
-      }
-    })
+    //   }
+    // })
   }
 
   ////////// Camera chụp ảnh
