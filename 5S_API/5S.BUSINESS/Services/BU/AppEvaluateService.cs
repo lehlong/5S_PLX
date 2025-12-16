@@ -273,7 +273,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 if (string.IsNullOrEmpty(extension))
                     return null;
 
-                string folder = GetFolderByExtension(extension);
+                string folder = GetFolderByExtension();
 
                 // Tạo file chính
                 var fileName = !string.IsNullOrEmpty(request.FileName)
@@ -326,8 +326,8 @@ namespace PLX5S.BUSINESS.Services.BU
                 if (file == null || file.Length == 0)
                     return null;
 
-                string extension = Path.GetExtension(file.FileName);
-                string folder = GetFolderByExtension(extension);
+                string extension = Path.GetExtension(file.FileName).ToLower();
+                string folder = GetFolderByExtension();
 
                 // Tạo tên file
                     string physicalFileName = BuildFileName(file.FileName, extension);
@@ -351,8 +351,9 @@ namespace PLX5S.BUSINESS.Services.BU
 
                 string thumbPath = null;
 
+                bool isImage = new[] { ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".webp" }.Contains(extension);
                 // === TẠO THUMBNAIL nếu là file ảnh ===
-                if (folder.Contains("Images"))
+                if (isImage)
                 {
                     try
                     {
@@ -379,10 +380,10 @@ namespace PLX5S.BUSINESS.Services.BU
 
                 return new TblBuEvaluateImage {
                     Code = Guid.NewGuid().ToString(),
-                    FilePath = $"{folder}/{physicalFileName}",
+                    FilePath = $"{fullFolderPath}/{physicalFileName}",
                     FileName = file.FileName,
                     NameThumbnail = thumbFileName,
-                    PathThumbnail = thumbPath != null ? $"{folder}/{thumbFileName}" : null,
+                    PathThumbnail = thumbPath != null ? $"{fullFolderPath}/{thumbFileName}" : null,
                     Type = extension,
                     KinhDo = 0,
                     ViDo = 0
@@ -407,7 +408,7 @@ namespace PLX5S.BUSINESS.Services.BU
 
                     string code = Guid.NewGuid().ToString();
                     string extension = Path.GetExtension(file.FileName).ToLower();
-                    string folder = GetFolderByExtension(extension);
+                    string folder = GetFolderByExtension();
 
                     // --- Tạo tên file ---
                     string physicalFileName = BuildFileName(file.FileName, extension);
@@ -415,7 +416,9 @@ namespace PLX5S.BUSINESS.Services.BU
 
                     // --- Đường dẫn thư mục ---
                     string fullFolderPath = Path.Combine(folder.Replace("/", "\\"));
-                    Directory.CreateDirectory(fullFolderPath);
+
+                    if (!Directory.Exists(fullFolderPath))
+                        Directory.CreateDirectory(fullFolderPath);
 
                     // --- Đường dẫn file gốc ---
                     string filePath = Path.Combine(fullFolderPath, physicalFileName);
@@ -463,9 +466,9 @@ namespace PLX5S.BUSINESS.Services.BU
                     {
                         Code = code,
                         FileName = file.FileName,
-                        FilePath = $"{folder}/{physicalFileName}",
+                        FilePath = $"{fullFolderPath}/{physicalFileName}",
                         NameThumbnail = isImage ? thumbFileName : null,
-                        PathThumbnail = isImage ? $"{folder}/{thumbFileName}" : null,
+                        PathThumbnail = isImage ? $"{fullFolderPath}/{thumbFileName}" : null,
                         Type = extension,
                         KinhDo = ToDecimal(file.KinhDo),
                         ViDo = ToDecimal(file.ViDo),
@@ -527,26 +530,10 @@ namespace PLX5S.BUSINESS.Services.BU
             return null;
         }
 
-        private string GetFolderByExtension(string extension)
+        private string GetFolderByExtension()
         {
-            extension = extension.ToLower();
-
-            if (new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp" }.Contains(extension))
-                return "Uploads/Images";
-
-            if (new[] { ".doc", ".docx" }.Contains(extension))
-                return "Uploads/Word";
-
-            if (new[] { ".xls", ".xlsx" }.Contains(extension))
-                return "Uploads/Excel";
-
-            if (extension == ".pdf")
-                return "Uploads/Pdf";
-
-            if (new[] { ".mp4", ".mov", ".avi", ".mkv" }.Contains(extension))
-                return "Uploads/Videos";
-
-            return "Uploads/Others";
+            var folderName = DateTime.Now.ToString("yyyyMM");
+            return Path.Combine("Uploads", folderName);
         }
         public byte[] GenerateThumbnailBytes(byte[] originalBytes, int maxWidth, int maxHeight)
         {

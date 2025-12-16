@@ -400,16 +400,16 @@ export class EvaluateComponent implements OnInit {
   }
 
   async handleSave() {
-    // let checkUpload = false
-    // const offlineFiles = this.evaluate.lstImages.filter((x: any) => x?.isBase64);
-    // if (offlineFiles?.length > 0) {
-    //   checkUpload = await this.uploadOfflineFiles(offlineFiles)
+    let checkUpload = false
+    const offlineFiles = this.evaluate.lstImages.filter((x: any) => x?.isBase64);
+    if (offlineFiles?.length > 0) {
+      checkUpload = await this.uploadOfflineFiles(offlineFiles)
 
-    //   if (!checkUpload) {
-    //     this.messageService.show('Duy trì mạng ổn định trong quá trình gửi!!!', 'warning');
-    //     return
-    //   }
-    // }
+      if (!checkUpload) {
+        this.messageService.show('Duy trì mạng ổn định trong quá trình gửi!!!', 'warning');
+        return
+      }
+    }
     this.tinhTong()
     console.log('autoSave', this.evaluate);
     this.messageService.show(
@@ -707,36 +707,41 @@ export class EvaluateComponent implements OnInit {
   async onFileSelected(event: any, tieuChiCode: any) {
     if (!this.isEdit) return;
     console.log(event);
-
-    const file: File = event.target.files[0];
-    if (file.size === 0) {
+    var file: File = event.target.files[0];
+    if (file.size === 0 || !file) {
       this.messageService.show('File không hợp lệ!!', 'warning');
       return;
     }
-    if (!file) return;
+    var ext = this._systemFileS.getFileExtension(file)
+    if (ext == '.webp') {
+      this.messageService.show('File không hợp lệ!!', 'warning');
+      return;
+    }
     const location = await this.getLocation();
 
     const formData = new FormData();
     formData.append('file', file, file.name);
-    const saved = await this.saveOffline(file, tieuChiCode, location);
+    // const saved = await this.saveOffline(file, tieuChiCode, location);
 
-    // this._service.uploadFile(formData).subscribe({
-    //   next: (resp: any) => {
-    //     resp.evaluateHeaderCode = this.headerId
-    //     resp.tieuChiCode = tieuChiCode
+    this._service.uploadFile(formData).subscribe({
+      next: (resp: any) => {
+        resp.evaluateHeaderCode = this.headerId
+        resp.tieuChiCode = tieuChiCode
+        resp.kinhDo = location.lng
+        resp.viDo = location.lat
 
-    //     this.evaluate.lstImages.push(resp)
-    //     this.autoSave()
+        this.evaluate.lstImages.push(resp)
+        this.autoSave()
 
-    //     this.cdr.detectChanges();
-    //   },
+        this.cdr.detectChanges();
+      },
 
-    //   error: async (err) => {
-    //     const saved = await this.saveOffline(file, tieuChiCode, location);
+      error: async (err) => {
+        const saved = await this.saveOffline(file, tieuChiCode, location);
 
         console.log("File đã lưu:", saved);
-    //   }
-    // })
+      }
+    })
   }
 
   ////////// Camera chụp ảnh
@@ -806,7 +811,6 @@ export class EvaluateComponent implements OnInit {
   async downloadFile(doc: any) {
     const url = this.getFilePath(doc); // link server
     const fileName = doc.fileName;
-    // const mime = this.getMimeType(doc.type);
 
     await this._systemFileS.downloadFile(url, fileName);
   }

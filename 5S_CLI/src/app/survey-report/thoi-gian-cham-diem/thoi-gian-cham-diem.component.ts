@@ -340,6 +340,8 @@ export class ThoiGianChamDiemComponent {
   // }
 
   getRange(n: number): number[] {
-    return n ? Array.from({ length: n }, (_, i) => i) : [];
+    // return n ? Array.from({ length: n }, (_, i) => i) : [];
+    
+    return Array.from({ length: n > 0 ? n : 1 }, (_, i) => i);
   }
 }

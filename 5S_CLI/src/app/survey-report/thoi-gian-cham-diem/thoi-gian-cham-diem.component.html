@@ -59,7 +59,7 @@
     <div class="table-wrapper">
       <div class="table-wrapper">
         <nz-table class="auto-text-table" nzBordered [nzData]="lstData" [nzFrontPagination]="false"
-          [nzScroll]="{ x: 'auto', y: 'calc(100vh - 365px)' }">
+          [nzScroll]="{ y: 'calc(100vh - 365px)' }">
 
           <thead>
             <tr>
@@ -70,22 +70,22 @@
               <th [attr.colspan]="maxAtvsv || 1">ATVSV</th>
               <th [attr.colspan]="maxChuyenGia || 1">TỔ CHUYÊN GIA, BAN 5S</th>
 
-              <th rowspan="2" nzWidth="200px">TỔNG</th>
-              <th rowspan="2" nzWidth="200px">ĐIỂM</th>
-              <th rowspan="2" nzWidth="250px">XẾP LOẠI</th>
+              <th rowspan="2" style="width:100px">TỔNG</th>
+              <th rowspan="2" style="width:100px">ĐIỂM</th>
+              <th rowspan="2" style="width:150px">XẾP LOẠI</th>
             </tr>
 
             <tr>
               <ng-container *ngFor="let i of getRange(maxCht)">
-                <th>Lần {{ i + 1 }}</th>
+                <th style="width:150px">Lần {{ i + 1 }}</th>
               </ng-container>
 
               <ng-container *ngFor="let i of getRange(maxAtvsv)">
-                <th>Lần {{ i + 1 }}</th>
+                <th style="width:150px">Lần {{ i + 1 }}</th>
               </ng-container>
 
               <ng-container *ngFor="let i of getRange(maxChuyenGia)">
-                <th>Lần {{ i + 1 }}</th>
+                <th style="width:150px">Lần {{ i + 1 }}</th>
               </ng-container>
             </tr>
           </thead>
@@ -96,18 +96,18 @@
               <td>{{ data.name }}</td>
 
               <ng-container *ngFor="let i of getRange(maxCht)">
-                <td>{{ data.cht?.[i] | removePrefix }}</td>
+                <td style="width:150px">{{ data.cht?.[i] | removePrefix }}</td>
               </ng-container>
 
               <ng-container *ngFor="let i of getRange(maxAtvsv)">
-                <td>{{ data.atvsv?.[i] | removePrefix }}</td>
+                <td style="width:150px">{{ data.atvsv?.[i] | removePrefix }}</td>
               </ng-container>
 
               <ng-container *ngFor="let i of getRange(maxChuyenGia)">
-                <td>{{ data.chuyenGia?.[i] | removePrefix }}</td>
+                <td style="width:150px">{{ data.chuyenGia?.[i] | removePrefix }}</td>
               </ng-container>
 
-              <td>
+              <td style="width:100px">
                 {{
                 (data.cht?.length || 0) +
                 (data.atvsv?.length || 0) +
@@ -115,9 +115,9 @@
                 }}
               </td>
 
-              <td>{{ data.point }}</td>
+              <td style="width:100px">{{ data.point }}</td>
 
-              <td>
+              <td style="width:150px">
                 <nz-tag *ngIf="data.point > 80" nzColor="blue">Tốt</nz-tag>
                 <nz-tag *ngIf="data.point > 30 && data.point <= 80" nzColor="orange">Khá</nz-tag>
                 <nz-tag *ngIf="data.point <= 30" nzColor="red">Kém</nz-tag>
