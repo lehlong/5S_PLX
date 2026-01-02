@@ -235,3 +235,38 @@ ion-item.highlight-score {
   height: 110px;
   border-radius: 16px;
 }
+
+.time-box {
+  padding-bottom: 6px;
+  margin: 0;
+  justify-content: space-between;
+}
+
+.list-item {
+  display: flex;
+  gap: 5px;
+  flex-direction: column;
+  background: none;
+}
+
+.group-item {
+  max-height: calc(100vh - 295px);
+  overflow-y: auto;
+  margin: 0
+}
+
+.item-info {
+  width: 100%;
+  padding: 4px 0;
+  justify-content: space-between;
+}
+
+.unread-indicator {
+  background: var(--ion-color-primary);
+  width: 10px;
+  height: 10px;
+  border-radius: 100%;
+  inset-inline-start: 12px;
+  margin: 13px 0;
+  margin-right: 7px;
+}

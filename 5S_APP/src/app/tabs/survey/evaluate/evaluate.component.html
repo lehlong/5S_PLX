@@ -39,7 +39,7 @@
         <ion-accordion [value]="node.key" [ngClass]="{ 'border-link': node.id === selectedAccordionId }">
           <ion-item slot="header" color="light" id="{{ node.id }}">
             <ion-label class="d-flex">
-              <div [ngClass]="{ 'p-10': node.number,  }">
+              <div [ngClass]="{ 'pd-10': node.number,  }">
                 {{ node.number ? node.number + "." : "" }}
               </div>
               <ion-label [innerHTML]="node.title | highlightSearch : searchKeyword"></ion-label>

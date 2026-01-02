@@ -8,6 +8,20 @@
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
+
+$my-map: (
+  "picton-blue",
+  "white",
+  'success',
+  'black',
+  'grey-light',
+  'black-light',
+  'purple',
+  'bright-blue',
+  'alice-blue',
+  'deep-blue-violet'
+);
+
 // @import '@ionic/angular/css/palettes/dark.system.css';
 html,
 body {
@@ -25,14 +39,6 @@ ion-header {
 
 .t-center {
   text-align: center;
-}
-
-.d-flex {
-  display: flex !important;
-}
-
-.d-block {
-  display: block;
 }
 
 .c-purple {
@@ -59,6 +65,10 @@ ion-header {
 
 .bg-success {
   background-color: #2dd55b;
+}
+
+.bg-none {
+  background: none !important;
 }
 
 :root {
@@ -145,6 +155,7 @@ ion-content::part(scroll)::-webkit-scrollbar-thumb {
   display: flex;
   flex-direction: column;
 }
+
 .alert-header-evaluate {
   display: flex;
   flex-direction: column;
@@ -162,22 +173,26 @@ ion-content::part(scroll)::-webkit-scrollbar-thumb {
   background-color: #ffff;
   z-index: 10;
 }
+
 .alert-icon-evaluate {
   font-size: 36px;
   color: #ff9800;
   margin-bottom: 8px;
 }
+
 .title-evaluate {
   font-size: 18px;
   font-weight: 600;
   color: #333;
 }
+
 .subtitle-evaluate {
   font-size: 14px;
   color: #666;
   margin-top: 4px;
   white-space: nowrap;
 }
+
 .alert-body {
   font-size: 14px;
   color: #444;
@@ -190,11 +205,13 @@ ion-content::part(scroll)::-webkit-scrollbar-thumb {
   max-height: 400px !important;
   width: 75vw !important;
 }
+
 .custom-alert-center-btn .alert-button-group {
   justify-content: center !important;
   width: 100%;
   margin: 0;
 }
+
 .custom-alert-center-btn .alert-button {
   flex: none !important;
   width: 100%;
@@ -202,10 +219,12 @@ ion-content::part(scroll)::-webkit-scrollbar-thumb {
   background-color: #6030ff;
   color: #fff;
 }
+
 ion-alert::part(button) {
   justify-content: center !important;
   text-align: center !important;
 }
+
 .alert-button-inner {
   justify-content: center !important;
 }
@@ -213,10 +232,395 @@ ion-alert::part(button) {
 .alert-head {
   display: none !important;
 }
+
 .alert-wrapper.sc-ion-alert-ios {
   display: flex !important;
   gap: 25px !important;
 }
+
 .alert-button-group.sc-ion-alert-md {
   margin-top: 20px !important;
+}
+
+
+
+.d-flex {
+  display: flex !important;
+}
+
+.d-none {
+  display: none;
+}
+
+.justify-between {
+  justify-content: space-between !important;
+}
+
+.justify-around {
+  justify-content: space-around !important;
+}
+
+.justify-evenly {
+  justify-content: space-evenly !important;
+}
+
+.justify-center {
+  display: flex;
+  justify-content: center !important;
+}
+
+.justify-start {
+  justify-content: start !important;
+}
+
+.justify-end {
+  justify-content: end !important;
+}
+
+.align-start {
+  align-items: start !important;
+}
+
+.align-center {
+  align-items: center !important;
+}
+
+.align-end {
+  align-items: end !important;
+}
+
+// Width: .w-1 đến .w-100 → width: 1% đến 100%
+@for $i from 1 through 100 {
+  .w-#{$i} {
+    width: #{ $i + '%' } !important;
+  }
+
+  .h-#{$i} {
+    height: #{ $i + '%' } !important;
+  }
+
+  .bd-rad-#{$i}px {
+    border-radius: #{ $i + 'px' } !important;
+  }
+
+  .bd-rad-#{$i} {
+    border-radius: #{ $i + '%' } !important;
+  }
+
+  .bd-rad-tl-#{$i}px {
+    border-top-left-radius: #{ $i + 'px' } !important;
+  }
+
+  .bd-rad-bl-#{$i}px {
+    border-bottom-left-radius: #{ $i + 'px' } !important;
+  }
+
+  .bd-rad-tr-#{$i}px {
+    border-top-right-radius: #{ $i + 'px' } !important;
+  }
+
+  .bd-rad-br-#{$i}px {
+    border-bottom-right-radius: #{ $i + 'px' } !important;
+  }
+
+  .gap-#{$i} {
+    display: flex;
+    gap: #{ $i + 'px'};
+  }
+}
+
+@for $i from 100 through 900 {
+  .fw-#{$i} {
+    font-weight: #{$i} !important;
+  }
+}
+
+// pixed → width: 1px đến 1000px
+@for $i from 1 through 1000 {
+  .w-#{$i}px {
+    width: #{ $i + 'px' };
+  }
+
+  .h-#{$i}px {
+    height: #{ $i + 'px' } !important;
+  }
+
+  .max-w-#{$i}px {
+    max-width: #{ $i + 'px' } !important;
+  }
+
+  .max-h-#{$i}px {
+    max-height: #{ $i + 'px' } !important;
+  }
+
+  .min-w-#{$i}px {
+    min-width: #{ $i + 'px' } !important;
+  }
+
+  .min-h-#{$i}px {
+    min-height: #{ $i + 'px' } !important;
+  }
+
+  .top-#{i}px {
+    top: #{ $i + 'px'} !important;
+  }
+
+  .bottom-#{i}px {
+    bottom: #{ $i + 'px'} !important;
+  }
+
+  .right-#{i}px {
+    right: #{ $i + 'px'} !important;
+  }
+
+  .left-#{i}px {
+    left: #{ $i + 'px'} !important;
+  }
+
+  .z-#{i} {
+    z-index: #{$i} !important;
+  }
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+@each $key in $my-map {
+
+  // css class text color
+  .text-color-#{$key} {
+    color: var(--bs-#{$key}) !important;
+  }
+
+  // css class bg color
+  .bg-color-#{$key} {
+    background-color: var(--bs-#{$key}) !important;
+  }
+
+  // css border color
+  .border-color-#{$key} {
+    border-color: var(--bs-#{$key}) !important;
+  }
+
+  // css text hover
+  .text-hover-#{$key} {
+    &:hover {
+      color: var(--bs-#{$key}) !important;
+    }
+  }
+
+  // css text hover underline
+  .text-hover-underline-#{$key} {
+    &:hover {
+      color: var(--bs-#{$key}) !important;
+      text-decoration-line: underline;
+    }
+  }
+}
+
+.text-upper {
+  text-transform: uppercase !important;
+}
+
+// margin classes (cách dùng: m-1, mx-1, my-1, .... , e: end, b: bottom, s: start, t: top, x: trục hoành, y trục tung)
+$max-spacing: 20;
+$spacing-unit: 0.25rem;
+
+@for $i from 0 through $max-spacing {
+  .m-#{$i} {
+    margin: $i * $spacing-unit !important;
+  }
+
+  .mt-#{$i} {
+    margin-top: $i * $spacing-unit !important;
+  }
+
+  .mb-#{$i} {
+    margin-bottom: $i * $spacing-unit !important;
+  }
+
+  .ms-#{$i} {
+    margin-left: $i * $spacing-unit !important;
+  }
+
+  .me-#{$i} {
+    margin-right: $i * $spacing-unit !important;
+  }
+
+  .mx-#{$i} {
+    margin-left: $i * $spacing-unit !important;
+    margin-right: $i * $spacing-unit !important;
+  }
+
+  .my-#{$i} {
+    margin-top: $i * $spacing-unit !important;
+    margin-bottom: $i * $spacing-unit !important;
+  }
+}
+
+// Padding classes (cách dùng: p-1, px-1, py-1, .... , e: end, b: bottom, s: start, t: top, x: trục hoành, y trục tung)
+@for $i from 0 through $max-spacing {
+  .p-#{$i} {
+    padding: $i * $spacing-unit !important;
+  }
+
+  .pt-#{$i} {
+    padding-top: $i * $spacing-unit !important;
+  }
+
+  .pb-#{$i} {
+    padding-bottom: $i * $spacing-unit !important;
+  }
+
+  .ps-#{$i} {
+    padding-left: $i * $spacing-unit !important;
+  }
+
+  .pe-#{$i} {
+    padding-right: $i * $spacing-unit !important;
+  }
+
+  .px-#{$i} {
+    padding-left: $i * $spacing-unit !important;
+    padding-right: $i * $spacing-unit !important;
+  }
+
+  .py-#{$i} {
+    padding-top: $i * $spacing-unit !important;
+    padding-bottom: $i * $spacing-unit !important;
+  }
+}
+
+// Font-size: .fs-12 đến .fs-100 (từ 12px - 100px)
+@for $i from 10 through 100 {
+  .fs-#{$i} {
+    font-size: #{$i}px !important;
+  }
+}
+
+.position-absolute {
+  position: absolute;
+}
+
+.position-relative {
+  position: relative;
+}
+
+.overflow-y-auto {
+  overflow-y: auto !important;
+}
+
+.d-block {
+  display: block !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.text-right {
+  text-align: right !important;
+  display: contents !important;
+}
+
+.flex-wrap {
+  flex-wrap: wrap !important;
+}
+
+.flex-form {
+  display: flex;
+  gap: 10px
+}
+
+.ant-row {
+  margin: 0 !important;
+}
+
+.swal2-popup {
+  border-radius: 2px !important;
+}
+
+.swal2-confirm {
+  border-radius: 2px !important;
+}
+
+.swal2-cancel {
+  border-radius: 2px !important;
+}
+
+
+
+
+
+
+
+
+
+
+/// Loading
+/// 
+/* Khung loading */
+.custom-loading .loading-wrapper {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* backdrop */
+.custom-loading .backdrop-no-tappable{
+  background: rgba(0, 0, 0, 0.799) !important;
+
+}
+.custom-loading .loading-wrapper {
+  background: none;
+  padding: 40px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white
+}
+
+/* Logo */
+.custom-loading .loading-wrapper::before {
+  content: "";
+  width: 70px;
+  height: 70px;
+  background-image: url('assets/img/logo.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 3;
+}
+
+/* Vòng tròn nét đứt */
+.custom-loading .loading-wrapper::after {
+  content: "";
+  position: absolute;
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  border: 6px dashed #ffffff;
+  animation: spinDashed 3.4s linear infinite;
+  z-index: 1;
+}
+
+/* Animation vòng tròn nét đứt */
+@keyframes spinDashed {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Animation ngược nếu muốn dùng */
+@keyframes spinReverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
 }

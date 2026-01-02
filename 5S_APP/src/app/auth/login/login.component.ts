@@ -143,21 +143,6 @@ export class LoginComponent implements OnInit {
           });
       },
       error: (error) => {
-        // this.messageService.show(`${error}`, 'warning');
-        // this.messageService.show('Đường dẫn API bị sai !', 'warning');
-        if (error === 'Thiết bị không có quyền đăng nhập') {
-          this.messageService.show(
-            'Thiết bị không có quyền đăng nhập',
-            'warning'
-          );
-        } else if (error === 'Tên đăng nhập hoặc mật khẩu không đúng') {
-          this.messageService.show(
-            'Tên đăng nhập hoặc mật khẩu không đúng',
-            'warning'
-          );
-        } else {
-          this.messageService.show('Cấu hình API không chính xác !', 'warning');
-        }
         console.log(error);
         this.isLogin = false;
       },

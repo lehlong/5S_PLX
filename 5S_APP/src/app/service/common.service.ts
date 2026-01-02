@@ -19,6 +19,7 @@ import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
 import { GlobalService } from './global.service';
 import { ConfigService } from './config.service';
+import { MessageService } from './message.service';
 
 @Injectable({
   providedIn: 'root',
@@ -36,6 +37,7 @@ export class CommonService {
     private http: HttpClient,
     private router: Router,
     private globalService: GlobalService,
+    private messService: MessageService,
     private configService: ConfigService
   ) {
     this.configService.apiUrl$.subscribe((url) => {
@@ -64,7 +66,7 @@ export class CommonService {
       });
     }
     if (showLoading) {
-      this.globalService.incrementApiCallCount(); // Tăng bộ đếm
+      this.globalService.loadingShow(); // Tăng bộ đếm
     }
     return this.http
       .get<any>(`${this.urlMap}/${endpoint}`, { params: httpParams })
@@ -81,7 +83,7 @@ export class CommonService {
           );
         }),
         finalize(() => {
-          this.globalService.decrementApiCallCount();
+          this.globalService.loadingHide();
         })
       );
   }
@@ -93,7 +95,7 @@ export class CommonService {
     showLoading: boolean = true
   ): Observable<T> {
     if (showLoading) {
-      this.globalService.incrementApiCallCount(); // Tăng bộ đếm
+      this.globalService.loadingShow(); // Tăng bộ đếm
     }
     return this.http.post<any>(`${this.urlMap}/${endpoint}`, data).pipe(
       map(this.handleApiResponse),
@@ -107,7 +109,7 @@ export class CommonService {
           this.post<T>(endpoint, data, showSuccess, showLoading)
         )
       ),
-      finalize(() => this.globalService.decrementApiCallCount()) // Giảm bộ đếm khi hoàn thành
+      finalize(() => this.globalService.loadingHide()) // Giảm bộ đếm khi hoàn thành
     );
   }
 
@@ -131,7 +133,7 @@ export class CommonService {
       });
     }
     if (showLoading) {
-      this.globalService.incrementApiCallCount(); // Tăng bộ đếm
+      this.globalService.loadingShow(); // Tăng bộ đếm
     }
     return this.http
       .get<any>(`${this.tmsUrl}/${endpoint}`, { params: httpParams })
@@ -148,10 +150,11 @@ export class CommonService {
           );
         }),
         finalize(() => {
-          this.globalService.decrementApiCallCount();
+          this.globalService.loadingHide();
         })
       );
   }
+
   get<T>(
     endpoint: string,
     params?: { [key: string]: any },
@@ -172,7 +175,7 @@ export class CommonService {
       });
     }
     if (showLoading) {
-      this.globalService.incrementApiCallCount(); // Tăng bộ đếm
+      this.globalService.loadingShow(); // Tăng bộ đếm
     }
     return this.http
       .get<any>(`${this.baseUrl}/${endpoint}`, { params: httpParams })
@@ -189,7 +192,7 @@ export class CommonService {
           );
         }),
         finalize(() => {
-          this.globalService.decrementApiCallCount();
+          this.globalService.loadingHide()// Giảm bộ đếm khi hoàn thành
         })
       );
   }
@@ -201,11 +204,13 @@ export class CommonService {
     showLoading: boolean = true
   ): Observable<T> {
     if (showLoading) {
-      this.globalService.incrementApiCallCount(); // Tăng bộ đếm
+      this.globalService.loadingShow(); // Tăng bộ đếm
     }
     return this.http.post<any>(`${this.baseUrl}/${endpoint}`, data).pipe(
       map(this.handleApiResponse),
       tap(() => {
+        console.log(showSuccess);
+
         if (showSuccess) {
           this.showSuccess('Thêm mới thông tin thành công');
         }
@@ -215,7 +220,7 @@ export class CommonService {
           this.post<T>(endpoint, data, showSuccess, showLoading)
         )
       ),
-      finalize(() => this.globalService.decrementApiCallCount()) // Giảm bộ đếm khi hoàn thành
+      finalize(() => this.globalService.loadingHide()) // Giảm bộ đếm khi hoàn thành
     );
   }
 
@@ -225,7 +230,7 @@ export class CommonService {
     showLoading: boolean = true
   ): Observable<T> {
     if (showLoading) {
-      this.globalService.incrementApiCallCount(); // Tăng bộ đếm
+      this.globalService.loadingShow(); // Tăng bộ đếm
     }
     return this.http.put<any>(`${this.baseUrl}/${endpoint}`, data).pipe(
       map(this.handleApiResponse),
@@ -233,7 +238,7 @@ export class CommonService {
       catchError((error) =>
         this.handleError(error, () => this.put<T>(endpoint, data, showLoading))
       ),
-      finalize(() => this.globalService.decrementApiCallCount()) // Giảm bộ đếm khi hoàn thành
+      finalize(() => this.globalService.loadingHide()) // Giảm bộ đếm khi hoàn thành
     );
   }
 
@@ -243,7 +248,7 @@ export class CommonService {
     showLoading: boolean = true
   ): Observable<T> {
     if (showLoading) {
-      this.globalService.incrementApiCallCount(); // Tăng bộ đếm
+      this.globalService.loadingShow(); // Tăng bộ đếm
     }
     return this.http.delete<any>(`${this.baseUrl}/${endpoint}`, data).pipe(
       map(this.handleApiResponse),
@@ -253,7 +258,7 @@ export class CommonService {
           this.delete<T>(endpoint, data, showLoading)
         )
       ),
-      finalize(() => this.globalService.decrementApiCallCount()) // Giảm bộ đếm khi hoàn thành
+      finalize(() => this.globalService.loadingHide()) // Giảm bộ đếm khi hoàn thành
     );
   }
 
@@ -263,7 +268,7 @@ export class CommonService {
     showLoading: boolean = true
   ): Observable<T> {
     if (showLoading) {
-      this.globalService.incrementApiCallCount(); // Tăng bộ đếm
+      this.globalService.loadingShow(); // Tăng bộ đếm
     }
     return this.http
       .request<any>('delete', `${this.baseUrl}/${endpoint}`, { body: data })
@@ -275,7 +280,7 @@ export class CommonService {
             this.deletes<T>(endpoint, data, showLoading)
           )
         ),
-        finalize(() => this.globalService.decrementApiCallCount()) // Giảm bộ đếm khi hoàn thành
+        finalize(() => this.globalService.loadingHide()) // Giảm bộ đếm khi hoàn thành
       );
   }
 
@@ -304,7 +309,7 @@ export class CommonService {
     }
 
     if (showLoading) {
-      this.globalService.incrementApiCallCount(); // Tăng bộ đếm
+      this.globalService.loadingShow(); // Tăng bộ đếm
     }
     return this.http
       .post<any>(`${this.baseUrl}/${endpoint}`, formData, {
@@ -318,7 +323,7 @@ export class CommonService {
             this.uploadFile(endpoint, file, paramsUrl, params, showLoading)
           )
         ),
-        finalize(() => this.globalService.decrementApiCallCount()) // Giảm bộ đếm khi hoàn thành
+        finalize(() => this.globalService.loadingHide()) // Giảm bộ đếm khi hoàn thành
       );
   }
 
@@ -355,7 +360,7 @@ export class CommonService {
     }
 
     if (showLoading) {
-      this.globalService.incrementApiCallCount(); // Tăng bộ đếm
+      this.globalService.loadingShow(); // Tăng bộ đếm
     }
     return this.http
       .post<any>(`${this.baseUrl}/${endpoint}`, formData, {
@@ -369,7 +374,7 @@ export class CommonService {
             this.uploadFiles(endpoint, files, paramsUrl, params, showLoading)
           )
         ),
-        finalize(() => this.globalService.decrementApiCallCount()) // Giảm bộ đếm khi hoàn thành
+        finalize(() => this.globalService.loadingHide()) // Giảm bộ đếm khi hoàn thành
       );
   }
 
@@ -379,7 +384,7 @@ export class CommonService {
     showLoading: boolean = true
   ): Observable<Blob> {
     if (showLoading) {
-      this.globalService.incrementApiCallCount(); // Tăng bộ đếm
+      this.globalService.loadingShow(); // Tăng bộ đếm
     }
     return this.http
       .get(`${this.baseUrl}/${endpoint}`, {
@@ -393,15 +398,22 @@ export class CommonService {
             this.downloadFile(endpoint, params, showLoading)
           )
         ),
-        finalize(() => this.globalService.decrementApiCallCount()) // Giảm bộ đếm khi hoàn thành
+        finalize(() => this.globalService.loadingHide()) // Giảm bộ đếm khi hoàn thành          
       );
   }
 
   private showSuccess(message: string): void {
     // this.message.create('success', message)
+    this.messService.show(message, 'success')
   }
-  private showError(message: string): void {
-    // this.message.create('error', message)
+  private showError(mess: string, type: any = 'warning'): void {
+    const has404 = mess.includes("404");
+    if (has404) {
+      mess = "Cấu hình api không chính xác!!"
+      type = 'danger'
+    }
+    if (mess.includes("Http failure during parsing")) return
+    this.messService.show(mess, type)
   }
 
   private handleError = (
@@ -443,30 +455,18 @@ export class CommonService {
       if (error.error && error.error.messageObject) {
         if (error.error.messageObject.messageDetail) {
           console.log(error.error.messageObject.messageDetail);
+
           errorMessage = error.error.messageObject.messageDetail;
         } else {
           errorMessage = `MSG${error.error.messageObject.code} ${error.error.message}`;
         }
 
-        //console.log(error)
-        //this.showError(error.error.messageObject.messageDetail.message)
-        // Swal.fire({
-        //   showCloseButton: true,
-        //   color: '#e74c3c',
-        //   width: 600,
-        //   html: `<strong>${`MSG${error.error.messageObject.code}`}</strong><br><strong>${
-        //     error.error.messageObject.message
-        //   }</strong><br><br>${error.error.messageObject.messageDetail.replace(/\./g, '.<br>')}`,
-        //   footer: `LogID - ${error.error.messageObject.logId}`,
-        //   position: 'top-end',
-        //   showConfirmButton: false,
-        //   allowOutsideClick: true,
-        // })
       } else {
         errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
       }
     }
-    return throwError(errorMessage);
+    this.showError(errorMessage)
+    return throwError(errorMessage)
   };
 
   private refreshToken(): Observable<any> {

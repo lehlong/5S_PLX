@@ -61,6 +61,7 @@ namespace PLX5S.BUSINESS.Services.BU
             try
             {
                 var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
+                var ky = inputKy.Result.KiKhaoSat;
                 var result = new List<KetQuaChamDiem>();
                 var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
                 if (filterReport.SurveyId == "DT1")
@@ -80,6 +81,14 @@ namespace PLX5S.BUSINESS.Services.BU
                             Name = item.Name,
                             Length = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Length ?? 0,
                             point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
+                            Description = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Description,
+                            EvaluateFilter = new EvaluateFilter
+                            {
+                                KiKhaoSatId = filterReport.KiKhaoSatId,
+                                SurveyId = ky.SurveyMgmtId,
+                                LstData = item.LstChamDiem,
+                                DoiTuongId = item.Id,
+                            }
                         };
 
                         result.Add(report);
@@ -102,8 +111,16 @@ namespace PLX5S.BUSINESS.Services.BU
                             Name = item.Name,
                             Length = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Length ?? 0,
                             point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
+                            Description = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Description,
+                            EvaluateFilter = new EvaluateFilter
+                            {
+                                KiKhaoSatId = filterReport.KiKhaoSatId,
+                                SurveyId = ky.SurveyMgmtId,
+                                LstData = item.LstChamDiem,
+                                DoiTuongId = item.Id,
+                            }
                         };
-                        
+
                         result.Add(report);
                     }
 
@@ -589,7 +606,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         ExcelNPOIExtention.SetCellValueNumber(row, 2, i.Length, styles.Number);
                         ExcelNPOIExtention.SetCellValueNumber(row, 3, i.point, styles.Number);
                         ExcelNPOIExtention.SetCellValueText(row, 4, "", styles.Text);
-                        ExcelNPOIExtention.SetCellValueText(row, 5, "", styles.Text);
+                        ExcelNPOIExtention.SetCellValueText(row, 5, i.Description, styles.Text);
 
                         startIndex++;
                     }

@@ -37,6 +37,7 @@ export class ListComponent implements OnInit {
   lstDoiTuong: any = [];
   lstKiKhaoSat: any = [];
   surveyId: any;
+  now = new Date()
   filterForm!: FormGroup;
   isOpen = false;
   lstAccount: any = [];
@@ -89,9 +90,12 @@ export class ListComponent implements OnInit {
       next: (data) => {
         this.lstKiKhaoSat = data.data;
         const filter = localStorage.getItem('filterLS') ?? '';
-        const filter2 = data.data.reduce((a: any, b: any) =>
-          new Date(a.endDate) > new Date(b.endDate) ? a : b
-        );
+        const filter2 =
+          data.data.find((item: any) => {
+            const d = new Date(item.endDate);
+            return d.getMonth() === this.now.getMonth() && d.getFullYear() === this.now.getFullYear();
+          }) || data.data[0] || null;
+
         if (filter != '') {
           this.filter = JSON.parse(filter);
           if (this.filter.filterKiKhaoSat.surveyMgmtId != this.surveyId) {
@@ -156,8 +160,10 @@ export class ListComponent implements OnInit {
   }
 
   searchDoiTuong(kiKhaoSat: any) {
-    this.inputSearchKiKhaoSat = kiKhaoSat;
-    this.inputSearchKiKhaoSat.doiTuong = this.doiTuong;
+    console.log(kiKhaoSat);
+    this.inputSearchKiKhaoSat = kiKhaoSat ?? {};
+    this.inputSearchKiKhaoSat.doiTuong = this.doiTuong ?? '';
+
     this._service.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
       next: (data) => {
         if (data.lstInputStore.length != 0) {

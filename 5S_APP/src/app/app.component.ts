@@ -39,7 +39,6 @@ export class AppComponent implements OnDestroy {
             this.mediaQueryListener
           );
         } catch (err) {
-          console.error('Error initializing StatusBar', err);
         }
       }
     });

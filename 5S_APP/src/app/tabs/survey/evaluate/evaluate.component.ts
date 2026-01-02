@@ -420,7 +420,6 @@ export class EvaluateComponent implements OnInit {
 
   async onSubmit() {
     if (!this.isEdit) return;
-    let checkUpload: boolean = false
     let allChecksPassed = true;
     let errorMessage: string[] = [];
 
@@ -477,24 +476,16 @@ export class EvaluateComponent implements OnInit {
       return;
     }
 
-    // Hiển thị loading
-    const loading = await this.loadingController.create({
-      message: 'Đang xử lý...',
-      spinner: 'circular',
-    });
-    await loading.present();
 
     const offlineFiles = this.evaluate.lstImages.filter((x: any) => x?.isBase64);
 
     if (offlineFiles?.length > 0) {
       const checkUpload = await this.uploadOfflineFiles(offlineFiles);
       if (!checkUpload) {
-        await loading.dismiss();
         this.messageService.show('Vui lòng kết nối mạng để nộp!!!', 'warning');
         return;
       }
     }
-
     try {
       this.tinhTong();
 
@@ -505,49 +496,29 @@ export class EvaluateComponent implements OnInit {
 
       console.log(this.evaluate);
 
-      await this._service.insertEvaluate2(this.evaluate).subscribe({
-        next: async (data) => {
-          console.log('Chấm điểm thành công');
-          await this._service
-            .HandlePointStore({
-              kiKhaoSatId: this.kiKhaoSat.id,
-              doiTuongId: this.doiTuong.id,
-              surveyId: this.kiKhaoSat.surveyMgmtId,
-              lstData: this.doiTuong.lstChamDiem,
-            })
-            .subscribe({
-              next: async (data) => {
-                console.log('tính tổng điểm thành công');
+      // 🔥 Gọi API chính và chờ kết quả
+      const data = await firstValueFrom(
+        this._service.insertEvaluate2(this.evaluate)
+      );
 
-                // Đóng loading
-                await loading.dismiss();
+      // 🔥 Gọi API thứ hai (không cần đợi)
+      this._service.HandlePointStore({
+        kiKhaoSatId: this.kiKhaoSat.id,
+        doiTuongId: this.doiTuong.id,
+        surveyId: this.kiKhaoSat.surveyMgmtId,
+        lstData: this.doiTuong.lstChamDiem,
+      }).subscribe();
 
-                this.messageService.show(
-                  `Chấm điểm Cửa hàng thành công`,
-                  'success'
-                );
-                await this.removeData()
-              },
-              error: async (error) => {
-                // Đóng loading khi có lỗi
-                await loading.dismiss();
-                console.error('Lỗi khi tính tổng điểm:', error);
-                this.messageService.show('Có lỗi xảy ra khi tính tổng điểm');
-              },
-            });
-        },
-        error: async (error) => {
-          // Đóng loading khi có lỗi
-          await loading.dismiss();
-          console.error('Lỗi khi chấm điểm:', error);
-          this.messageService.show('Có lỗi xảy ra khi chấm điểm');
-        },
-      });
+      // Sau khi chấm điểm xong
+      console.log('Chấm điểm thành công');
+      this.messageService.show(`Chấm điểm Cửa hàng thành công`, 'success');
+
+      // 🔥 Xóa data local
+      await this.removeData();
+
     } catch (error) {
-      // Đóng loading trong trường hợp có lỗi không mong muốn
-      await loading.dismiss();
-      console.error('Lỗi không mong muốn:', error);
-      this.messageService.show('Có lỗi không mong muốn xảy ra');
+      console.error('Lỗi khi chấm điểm:', error);
+      // this.messageService.show('Có lỗi xảy ra khi chấm điểm');
     }
   }
 

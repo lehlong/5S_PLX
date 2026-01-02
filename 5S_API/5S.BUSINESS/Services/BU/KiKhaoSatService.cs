@@ -19,6 +19,7 @@ using NPOI.SS.Formula.Functions;
 using Microsoft.AspNetCore.Hosting;
 using Services.AD;
 using Dtos.AD;
+using PLX5S.CORE.Statics;
 
 
 namespace PLX5S.BUSINESS.Services.BU
@@ -306,18 +307,18 @@ namespace PLX5S.BUSINESS.Services.BU
                 var lstInputStore = new List<InputStore>();
                 var lstInputWareHouse = new List<InputWarehouse>();
                 var ki = _dbContext.TblBuKiKhaoSat.AsNoTracking().Where(x => x.IsDeleted != true && x.Id == idKi).FirstOrDefault();
+                var survey = _dbContext.TblBuSurveyMgmt.FirstOrDefault(x => x.Id == ki.SurveyMgmtId);
                 var lstMdStore = _dbContext.tblMdStore.ToList();
-                var lstMdWareHouse = _dbContext.TblMdWareHouse.ToList();
                 var lstPointstore = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == idKi).ToList();
                 var lstChamDiem = _dbContext.TblBuInputChamDiem.AsNoTracking().Where(x => x.IsDeleted != true && x.KiKhaoSatId == idKi).ToList();
-                var lstInDoiTuong = _dbContext.TblBuInputDoiTuong.AsNoTracking().Where(x => x.IsDeleted != true && x.SurveyMgmtId == ki.SurveyMgmtId && x.IsActive == true).ToList();
+                var lstInDoiTuong = _dbContext.TblBuInputDoiTuong.AsNoTracking().Where(x => x.IsDeleted != true && x.SurveyMgmtId == ki.SurveyMgmtId && x.IsActive == true).OrderBy(x => x.DoiTuongId).ToList();
 
-                foreach (var item in lstInDoiTuong)
+                if (survey.DoiTuongId == DoiTuongType.CuaHang)
                 {
-                    var store = lstMdStore.Where(x => x.Id == item.DoiTuongId).FirstOrDefault();
-                    var WareHouse = lstMdWareHouse.Where(x => x.Id == item.DoiTuongId).FirstOrDefault();
-                    if (store != null)
+                    foreach (var item in lstInDoiTuong)
                     {
+                        var store = lstMdStore.Where(x => x.Id == item.DoiTuongId).FirstOrDefault();
+
                         var lstChamDiem2 = lstChamDiem.Where(x => x.DoiTuongId == item.DoiTuongId).ToList();
                         var inStore = new InputStore()
                         {
@@ -335,10 +336,19 @@ namespace PLX5S.BUSINESS.Services.BU
                             Point = lstPointstore.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
                             LstChamDiem = lstChamDiem2.Select(x => x.UserName).ToList()
                         };
+                        
                         lstInputStore.Add(inStore);
+
                     }
-                    else if (WareHouse != null)
+                }
+                if (survey.DoiTuongId == DoiTuongType.Kho)
+                {
+                    var lstMdWareHouse = _dbContext.TblMdWareHouse.ToList();
+                    foreach (var item in lstInDoiTuong)
                     {
+
+                        var WareHouse = lstMdWareHouse.Where(x => x.Id == item.DoiTuongId).FirstOrDefault();
+
                         var lstChamDiem3 = lstChamDiem.Where(x => x.DoiTuongId == item.DoiTuongId).ToList();
                         var inWareHousee = new InputWarehouse()
                         {
@@ -356,11 +366,12 @@ namespace PLX5S.BUSINESS.Services.BU
                     }
                 }
 
+
                 return new KiKhaoSatModel()
                 {
                     KiKhaoSat = ki,
-                    lstInputStore = lstInputStore,
-                    lstInputWareHouse = lstInputWareHouse
+                    lstInputStore = lstInputStore.OrderBy(x => x.Name).ToList(),
+                    lstInputWareHouse = lstInputWareHouse.OrderBy(x => x.Name).ToList()
                 };
             }
             catch (Exception ex)

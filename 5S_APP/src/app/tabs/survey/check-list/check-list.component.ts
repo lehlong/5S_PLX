@@ -16,7 +16,6 @@ import { FileOfflineService } from 'src/app/service/common/systemfile.service';
   styleUrls: ['./check-list.component.scss'],
 })
 export class CheckListComponent implements OnInit {
-  [x: string]: any;
   kiKhaoSat: any = {};
   mode: 'draft' | 'new' = 'draft';
   doiTuong: any = {};
@@ -24,6 +23,7 @@ export class CheckListComponent implements OnInit {
   doiTuongId: any = '';
   deviceID: string = '';
   account: any = {};
+  now = new Date()
   lstAccout: any = [];
   evaluate: any = {
     header: {},
@@ -105,13 +105,12 @@ export class CheckListComponent implements OnInit {
 
   checkRightEvaluate() {
     const date = new Date(this.kiKhaoSat.endDate);
-    const now = new Date();
 
-    const currentMonth = now.getMonth() + 1;
+    const currentMonth = this.now.getMonth() + 1;
 
     if (
       this.kiKhaoSat?.trangThaiKi !== '2' ||
-      date.getMonth() + 1 < currentMonth
+      (date.getMonth() + 1) !== currentMonth
     )
       return false;
     if (this.account.allowScoring) return true;

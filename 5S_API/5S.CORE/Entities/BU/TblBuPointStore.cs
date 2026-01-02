@@ -29,6 +29,9 @@ namespace PLX5S.CORE.Entities.BU
         [Column("POINT", TypeName = "DECIMAIL(18.3)")]
         public decimal? Point { get; set; }
 
+        [Column("DESCRIPTION", TypeName = "NVARCHAR(350)")]
+        public string? Description { get; set; }
+
         [Column("LENGTH", TypeName = "DECIMAIL(18.0)")]
         public decimal? Length { get; set; } //đếm số lần chấm điểm
     }

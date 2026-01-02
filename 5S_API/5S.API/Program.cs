@@ -205,8 +205,12 @@ var kikhaosatService = scope.ServiceProvider.GetRequiredService<IKikhaosatServic
 var backgroundJobService = new BackgroundJobService(dbContext, kikhaosatService);
 var recurringJobManager = app.Services.GetRequiredService<IRecurringJobManager>();
 recurringJobManager.AddOrUpdate("AutoCreate", () => backgroundJobService.AutoCreateKy(), "0 0 */1 27 * *");
-recurringJobManager.AddOrUpdate("AutoStart", () => backgroundJobService.AutoStartKy(), "0 0 */1 28 * *");
-recurringJobManager.AddOrUpdate("AutoClose", () => backgroundJobService.AutoCloseKy(), "0 0 */1 1 * *");
+//recurringJobManager.AddOrUpdate("AutoStart", () => backgroundJobService.AutoStartKy(), "0 0 */15 1 * *");
+    recurringJobManager.AddOrUpdate("AutoStart",
+        () => backgroundJobService.AutoStartKy(),
+        "0 */15 * 1 * *");
+
+//recurringJobManager.AddOrUpdate("AutoClose", () => backgroundJobService.AutoCloseKy(), "0 0 */1 1 * *");
 //recurringJobManager.AddOrUpdate("AutoCreate", () => backgroundJobService.AutoCreateKy(), "*/59 * * * * *");
 
 
@@ -441,7 +445,7 @@ app.Run();
 //        "0 */15 * 27 * *");
 //    recurringJobManager.AddOrUpdate("AutoStart",
 //        () => backgroundJobService.AutoStartKy(),
-//        "0 */15 * 28,29,30,31 * *");
+//        "0 */15 * 1 * *");
 
 //    recurringJobManager.AddOrUpdate("AutoClose",
 //        () => backgroundJobService.AutoCloseKy(),

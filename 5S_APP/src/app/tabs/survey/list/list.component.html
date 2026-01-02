@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-back-button slot="start"></ion-back-button>
-    <h5 class="t-center">Chấm điểm 5S {{ doiTuong }}</h5>
+    <h5 class="t-center">Chấm điểm 5S {{ doiTuong ?? '' }}</h5>
     <ion-button (click)="openFilterModal()" id="open-modal" fill="clear" class="custom-color" slot="end">
       <ion-icon name="filter-outline"></ion-icon>
     </ion-button>
@@ -17,9 +17,9 @@
     <ion-item>
       <ion-icon slot="start" class="c-purple" name="warning-outline"></ion-icon>
       <p>Trạng thái</p>
-      <ion-chip *ngIf="filter.filterKiKhaoSat.trangThaiKi === '0'" slot="end" color="danger">Đã đóng</ion-chip>
-      <ion-chip *ngIf="filter.filterKiKhaoSat.trangThaiKi === '1'" slot="end" color="primary">Khởi tạo</ion-chip>
-      <ion-chip *ngIf="filter.filterKiKhaoSat.trangThaiKi === '2'" slot="end" color="success">Đang mở</ion-chip>
+      <ion-chip *ngIf="filter.filterKiKhaoSat?.trangThaiKi === '0'" slot="end" color="danger">Đã đóng</ion-chip>
+      <ion-chip *ngIf="filter.filterKiKhaoSat?.trangThaiKi === '1'" slot="end" color="primary">Khởi tạo</ion-chip>
+      <ion-chip *ngIf="filter.filterKiKhaoSat?.trangThaiKi === '2'" slot="end" color="success">Đang mở</ion-chip>
     </ion-item>
     <ion-item lines="none">
       <ion-select justify="end" interface="popover" label="Sắp xếp theo:" placeholder="" [(ngModel)]="selectValue"

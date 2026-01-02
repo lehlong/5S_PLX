@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { LoadingController } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GlobalService {
-  private loading: BehaviorSubject<boolean>;
   private apiCallCount: number = 0;
   private userNameSubject: BehaviorSubject<string | null> = new BehaviorSubject<
     string | null
@@ -15,12 +15,15 @@ export class GlobalService {
   rightData: any = [];
   breadcrumbSubject: Subject<boolean> = new Subject<boolean>();
   breadcrumb: any = [];
+  private loading: HTMLIonLoadingElement | null = null;
+
 
   orgCode?: string = localStorage.getItem('companyCode')?.toString();
   warehouseCode?: string = localStorage.getItem('warehouseCode')?.toString();
 
-  constructor() {
-    this.loading = new BehaviorSubject<boolean>(false);
+  constructor(
+    private loadingCtrl: LoadingController
+  ) {
     this.rightSubject.subscribe((value) => {
       localStorage.setItem('userRights', value);
       this.rightData = value;
@@ -107,27 +110,6 @@ export class GlobalService {
     }
   }
 
-  getLoading(): Observable<boolean> {
-    return this.loading.asObservable();
-  }
-
-  setLoading(newValue: boolean): void {
-    setTimeout(() => {
-      this.loading.next(newValue);
-    });
-  }
-
-  incrementApiCallCount(): void {
-    this.apiCallCount++;
-    this.setLoading(true);
-  }
-
-  decrementApiCallCount(): void {
-    this.apiCallCount--;
-    if (this.apiCallCount === 0) {
-      this.setLoading(false);
-    }
-  }
 
   incrementApiCallCountNoLoading(): void {
     this.apiCallCount++;
@@ -142,4 +124,34 @@ export class GlobalService {
       ? false
       : true;
   }
+
+  private isCreatingLoading = false;
+
+  async loadingShow(message: string = 'Đang xử lý...') {
+    if (this.loading || this.isCreatingLoading) return;
+
+    this.isCreatingLoading = true;
+    this.loading = await this.loadingCtrl.create({
+      message: '',
+      spinner: null,
+      cssClass: 'custom-loading',
+      backdropDismiss: false,
+      showBackdrop: true
+    });
+    this.isCreatingLoading = false;
+
+    await this.loading.present();
+  }
+
+  async loadingHide() {
+    try {
+      if (this.loading) {
+        await this.loading.dismiss();
+        this.loading = null;
+      }
+    } catch (e) {
+      this.loading = null;
+    }
+  }
+
 }

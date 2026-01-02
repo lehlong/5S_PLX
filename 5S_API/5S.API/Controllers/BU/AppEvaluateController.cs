@@ -148,6 +148,7 @@ namespace PLX5S.API.Controllers.BU
             await _service.InsertEvaluate2(data);
             if (_service.Status)
             {
+                transferObject.MessageObject.Message = _service.MessageObject.Message;
                 transferObject.Status = true;
             }
             else
@@ -155,6 +156,7 @@ namespace PLX5S.API.Controllers.BU
                 transferObject.Status = false;
                 transferObject.MessageObject.MessageType = MessageType.Error;
                 transferObject.GetMessage("0001", _service);
+                transferObject.MessageObject.MessageDetail = _service.MessageObject.Message;
             }
             return Ok(transferObject);
         }
@@ -220,7 +222,8 @@ namespace PLX5S.API.Controllers.BU
         public async Task<IActionResult> HandlePointStore([FromBody] EvaluateFilter param)
         {
             var transferObject = new TransferObject();
-            await _service.HandlePointStore(param);
+            //await _service.HandlePointStore(param);
+            await _service.HandlePointStore2(param);
             if (_service.Status)
             {
                 transferObject.Status = true;
@@ -253,24 +256,6 @@ namespace PLX5S.API.Controllers.BU
         }
 
 
-        //[HttpGet("")]
-        //public async Task<IActionResult> GetPointStore([FromQuery] string kiKhaoSatId, string surveyId)
-        //{
-        //    var transferObject = new TransferObject();
-        //    var data = await _service.GetPointStore(kiKhaoSatId, surveyId);
-        //    if (_service.Status)
-        //    {
-        //        transferObject.Data = data;
-        //        transferObject.Status = true;
-        //    }
-        //    else
-        //    {
-        //        transferObject.Status = false;
-        //        transferObject.MessageObject.MessageType = MessageType.Error;
-        //        transferObject.GetMessage("0001", _service);
-        //    }
-        //    return Ok(transferObject);
-        //}
 
         [HttpGet("GetPointStore")]
         public async Task<IActionResult> GetPointStore([FromQuery] string kiKhaoSatId, string surveyId)
@@ -308,15 +293,6 @@ namespace PLX5S.API.Controllers.BU
                 transferObject.GetMessage("0001", _service);
             }
             return Ok(transferObject);
-        }
-
-
-        //[HttpPost("upload-image")]
-        //public async Task<IActionResult> UploadImage([FromBody] ImageUploadRequest request)
-        //{
-        //    
-        //}
-
-
+        } 
     }
 }

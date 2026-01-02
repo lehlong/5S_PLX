@@ -1,4 +1,5 @@
-﻿using PLX5S.CORE.Entities.BU;
+﻿using Common;
+using PLX5S.CORE.Entities.BU;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -14,7 +15,6 @@ namespace PLX5S.BUSINESS.Models
         public string? KiKhaoSatId { set; get; }
         public string? SurveyId { set; get; }
         public string? DoiTuongId { set; get; }
-
     }
 
 
@@ -24,6 +24,9 @@ namespace PLX5S.BUSINESS.Models
         public string Name { set; get; }
         public decimal? Length { set; get; }
         public decimal? point { set; get; }
+        public string? Description { set; get; }
+        public EvaluateFilter EvaluateFilter { set; get; } = new EvaluateFilter();
+
     }
 
     public class ThoiGianChamDiem

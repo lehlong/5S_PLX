@@ -1,30 +1,22 @@
 ﻿using AutoMapper;
 using Common;
+using FirebaseAdmin.Auth;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
-using NPOI.HPSF;
-using NPOI.SS.Formula.Functions;
 using PLX5S.BUSINESS.Common;
 using PLX5S.BUSINESS.Dtos.BU;
 using PLX5S.BUSINESS.Models;
 using PLX5S.CORE;
+using PLX5S.CORE.Entities.AD;
 using PLX5S.CORE.Entities.BU;
+using PLX5S.CORE.Statics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
-using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Threading.Tasks;
-using static Google.Cloud.Firestore.V1.StructuredAggregationQuery.Types.Aggregation.Types;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Xml.Serialization;
 
 namespace PLX5S.BUSINESS.Services.BU
 {
@@ -34,14 +26,15 @@ namespace PLX5S.BUSINESS.Services.BU
         Task<List<TieuChiDto>> GetAllTieuChiLeaves(string kiKhaoSatId, string doiTuongId);
         Task<EvaluateModel> BuildInputEvaluate(string kiKhaoSatId, string doiTuongId, string deviceId);
         Task<object> UploadFile(IFormFile request);
-        Task InsertEvaluate(EvaluateModel data); 
+        Task InsertEvaluate(EvaluateModel data);
         Task InsertEvaluate2(EvaluateModel data);
         Task<TblBuEvaluateImage> HandelFile(TblBuEvaluateImage request);
         Task<EvaluateModel> GetResultEvaluate(string code);
         Task TinhTongLanCham(TblBuPoint point);
         Task<List<TblBuPoint>> GetPointStore(string kiKhaoSatid, string surveyId);
-        Task <List<TblBuNotification>> GetNotification();
+        Task<List<TblBuNotification>> GetNotification();
         Task HandlePointStore(EvaluateFilter param);
+        Task HandlePointStore2(EvaluateFilter param);
         Task<HomeModel> GetDataHome(string userName);
         Task<List<TblBuEvaluateImage>> UploadFileOffline(List<FileModel> files);
     }
@@ -96,7 +89,7 @@ namespace PLX5S.BUSINESS.Services.BU
             {
                 Code = node.Code,
                 Id = node.Id,
-                Key = node.Id,   
+                Key = node.Id,
                 Name = node.Name,
                 Title = node.Name,
                 PId = node.PId,
@@ -217,7 +210,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         IsActive = true,
                         KiKhaoSatId = kiKhaoSatId,
                         CreateDate = DateTime.Now,
-                        DeviceId= deviceId
+                        DeviceId = deviceId
                     },
                     LstEvaluate = lstTieuChi.Select(x => new TblBuEvaluateValue
                     {
@@ -232,7 +225,6 @@ namespace PLX5S.BUSINESS.Services.BU
             }
             catch (Exception ex)
             {
-
                 return null;
             }
         }
@@ -330,7 +322,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 string folder = GetFolderByExtension();
 
                 // Tạo tên file
-                    string physicalFileName = BuildFileName(file.FileName, extension);
+                string physicalFileName = BuildFileName(file.FileName, extension);
                 //string newFileName = $"{Guid.NewGuid()}{extension}";
                 string thumbFileName = $"{Guid.NewGuid()}_thumb{extension}";
 
@@ -378,7 +370,8 @@ namespace PLX5S.BUSINESS.Services.BU
                 // Trả về URL public
                 //string baseUrl = $"{Request.Scheme}://{Request.Host}/";
 
-                return new TblBuEvaluateImage {
+                return new TblBuEvaluateImage
+                {
                     Code = Guid.NewGuid().ToString(),
                     FilePath = $"{fullFolderPath}/{physicalFileName}",
                     FileName = file.FileName,
@@ -580,7 +573,7 @@ namespace PLX5S.BUSINESS.Services.BU
                     LstImages = _dbContext.TblBuEvaluateImage.Where(x => x.EvaluateHeaderCode == code).ToList()
                 };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 this.Status = false;
                 return null;
@@ -611,19 +604,21 @@ namespace PLX5S.BUSINESS.Services.BU
             try
             {
                 var diem = _dbContext.TblBuPoint.FirstOrDefault(x => x.DoiTuongId == point.DoiTuongId && x.KiKhaoSatId == point.KiKhaoSatId && x.SurveyId == point.SurveyId);
-                if(diem == null)
+                if (diem == null)
                 {
                     point.Code = Guid.NewGuid().ToString();
+                    point.Description = point.Description;
                     await _dbContext.TblBuPoint.AddAsync(point);
                 }
                 else
                 {
                     diem.Point = point.Point;
+                    diem.Description = point.Description;
                     diem.Length = point.Length;
                 }
                 await _dbContext.SaveChangesAsync();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 this.Status = false;
                 //return null;
@@ -641,13 +636,13 @@ namespace PLX5S.BUSINESS.Services.BU
                 {
                     this.Status = false;
                     return;
-                };
+                }
 
                 var lstImage = new List<TblBuEvaluateImage>();
 
-                var lstHeader = _dbContext.TblBuEvaluateHeader.Where(x => 
-                                    x.KiKhaoSatId == data.Header.KiKhaoSatId && 
-                                    x.DoiTuongId == data.Header.DoiTuongId && 
+                var lstHeader = _dbContext.TblBuEvaluateHeader.Where(x =>
+                                    x.KiKhaoSatId == data.Header.KiKhaoSatId &&
+                                    x.DoiTuongId == data.Header.DoiTuongId &&
                                     x.IsActive == true).ToList();
                 var header = lstHeader.OrderByDescending(x => x.Order).FirstOrDefault();
 
@@ -706,75 +701,51 @@ namespace PLX5S.BUSINESS.Services.BU
         }
 
 
-
+        //CHT, TK : 1 - 7
+        // avtsv : 8 - 15
+        //CHT, TK : 16 - 23
+        // atvsv : 24 - end
         public async Task InsertEvaluate2(EvaluateModel data)
         {
             try
             {
-                var dateNow = DateTime.Now;
-                if (_dbContext.TblBuKiKhaoSat.Any(x => x.Id == data.Header.KiKhaoSatId && x.EndDate <= dateNow))
+                var now = DateTime.Now;
+                //var now = new DateTime(2025, 12, 20);
+
+                var user = _dbContext.TblAdAccount.FirstOrDefault(x => x.UserName == data.Header.AccountUserName);
+                if (user.ChucVuId == null)
                 {
-                    this.Status = false;
+                    Status = false;
+                    MessageObject.Message = "Bạn chưa được phân chức vụ!!";
                     return;
                 }
-                ;
+                // 2️⃣ Lấy order lần chấm
+                int order = _dbContext.TblBuEvaluateHeader
+                            .Count(x =>
+                                x.KiKhaoSatId == data.Header.KiKhaoSatId &&
+                                x.DoiTuongId == data.Header.DoiTuongId);
 
-                var lstImage = new List<TblBuEvaluateImage>();
+                // 3️⃣ Gán thông tin hệ thống
+                data.Header.ChucVuId = user.ChucVuId;
+                data.Header.Order = order + 1;
+                data.Header.Name = $"Lần chấm thứ {(order + 1).ToString()}";
+                data.Header.UpdateDate = now;
 
-                var lstHeader = _dbContext.TblBuEvaluateHeader.Where(x =>
-                                    x.KiKhaoSatId == data.Header.KiKhaoSatId &&
-                                    x.DoiTuongId == data.Header.DoiTuongId &&
-                                    x.IsActive == true).ToList();
-                var header = lstHeader.OrderByDescending(x => x.Order).FirstOrDefault();
-
-
-                bool dot1 = lstHeader.Any(x =>
-                    x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 1) &&
-                    x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 7));
-
-                bool dot2 = lstHeader.Any(x =>
-                    x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 8) &&
-                    x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 15));
-
-                bool dot3 = lstHeader.Any(x =>
-                    x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 16) &&
-                    x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 23));
-
-                if (data.Header.ChucVuId == "CHT" || data.Header.ChucVuId == "TK")
-                {
-                    if (((dateNow.Day >= 08 && dateNow.Day <= 15) || (dateNow.Day >= 16 && dateNow.Day <= 23)) && !dot1)
-                    {
-                        data.Header.IsActive = false;
-                    }
-                    else if ((!dot1 && !dot3) && (dateNow.Day > 23))
-                    {
-                        data.Header.IsActive = false;
-                    }
-                }
-                else if (data.Header.ChucVuId == "ATVSV" && dateNow.Day >= 16 && !dot2)
-                {
-                    data.Header.IsActive = false;
-                }
-
-                data.Header.Name = "Lần chấm thứ " + (header != null ? header.Order + 1 : 1).ToString();
-                data.Header.Order = header != null ? header.Order + 1 : 1;
-                data.Header.UpdateDate = DateTime.Now;
-
-
-                _dbContext.TblBuEvaluateHeader.Add(data.Header);
-
-                _dbContext.TblBuEvaluateImage.AddRange(data.LstImages);
-                _dbContext.TblBuEvaluateValue.AddRange(data.LstEvaluate);
+                // 4️⃣ Insert
+                await _dbContext.TblBuEvaluateHeader.AddAsync(data.Header);
+                await _dbContext.TblBuEvaluateImage.AddRangeAsync(data.LstImages);
+                await _dbContext.TblBuEvaluateValue.AddRangeAsync(data.LstEvaluate);
 
                 await _dbContext.SaveChangesAsync();
-                this.Status = true;
+                Status = true;
             }
             catch (Exception ex)
             {
-                this.Status = false;
+                Status = false;
+                MessageObject.MessageDetail = "Chấm điểm thất bại!";
+                Exception = ex;
             }
         }
-
 
 
         public async Task HandlePointStore(EvaluateFilter param)
@@ -791,7 +762,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 decimal count = 0;
                 decimal countChuyenVien = 0;
 
-                if (checkViPham) 
+                if (checkViPham)
                 {
                     tong = 0;
                 }
@@ -823,7 +794,7 @@ namespace PLX5S.BUSINESS.Services.BU
                                 break;
                             }
 
-                        } 
+                        }
                         else if (item.ChucVuId == "ATVSV")
                         {
                             bool dot2 = lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList().Any(x =>
@@ -857,7 +828,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         }
 
                     }
-                    if(count == 0 || countChuyenVien == 0)
+                    if (count == 0 || countChuyenVien == 0)
                     {
                         tong = 0;
                     }
@@ -867,12 +838,8 @@ namespace PLX5S.BUSINESS.Services.BU
                         tongPointUser = tongPointUser / count;
 
                         tong = (tong * (tongPointUser + tongChuyenVien)) / 2;
-
                     }
-
                 }
-
-
                 await TinhTongLanCham(new TblBuPoint
                 {
                     Code = "",
@@ -882,7 +849,6 @@ namespace PLX5S.BUSINESS.Services.BU
                     SurveyId = param.SurveyId,
                     Point = tong,
                 });
-
             }
             catch (Exception ex)
             {
@@ -890,7 +856,158 @@ namespace PLX5S.BUSINESS.Services.BU
             }
         }
 
-        public  async Task<List<TblBuPoint>> GetPointStore(string kiKhaoSatid, string surveyId)
+        public async Task HandlePointStore2(EvaluateFilter param)
+        {
+            var now = DateTime.Now;
+            string description = "";
+            decimal tongDiem = 1;
+
+            var headers = await _dbContext.TblBuEvaluateHeader
+                .Where(x => x.KiKhaoSatId == param.KiKhaoSatId &&
+                            x.DoiTuongId == param.DoiTuongId &&
+                            x.IsActive == true)
+                .ToListAsync();
+
+            var users = await _dbContext.TblAdAccount
+                .Where(u => param.LstData.Contains(u.UserName))
+                .ToListAsync();
+
+            var rolesInStore = users.Select(x => x.ChucVuId).Distinct().ToList();
+
+
+            // =============================
+            // 1) XÁC ĐỊNH NHÓM QUẢN LÝ
+            // =============================
+            List<string> groupRoles = new();
+
+            if (rolesInStore.Contains(RoleIds.CHT))
+                groupRoles.Add(RoleIds.CHT);
+            else if (rolesInStore.Contains(RoleIds.TK))
+                groupRoles.Add(RoleIds.TK);
+
+            groupRoles.Add(RoleIds.ATVSV);
+
+            // =============================
+            // 3) KIỂM TRA CHUYÊN QUẢN (CQ)
+            // =============================
+            var cqUsers = users.Where(u => u.ChucVuId == RoleIds.CQ).ToList();
+            var headerCQ = headers.Any(x => x.ChucVuId == RoleIds.CQ);
+            if (!headerCQ)
+            {
+                if (cqUsers.Any())
+                {
+                    tongDiem = 0;
+                    description += "Chuyên quản Chưa chấm | ";
+                }
+                else
+                {
+                    description += "Thiếu chức vụ Chuyên quản | ";
+                }
+
+            }
+
+
+            // =============================
+            // 2) KIỂM TRA NHÓM QUẢN LÝ + ATVSV
+            // =============================
+            foreach (var roleId in groupRoles)
+            {
+                var roleUsers = users.Where(u => u.ChucVuId == roleId).ToList();
+
+                if (CheckViolationByGroup(roleId, headers, now, out var reason))
+                {
+                    tongDiem = 0;
+                    description += reason;
+                    goto TINH_DIEM;
+                }
+                else
+                {
+                    description += reason;
+                }
+            }
+
+
+
+        TINH_DIEM:
+
+            if (tongDiem > 0)
+                tongDiem = TinhDiemTong(headers);
+
+            await TinhTongLanCham(new TblBuPoint
+            {
+                KiKhaoSatId = param.KiKhaoSatId,
+                DoiTuongId = param.DoiTuongId,
+                SurveyId = param.SurveyId,
+                Point = tongDiem,
+                Description = description,
+                Length = headers.Count
+            });
+        }
+
+
+        private decimal TinhDiemTong(List<TblBuEvaluateHeader> headers)
+        {
+            var diemQuanLy = headers
+                .Where(x => DotChamHelper.BatBuocTheoChucVu.ContainsKey(x.ChucVuId))
+                .Select(x => x.Point)
+                .DefaultIfEmpty(0)
+                .Average();
+
+            var diemChuyenVien = headers
+                .Where(x => !DotChamHelper.BatBuocTheoChucVu.ContainsKey(x.ChucVuId))
+                .Select(x => x.Point)
+                .DefaultIfEmpty(0)
+                .Average();
+
+            if (diemQuanLy == 0 && diemChuyenVien == 0)
+                return 0;
+
+            return (diemQuanLy + diemChuyenVien) / 2;
+        }
+
+        private bool CheckViolationByGroup(string roleId, List<TblBuEvaluateHeader> allHeaders, DateTime now, out string description)
+        {
+            description = string.Empty;
+
+            // Không có rule → không vi phạm
+            if (!DotChamHelper.BatBuocTheoChucVu.TryGetValue(roleId, out var batBuocDots))
+                return false;
+
+            var nowDot = DotChamHelper.GetDot(now);
+
+            // Những đợt bắt buộc đã qua
+            var requiredDots = batBuocDots.Where(d => d <= nowDot).ToList();
+
+            // Lấy tất cả headers của role này (một hoặc nhiều người)
+            var headersOfRole = allHeaders
+                .Where(x => x.ChucVuId == roleId && x.UpdateDate != null)
+                .ToList();
+
+            // Danh sách đợt đã có người trong nhóm chấm
+            var dotsDaCham = headersOfRole
+                .Select(x => DotChamHelper.GetDot(x.UpdateDate.Value))
+                .Distinct()
+                .ToList();
+
+            // Kiểm tra thiếu đợt nào
+            var thieuDots = requiredDots
+                .Where(d => !dotsDaCham.Contains(d))
+                .ToList();
+
+            if (thieuDots.Any())
+            {
+                var roleName = DotChamHelper.GetRoleName(roleId);
+                var dotNames = thieuDots.Select(d => $"Đợt {DotChamHelper.ToNumber(d)}");
+
+                description = $"{roleName} chấm thiếu: {string.Join(", ", dotNames)} | ";
+                return true;
+            }
+
+            return false;
+        }
+
+
+        public async Task<List<TblBuPoint>> GetPointStore(string kiKhaoSatid, string surveyId)
         {
             try
             {
@@ -898,86 +1015,69 @@ namespace PLX5S.BUSINESS.Services.BU
                 lstPointStore = await _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == kiKhaoSatid && x.SurveyId == surveyId).ToListAsync();
                 return lstPointStore;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 this.Status = false;
                 return null;
             }
         }
 
+
         public async Task<HomeModel> GetDataHome(string userName)
         {
             try
             {
-                var dateNow = DateTime.Now;
-                bool isScore = true;
                 var result = new HomeModel();
-                var lstDoiTuong = new List<DoiTuong>();
+                var now = DateTime.Now;
+                //var now = new DateTime(2026, 01, 8);
+                var user = _dbContext.TblAdAccount.FirstOrDefault(x => x.UserName == userName);
+                var dot = GetDotInfo(now, user.ChucVuId);
 
-                var lstInChamDiem = _dbContext.TblBuInputChamDiem.Where(x => x.UserName == userName && x.IsActive == true).ToList();
-                var lstPoint = _dbContext.TblBuPoint.OrderBy(x => x.Code).ToList();
-                var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.AccountUserName == userName).ToList();
+                var lstSurvey = _dbContext.TblBuSurveyMgmt.OrderBy(x => x.Id).ToList();
+                var lstKy = _dbContext.TblBuKiKhaoSat.Where(x => x.TrangThaiKi == "2" && x.EndDate.Month == now.Month).ToList();
 
-                var lstInStore = _dbContext.TblBuInputDoiTuong.Where(x => x.SurveyMgmtId == "03805572-e6b7-4455-90fe-9b6584eef46f").ToList();
-                var lstInWareHouse = _dbContext.TblBuInputDoiTuong.Where(x => x.SurveyMgmtId == "16d30d78-0b80-4323-bd86-2498aae676a1").ToList();
+                var lstHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.AccountUserName == userName && lstKy.Select(x => x.Id).Contains(x.KiKhaoSatId)).ToList();
+                var lstChamDiem = _dbContext.TblBuInputChamDiem.Where(x => x.UserName == userName && lstKy.Select(x => x.Id).Contains(x.KiKhaoSatId)).ToList();
+                var lstPoint = _dbContext.TblBuPoint.Where(x => lstKy.Select(x => x.Id).Contains(x.KiKhaoSatId)).ToList();
 
-                var lstStore = _dbContext.tblMdStore.Where(x => x.IsActive == true).ToList();
-                var lstWareHouse = _dbContext.TblMdWareHouse.Where(x => x.IsActive == true).ToList();
+                var lstInDoiTuong = _dbContext.TblBuInputDoiTuong.Where(x => lstSurvey.Select(x => x.Id).Contains(x.SurveyMgmtId)).ToList();
+                var lstStore = _dbContext.tblMdStore.OrderBy(x => x.Id).ToList();
+                var lstWareHouse = _dbContext.TblMdWareHouse.OrderBy(x => x.Id).ToList();
 
-                var lstKiKhaoSatStore = _dbContext.TblBuKiKhaoSat.Where(x => x.TrangThaiKi == "2" && x.SurveyMgmtId == "03805572-e6b7-4455-90fe-9b6584eef46f" && x.EndDate.Month == dateNow.Month).ToList();
-                var lstKiKhaoSatKho = _dbContext.TblBuKiKhaoSat.Where(x => x.TrangThaiKi == "2" && (x.SurveyMgmtId == "16d30d78-0b80-4323-bd86-2498aae676a1") && x.EndDate.Month == dateNow.Month).ToList();
-
-                foreach (var i in lstKiKhaoSatStore)
+                foreach (var i in lstChamDiem)
                 {
-                    var lstAllNguoiCham = _dbContext.TblBuInputChamDiem.Where(x => x.KiKhaoSatId == i.Id).ToList();
-                    foreach (var e in lstInStore)
+                    var ky = lstKy.FirstOrDefault(x => x.Id == i.KiKhaoSatId);
+                    var survey = lstSurvey.FirstOrDefault(x => x.Id == ky.SurveyMgmtId);
+                    var doiTuongName = survey.DoiTuongId == "DT1"
+                            ? lstStore.FirstOrDefault(x => x.Id == i.DoiTuongId).Name
+                            : survey.DoiTuongId == "DT2"
+                                ? lstWareHouse.FirstOrDefault(x => x.Id == i.DoiTuongId).Name
+                                : "";
+                    var doiTuongId = lstInDoiTuong.FirstOrDefault(x => x.DoiTuongId == i.DoiTuongId && ky.SurveyMgmtId == x.SurveyMgmtId).Id;
+                    var isScore = dot.Dot == 0 ? false : !lstHeader.Any(x => x.UpdateDate >= dot.FDate && x.UpdateDate <= dot.EDate && x.DoiTuongId == doiTuongId);
+                    var scored = dot.Dot == 0 ? false : lstHeader.Any(x => x.UpdateDate >= dot.FDate && x.UpdateDate <= dot.EDate && x.DoiTuongId == doiTuongId);
+
+                    result.LstDoiTuong.Add(new DoiTuong()
                     {
-                        result.LanCham = result.LanCham + lstEvaHeader.Count(x => x.KiKhaoSatId == i.Id && x.DoiTuongId == e.Id && x.IsActive == true);
-                        result.ViPham = result.ViPham + lstEvaHeader.Count(x => x.KiKhaoSatId == i.Id && x.DoiTuongId == e.Id && x.IsActive == false);
-                        lstDoiTuong.AddRange(lstInChamDiem.Where(x => x.KiKhaoSatId == i.Id && x.DoiTuongId == e.DoiTuongId).Select(x => new DoiTuong
-                        {
-                            Id = e.Id,
-                            Name = lstStore.FirstOrDefault(_x => _x.Id == e.DoiTuongId).Name,
-                            FDate = i.StartDate,
-                            EndDate = i.EndDate,
-                            Type = "DT1",
-                            SurveyId = "03805572-e6b7-4455-90fe-9b6584eef46f",
-                            Point = lstPoint.FirstOrDefault(y => y.DoiTuongId == e.Id && y.KiKhaoSatId == i.Id)?.Point ?? 0,
-                            KiKhaoSatCode = i.Code,
-                            KiKhaoSatName = i.Name,
-                            LstChamDiem = lstAllNguoiCham.Where(_x => _x.DoiTuongId == e.DoiTuongId).Select(_x => _x.UserName).ToList(),
-                            KiKhaoSatId = i.Id,
-                        }).ToList());
-                    }
+                        Id = doiTuongId,
+                        Name = doiTuongName,
+                        KiKhaoSatCode = ky.Code,
+                        KiKhaoSatId = ky.Id,
+                        KiKhaoSatName = ky.Name,
+                        FDate = ky.StartDate,
+                        EndDate = ky.EndDate,
+                        Type = survey.DoiTuongId,
+                        Point = lstPoint.FirstOrDefault(y => y.DoiTuongId == lstInDoiTuong.FirstOrDefault(x => x.DoiTuongId == i.DoiTuongId).Id)?.Point ?? 0,
+                        IsScore = isScore,
+                        TimeText = FormatToMonthYear(ky.EndDate),
+                        Description = GetChamDiemStatus(ky.EndDate, now, scored, user.ChucVuId),
+                        Scored = scored,
+                        LstChamDiem = [userName]
+                    });
                 }
-                foreach (var i in lstKiKhaoSatKho)
-                {
-                    var lstAllNguoiCham = _dbContext.TblBuInputChamDiem.Where(x => x.KiKhaoSatId == i.Id).ToList();
 
-                    foreach (var e in lstInWareHouse)
-                    {
-                        result.LanCham = result.LanCham + lstEvaHeader.Count(x => x.KiKhaoSatId == i.Id && x.DoiTuongId == e.Id && x.IsActive == true);
-                        result.ViPham = result.ViPham + lstEvaHeader.Count(x => x.KiKhaoSatId == i.Id && x.DoiTuongId == e.Id && x.IsActive == false);
-
-                        lstDoiTuong.AddRange(lstInChamDiem.Where(x => x.KiKhaoSatId == i.Id && x.DoiTuongId == e.DoiTuongId).Select(x => new DoiTuong
-                        {
-                            Id = e.Id,
-                            Name = lstWareHouse.FirstOrDefault(_x => _x.Id == e.DoiTuongId).Name,
-                            FDate = i.StartDate,
-                            EndDate = i.EndDate,
-                            Type = "DT2",
-                            SurveyId = "16d30d78-0b80-4323-bd86-2498aae676a1",
-                            Point = lstPoint.FirstOrDefault(y => y.DoiTuongId == e.Id && y.KiKhaoSatId == i.Id)?.Point ?? 0,
-                            KiKhaoSatCode = i.Code,
-                            KiKhaoSatName = i.Name,
-                            LstChamDiem = lstAllNguoiCham.Where(_x => _x.DoiTuongId == e.DoiTuongId).Select(_x => _x.UserName).ToList(),
-                            KiKhaoSatId = i.Id,
-                        }).ToList());
-                    }
-                }
-                result.LstDoiTuong.AddRange(lstDoiTuong);
-
-                result = await HandleLanCham(result, userName);
+                result.LanCham = lstHeader.Count();
+                result.ChuaCham = dot.Dot == 0 ? 0 : result.LstDoiTuong.Count(x => x.IsScore == true);
 
                 return result;
             }
@@ -987,6 +1087,112 @@ namespace PLX5S.BUSINESS.Services.BU
                 return null;
             }
         }
+
+        public static DotInfo GetDotInfo(DateTime date, string? chucVuId = null)
+        {
+            var dot = DotChamHelper.GetDot2(date, chucVuId);     // dùng hàm enum DotCham có sẵn
+
+            // fDate, eDate theo đợt
+            var fDate = dot switch
+            {
+                DotCham.Dot1 => new DateTime(date.Year, date.Month, 1),
+                DotCham.Dot2 => new DateTime(date.Year, date.Month, 8),
+                DotCham.Dot3 => new DateTime(date.Year, date.Month, 16),
+                DotCham.Dot4 => new DateTime(date.Year, date.Month, 24),
+                _ => new DateTime(date.Year, date.Month, 1)
+            };
+
+            var eDate = dot switch
+            {
+                DotCham.Dot1 => new DateTime(date.Year, date.Month, 7),
+                DotCham.Dot2 => new DateTime(date.Year, date.Month, 15),
+                DotCham.Dot3 => new DateTime(date.Year, date.Month, 23),
+                DotCham.Dot4 => new DateTime(date.Year, date.Month, DateTime.DaysInMonth(date.Year, date.Month)),
+                _ => new DateTime(date.Year, date.Month, DateTime.DaysInMonth(date.Year, date.Month))
+            };
+
+            return new DotInfo((int)dot, fDate, eDate);
+        }
+
+        public string FormatToMonthYear(DateTime dateStr)
+        {
+            var month = dateStr.Month.ToString("00");
+            var year = dateStr.Year;
+
+            return $"T{month}/{year}";
+        }
+
+        public string GetChamDiemStatus(DateTime eDate, DateTime now, bool scored, string chucVuId)
+        {
+            DateTime date = eDate;
+            //DateTime now = new DateTime(2026, 1, 8);
+            // nếu muốn dùng ngày hiện tại thực tế:
+
+            int currentMonth = now.Month;
+            int currentYear = now.Year;
+            int dateMonth = date.Month;
+            int dateYear = date.Year;
+            int dateDay = now.Day;
+
+            if (scored)
+                return "Đã chấm";
+
+            if (dateMonth != currentMonth || dateYear != currentYear)
+                return "Ngoài thời gian chấm";
+
+            // CHT, TK, ATVSV
+            if (chucVuId == RoleIds.CHT || chucVuId == RoleIds.TK || chucVuId == RoleIds.ATVSV)
+            {
+                // CHT + TK → ngày 01–07
+                if (dateDay >= 1 && dateDay <= 7 &&
+                    (chucVuId == RoleIds.CHT || chucVuId == RoleIds.TK))
+                {
+                    return $"Trong thời gian (01-07/{currentMonth:00})";
+                }
+
+                // CHT + TK → ngày 16–23
+                if (dateDay >= 16 && dateDay <= 23 &&
+                    (chucVuId == RoleIds.CHT || chucVuId == RoleIds.TK))
+                {
+                    return $"Trong thời gian (15-23/{currentMonth:00})";
+                }
+
+                // ATVSV → ngày 08–15
+                if (dateDay >= 8 && dateDay <= 15 && chucVuId == RoleIds.ATVSV)
+                {
+                    return $"Trong thời gian (08-15/{currentMonth:00})";
+                }
+
+                // ATVSV → ngày 24–30
+                if (dateDay >= 24 && chucVuId == RoleIds.ATVSV)
+                {
+                    return $"Trong thời gian (24-30/{currentMonth:00})";
+                }
+
+                return "Ngoài thời gian chấm";
+            }
+            else
+            {
+                return "Trong thời gian chấm";
+            }
+        }
+        //public async Task<HomeModel> CountViPham(HomeModel data, string chucVuId, DateTime now)
+        //{
+        //    var dot = DotChamHelper.GetDot2(now, chucVuId);     // dùng hàm enum DotCham có sẵn
+        //    if (chucVuId == RoleIds.CQ || dot == DotCham.Dot1)
+        //    {
+        //        return data;
+        //    }
+
+        //    if((dot == DotCham.Dot2 || dot == DotCham.Dot3) && (chucVuId == RoleIds.CHT || chucVuId == RoleIds.TK))
+        //    {
+        //        data.LanCham >= data.LstDoiTuong.Count()
+        //            ? return data
+        //            : return
+        //    }
+
+        //    return null;
+        //}
 
         public async Task<HomeModel> HandleLanCham(HomeModel data, string userName)
         {
@@ -998,7 +1204,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 var dateNow = DateTime.Now;
                 var user = _dbContext.TblAdAccount.FirstOrDefault(x => x.UserName == userName);
                 var lstEvaHeader = await _dbContext.TblBuEvaluateHeader.Where(x => x.AccountUserName == userName && x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 1)).ToListAsync();
-                
+
                 if (dateNow.Day <= 7)
                 {
                     foreach (var item in data.LstDoiTuong)
@@ -1009,7 +1215,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         }
                         else
                         {
-                            if(user.ChucVuId != "ATVSV")
+                            if (user.ChucVuId != "ATVSV")
                             {
                                 item.IsScore = true;
                                 data.ChuaCham = data.ChuaCham + 1;
@@ -1020,7 +1226,7 @@ namespace PLX5S.BUSINESS.Services.BU
                             }
                         }
                     }
-                } 
+                }
                 else if (dateNow.Day > 7 && dateNow.Day < 15)
                 {
                     foreach (var item in data.LstDoiTuong)
@@ -1067,7 +1273,8 @@ namespace PLX5S.BUSINESS.Services.BU
                                 data.ChuaCham = data.ChuaCham + 1;
                                 item.IsScore = false;
                             }
-                        }else if (user.ChucVuId == "ATVSV")
+                        }
+                        else if (user.ChucVuId == "ATVSV")
                         {
                             if (lstEvaHeader.Any(x => x.DoiTuongId == item.Id &&
                                 x.KiKhaoSatId == item.KiKhaoSatId &&
@@ -1111,7 +1318,7 @@ namespace PLX5S.BUSINESS.Services.BU
                                 x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 7)) || (
                                 x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 15) &&
                                 x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 23))
-                                ) ))
+                                )))
                             {
                                 item.IsScore = false;
                             }
@@ -1158,7 +1365,7 @@ namespace PLX5S.BUSINESS.Services.BU
 
                 return data;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 this.Status = false;
                 return null;

@@ -13,7 +13,7 @@ export class AppEvaluateService {
   }
 
   HandlePointStore(params: any): Observable<any> {
-    return this.commonService.post(`AppEvaluate/HandlePointStore`, params)
+    return this.commonService.post(`AppEvaluate/HandlePointStore`, params, false)
   }
 
   GetAllTieuChiLeaves(kiKhaoSatId: any, doiTuongId: any): Observable<any> {
@@ -35,7 +35,7 @@ export class AppEvaluateService {
   }
 
   insertEvaluate2(params: any): Observable<any> {
-    return this.commonService.post(`AppEvaluate/InsertEvaluate2`, params)
+    return this.commonService.post(`AppEvaluate/InsertEvaluate2`, params, false)
   }
 
   tinhTongLanCham(params: any): Observable<any> { 

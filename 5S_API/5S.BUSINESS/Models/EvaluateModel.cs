@@ -1,9 +1,4 @@
 ﻿using PLX5S.CORE.Entities.BU;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PLX5S.BUSINESS.Models
 {
@@ -29,13 +24,19 @@ namespace PLX5S.BUSINESS.Models
         public string? KiKhaoSatCode { set; get; }
         public string? Name { set; get; }
         public string? Type { set; get; }
-        public bool? IsScore { set; get; } = false;
         public string? KiKhaoSatName { set; get; }
         public string? SurveyId { set; get; }
         public string? KiKhaoSatId { set; get; }
+        public string? TimeText { set; get; }
+        public string? Description { set; get; }
+        public bool? IsScore { set; get; } = false;
+        public bool? Scored { set; get; } = false;
         public decimal? Point { set; get; }
+        public decimal? viPham { set; get; }
         public DateTime? FDate { set; get; }
         public DateTime? EndDate { set; get; }
         public List<string>? LstChamDiem { set; get; }
     }
+
+    public record DotInfo(int Dot, DateTime FDate, DateTime EDate);
 }
