@@ -1,169 +1,169 @@
-<ion-content>
-  <!-- 🚀 Thêm ion-refresher vào đầu ion-content -->
-  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)" pullFactor="5" closeDuration="10000ms" pullMin="1000"
-    pullMax="2000">
-    <ion-refresher-content>
-    </ion-refresher-content>
-  </ion-refresher>
+  <ion-content>
+    <!-- 🚀 Thêm ion-refresher vào đầu ion-content -->
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)" pullFactor="5" closeDuration="10000ms" pullMin="1000"
+      pullMax="2000">
+      <ion-refresher-content>
+      </ion-refresher-content>
+    </ion-refresher>
 
-  <div class="main-news">
-    <div class="d-flex" style="margin-bottom: 10px" (click)="reload()">
-      <!-- <div class=""></div> -->
-      <img style="width: 40px" src="../../../assets/img/logo.png" alt="" />
-      <h4 style="
-          font-size: 20px;
-          border-bottom: 1px solid #d7d7d7;
-          padding-left: 4px;
-          margin: 5px 0;
-        ">
-        Chấm điểm
-      </h4>
-    </div>
-    <!-- <div style="padding: 20px 10px;">
+    <div class="main-news">
+      <div class="d-flex" style="margin-bottom: 10px" (click)="reload()">
+        <!-- <div class=""></div> -->
+        <img style="width: 40px" src="../../../assets/img/logo.png" alt="" />
+        <h4 style="
+            font-size: 20px;
+            border-bottom: 1px solid #d7d7d7;
+            padding-left: 4px;
+            margin: 5px 0;
+          ">
+          Chấm điểm
+        </h4>
+      </div>
+      <!-- <div style="padding: 20px 10px;">
 
-      <h4>Khảo Sát 5S</h4>
-      <h4>Morning, Hoang Trung Kien</h4>
-    </div> -->
-    <ng-container *ngIf="userInfo">
-      <div class="user-info" style="padding: 8px">
-        <ion-grid style="background-color: #254edb; border-radius: 10px; padding: 10px">
-          <ion-row class="ion-align-items-center">
-            <ion-col style="margin-right: 8px;" size="2">
-              <!-- <ion-icon class="icon-user" name="person-outline"></ion-icon> -->
-              <ion-icon style="border: 3px solid #fff; border-radius: 10px;" class="avatar" name="person"></ion-icon>
-            </ion-col>
-            <ion-col size="8">
-              <h5 style="margin: 0px" class="user-name">{{ userInfo.fullName }}</h5>
-              <p class="user-position" style="margin: 0px; opacity: 0.8;">
-                {{ getChucVuName(userInfo.chucVuId) }}
-              </p>
-            </ion-col>
-            <ion-col style="text-align: center">
-              <div style="position: relative; display: inline-block; color: black"></div>
-            </ion-col>
-          </ion-row>
-          <ion-row class="calendar-row ion-justify-content-start" style="
-              width: 100%;
-              color: #f4f4f5d9;
-              padding: 8px;
-              border-radius: 8px;
-              background-color: #183188;
-              font-size: 10px;
-            ">
-            <ion-icon name="calendar-outline" style="padding: 0 10px"></ion-icon>
-            {{ formattedDate }}
+        <h4>Khảo Sát 5S</h4>
+        <h4>Morning, Hoang Trung Kien</h4>
+      </div> -->
+      <ng-container *ngIf="userInfo">
+        <div class="user-info" style="padding: 8px">
+          <ion-grid style="background-color: #254edb; border-radius: 10px; padding: 10px">
+            <ion-row class="ion-align-items-center">
+              <ion-col style="margin-right: 8px;" size="2">
+                <!-- <ion-icon class="icon-user" name="person-outline"></ion-icon> -->
+                <ion-icon style="border: 3px solid #fff; border-radius: 10px;" class="avatar" name="person"></ion-icon>
+              </ion-col>
+              <ion-col size="8">
+                <h5 style="margin: 0px" class="user-name">{{ userInfo.fullName }}</h5>
+                <p class="user-position" style="margin: 0px; opacity: 0.8;">
+                  {{ getChucVuName(userInfo.chucVuId) }}
+                </p>
+              </ion-col>
+              <ion-col style="text-align: center">
+                <div style="position: relative; display: inline-block; color: black"></div>
+              </ion-col>
+            </ion-row>
+            <ion-row class="calendar-row ion-justify-content-start" style="
+                width: 100%;
+                color: #f4f4f5d9;
+                padding: 8px;
+                border-radius: 8px;
+                background-color: #183188;
+                font-size: 10px;
+              ">
+              <ion-icon name="calendar-outline" style="padding: 0 10px"></ion-icon>
+              {{ formattedDate }}
+            </ion-row>
+          </ion-grid>
+        </div>
+      </ng-container>
+
+      <div>
+        <ion-grid class="container-job-card">
+          <ion-row gap="2" class="space-card">
+            <ng-container *ngIf="fullData">
+              <div class="bg-success card-job-item ion-text-center">
+                <h5><strong style="color: white">{{fullData.lanCham}}</strong></h5>
+                <p style="color: white">Lần chấm</p>
+              </div>
+              <div class="bg-warning card-job-item ion-text-center">
+                <h5><strong style="color: white">{{fullData.chuaCham}}</strong></h5>
+                <p style="color: white">Chưa chấm</p>
+              </div>
+
+              <div class="bg-purple card-job-item ion-text-center">
+                <h5><strong style="color: white">{{fullData.viPham}}</strong></h5>
+                <p style="color: white">Vi phạm</p>
+              </div>
+            </ng-container>
           </ion-row>
         </ion-grid>
       </div>
-    </ng-container>
-
-    <div>
-      <ion-grid class="container-job-card">
-        <ion-row gap="2" class="space-card">
-          <ng-container *ngIf="fullData">
-            <div class="bg-success card-job-item ion-text-center">
-              <h5><strong style="color: white">{{fullData.lanCham}}</strong></h5>
-              <p style="color: white">Lần chấm</p>
-            </div>
-            <div class="bg-warning card-job-item ion-text-center">
-              <h5><strong style="color: white">{{fullData.chuaCham}}</strong></h5>
-              <p style="color: white">Chưa chấm</p>
-            </div>
-
-            <div class="bg-purple card-job-item ion-text-center">
-              <h5><strong style="color: white">{{fullData.viPham}}</strong></h5>
-              <p style="color: white">Vi phạm</p>
-            </div>
-          </ng-container>
-        </ion-row>
-      </ion-grid>
-    </div>
-    <div class="horizontal-scroll-buttons d-flex px-4 w-100 gap-5">
-      <ion-button *ngFor="let item of buttons" [class.active]="selected === item.value" class="custom"
-        (click)="select(item.value)">{{ item.label }}
-        {{ item.value == 'store' ? storeLength : item.value == 'warehouse' ? wareHouseLength : item.value == 'chuaCham'
-        ? chuaChamLength : '' }}
-      </ion-button>
-    </div>
-    <!-- all -->
-    <ng-container>
-      <ion-item-group class="group-item">
-        <ion-grid>
-          <ion-list class="list-item">
-            <ion-item [button]="true" *ngFor="let data of dataHome" (click)="navigateItem(data)"
-              style=" --background: none; width: auto;"
-              [ngClass]="{ 'highlight-score': data.isScore === false }" class="d-flex m-2">
-              <div class="py-4 h-100">
-                <div class="unread-indicator" [ngClass]="{'bg-none' : data.scored}"></div>
-              </div>
-              <div class="w-100 me-5 my-3" >
-                <div class="item-info d-flex">
-                  <h5 class="mg-0 my-3 fs-13">
-                    {{ data.name }}
-                  </h5>
-                  <p class="mg-0">
-                    <ion-chip *ngIf="data.point >= 95" color="success">{{ data.point }}</ion-chip>
-                    <ion-chip *ngIf="data.point >= 90 && data.point < 95" color="primary">{{ data.point }}</ion-chip>
-                    <ion-chip *ngIf="data.point >= 80 && data.point < 90" color="warning">{{ data.point }}</ion-chip>
-                    <ion-chip *ngIf="data.point < 80" color="tertiary">{{ data.point }}</ion-chip>
-                  </p>
+      <div class="horizontal-scroll-buttons d-flex px-4 w-100 gap-5">
+        <ion-button *ngFor="let item of buttons" [class.active]="selected === item.value" class="custom"
+          (click)="select(item.value)">{{ item.label }}
+          {{ item.value == 'store' ? storeLength : item.value == 'warehouse' ? wareHouseLength : item.value == 'chuaCham'
+          ? chuaChamLength : '' }}
+        </ion-button>
+      </div>
+      <!-- all -->
+      <ng-container>
+        <ion-item-group class="group-item">
+          <ion-grid>
+            <ion-list class="list-item">
+              <ion-item [button]="true" *ngFor="let data of dataHome" (click)="navigateItem(data)"
+                style=" --background: none; width: auto;"
+                [ngClass]="{ 'highlight-score': data.isScore === false }" class="d-flex m-2">
+                <div class="py-4 h-100">
+                  <div class="unread-indicator" [ngClass]="{'bg-none' : data.scored}"></div>
                 </div>
-                <div class="time-box d-flex">
-                  <span class="text-italic" style="font-size: 12px">
-                    <ion-icon name="calendar-outline"></ion-icon>
-                    {{ data?.timeText }}</span>
-                  <span class="text-italic" style="font-size: 12px; padding-left: 15px">{{ data?.description }}</span>
+                <div class="w-100 my-3" >
+                  <div class="item-info d-flex">
+                    <h5 class="mg-0 my-3 fs-13">
+                      {{ data.name }}
+                    </h5>
+                    <p class="mg-0">
+                      <ion-chip *ngIf="data.point >= 95" color="success">{{ data.point }}</ion-chip>
+                      <ion-chip *ngIf="data.point >= 90 && data.point < 95" color="primary">{{ data.point }}</ion-chip>
+                      <ion-chip *ngIf="data.point >= 80 && data.point < 90" color="warning">{{ data.point }}</ion-chip>
+                      <ion-chip *ngIf="data.point < 80" color="tertiary">{{ data.point }}</ion-chip>
+                    </p>
+                  </div>
+                  <div class="time-box d-flex">
+                    <span class="text-italic" style="font-size: 12px">
+                      <ion-icon name="calendar-outline"></ion-icon>
+                      {{ data?.timeText }}</span>
+                    <span class="text-italic" style="font-size: 12px; padding-left: 15px">{{ data?.description }}</span>
+                  </div>
                 </div>
-              </div>
-            </ion-item>
-          </ion-list>
-        </ion-grid>
-      </ion-item-group>
-    </ng-container>
-    <!-- store -->
-    <ion-segment-view style="padding: 0 15px">
-      <ion-segment-content *ngFor="let item of paginationResult.data" id="second" class="item-survey" style="
-          background-image: url('../../../assets/img/bg-store.jpeg');
-        " (click)="navigateTo(item.id)">
-        <div class="text-segment-content">
-          <p style="font-size: 14px;">{{ item.name }}</p>
-          <span style="font-size: 14px; color: white;  opacity: 0.8">
-            Đánh giá ngay <ion-icon name="arrow-forward-outline"></ion-icon>
-          </span>
-        </div>
-        <div class="logo">
-          <img style="width: 74px; height: 62px" src="../../../assets/img/Logo_of_Petrolimex.svg.png" alt="" />
-        </div>
-      </ion-segment-content>
+              </ion-item>
+            </ion-list>
+          </ion-grid>
+        </ion-item-group>
+      </ng-container>
+      <!-- store -->
+      <ion-segment-view style="padding: 0 15px">
+        <ion-segment-content *ngFor="let item of paginationResult.data" id="second" class="item-survey" style="
+            background-image: url('../../../assets/img/bg-store.jpeg');
+          " (click)="navigateTo(item.id)">
+          <div class="text-segment-content">
+            <p style="font-size: 14px;">{{ item.name }}</p>
+            <span style="font-size: 14px; color: white;  opacity: 0.8">
+              Đánh giá ngay <ion-icon name="arrow-forward-outline"></ion-icon>
+            </span>
+          </div>
+          <div class="logo">
+            <img style="width: 74px; height: 62px" src="../../../assets/img/Logo_of_Petrolimex.svg.png" alt="" />
+          </div>
+        </ion-segment-content>
 
-      <!-- <ion-segment-content id="third" class="item-survey" style="
-          background-image: url('../../../assets/img/bg-ware-house.jpeg');
-        " (click)="navigateTo('16d30d78-0b80-4323-bd86-2498aae676a1')">
-        <div class="text-segment-content">
-          <p style="font-size: 14px;">Chấm điểm 5s kho</p>
-          <a style="font-size: 14px; opacity: 0.8;" href="">
-            Đánh giá ngay <ion-icon name="arrow-forward-outline"></ion-icon>
-          </a>
-        </div>
-        <div class="logo">
-          <img style="width: 74px; height: 62px" src="../../../assets/img/Logo_of_Petrolimex.svg.png" alt="" />
-        </div>
-      </ion-segment-content>
+        <!-- <ion-segment-content id="third" class="item-survey" style="
+            background-image: url('../../../assets/img/bg-ware-house.jpeg');
+          " (click)="navigateTo('16d30d78-0b80-4323-bd86-2498aae676a1')">
+          <div class="text-segment-content">
+            <p style="font-size: 14px;">Chấm điểm 5s kho</p>
+            <a style="font-size: 14px; opacity: 0.8;" href="">
+              Đánh giá ngay <ion-icon name="arrow-forward-outline"></ion-icon>
+            </a>
+          </div>
+          <div class="logo">
+            <img style="width: 74px; height: 62px" src="../../../assets/img/Logo_of_Petrolimex.svg.png" alt="" />
+          </div>
+        </ion-segment-content>
 
 
-      <ion-segment-content id="four" class="item-survey" style="
-          background-image: url('../../../assets/img/bg-ware-house.jpeg');
-        " (click)="navigateTo('6ce4b2ad-dfc4-4a17-8182-1cc5ca183839')">
-        <div class="text-segment-content">
-          <p style="font-size: 14px;">Chấm điểm 5s kho</p>
-          <a style="font-size: 14px; opacity: 0.8;" href="">
-            Đánh giá ngay <ion-icon name="arrow-forward-outline"></ion-icon>
-          </a>
-        </div>
-        <div class="logo">
-          <img style="width: 74px; height: 62px" src="../../../assets/img/Logo_of_Petrolimex.svg.png" alt="" />
-        </div>
-      </ion-segment-content> -->
-    </ion-segment-view>
-  </div>
-</ion-content>
+        <ion-segment-content id="four" class="item-survey" style="
+            background-image: url('../../../assets/img/bg-ware-house.jpeg');
+          " (click)="navigateTo('6ce4b2ad-dfc4-4a17-8182-1cc5ca183839')">
+          <div class="text-segment-content">
+            <p style="font-size: 14px;">Chấm điểm 5s kho</p>
+            <a style="font-size: 14px; opacity: 0.8;" href="">
+              Đánh giá ngay <ion-icon name="arrow-forward-outline"></ion-icon>
+            </a>
+          </div>
+          <div class="logo">
+            <img style="width: 74px; height: 62px" src="../../../assets/img/Logo_of_Petrolimex.svg.png" alt="" />
+          </div>
+        </ion-segment-content> -->
+      </ion-segment-view>
+    </div>
+  </ion-content>

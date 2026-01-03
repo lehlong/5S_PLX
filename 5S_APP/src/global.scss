@@ -559,29 +559,20 @@ $spacing-unit: 0.25rem;
 
 
 /// Loading
-/// 
-/* Khung loading */
+// /// /* --- Custom Loader --- */
 .custom-loading .loading-wrapper {
   background: none !important;
   box-shadow: none !important;
-}
-
-/* backdrop */
-.custom-loading .backdrop-no-tappable{
-  background: rgba(0, 0, 0, 0.799) !important;
-
-}
-.custom-loading .loading-wrapper {
-  background: none;
-  padding: 40px;
-  position: relative;
+  // width: 120px;
+  // height: 120px
+  padding: 0;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  color: white
+  justify-content: center;
+  position: relative;
 }
 
-/* Logo */
+/* Logo 5S */
 .custom-loading .loading-wrapper::before {
   content: "";
   width: 70px;
@@ -593,34 +584,36 @@ $spacing-unit: 0.25rem;
   z-index: 3;
 }
 
-/* Vòng tròn nét đứt */
+/* SVG nét đứt – render mượt trên mọi hệ điều hành */
 .custom-loading .loading-wrapper::after {
   content: "";
+  width: 80px;
+  height: 80px;
   position: absolute;
-  width: 75px;
-  height: 75px;
-  border-radius: 50%;
-  border: 6px dashed #ffffff;
-  animation: spinDashed 3.4s linear infinite;
+  top: -5px;
+  left: -5px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-image: url("data:image/svg+xml;utf8,\
+<svg width='80' height='80' xmlns='http://www.w3.org/2000/svg'>\
+  <circle cx='40' cy='40' r='37' \
+    stroke='white' \
+    stroke-width='6' \
+    fill='none' \
+    stroke-dasharray='8 15' \
+    stroke-linecap='round' />\
+</svg>");
+  animation: spin 3.2s linear infinite;
   z-index: 1;
 }
 
-/* Animation vòng tròn nét đứt */
-@keyframes spinDashed {
+/* Xoay SVG */
+@keyframes spin {
   from {
     transform: rotate(0deg);
   }
-  to {
-    transform: rotate(360deg);
-  }
-}
 
-/* Animation ngược nếu muốn dùng */
-@keyframes spinReverse {
-  from {
-    transform: rotate(360deg);
-  }
   to {
-    transform: rotate(0deg);
+    transform: rotate(360deg);
   }
 }
