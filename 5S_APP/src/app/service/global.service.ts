@@ -142,10 +142,13 @@ export class GlobalService {
 
     await this.loading.present();
   }
-
   async loadingHide() {
     try {
       if (this.loading) {
+
+        // Delay 500ms
+        await new Promise(resolve => setTimeout(resolve, 500));
+
         await this.loading.dismiss();
         this.loading = null;
       }

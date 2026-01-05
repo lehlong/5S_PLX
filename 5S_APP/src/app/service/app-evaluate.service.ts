@@ -39,7 +39,7 @@ export class AppEvaluateService {
   }
 
   tinhTongLanCham(params: any): Observable<any> { 
-    return this.commonService.post(`AppEvaluate/TinhTongLanCham`, params)
+    return this.commonService.post(`AppEvaluate/TinhTongLanCham`, params, false)
   }
 
   getResultEvaluate(params: any): Observable<any> {
@@ -51,7 +51,7 @@ export class AppEvaluateService {
   }
 
   uploadFile(params: any){
-    return this.commonService.post(`AppEvaluate/UploadFile`, params)
+    return this.commonService.post(`AppEvaluate/UploadFile`, params, false)
   }
   
   uploadFileOffline(params: any){

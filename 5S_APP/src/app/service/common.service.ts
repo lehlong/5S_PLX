@@ -200,8 +200,6 @@ export class CommonService {
     return this.http.post<any>(`${this.baseUrl}/${endpoint}`, data).pipe(
       map(this.handleApiResponse),
       tap(() => {
-        console.log(showSuccess);
-
         if (showSuccess) {
           this.showSuccess('Thêm mới thông tin thành công');
         }
@@ -221,7 +219,7 @@ export class CommonService {
     }
     return this.http.put<any>(`${this.baseUrl}/${endpoint}`, data).pipe(
       map(this.handleApiResponse),
-      tap(() => this.showSuccess('Cập nhật thông tin thành công')),
+      tap(() => this.showSuccess('Cập nhật thông tin thành công', 'primary')),
       catchError((error) =>
         this.handleError(error, () => this.put<T>(endpoint, data, showLoading))
       ),
@@ -375,7 +373,7 @@ export class CommonService {
       );
   }
 
-  private showSuccess(message: string): void {
+  private showSuccess(message: string , type:'success' | 'danger' | 'warning' | 'primary' = 'primary'): void {
     // this.message.create('success', message)
     this.messService.show(message, 'success')
   }
