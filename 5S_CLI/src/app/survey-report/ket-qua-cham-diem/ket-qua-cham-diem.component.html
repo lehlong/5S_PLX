@@ -85,6 +85,7 @@
           <th nzWidth="">ĐIỂM BÌNH QUÂN</th>
           <th nzWidth="">XẾP LOẠI</th>
           <th nzWidth="">GHI CHÚ</th>
+          <th nzWidth="">Thao tác</th>
         </tr>
       </thead>
       <tbody>
@@ -93,10 +94,17 @@
           <td>{{ data.name }}</td>
           <td nzAlign="right">{{ data.length }}</td>
           <td nzAlign="right">{{ data.point }}</td>
-          <td  nzAlign="center">
+          <td nzAlign="center">
             <nz-tag *ngIf="data.point > 80" nzColor="blue">Tốt</nz-tag>
             <nz-tag *ngIf="data.point <= 30" nzColor="red">Kém</nz-tag>
             <nz-tag *ngIf="data.point > 30 && data.point <= 80" nzColor="orange">Khá</nz-tag>
+          </td>
+          <td>{{ data.description }}</td>
+          <td nzAlign="center">
+            <button nz-button (click)="tinhLai(data.evaluateFilter)" >
+              <nz-icon nzType="sync" nzTheme="outline" />
+              Xét lại
+            </button>
           </td>
         </tr>
       </tbody>

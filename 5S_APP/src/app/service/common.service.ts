@@ -155,11 +155,7 @@ export class CommonService {
       );
   }
 
-  get<T>(
-    endpoint: string,
-    params?: { [key: string]: any },
-    showLoading: boolean = true
-  ): Observable<T> {
+  get<T>(endpoint: string, params?: { [key: string]: any }, showLoading: boolean = true): Observable<T> {
     let httpParams = new HttpParams();
     if (params) {
       Object.keys(params).forEach((key) => {
@@ -197,12 +193,7 @@ export class CommonService {
       );
   }
 
-  post<T>(
-    endpoint: string,
-    data: any,
-    showSuccess: boolean = true,
-    showLoading: boolean = true
-  ): Observable<T> {
+  post<T>(endpoint: string, data: any, showSuccess: boolean = true, showLoading: boolean = true): Observable<T> {
     if (showLoading) {
       this.globalService.loadingShow(); // Tăng bộ đếm
     }
@@ -224,11 +215,7 @@ export class CommonService {
     );
   }
 
-  put<T>(
-    endpoint: string,
-    data: any,
-    showLoading: boolean = true
-  ): Observable<T> {
+  put<T>(endpoint: string, data: any, showLoading: boolean = true): Observable<T> {
     if (showLoading) {
       this.globalService.loadingShow(); // Tăng bộ đếm
     }
@@ -242,11 +229,7 @@ export class CommonService {
     );
   }
 
-  delete<T>(
-    endpoint: string,
-    data: any = {},
-    showLoading: boolean = true
-  ): Observable<T> {
+  delete<T>(endpoint: string, data: any = {}, showLoading: boolean = true): Observable<T> {
     if (showLoading) {
       this.globalService.loadingShow(); // Tăng bộ đếm
     }
@@ -262,11 +245,7 @@ export class CommonService {
     );
   }
 
-  deletes<T>(
-    endpoint: string,
-    data: string | number[],
-    showLoading: boolean = true
-  ): Observable<T> {
+  deletes<T>(endpoint: string, data: string | number[], showLoading: boolean = true): Observable<T> {
     if (showLoading) {
       this.globalService.loadingShow(); // Tăng bộ đếm
     }
@@ -327,13 +306,7 @@ export class CommonService {
       );
   }
 
-  uploadFiles(
-    endpoint: string,
-    files: File[],
-    paramsUrl?: { [key: string]: any },
-    params?: { [key: string]: any },
-    showLoading: boolean = true
-  ): Observable<any> {
+  uploadFiles(endpoint: string, files: File[], paramsUrl?: { [key: string]: any }, params?: { [key: string]: any }, showLoading: boolean = true): Observable<any> {
     const formData: FormData = new FormData();
     files.forEach((file) => {
       formData.append('files', file, file.name);
@@ -407,12 +380,6 @@ export class CommonService {
     this.messService.show(message, 'success')
   }
   private showError(mess: string, type: any = 'warning'): void {
-    const has404 = mess.includes("404");
-    if (has404) {
-      mess = "Cấu hình api không chính xác!!"
-      type = 'danger'
-    }
-    if (mess.includes("Http failure during parsing")) return
     this.messService.show(mess, type)
   }
 
@@ -455,17 +422,20 @@ export class CommonService {
       if (error.error && error.error.messageObject) {
         if (error.error.messageObject.messageDetail) {
           console.log(error.error.messageObject.messageDetail);
-
           errorMessage = error.error.messageObject.messageDetail;
+          this.showError(errorMessage)
         } else {
           errorMessage = `MSG${error.error.messageObject.code} ${error.error.message}`;
         }
 
       } else {
+        console.log(error);
+        if (!error.message.includes ('failure during parsing')) {
+          this.showError("Đường dẫn API không hợp lệ !!", 'danger')
+        }
         errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
       }
     }
-    this.showError(errorMessage)
     return throwError(errorMessage)
   };
 

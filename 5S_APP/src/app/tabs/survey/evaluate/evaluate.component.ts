@@ -400,16 +400,16 @@ export class EvaluateComponent implements OnInit {
   }
 
   async handleSave() {
-    let checkUpload = false
-    const offlineFiles = this.evaluate.lstImages.filter((x: any) => x?.isBase64);
-    if (offlineFiles?.length > 0) {
-      checkUpload = await this.uploadOfflineFiles(offlineFiles)
+    // let checkUpload = false
+    // const offlineFiles = this.evaluate.lstImages.filter((x: any) => x?.isBase64);
+    // if (offlineFiles?.length > 0) {
+    //   checkUpload = await this.uploadOfflineFiles(offlineFiles)
 
-      if (!checkUpload) {
-        this.messageService.show('Duy trì mạng ổn định trong quá trình gửi!!!', 'warning');
-        return
-      }
-    }
+    //   if (!checkUpload) {
+    //     this.messageService.show('Duy trì mạng ổn định trong quá trình gửi!!!', 'warning');
+    //     return
+    //   }
+    // }
     this.tinhTong()
     console.log('autoSave', this.evaluate);
     this.messageService.show(

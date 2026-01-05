@@ -144,9 +144,22 @@ export class KetQuaChamDiemComponent {
   getReport() {
     this._appReportService.KetQuaChamDiem({ surveyId: this.survey.doiTuongId, kiKhaoSatId: this.kiKhaosatId, doiTuongId: this.doiTuongId }).subscribe({
       next: (data) => {
-        console.log(data);
         this.lstData = data
       }
     })
   }
+
+  tinhLai(data: any){
+    console.log(data);
+    this._appReportService.tinhLai(data).subscribe({
+      next: ( resp) => {
+        this.message.success('Tính toán lại')
+        this.getReport()
+      },
+      error:(err) => {
+        
+      },
+    })
+  }
+
 }

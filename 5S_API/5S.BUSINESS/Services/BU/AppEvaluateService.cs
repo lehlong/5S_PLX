@@ -82,9 +82,8 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             var lstNode = new List<TieuChiDto>();
             var node = _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == kiKhaoSatId && x.PId == "-1" && x.IsDeleted != true).FirstOrDefault();
-            var lstBlack = _dbContext.TblBuCriteriaExcludedObject.Where(x => x.IsDeleted != true).ToList();
             var lstAllTieuChi = await _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == kiKhaoSatId && x.PId != "-1" && x.IsDeleted != true).OrderBy(x => x.OrderNumber).ToListAsync();
-            var indexTC = 0;
+            var lstBlack = _dbContext.TblBuCriteriaExcludedObject.Where(x => x.IsDeleted != true && x.DoiTuongId == doiTuongId && lstAllTieuChi.Select(x => x.Code).Contains(x.TieuChiCode)).ToList();
             var rootNode = new TieuChiDto()
             {
                 Code = node.Code,
@@ -107,8 +106,8 @@ namespace PLX5S.BUSINESS.Services.BU
             lstNode.Add(rootNode);
             foreach (var menu in lstAllTieuChi)
             {
-                var checkBack = lstBlack.FirstOrDefault(x => x.TieuChiCode == menu.Code && x.DoiTuongId == doiTuongId);
-                if (checkBack == null)
+                var checkBlack = lstBlack.FirstOrDefault(x => x.TieuChiCode == menu.Code);
+                if (checkBlack == null)
                 {
                     var node1 = new TieuChiDto()
                     {
@@ -153,13 +152,13 @@ namespace PLX5S.BUSINESS.Services.BU
             try
             {
                 var tieuChi = _dbContext.TblBuTieuChi.Where(x => x.IsDeleted != true && x.KiKhaoSatId == kiKhaoSatId && x.IsGroup == false).OrderBy(x => x.CreateDate).ToList();
-                var lstBlack = _dbContext.TblBuCriteriaExcludedObject.Where(x => x.IsDeleted != true).ToList();
-                var lstDiem = _dbContext.TblBuTinhDiemTieuChi.OrderBy(x => x.MoTa).ToList();
+                var lstBlack = _dbContext.TblBuCriteriaExcludedObject.Where(x => x.IsDeleted != true && x.DoiTuongId == doiTuongId && tieuChi.Select(x => x.Code).Contains(x.TieuChiCode)).ToList();
+                var lstDiem = _dbContext.TblBuTinhDiemTieuChi.Where(x => tieuChi.Select(x => x.Code).Contains(x.TieuChiCode)).OrderBy(x => x.MoTa).ToList();
                 var lstTieuChiLeaves = new List<TieuChiDto>();
                 foreach (var item in tieuChi)
                 {
-                    var checkBack = lstBlack.FirstOrDefault(x => x.TieuChiCode == item.Code && x.DoiTuongId == doiTuongId);
-                    if (checkBack == null)
+                    var checkBlack = lstBlack.FirstOrDefault(x => x.TieuChiCode == item.Code);
+                    if (checkBlack == null)
                     {
                         var leaves = new TieuChiDto()
                         {

@@ -495,9 +495,6 @@ export class KiKhaoSatComponent {
     if (event.node.parentNode.origin.code != event.dragNode.parentNode.origin.code) {
       this.CheckTreeLeaves();
     }
-
-
-
   }
 
   onDragStart(event: any) { }

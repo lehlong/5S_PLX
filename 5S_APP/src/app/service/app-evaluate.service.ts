@@ -55,6 +55,6 @@ export class AppEvaluateService {
   }
   
   uploadFileOffline(params: any){
-    return this.commonService.post(`AppEvaluate/UploadFileOffline`, params)
+    return this.commonService.post(`AppEvaluate/UploadFileOffline`, params, false)
   }
 }

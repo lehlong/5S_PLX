@@ -6,7 +6,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class AppReportService {
-  constructor(private commonService: CommonService) {}
+  constructor(private commonService: CommonService) { }
 
   KetQuaChamDiem(params: any): Observable<any> {
     return this.commonService.get('AppReport/KetQuaChamDiem', params);
@@ -31,6 +31,12 @@ export class AppReportService {
     return this.commonService.postNoMess(
       `AppReport/ExportExcel?ReportName=${NameReport}`,
       params
+    );
+  }
+  tinhLai(param: any): Observable<any> {
+    return this.commonService.postNoMess(
+      `AppEvaluate/HandlePointStore`,
+      param
     );
   }
 }

@@ -1,4 +1,3 @@
-
 import { Injectable } from '@angular/core';
 import { ToastController } from '@ionic/angular';
 
@@ -6,15 +5,37 @@ import { ToastController } from '@ionic/angular';
   providedIn: 'root'
 })
 export class MessageService {
-  constructor(private toastController: ToastController) {}
 
-  async show(message: string, color: 'success' | 'danger' | 'warning' | 'primary' = 'primary', duration: number = 3000, position: 'top' | 'middle' | 'bottom' = 'top') {
+  constructor(private toastController: ToastController) { }
+  async show(
+    message: string,
+    type: 'success' | 'danger' | 'warning' | 'primary' = 'primary',
+    autoClose = true,
+    position: 'top' | 'middle' | 'bottom' = 'top'
+  ) {
+    const icons: any = {
+      success: 'checkmark-circle-outline',
+      warning: 'alert-circle-outline',
+      danger: 'close-circle-outline',
+      info: 'information-circle-outline'
+    };
+
     const toast = await this.toastController.create({
       message,
-      duration,
+      duration: autoClose ? 3000 : 0,
       position,
-      color
+      color: type,
+      icon: icons[type],      // ⭐ CHỈ TRỎ ICON
+      cssClass: 'custom-toast',
+      buttons: [
+        {
+          icon: 'close',
+          role: 'cancel'
+        }
+      ]
     });
-    toast.present();
+
+    await toast.present();
   }
+
 }
