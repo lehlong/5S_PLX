@@ -617,3 +617,75 @@ $spacing-unit: 0.25rem;
     transform: rotate(360deg);
   }
 }
+
+
+
+
+
+
+
+/// show message
+/// 
+.custom-toast {
+  --border-radius: 16px;
+  --min-width: 90%;
+  // --max-width: 90%;
+  --box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.18);
+  margin-top: 12px !important;
+}
+
+/* căn layout ngang giữa icon + text */
+.custom-toast .toast-message {
+  padding: 14px 18px !important;
+}
+.toast-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* icon */
+.toast-icon {
+  --font-size: 30px;
+  min-width: 22px;
+}
+
+/* text */
+.toast-text {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* Close button (X) */
+.custom-toast ion-button {
+  --color: black;
+  --padding-start: 0 !important;
+  --padding-end: 0 !important;
+}
+
+.custom-toast .toast-button {
+  margin-right: 8px !important;
+}
+
+/* --- Colors --- */
+// .custom-toast.info {
+//   --background: #1976d2;
+//   --color: #ffffff;
+// }
+
+// .custom-toast.success {
+//   --background: #2e7d32;
+//   --color: #ffffff;
+// }
+
+// .custom-toast.warning {
+//   --background: #222428;
+//   // --background: #ffb300;
+//   --color: #000000;
+// }
+
+// .custom-toast.danger {
+//   --background: #d32f2f;
+//   --color: #ffffff;
+// }
