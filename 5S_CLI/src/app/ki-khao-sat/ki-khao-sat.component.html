@@ -12,7 +12,7 @@
         </button>
         <button (click)="reset()" class="flex !items-center !border-l-0 gray-btn" nzType="default" nz-button
           nzType="default">
-          <span nz-icon nzType="redo"></span> 
+          <span nz-icon nzType="redo"></span>
         </button>
       </nz-space>
       <button (click)="openCreateKi()" class="!flex !items-center space-btn" nzType="primary" nz-button>
@@ -107,14 +107,18 @@
 </nz-page-header>
 
 <!--Create Update kì khảo sát-->
-<nz-drawer [nzVisible]="visibleKiKhaoSat" [nzExtra]="extra"
+<nz-drawer [nzVisible]="visibleKiKhaoSat" [nzExtra]="extra" [nzMaskClosable]="edit"
   [nzTitle]="edit ? ' CHỈNH SỬA KỲ CHẤM ĐIỂM  ' : ' THÊM MỚI KỲ CHẤM ĐIỂM  '" [nzFooter]=" " (nzOnClose)="closeDrawer()"
   nzWidth="80%">
   <ng-container *nzDrawerContent>
 
     <!-- <form nz-form nzLayout="vertical" [formGroup]="validateForm" (ngSubmit)="submitForm()"> -->
     <nz-tabset (nzSelectedIndexChange)="onTabChange($event)">
-      <nz-tab nzTitle="THÔNG TIN KÌ CHẤM ĐIỂM">
+      <nz-tab [nzTitle]="info">
+        <ng-template #info>
+          <nz-icon nzType="profile" nzTheme="outline" class="m-0" />
+          THÔNG TIN KỲ CHẤM ĐIỂM
+        </ng-template>
         <div nz-row [nzGutter]="12">
           <div nz-col [nzXs]="12">
             <div class="inner-box">
@@ -163,39 +167,21 @@
         </div>
       </nz-tab>
 
-      <nz-tab nzTitle="NGƯỜI CHẤM ĐIỂM">
-        <!-- <nz-space style="float: right;">
-          <app-input-clear placeholder="Tìm kiếm" (enterEvent)="searchNguoiChamDiem()"
-            [(value)]="filterNguoiChamDiem"></app-input-clear>
-          <button (click)="searchNguoiChamDiem()" class="flex !items-center !border-l-0 gray-btn" nzType="default"
-            nz-button nzType="default">
-            <span nz-icon nzType="search"></span>
-          </button>
-          <button (click)="resetStore()" class="flex !items-center !border-l-0 gray-btn" nzType="default" nz-button
-            nzType="default">
-            <span nz-icon nzType="redo"></span>
-          </button>
-        </nz-space> -->
+      <nz-tab [nzTitle]="member">
+        <ng-template #member>
+          <nz-icon nzType="usergroup-add" nzTheme="outline" class="m-0" />
+          NGƯỜI CHẤM ĐIỂM
+        </ng-template>
         <nz-table *ngIf="inputKi.lstInputStore?.length  != 0" class="auto-scroll-table" #headerTable
           [nzData]="inputKi.lstInputStore" [nzFrontPagination]="false" [nzScroll]="{ y: 'calc(100vh - 244px)' }">
           <thead>
             <tr>
               <th nzWidth="60px">STT</th>
-              <th nzWidth="160px" [nzSortFn]="true" [nzAlign]="'left'">
-                Mã
-              </th>
-              <th [nzSortFn]="true">
-                Tên Cửa Hàng
-              </th>
-              <th [nzSortFn]="true">
-                Cửa Hàng Trưởng
-              </th>
-              <th [nzSortFn]="true">
-                Người Phụ Trách
-              </th>
-              <th [nzSortFn]="true">
-                Người Chấm Điểm
-              </th>
+              <th nzWidth="160px" [nzAlign]="'left'"> Mã </th>
+              <th> Tên Cửa Hàng </th>
+              <th> Cửa Hàng Trưởng </th>
+              <th> Người Phụ Trách </th>
+              <th nzWidth="460px"> Người Chấm Điểm </th>
             </tr>
           </thead>
           <tbody>
@@ -213,7 +199,7 @@
                   nzMode="multiple" nzPlaceHolder="Please select" [ngModelOptions]="{ standalone: true }"
                   [(ngModel)]="data.lstChamDiem" (ngModelChange)="onChangeChamDiem($event, data)">
                   <nz-option cdkScrollable *ngFor="let item of lstAccount; trackBy: trackByKey"
-                    [nzLabel]="item.fullName" [nzValue]="item.userName">
+                    [nzLabel]="item.fullName + getChucVu(item.chucVuId)" [nzValue]="item.userName">
                   </nz-option>
                 </nz-select>
               </td>
@@ -226,21 +212,11 @@
           <thead>
             <tr>
               <th nzWidth="60px">STT</th>
-              <th nzWidth="160px" [nzSortFn]="true" [nzAlign]="'left'">
-                Mã
-              </th>
-              <th [nzSortFn]="true">
-                Tên Kho
-              </th>
-              <th [nzSortFn]="true">
-                Trưởng Kho
-              </th>
-              <th [nzSortFn]="true">
-                Người Phụ Trách
-              </th>
-              <th [nzSortFn]="true">
-                Người Chấm Điểm
-              </th>
+              <th nzWidth="160px" [nzAlign]="'left'"> Mã </th>
+              <th> Tên Kho </th>
+              <th> Trưởng Kho </th>
+              <th> Người Phụ Trách </th>
+              <th nzWidth="460px"> Người Chấm Điểm </th>
             </tr>
           </thead>
           <tbody>
@@ -251,7 +227,6 @@
                 <a>{{ data.wareHouseId }}</a>
               </td>
               <td nzAlign="left">{{ data.name }}</td>
-
               <td>{{ getNameByCodeAccount(data.truongKho) }}</td>
               <td>{{ getNameByCodeAccount(data.nguoiPhuTrach) }}</td>
               <td nzAlign="center">
@@ -259,7 +234,7 @@
                   nzMode="multiple" nzPlaceHolder="Please select" [ngModelOptions]="{ standalone: true }"
                   [(ngModel)]="data.lstChamDiem" (ngModelChange)="onChangeChamDiem($event, data)">
                   <nz-option cdkScrollable *ngFor="let item of lstAccount; trackBy: trackByKey"
-                    [nzLabel]="item.fullName" [nzValue]="item.userName">
+                    [nzLabel]="item.fullName + getChucVu(item.chucVuId)" [nzValue]="item.userName">
                     <!-- [nzValue]="item.userName"> -->
                   </nz-option>
                 </nz-select>
@@ -277,19 +252,21 @@
   <nz-space>
     <ng-container *ngIf="edit">
       <ng-container *nzSpaceItem>
-        <button *ngIf="inputKi.kiKhaoSat.trangThaiKi == '0' || inputKi.kiKhaoSat.trangThaiKi == '1'"
+        <button *ngIf="inputKi.kiKhaoSat.trangThaiKi == trangThaiKy.KhoiTao"
           [nzLoading]="loading" nz-button nzType="default"
           style="background-color: #04AA6D; color: white; border: none;" class="!flex !items-center"
           (click)="onUpdateKhaoSatTrangThai('2')">
-          <span nz-icon nzType="save" nzTheme="outline"></span>Mở kỳ
+           <nz-icon nzType="pause" nzTheme="outline" />
+          Mở kỳ
         </button>
-        <button *ngIf="inputKi.kiKhaoSat.trangThaiKi == '2'" [nzLoading]="loading" nz-button nzType="default"
+        <button *ngIf="inputKi.kiKhaoSat.trangThaiKi == trangThaiKy.KyMo" [nzLoading]="loading" nz-button nzType="default"
           style="background-color: #722ed1; color: white; border: none;" class="!flex !items-center"
           (click)="onUpdateKhaoSatTrangThai('0')">
-          <span nz-icon nzType="save" nzTheme="outline"></span>Đóng kỳ
+          <nz-icon nzType="poweroff" nzTheme="outline" />
+          Đóng kỳ
         </button>
       </ng-container>
-      <button [nzLoading]="loading" *nzSpaceItem nz-button nzType="primary" class="!flex !items-center"
+      <button [nzLoading]="loading" *nzSpaceItem [disabled]="inputKi.kiKhaoSat.trangThaiKi == trangThaiKy.KyDong" nz-button nzType="primary" class="!flex !items-center"
         (click)="onUpdateKiKhaoSat()">
         <span nz-icon nzType="save" nzTheme="outline"></span>Lưu
       </button>
@@ -319,29 +296,27 @@
           <nz-page-header-title>Cây Tiêu Chí Chấm Điểm</nz-page-header-title>
           <button nz-button nzType="default" (click)="updateOrderTree()">Cập nhật vị trí</button>
         </div>
-        <nz-divider style="margin: 15px 0px;"></nz-divider>
-        <nz-page-header-content class="main-content">
+        <nz-divider class="my-3"></nz-divider>
+        <nz-page-header-content class="main-content-tree">
           <nz-tree #treeCom class="!pl-[10px] overflow-auto" [nzData]="treeData" nzDraggable nzBlockNode
             (nzOnDrop)="nzEvent($event)" [nzSearchValue]="searchValue" (nzExpandChange)="nzEvent($event)"
             (nzSearchValueChange)="nzEvent($event)" (nzOnDrop)="onDrop($event)" (nzOnDragStart)="onDragStart($event)"
             [nzTreeTemplate]="nzTreeTemplate" [nzExpandedIcon]="multiExpandedIconTpl">
             <ng-template #nzTreeTemplate let-node nzWidth="85%">
               <div class="flex items-center justify-between pr-4 gap-2 w-full" (click)="onClick(node)">
-                <div class="truncate whitespace-nowrap overflow-hidden text-ellipsis" [title]="node.title"
-                  style="  white-space: nowrap;  overflow: hidden;  text-overflow: ellipsis; max-width: calc(100% - 80px); padding: 3px 0;">
+                <div class="truncate whitespace-nowrap overflow-hidden text-ellipsis note-title" [title]="node.title">
                   {{ node.title }}
                 </div>
-                <div class="" style=" position: absolute;    right: 0px; ">
+                <div class="position-absolute right-0px">
                   <ng-container *ngIf="node.origin.pId !== '-1'">
                     <button nz-popconfirm nzPopconfirmTitle="Bạn có chắc chắn muốn xóa không?"
                       style="border: none; background: none; color: red;" class="!flex !items-center" nzType="default"
                       nz-button (nzOnConfirm)="deleteTree(node)">
-                      <span nz-icon nzType="delete" nzTheme="outline" style="cursor:pointer;"></span>
+                      <span nz-icon nzType="delete" nzTheme="outline" class="cursor-pointer"></span>
                     </button>
                   </ng-container>
-                  <span nz-icon (click)="openEditTree(node)" nzType="edit" nzTheme="outline"></span>
-                  <span nz-icon (click)="openCreateTree(node)" nzType="plus-circle" nzTheme="twotone"
-                    style="margin-left: 8px;"></span>
+                  <span nz-icon (click)="openEditTree(node)" nzType="edit" nzTheme="outline" ></span>
+                  <span nz-icon (click)="openCreateTree(node)" nzType="plus-circle" nzTheme="twotone" class="ms-2"></span>
                 </div>
               </div>
             </ng-template>
@@ -355,10 +330,11 @@
 
       <div class="right-panel w-2/3 pl-4">
         <nz-page-header nzBackIcon>
-          <nz-page-header-title>Chi Tiết Tiêu Chí</nz-page-header-title>
+          <nz-page-header-title class="p-0">Chi Tiết Tiêu Chí</nz-page-header-title>
           <nz-page-header-extra>
-            <button nz-button nzType="primary" *ngIf="treeId != ''" class="mt-2" (click)="openCreLeaves(selectedNode)">
-              <i nz-icon nzType="plus-circle"></i> Thêm mới
+            <button nz-button nzType="primary" *ngIf="treeId != ''" (click)="openCreLeaves(selectedNode)">
+              <nz-icon nzType="plus" nzTheme="outline" />
+              Thêm mới
             </button>
           </nz-page-header-extra>
         </nz-page-header>
@@ -376,17 +352,17 @@
           <tbody cdkDropList (cdkDropListDropped)="drop($event)">
             <tr *ngFor="let data of selectedNodeDetails; let i = index" cdkDrag>
               <td>{{ i + 1 }}</td>
-              <td><a (click)="openUpdateLeaves(data)" style="cursor:pointer;">{{ data.id }}</a></td>
+              <td><a (click)="openUpdateLeaves(data)" class="cursor-pointer">{{ data.id }}</a></td>
               <td>{{ data.name }}</td>
               <td>{{ data.isImg ? 'Có' : 'Không' }}</td>
               <td nzAlign="center">
                 <div>
                   <span nz-icon (click)="openUpdateLeaves(data)" nzType="edit" nzTheme="outline"
-                    style="margin: 0 5px; cursor: pointer;"></span>
+                    class="me-2 cursor-pointer" ></span>  
                   <button nz-popconfirm nzPopconfirmTitle="Bạn có chắc chắn muốn xóa không?"
                     style="border: none; background: none;" (nzOnConfirm)="deleteLeaves(data)"
                     nzPopconfirmPlacement="topRight" nz-button>
-                    <span nz-icon nzType="delete" nzTheme="outline" style="cursor:pointer;"></span>
+                    <span nz-icon nzType="delete" nzTheme="outline" class="cursor-pointer"></span>
                   </button>
                 </div>
               </td>
@@ -533,13 +509,13 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
+              <!-- <tr>
                 <td><span nz-icon nzType="history"></span></td>
                 <td nzAlign="center"><input nz-input type="text"></td>
                 <td nzAlign="left"><input nz-input type="text"></td>
                 <td nzAlign="left"><input nz-input type="text"></td>
                 <td nzAlign="left"><input nz-input type="text"></td>
-              </tr>
+              </tr> -->
 
               <tr *ngFor="let data of inputKi.lstInputStore; let i = index">
                 <td nzWidth="60px" [nzChecked]="isCheckedObject(data.id)"

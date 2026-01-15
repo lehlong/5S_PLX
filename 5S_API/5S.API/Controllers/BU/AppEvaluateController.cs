@@ -110,7 +110,8 @@ namespace PLX5S.API.Controllers.BU
             {
                 transferObject.Status = false;
                 transferObject.MessageObject.MessageType = MessageType.Error;
-                transferObject.GetMessage("0001", _service);
+                //transferObject.GetMessage("0001", _service);
+                transferObject.MessageObject.MessageDetail = _service.MessageObject.Message;
             }
             return Ok(transferObject);
         }

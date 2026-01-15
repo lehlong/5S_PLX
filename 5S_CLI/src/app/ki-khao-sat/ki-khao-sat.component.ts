@@ -15,6 +15,9 @@ import { TreeTieuChiService } from '../service/business/tree-tieu-chi.service';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { log } from 'ng-zorro-antd/core/logger';
 import { WareHouseService } from '../service/master-data/ware-house.service';
+import { ChucVu } from '../shared/statics/chuc-vu.static';
+import { TrangThaiKy } from '../shared/statics/trang-thai-ky.static';
+
 @Component({
   selector: 'app-ki-khao-sat',
   imports: [ShareModule, RouterModule, DragDropModule],
@@ -24,6 +27,8 @@ import { WareHouseService } from '../service/master-data/ware-house.service';
 })
 export class KiKhaoSatComponent {
   @ViewChild('treeCom', { static: false }) treeCom!: NzTreeComponent;
+
+  trangThaiKy = TrangThaiKy
 
   isSubmit: boolean = false;
   visible: boolean = false;
@@ -376,11 +381,8 @@ export class KiKhaoSatComponent {
     });
   }
   onTabChange(index: number) {
-    // Nếu tab "NGƯỜI CHẤM ĐIỂM" là tab thứ 1
     if (index === 1) {
-
       this.lstAccount = this.lstAllAccount
-      console.log(this.lstAccount);
     }
   }
   getAllKho() {
@@ -472,7 +474,6 @@ export class KiKhaoSatComponent {
   }
 
   openEditKyKhaoSat(data: any) {
-    console.log(data);
     this._service.getInputKiKhaoSat(data.id).subscribe({
       next: (data) => {
         this.inputKi = data
@@ -699,6 +700,14 @@ export class KiKhaoSatComponent {
     return item ? item.fullName : code;
   }
 
+  getChucVu(chucVuId: any){
+    if(!chucVuId)
+      return '(N/A)'
+    return `(${Object.keys(ChucVu).find(key => (ChucVu as any)[key] === chucVuId)})`;
+  }
+
+
+
 
   checkedAllObject: any = false
   lstCheckedObject: any = []
@@ -756,5 +765,6 @@ export class KiKhaoSatComponent {
   trackByKey(index: number, item: any): string {
     return item.key || item.code || item.key; // hoặc item.id nếu bạn dùng id
   }
+
 
 }

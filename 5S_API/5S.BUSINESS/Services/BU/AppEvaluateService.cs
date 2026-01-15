@@ -195,8 +195,23 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
+                var ky = _dbContext.TblBuKiKhaoSat.FirstOrDefault(x => x.Id == kiKhaoSatId);
+                if (ky.TrangThaiKi == TrangThaiKy.KhoiTao)
+                {
+                    Status = false;
+                    MessageObject.Message = $"Kỳ khảo sát {ky.Name} chưa bắt đầu";
+                    return null;
+                }
+                if (ky.TrangThaiKi == TrangThaiKy.KyDong)
+                {
+                    Status = false;
+                    MessageObject.Message = $"Kỳ khảo sát {ky.Name} đã kết thúc";
+                    return null;
+                }
+
                 var lstTieuChi = await GetAllTieuChiLeaves(kiKhaoSatId, doiTuongId);
                 var idHeader = Guid.NewGuid().ToString();
+
                 return new EvaluateModel()
                 {
                     Header = new TblBuEvaluateHeader()
@@ -718,6 +733,19 @@ namespace PLX5S.BUSINESS.Services.BU
                     MessageObject.Message = "Bạn chưa được phân chức vụ!!";
                     return;
                 }
+                var ky = _dbContext.TblBuKiKhaoSat.FirstOrDefault(x => x.Id == data.Header.KiKhaoSatId);
+                if (ky.TrangThaiKi == TrangThaiKy.KhoiTao)
+                {
+                    Status = false;
+                    MessageObject.Message = $"Kỳ khảo sát {ky.Name} chưa bắt đầu";
+                    return;
+                }
+                if (ky.TrangThaiKi == TrangThaiKy.KyDong)
+                {
+                    Status = false;
+                    MessageObject.Message = $"Kỳ khảo sát {ky.Name} đã kết thúc";
+                    return;
+                }
                 // 2️⃣ Lấy order lần chấm
                 int order = _dbContext.TblBuEvaluateHeader
                             .Count(x =>
@@ -741,7 +769,7 @@ namespace PLX5S.BUSINESS.Services.BU
             catch (Exception ex)
             {
                 Status = false;
-                MessageObject.MessageDetail = "Chấm điểm thất bại!";
+                MessageObject.Message = "Chấm điểm thất bại!";
                 Exception = ex;
             }
         }
