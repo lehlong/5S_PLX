@@ -75,10 +75,10 @@
           <th nzWidth="" rowspan="2" >TỔ CHUYÊN GIA,<br> BAN 5S</th>
         </tr>
         <tr>
-          <th nzWidth="60px" rowspan="1">TRONG KHUNG <br> THỜI GIAN</th>
-          <th nzWidth="" rowspan="1" >NGOÀI KHUNG <br> THỜI GIAN</th>
-          <th nzWidth="60px" rowspan="1" >TRONG KHUNG <br> THỜI GIAN</th>
-          <th nzWidth="" rowspan="1" >NGOÀI KHUNG <br> THỜI GIAN</th>
+          <th style="width:150px" rowspan="1">TRONG KHUNG <br> THỜI GIAN</th>
+          <th style="width:150px" rowspan="1" >NGOÀI KHUNG <br> THỜI GIAN</th>
+          <th style="width:150px" rowspan="1" >TRONG KHUNG <br> THỜI GIAN</th>
+          <th style="width:150px" rowspan="1" >NGOÀI KHUNG <br> THỜI GIAN</th>
         </tr>
 
       </thead>
@@ -86,17 +86,17 @@
         <tr *ngFor="let data of lstData; let i = index">
           <td>{{ i + 1 }}</td>
           <td >{{ data.name }}</td>
-          <td nzAlign="right">{{ data.cht_T }}</td>
-          <td nzAlign="right">{{ data.cht_N }}</td>
-          <td nzAlign="right">{{ data.atvsv_T }}</td>
-          <td nzAlign="right">{{ data.atvsv_N }}</td>
-          <td nzAlign="right">{{ data.chuyenGia }}</td>
-          <td nzAlign="right">{{ data.cht_T + data.cht_N + data.atvsv_T + data.atvsv_N + data.chuyenGia  }}</td>
+          <td nzAlign="right" style="width:150px">{{ data.cht_T }}</td>
+          <td nzAlign="right" style="width:150px">{{ data.cht_N }}</td>
+          <td nzAlign="right" style="width:150px">{{ data.atvsv_T }}</td>
+          <td nzAlign="right" style="width:150px">{{ data.atvsv_N }}</td>
+          <td nzAlign="right" >{{ data.chuyenGia }}</td>
+          <td nzAlign="right" >{{ data.cht_T + data.cht_N + data.atvsv_T + data.atvsv_N + data.chuyenGia  }}</td>
           <td nzAlign="right">{{ data.point }}</td>
           <td nzAlign="center">
-            <nz-tag *ngIf="data.point > 80" nzColor="blue">Tốt</nz-tag>
-            <nz-tag *ngIf="data.point <= 30" nzColor="red">Kém</nz-tag>
-            <nz-tag *ngIf="data.point > 30 && data.point <= 80" nzColor="orange">Khá</nz-tag>
+            <nz-tag [nzColor]="(data.point | rankTag).color">
+              {{ (data.point | rankTag).text }}
+            </nz-tag>
           </td>
         </tr>
       </tbody>

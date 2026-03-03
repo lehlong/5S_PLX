@@ -3,19 +3,32 @@
   width: 100%;
 }
 
+.table-wrapper {
+  width: 100%;
+  overflow: hidden;
+}
+
 .auto-scroll-table th,
 .auto-scroll-table td {
   white-space: nowrap;
   text-align: center;
 }
-
-/* Cố định độ rộng các cột */
-.auto-scroll-table .col-fixed {
-  width: 200px;
-  min-width: 200px;
+.table-wrapper {
+  width: 100%;
+  overflow: hidden;
 }
 
-.auto-scroll-table .col-small {
-  width: 50px;
-  min-width: 50px;
+/* Cho cột tự giãn theo text */
+:host ::ng-deep .auto-text-table table {
+  table-layout: auto !important;
+  width: max-content;
+  min-width: 100%;
+}
+
+/* Không cho xuống dòng → giãn ngang */
+:host ::ng-deep .auto-text-table th,
+:host ::ng-deep .auto-text-table td {
+  white-space: nowrap;
+  padding: 8px 12px;
+  text-align: center;
 }

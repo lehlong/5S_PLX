@@ -92,7 +92,7 @@ export class FileOfflineService {
   // 5. Lưu file vào Filesystem
   // =========================================================
   async saveFile(blob: any, folder: string) {
-    // Tạo thư mục nếu chưa có
+    // Tạo thư mục nếu chưa có 
     try {
       await Filesystem.mkdir({
         directory: Directory.Data,
@@ -100,55 +100,46 @@ export class FileOfflineService {
         recursive: true
       });
     } catch {
-      // Folder đã có → bỏ qua
+      // Folder đã có → bỏ qua 
     }
-
     const ext = this.getFileExtension(blob);
     const timestamp = Date.now();
-    const fileName = `${blob.name}`;
+    const fileName = blob.name 
+                        ? blob.name 
+                        : `${Date.now() + ext}`;
     const filePath = `${folder}/${fileName}`;
-
     const base64 = await this.blobToBase64(blob);
-
-    // Ghi file gốc
+    // Ghi file gốc 
     await Filesystem.writeFile({
       directory: Directory.Data,
       path: filePath,
       data: base64
-    });
-
-    // Tạo thumbnail nếu là ảnh
+    }); 
+    // Tạo thumbnail nếu là ảnh 
     let thumbPath = '';
     let thumbName = '';
     let viewUrl = '';
-
     if (blob.type.startsWith('image/')) {
       const thumbBase64 = await this.createThumbnail(blob, 100, 100);
       thumbName = `thumb_${timestamp}${ext}`;
       thumbPath = `${folder}/${thumbName}`;
-
       await Filesystem.writeFile({
         directory: Directory.Data,
         path: thumbPath,
         data: thumbBase64
       });
-
       const thumbUri = await Filesystem.getUri({
         directory: Directory.Data,
         path: thumbPath
       });
-
       viewUrl = Capacitor.convertFileSrc(thumbUri.uri);
     } else {
-
       const fileUri = await Filesystem.getUri({
         directory: Directory.Data,
         path: filePath
       });
-
       viewUrl = Capacitor.convertFileSrc(fileUri.uri);
     }
-
     return {
       filePath,
       pathThumbnail: thumbPath,
@@ -160,13 +151,38 @@ export class FileOfflineService {
       isBase64: true,
       isActive: true,
       isDeleted: false,
-
       evaluateHeaderCode: '',
       tieuChiCode: '',
       viDo: '0',
       kinhDo: '0'
     };
   }
+
+
+
+
+
+  // async createThumbnailBlob(blob: Blob, maxWidth: number): Promise<Blob> {
+  //   const img = new Image();
+  //   img.src = URL.createObjectURL(blob);
+
+  //   await new Promise(resolve => { img.onload = resolve });
+
+  //   const scale = maxWidth / img.width;
+  //   const w = maxWidth;
+  //   const h = img.height * scale;
+
+  //   const canvas = document.createElement('canvas');
+  //   canvas.width = w;
+  //   canvas.height = h;
+  //   const ctx = canvas.getContext('2d')!;
+  //   ctx.drawImage(img, 0, 0, w, h);
+
+  //   return await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.8)) as Blob;
+  // }
+
+
+
 
   // =========================================================
   // 6. Đọc file → Base64

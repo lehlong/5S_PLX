@@ -127,12 +127,12 @@ export class GlobalService {
 
   private isCreatingLoading = false;
 
-  async loadingShow(message: string = 'Đang xử lý...') {
+  async loadingShow(message: string = '') {
     if (this.loading || this.isCreatingLoading) return;
 
     this.isCreatingLoading = true;
     this.loading = await this.loadingCtrl.create({
-      message: '',
+      message: message,
       spinner: null,
       cssClass: 'custom-loading',
       backdropDismiss: false,
@@ -142,6 +142,7 @@ export class GlobalService {
 
     await this.loading.present();
   }
+
   async loadingHide() {
     try {
       if (this.loading) {

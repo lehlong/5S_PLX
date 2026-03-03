@@ -45,6 +45,7 @@ import { NzCollapseModule } from 'ng-zorro-antd/collapse'
 import { NzTimelineModule } from 'ng-zorro-antd/timeline'
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown'
 import { NzCardModule } from 'ng-zorro-antd/card'
+import { RankTagPipe } from '../pipes/ranktack'
 
 @NgModule({
   providers: [{ provide: NZ_ICONS, useValue: [UserOutline, LockOutline] }],
@@ -52,6 +53,7 @@ import { NzCardModule } from 'ng-zorro-antd/card'
     InputClearComponent,
     InputNumberComponent,
     NzIconModule, 
+    RankTagPipe,
     NzUploadModule
   ],
   declarations: [],
@@ -101,6 +103,7 @@ import { NzCardModule } from 'ng-zorro-antd/card'
     NzInputNumberModule,
     NzDropDownModule,
     NzCardModule,
+    RankTagPipe,
   ],
 })
 export class ShareModule {}

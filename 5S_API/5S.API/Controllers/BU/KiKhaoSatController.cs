@@ -39,6 +39,7 @@ namespace PLX5S.API.Controllers.BU
         public async Task<IActionResult> Search([FromQuery] BaseFilter filter)
         {
             var transferObject = new TransferObject();
+            filter.PageSize = 1000;
             var result = await _service.Search(filter);
             if (_service.Status)
             {
@@ -53,6 +54,23 @@ namespace PLX5S.API.Controllers.BU
             return Ok(transferObject);
         }
 
+        //[HttpGet("GetAll")]
+        //public async Task<IActionResult> GetAll([FromQuery] string surveyId)
+        //{
+        //    var transferObject = new TransferObject();
+        //    var result = await _service.GetAll(surveyId);
+        //    if (_service.Status)
+        //    {
+        //        transferObject.Data = result;
+        //    }
+        //    else
+        //    {
+        //        transferObject.Status = false;
+        //        transferObject.MessageObject.MessageType = MessageType.Error;
+        //        transferObject.GetMessage("0001", _service);
+        //    }
+        //    return Ok(transferObject);
+        //}
         [HttpGet("BuildObjCreate")]
         public async Task<IActionResult> BuildObjCreate([FromQuery] string id)
         {
@@ -202,7 +220,7 @@ namespace PLX5S.API.Controllers.BU
         {
             var transferObject = new TransferObject();
             var result = '-';
-                //await _service.Getchamdiem(kiKhaoSatId);
+            //await _service.Getchamdiem(kiKhaoSatId);
             if (result != null)
             {
                 transferObject.Data = result;

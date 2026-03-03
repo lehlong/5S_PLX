@@ -25,6 +25,8 @@ namespace PLX5S.BUSINESS.Models
         public decimal? Length { set; get; }
         public decimal? point { set; get; }
         public string? Description { set; get; }
+        public List<string> ListPoint { set; get; }
+        public string ListPointExcel { set; get; }
         public EvaluateFilter EvaluateFilter { set; get; } = new EvaluateFilter();
 
     }

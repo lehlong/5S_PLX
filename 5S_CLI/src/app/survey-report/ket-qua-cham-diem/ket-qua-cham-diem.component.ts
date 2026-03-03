@@ -16,13 +16,16 @@ import { environment } from '../../../environments/environment';
 @Component({
   selector: 'app-ket-qua-cham-diem',
   standalone: true,
-  imports: [ShareModule],
+  imports: [
+    ShareModule,
+  ],
   templateUrl: './ket-qua-cham-diem.component.html',
   styleUrl: './ket-qua-cham-diem.component.scss'
 })
 export class KetQuaChamDiemComponent {
 
   filter = new AccountTypeFilter()
+  userInfo = JSON.parse(localStorage.getItem('UserInfo') ?? '')
   paginationResult = new PaginationResult()
   loading: boolean = false
   lstSurvey: any = []
@@ -56,6 +59,8 @@ export class KetQuaChamDiemComponent {
   }
 
   ngOnInit(): void {
+    console.log(this.userInfo);
+
     this.getAllKiKhaoSat()
     this.getAllSurvey()
   }
@@ -94,6 +99,7 @@ export class KetQuaChamDiemComponent {
         } else {
           this.lstDoiTuong = data.lstInputWareHouse
         }
+
       },
       error: (response) => {
         console.log(response)
@@ -102,7 +108,11 @@ export class KetQuaChamDiemComponent {
   }
 
   searchKiKhaoSat() {
+    console.log(this.lstAllKiKhaoSat);
+
     this.lstKiKhaoSat = this.lstAllKiKhaoSat.filter((x: any) => x.surveyMgmtId == this.survey.id)
+    console.log(this.lstKiKhaoSat);
+
     this.kiKhaosatId = this.lstKiKhaoSat.reduce((a: any, b: any) =>
       new Date(a.endDate) > new Date(b.endDate) ? a.id : b.id
     )
@@ -149,15 +159,15 @@ export class KetQuaChamDiemComponent {
     })
   }
 
-  tinhLai(data: any){
+  tinhLai(data: any) {
     console.log(data);
     this._appReportService.tinhLai(data).subscribe({
-      next: ( resp) => {
+      next: (resp) => {
         this.message.success('Tính toán lại')
         this.getReport()
       },
-      error:(err) => {
-        
+      error: (err) => {
+
       },
     })
   }

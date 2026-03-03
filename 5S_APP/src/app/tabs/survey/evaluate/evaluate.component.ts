@@ -26,6 +26,8 @@ import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
 import { FileOfflineService } from 'src/app/service/common/systemfile.service';
 import { firstValueFrom } from 'rxjs';
+import { GlobalService } from 'src/app/service/global.service';
+import { NetworkSpeedService } from 'src/app/service/common/network-speed.service';
 
 @Component({
   imports: [SharedModule, HighlightSearchPipe],
@@ -100,76 +102,97 @@ export class EvaluateComponent implements OnInit {
     private _storageService: StorageService,
     private _service: AppEvaluateService,
     private _authService: AuthService,
+    private _globalS: GlobalService,
+    private _networkSpeedS: NetworkSpeedService,
     private messageService: MessageService,
-    private loadingController: LoadingController,
     private cdr: ChangeDetectorRef,
     private renderer: Renderer2,
     private _systemFileS: FileOfflineService,
     private router: Router
-  ) { }
+  ) {
+  }
 
   async ngOnInit() {
-    const api = localStorage.getItem('CapacitorStorage.apiUrl') ?? '';
-    this.apiFile = api.replace(/\/api$/, '/');
-    this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
+    this.route.paramMap.subscribe(async (params) => {
+      const api = localStorage.getItem('CapacitorStorage.apiUrl') ?? '';
+      this.apiFile = api.replace(/\/api$/, '/');
+      this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
 
-    this.route.paramMap.subscribe({
-      next: async (params) => {
-        this.headerId = params.get('code') ?? '';
-        const mode = params.get('mode') ?? '';
+      const filter = JSON.parse(localStorage.getItem('filterCS') ?? '{}');
+      this.doiTuong = filter.doiTuong;
+      this.kiKhaoSat = filter.kiKhaoSat;
+      const mode = params.get('mode') ?? '';
+      this.headerId = params.get('code') ?? '';
 
-        let nav = localStorage.getItem('filterCS');
-        this.doiTuong = JSON.parse(nav ?? '').doiTuong;
-        this.kiKhaoSat = JSON.parse(nav ?? '').kiKhaoSat;
+      const key = `${this.doiTuong.id}_${this.kiKhaoSat.code}`;
 
-        setTimeout(async () => {
-          if (this.evaluate != null) {
+      // STEP 1: Load evaluate đúng thứ tự
+      if (mode === 'draft') {
+        this.evaluate = await this._storageService.get(key);
 
-            let data = localStorage.getItem(
-              this.doiTuong.id + '_' + this.kiKhaoSat.code
-            );
-            if (data == null) {
-              this.getAllTieuChi();
-            } else {
-              this.dataTree = JSON.parse(data);
-              // console.log(this.dataTree);
-
-              this.treeData = this.dataTree?.tree;
-              this.lstTieuChi = this.dataTree?.leaves;
-              this.lstTreeOpen = [...this.getKeysAndLeaves(this.treeData).keys];
-              await this.cdr.detectChanges();
-            }
-          } else {
-            console.log(this.evaluate);
-          }
-        }, 500);
-
-        if (mode == 'draft') {
-          this.evaluate = await this._storageService.get(
-            this.doiTuong.id + '_' + this.kiKhaoSat.code
-          );
-          console.log(this.evaluate);
-          if (this.evaluate === null || this.evaluate === undefined) {
-            this.router.navigate([`/survey/check-list/${this.doiTuong.id}`]);
-          }
-
-        } else {
-          this.isEdit = false;
-          console.log("Xem");
-
-          this.getResultEvaluate();
-          this.getAllAccount();
+        if (!this.evaluate) {
+          this.router.navigate([`/survey/check-list/${this.doiTuong.id}`]);
+          return;
         }
-      },
+      }
+      else {
+        // mode = xem
+        this.evaluate = await this.getResultEvaluate();
+        this.isEdit = false;
+        this.getAllAccount();
+      }
+
+      // STEP 2: Load tree sau khi evaluate đã có
+      await this.loadTreeData(key);
+      await this.cdr.detectChanges();
+
     });
   }
+
+  // ---------------------------
+  // Load Tree / TieuChi chuẩn
+  // ---------------------------
+  async loadTreeData(key: string) {
+    const rawTree = localStorage.getItem(key);
+    console.log(this.dataTree);
+
+    if (!rawTree) {
+      // chưa từng có tree → gọi API
+      await this.getAllTieuChi();
+      return;
+    }
+
+    try {
+      this.dataTree = JSON.parse(rawTree);
+      this.treeData = this.dataTree?.tree;
+      this.lstTieuChi = this.dataTree?.leaves;
+
+      // lấy danh sách node expand
+      this.lstTreeOpen = [...this.getKeysAndLeaves(this.treeData).keys];
+
+      await this.cdr.detectChanges();
+      this._globalS.loadingHide()
+    } catch {
+      await this.getAllTieuChi();
+    }
+  }
+
+  // ---------------------------
+  // AutoSave không bị race-condition
+  // ---------------------------
+  autoSave() {
+    if (!this.evaluate) return;
+    const key = `${this.doiTuong.id}_${this.kiKhaoSat.code}`;
+    this._storageService.set(key, this.evaluate);
+  }
+
+
 
   ngAfterViewInit() {
     mediumZoom('.zoom-image');
   }
 
   /////////Hàm search
-
   openSearchInput() {
     this.isSearchVisible = !this.isSearchVisible;
   }
@@ -181,12 +204,17 @@ export class EvaluateComponent implements OnInit {
     this.currentHighlights = [];
   }
 
-
-  getResultEvaluate() {
-    this._service.getResultEvaluate(this.headerId).subscribe({
-      next: async (data) => {
-        this.evaluate = data;
-      },
+  async getResultEvaluate(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this._service.getResultEvaluate(this.headerId).subscribe({
+        next: (data) => {
+          // this.evaluate = data;
+          resolve(data);
+        },
+        error: (err) => {
+          resolve(null);
+        }
+      });
     });
   }
 
@@ -195,6 +223,7 @@ export class EvaluateComponent implements OnInit {
       .buildDataTreeForApp(this.kiKhaoSat.id, this.doiTuong.id)
       .subscribe({
         next: async (data) => {
+          var key = this.doiTuong.id + '_' + this.kiKhaoSat.code
           this.treeData = [data];
           const result = this.getKeysAndLeaves([data]);
 
@@ -203,12 +232,10 @@ export class EvaluateComponent implements OnInit {
 
           this.dataTree.leaves = this.lstTieuChi;
           this.dataTree.tree = this.treeData;
-
-          localStorage.setItem(
-            this.doiTuong.id + '_' + this.kiKhaoSat.code,
-            JSON.stringify(this.dataTree)
-          );
-
+          if (this.isEdit) {
+            localStorage.setItem(key, JSON.stringify(this.dataTree));
+          }
+          // await this.loadTreeData(key)
           this.cdr.detectChanges();
         },
       });
@@ -392,12 +419,12 @@ export class EvaluateComponent implements OnInit {
     this.autoSave()
   }
 
-  autoSave() {
-    this._storageService.set(
-      this.doiTuong.id + '_' + this.kiKhaoSat.code,
-      this.evaluate
-    );
-  }
+  // autoSave() {
+  //   this._storageService.set(
+  //     this.doiTuong.id + '_' + this.kiKhaoSat.code,
+  //     this.evaluate
+  //   );
+  // }
 
   async handleSave() {
     // let checkUpload = false
@@ -437,12 +464,7 @@ export class EvaluateComponent implements OnInit {
       }
       // Kiểm tra có đủ ảnh không
       if (tieuChi.isImg) {
-        if (
-          tieuChi.chiChtAtvsv &&
-          !(
-            this.account.chucVuId === 'CHT' || this.account.chucVuId === 'ATVSV'
-          )
-        ) {
+        if (tieuChi.chiChtAtvsv && !(this.account.chucVuId === 'CHT' || this.account.chucVuId === 'ATVSV')) {
           continue;
         }
 
@@ -475,7 +497,7 @@ export class EvaluateComponent implements OnInit {
       await alert.present();
       return;
     }
-
+    this._globalS.loadingShow('Đang đồng bộ Ảnh ...')
 
     const offlineFiles = this.evaluate.lstImages.filter((x: any) => x?.isBase64);
 
@@ -487,9 +509,12 @@ export class EvaluateComponent implements OnInit {
       }
     }
     try {
+
       this.tinhTong();
 
-      // Trường hợp đủ
+      //   // Trường hợp đủ
+      console.log(this.account);
+
       this.evaluate.header.accountUserName = this.account.userName;
       this.evaluate.header.chucVuId = this.account.chucVuId;
       this.evaluate.lstImages = this.evaluate.lstImages.filter((item: any) => item.isBase64 === undefined);
@@ -543,47 +568,102 @@ export class EvaluateComponent implements OnInit {
     return `${currentUrl}#${itemId}`;
   }
 
+
   async uploadOfflineFiles(files: any[]) {
-    const batchSize = 10;
+    if (!files || files.length === 0) return true;
 
-    for (let i = 0; i < files.length; i += batchSize) {
-      const chunk = files.slice(i, i + batchSize);
-      const formData = new FormData();
-      let count = 0;
+    const speed = await this._networkSpeedS.measureSpeed();
+    console.log("Speed:", speed, "Mbps");
 
-      for (const item of chunk) {
-        try {
-          const blob = await this._systemFileS.readFileBlob(item.filePath, item.type);
+    if (speed < 3) {
+      const ok = confirm(
+        `⚠ Tốc độ mạng hiện tại rất thấp (${speed} Mbps).\n` +
+        `Đồng bộ có thể mất rất lâu hoặc bị lỗi.\n\n` +
+        `Bạn có muốn tiếp tục không?`
+      );
 
-          formData.append(`files[${count}].File`, blob, item.fileName);
-          formData.append(`files[${count}].KinhDo`, item.kinhDo);
-          formData.append(`files[${count}].ViDo`, item.viDo);
-          formData.append(`files[${count}].FileName`, item.fileName);
-          formData.append(`files[${count}].Type`, item.type);
-          formData.append(`files[${count}].TieuChiCode`, item.tieuChiCode);
-          formData.append(`files[${count}].EvaluateHeaderCode`, item.evaluateHeaderCode);
-
-          count++;
-        } catch (err) {
-          console.error("Lỗi đọc file offline:", item.fileName, err);
-          return false; // Lỗi đọc file → dừng luôn
-        }
-      }
-
-      try {
-        const resp = await firstValueFrom(this._service.uploadFileOffline(formData));
-        // nếu upload thành công
-        for (const item of chunk) {
-          item.isBase64 = false;
-        }
-      } catch (err) {
-        console.error("Upload batch thất bại:", err);
-        return false; // Lỗi upload → dừng luôn
+      if (!ok) {
+        this._globalS.loadingHide()
+        return false; // người dùng bấm Cancel → không upload
       }
     }
+    console.log('Bắt đầu upload', files.length, 'file');
+    // return true;
 
-    return true; // Tất cả batch upload thành công
+    const ok = await this.uploadWithConcurrency(files, 5);
+
+    if (ok) {
+      console.log('Upload toàn bộ thành công');
+      this._globalS.loadingHide()
+      return true;
+    } else {
+      console.error('Upload lỗi, dừng lại');
+      this._globalS.loadingHide()
+      return false;
+    }
   }
+
+  private async uploadWithConcurrency(files: any[], limit = 5): Promise<boolean> {
+    let index = 0;
+
+    const workers = [];
+
+    const worker = async () => {
+      while (index < files.length) {
+        const file = files[index++];
+        const ok = await this.uploadSingleFile(file);
+        if (!ok) return false;
+      }
+      return true;
+    };
+
+    for (let i = 0; i < limit; i++) workers.push(worker());
+
+    const results = await Promise.all(workers);
+    return results.every(x => x === true);
+  }
+
+  private async uploadSingleFile(item: any): Promise<boolean> {
+    try {
+      const blob = await this._systemFileS.readFileBlob(item.filePath, item.type);
+
+      const formData = new FormData();
+      formData.append('file', blob, item.fileName);
+      formData.append('KinhDo', item.kinhDo);
+      formData.append('ViDo', item.viDo);
+      formData.append('FileName', item.fileName);
+      formData.append('Type', item.type);
+      formData.append('TieuChiCode', item.tieuChiCode);
+      formData.append('EvaluateHeaderCode', item.evaluateHeaderCode);
+
+      var result = await firstValueFrom(this._service.uploadSingleFileOff(formData));
+
+      item.isBase64 = false;
+
+
+      const index = this.evaluate.lstImages.findIndex((x: any) => x.code === item.code);
+
+      if (index !== -1) {
+        // Ghi đè toàn bộ object
+        this.evaluate.lstImages[index] = result;
+      }
+
+      console.log(item, this.evaluate);
+
+      return true;
+    } catch (err) {
+      console.error('Upload thất bại:', item.fileName, err);
+      return false;
+    }
+  }
+
+
+
+
+
+
+
+
 
   //////// Views ảnh
 
@@ -692,27 +772,27 @@ export class EvaluateComponent implements OnInit {
 
     const formData = new FormData();
     formData.append('file', file, file.name);
-    // const saved = await this.saveOffline(file, tieuChiCode, location);
+    const saved = await this.saveOffline(file, tieuChiCode, location);
 
-    this._service.uploadFile(formData).subscribe({
-      next: (resp: any) => {
-        resp.evaluateHeaderCode = this.headerId
-        resp.tieuChiCode = tieuChiCode
-        resp.kinhDo = location.lng
-        resp.viDo = location.lat
+    // this._service.uploadFile(formData).subscribe({
+    //   next: (resp: any) => {
+    //     resp.evaluateHeaderCode = this.headerId
+    //     resp.tieuChiCode = tieuChiCode
+    //     resp.kinhDo = location.lng
+    //     resp.viDo = location.lat
 
-        this.evaluate.lstImages.push(resp)
-        this.autoSave()
+    //     this.evaluate.lstImages.push(resp)
+    //     this.autoSave()
 
-        this.cdr.detectChanges();
-      },
+    //     this.cdr.detectChanges();
+    //   },
 
-      error: async (err) => {
-        const saved = await this.saveOffline(file, tieuChiCode, location);
+    //   error: async (err) => {
+    //     const saved = await this.saveOffline(file, tieuChiCode, location);
 
-        console.log("File đã lưu:", saved);
-      }
-    })
+    //     console.log("File đã lưu:", saved);
+    //   }
+    // })
   }
 
   ////////// Camera chụp ảnh
@@ -738,33 +818,33 @@ export class EvaluateComponent implements OnInit {
       // =================================================
       // 1. Có mạng → Upload trực tiếp lên server
       // =================================================
-      if (navigator.onLine) {
-        const formData = new FormData();
-        const ext = blob.type.split('/')[1];
-        formData.append('file', blob, `${Date.now()}.${ext}`);
+      // if (navigator.onLine) {
+      //   const formData = new FormData();
+      //   const ext = blob.type.split('/')[1];
+      //   formData.append('file', blob, `${Date.now()}.${ext}`);
 
-        this._service.uploadFile(formData).subscribe({
-          next: async (resp: any) => {
+      //   this._service.uploadFile(formData).subscribe({
+      //     next: async (resp: any) => {
 
-            resp.evaluateHeaderCode = this.headerId;
-            resp.tieuChiCode = code;
-            resp.viDo = location.lat;
-            resp.kinhDo = location.lng;
+      //       resp.evaluateHeaderCode = this.headerId;
+      //       resp.tieuChiCode = code;
+      //       resp.viDo = location.lat;
+      //       resp.kinhDo = location.lng;
 
-            this.evaluate.lstImages.push(resp);
+      //       this.evaluate.lstImages.push(resp);
 
-            this.autoSave();
-            this.cdr.detectChanges();
-          },
+      //       this.autoSave();
+      //       this.cdr.detectChanges();
+      //     },
 
-          error: async () => {
-            console.warn("Upload lỗi → Lưu offline");
-            await this.saveOffline(blob, code, location);
-          }
-        });
+      //     error: async () => {
+      //       console.warn("Upload lỗi → Lưu offline");
+      //       await this.saveOffline(blob, code, location);
+      //     }
+      //   });
 
-        return;
-      }
+      //   return;
+      // }
 
       // =================================================
       // 2. Không có mạng → Lưu offline

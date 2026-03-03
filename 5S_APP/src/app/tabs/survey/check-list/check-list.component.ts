@@ -8,6 +8,7 @@ import { StorageService } from 'src/app/service/storage.service';
 import { AuthService } from 'src/app/service/auth.service';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { FileOfflineService } from 'src/app/service/common/systemfile.service';
+import { GlobalService } from 'src/app/service/global.service';
 
 @Component({
   selector: 'app-check-list',
@@ -38,60 +39,55 @@ export class CheckListComponent implements OnInit {
     private _storageService: StorageService,
     private _service: AppEvaluateService,
     private _systemFileS: FileOfflineService,
-
+    private _globalS: GlobalService,
   ) { }
-
   ngOnInit() {
-    this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
-    this.route.paramMap.subscribe({
-      next: async (params) => {
+    this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '{}');
 
-        this.lstHisEvaluate = []
-        // console.log(this.lstHisEvaluate);
+    this.route.paramMap.subscribe(async params => {
+      this.lstHisEvaluate = [];
 
-        const id = params.get('id');
-        const filter = JSON.parse(localStorage.getItem('filterCS') ?? '');
-        this.kiKhaoSat = filter.kiKhaoSat;
-        this.doiTuong = filter.doiTuong;
+      const id = params.get('id');
+      const filter = JSON.parse(localStorage.getItem('filterCS') ?? '{}');
+      this.kiKhaoSat = filter.kiKhaoSat;
+      this.doiTuong = filter.doiTuong;
 
-        // console.log(filter);
+      // load draft (nếu có)
+      const eva = await this._storageService.get(
+        `${this.doiTuong.id}_${this.kiKhaoSat.code}`
+      );
 
-        // await this._storageService.clear()
-        let eva = await this._storageService.get(
-          this.doiTuong.id + '_' + this.kiKhaoSat.code
-        );
+      if (eva && eva.header?.kiKhaoSatId == this.kiKhaoSat.id) {
+        this.evaluate = eva;
+        this.lstHisEvaluate.push(eva.header);   // thêm bản nháp trước
+      } else {
+        this.mode = 'new';
+      }
 
-        //check xem có bản nháp trong sqlite hay không
-        if (eva) {
-          this.evaluate = eva;
-          if (this.evaluate.header.kiKhaoSatId == this.kiKhaoSat.id) {
-            this.lstHisEvaluate = [this.evaluate.header];
-          }
-          // console.log(this.lstHisEvaluate);
+      this.doiTuongId = id;
 
-        } else {
-          this.mode = 'new';
-        }
-        this.doiTuongId = id;
-        this.getAllEvaluateHistory();
-        this.getAllAccount();
-      },
+      this.getAllAccount();
+      await this.getAllEvaluateHistory();
     });
   }
 
-  getAllEvaluateHistory() {
-    this._service
-      .search({ keyWord: this.doiTuongId, sortColumn: this.kiKhaoSat.id })
-      .subscribe({
-        next: (data) => {
-          if (data.data.length == 0) return;
-          this.lstHisEvaluate.push(
-            ...data.data.sort((a: any, b: any) => b.order - a.order)
-          );
-        },
-      });
-  }
 
+  getAllEvaluateHistory() {
+    return new Promise<void>((resolve) => {
+      this._service
+        .search({ keyWord: this.doiTuongId, sortColumn: this.kiKhaoSat.id })
+        .subscribe({
+          next: (data) => {
+            if (data.data.length == 0) return;
+            this.lstHisEvaluate.push(
+              ...data.data.sort((a: any, b: any) => b.order - a.order)
+            )
+          },
+          error: () => resolve()
+        });
+    });
+  }
+  
   getAllAccount() {
     this._authService.GetAllAccount().subscribe({
       next: (data) => {
@@ -125,6 +121,7 @@ export class CheckListComponent implements OnInit {
     this.lstHisEvaluate = [];
 
     if (data.name == 'Bản nháp') {
+      this._globalS.loadingShow()
       this.router.navigate([`survey/evaluate/draft/${data.code}`]);
     } else {
       this.router.navigate([`survey/evaluate/view/${data.code}`]);
@@ -132,6 +129,7 @@ export class CheckListComponent implements OnInit {
   }
 
   async navigateTo() {
+    this._globalS.loadingShow()
     this.lstHisEvaluate = [];
     let userInfo = JSON.parse(localStorage.getItem('UserInfo') ?? '');
     this.deviceID = userInfo?.deviceId || '';

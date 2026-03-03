@@ -1,6 +1,8 @@
-﻿using PLX5S.BUSINESS.Models;
+﻿using Dtos.AD;
+using PLX5S.BUSINESS.Models;
 using PLX5S.BUSINESS.Services.BU;
 using PLX5S.CORE;
+using PLX5S.CORE.Entities.BU;
 using Services.AD;
 using System;
 using System.Collections.Generic;
@@ -14,18 +16,19 @@ namespace PLX5S.BUSINESS.Services.BackgroundHangfire
     {
         private readonly AppDbContext _dbContext;
         private readonly IKikhaosatService _kikhaosatService;
+        private readonly IFirebaseNotificationService _firebaseNotificationService;
 
-        public BackgroundJobService(AppDbContext dbContext, IKikhaosatService kikhaosatService)
+        public BackgroundJobService(AppDbContext dbContext, IKikhaosatService kikhaosatService, IFirebaseNotificationService firebaseNotificationService)
         {
             _dbContext = dbContext;
             _kikhaosatService = kikhaosatService;
+            _firebaseNotificationService = firebaseNotificationService;
         }
 
         public async Task TestJobHangfire()
         {
             try
             {
-
                 var ky = _dbContext.TblBuKiKhaoSat.FirstOrDefault();
                 ky.Des = "backGroupJob hangfire thành công";
                 await _dbContext.SaveChangesAsync();
@@ -170,6 +173,114 @@ namespace PLX5S.BUSINESS.Services.BackgroundHangfire
             {
             }
         }
+
+
+        public async Task NotifyCanhBaoDenDotCham()
+        {
+            try
+            {
+                var now = DateTime.Now;
+                //var now = new DateTime(2026, 3, 3);
+                var lastDay = LastDayOfMonth(now);
+
+                if (now.Day == 3)
+                {
+                    var noti = _dbContext.TblBuNotification.FirstOrDefault(x => x.CreateDate.Value.Day == now.Day &&
+                                                                                x.CreateDate.Value.Month == now.Month &&
+                                                                                x.CreateDate.Value.Year == now.Year);
+                    if(noti != null)
+                    {
+                        return;
+                    }
+                    var newNoti = new TblBuNotification
+                    {
+                        Code = Guid.NewGuid().ToString(),
+                        Title = "Đến thời gian chấm điểm 5S",
+                        Body = $"Kính báo chuẩn bị đến thời gian chấm điểm của An toàn vệ sinh viên, từ ngày 08-15/{now.Month}",
+                    };
+
+                    _dbContext.TblBuNotification.Add(newNoti);
+                    _dbContext.SaveChanges();
+
+                    await _firebaseNotificationService.SendToTopicAsync("PLX5S_NOTI", "Đến thời gian chấm điểm 5S", $"chuẩn bị đến thời gian chấm điểm của An toàn vệ sinh viên", new DataFireBase());
+
+                }
+
+                if (now.Day == 15)
+                {
+                    var noti = _dbContext.TblBuNotification.FirstOrDefault(x => x.CreateDate.Value.Day == now.Day &&
+                                                                                x.CreateDate.Value.Month == now.Month &&
+                                                                                x.CreateDate.Value.Year == now.Year);
+                    if (noti != null)
+                    {
+                        return;
+                    }
+
+                    var newNoti = new TblBuNotification
+                    {
+                        Code = Guid.NewGuid().ToString(),
+                        Title = "Đến thời gian chấm điểm 5S",
+                        Body = $"Kính báo chuẩn bị đến thời gian chấm điểm của Cửa hàng trưởng, từ ngày 16-23/{now.Month}",
+                    };
+
+                    _dbContext.TblBuNotification.Add(newNoti);
+                    _dbContext.SaveChanges();
+                    await _firebaseNotificationService.SendToTopicAsync("PLX5S_NOTI", "Đến thời gian chấm điểm 5S", $"chuẩn bị đến thời gian chấm điểm của Cửa hàng trưởng", new DataFireBase());
+                }
+
+                if (now.Day == 23)
+                {
+                    var noti = _dbContext.TblBuNotification.FirstOrDefault(x => x.CreateDate.Value.Day == now.Day &&
+                                                                                x.CreateDate.Value.Month == now.Month &&
+                                                                                x.CreateDate.Value.Year == now.Year);
+                    if (noti != null)
+                    {
+                        return;
+                    }
+                    var newNoti = new TblBuNotification
+                    {
+                        Code = Guid.NewGuid().ToString(),
+                        Title = "Đến thời gian chấm điểm 5S",
+                        Body = $"Kính báo chuẩn bị đến thời gian chấm điểm của An toàn vệ sinh viên, từ ngày 24-{lastDay.Day}/{now.Month}",
+                    };
+                    
+                    _dbContext.TblBuNotification.Add(newNoti);
+                    _dbContext.SaveChanges();
+                    await _firebaseNotificationService.SendToTopicAsync("PLX5S_NOTI", "Đến thời gian chấm điểm 5S", $"chuẩn bị đến thời gian chấm điểm của An toàn vệ sinh viên", new DataFireBase());
+                }
+
+                if (now.Day == lastDay.Day)
+                {
+                    var noti = _dbContext.TblBuNotification.FirstOrDefault(x => x.CreateDate.Value.Day == now.Day &&
+                                                                                x.CreateDate.Value.Month == now.Month &&
+                                                                                x.CreateDate.Value.Year == now.Year);
+                    if (noti != null)
+                    {
+                        return;
+                    }
+
+                    var newNoti = new TblBuNotification
+                    {
+                        Code = Guid.NewGuid().ToString(),
+                        Title = "Đến thời gian chấm điểm 5S",
+                        Body = $"Kính báo chuẩn bị đến thời gian chấm điểm của Cửa hàng trưởng, từ ngày 01-07/{now.Month + 1}",
+                        CreateDate = now
+                    };
+                    
+                    _dbContext.TblBuNotification.Add(newNoti);
+                    _dbContext.SaveChanges();
+                    await _firebaseNotificationService.SendToTopicAsync("PLX5S_NOTI", "Đến thời gian chấm điểm 5S", $"chuẩn bị đến thời gian chấm điểm của Cửa hàng trưởng", new DataFireBase());
+                }
+
+            }
+            catch (Exception ex)
+            {
+                // log lỗi ra file/db thay vì bỏ trống
+            }
+        }
+
+
+
         private DateTime LastDayOfMonth(DateTime dt)
         {
             return new DateTime(dt.Year, dt.Month, DateTime.DaysInMonth(dt.Year, dt.Month));

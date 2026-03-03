@@ -106,7 +106,7 @@ export class CommonService {
       }),
       catchError((error) =>
         this.handleError(error, () =>
-          this.post<T>(endpoint, data, showSuccess, showLoading)
+          this.post<T>(endpoint, data, showSuccess, '', showLoading)
         )
       ),
       finalize(() => this.globalService.loadingHide()) // Giảm bộ đếm khi hoàn thành
@@ -193,9 +193,9 @@ export class CommonService {
       );
   }
 
-  post<T>(endpoint: string, data: any, showSuccess: boolean = true, showLoading: boolean = true): Observable<T> {
+  post<T>(endpoint: string, data: any, showSuccess: boolean = true, messageLoad: string = '', showLoading: boolean = true, autoClose: boolean = true): Observable<T> {
     if (showLoading) {
-      this.globalService.loadingShow(); // Tăng bộ đếm
+      this.globalService.loadingShow(messageLoad); // Tăng bộ đếm
     }
     return this.http.post<any>(`${this.baseUrl}/${endpoint}`, data).pipe(
       map(this.handleApiResponse),
@@ -206,10 +206,15 @@ export class CommonService {
       }),
       catchError((error) =>
         this.handleError(error, () =>
-          this.post<T>(endpoint, data, showSuccess, showLoading)
+          this.post<T>(endpoint, data, showSuccess, messageLoad, showLoading, autoClose)
         )
       ),
-      finalize(() => this.globalService.loadingHide()) // Giảm bộ đếm khi hoàn thành
+      finalize(() => {
+        if(autoClose){
+          this.globalService.loadingHide()
+        }
+      }
+    ) // Giảm bộ đếm khi hoàn thành
     );
   }
 

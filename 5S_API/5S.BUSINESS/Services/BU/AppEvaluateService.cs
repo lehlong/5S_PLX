@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Common;
+using DocumentFormat.OpenXml.Spreadsheet;
 using FirebaseAdmin.Auth;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -26,6 +27,7 @@ namespace PLX5S.BUSINESS.Services.BU
         Task<List<TieuChiDto>> GetAllTieuChiLeaves(string kiKhaoSatId, string doiTuongId);
         Task<EvaluateModel> BuildInputEvaluate(string kiKhaoSatId, string doiTuongId, string deviceId);
         Task<object> UploadFile(IFormFile request);
+        Task<object> UploadSingleFileOff(FileModel request);
         Task InsertEvaluate(EvaluateModel data);
         Task InsertEvaluate2(EvaluateModel data);
         Task<TblBuEvaluateImage> HandelFile(TblBuEvaluateImage request);
@@ -33,8 +35,7 @@ namespace PLX5S.BUSINESS.Services.BU
         Task TinhTongLanCham(TblBuPoint point);
         Task<List<TblBuPoint>> GetPointStore(string kiKhaoSatid, string surveyId);
         Task<List<TblBuNotification>> GetNotification();
-        Task HandlePointStore(EvaluateFilter param);
-        Task HandlePointStore2(EvaluateFilter param);
+        Task HandlePointStore3(EvaluateFilter param);
         Task<HomeModel> GetDataHome(string userName);
         Task<List<TblBuEvaluateImage>> UploadFileOffline(List<FileModel> files);
     }
@@ -402,6 +403,87 @@ namespace PLX5S.BUSINESS.Services.BU
                 return null;
             }
         }
+
+        public async Task<object> UploadSingleFileOff(FileModel file)
+        {
+            try
+            {
+                if (file.file == null || file.file.Length == 0)
+                    return null;
+
+                string extension = Path.GetExtension(file.FileName).ToLower();
+                string folder = GetFolderByExtension();
+
+                // Tạo tên file
+                string physicalFileName = BuildFileName(file.FileName, extension);
+                //string newFileName = $"{Guid.NewGuid()}{extension}";
+                string thumbFileName = $"{Guid.NewGuid()}_thumb{extension}";
+
+                // Đường dẫn vật lý
+                string fullFolderPath = Path.Combine(folder.Replace("/", "\\"));
+
+                if (!Directory.Exists(fullFolderPath))
+                    Directory.CreateDirectory(fullFolderPath);
+
+                // Đường dẫn file gốc
+                string filePath = Path.Combine(fullFolderPath, physicalFileName);
+
+                // Ghi file gốc
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.file.CopyToAsync(stream);
+                }
+
+                string thumbPath = null;
+
+                bool isImage = new[] { ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".webp" }.Contains(extension);
+                // === TẠO THUMBNAIL nếu là file ảnh ===
+                if (isImage)
+                {
+                    try
+                    {
+                        thumbPath = Path.Combine(fullFolderPath, thumbFileName);
+
+                        using (var img = await SixLabors.ImageSharp.Image.LoadAsync(file.file.OpenReadStream()))
+                        {
+                            img.Mutate(x => x
+                                .Resize(new SixLabors.ImageSharp.Processing.ResizeOptions
+                                {
+                                    Size = new SixLabors.ImageSharp.Size(100, 100),
+                                    Mode = SixLabors.ImageSharp.Processing.ResizeMode.Crop
+                                })
+                            );
+
+                            await img.SaveAsync(thumbPath);
+                        }
+                    }
+                    catch { }
+                }
+
+                // Trả về URL public
+                //string baseUrl = $"{Request.Scheme}://{Request.Host}/";
+
+                return new TblBuEvaluateImage
+                {
+                    Code = Guid.NewGuid().ToString(),
+                    FilePath = $"{fullFolderPath}/{physicalFileName}",
+                    FileName = file.FileName,
+                    NameThumbnail = thumbFileName,
+                    PathThumbnail = thumbPath != null ? $"{fullFolderPath}/{thumbFileName}" : null,
+                    Type = extension,
+                    EvaluateHeaderCode = file.EvaluateHeaderCode,
+                    TieuChiCode = file.TieuChiCode,
+                    KinhDo = ToDecimal(file.KinhDo),
+                    ViDo = ToDecimal(file.ViDo)
+                };
+            }
+            catch (Exception ex)
+            {
+                this.Status = false;
+                return null;
+            }
+        }
+
         public async Task<List<TblBuEvaluateImage>> UploadFileOffline(List<FileModel> files)
         {
             var result = new List<TblBuEvaluateImage>();
@@ -594,8 +676,6 @@ namespace PLX5S.BUSINESS.Services.BU
             }
         }
 
-
-
         private string GetExtensionFromMimeType(string mime)
         {
             if (mime.Contains("image/jpeg")) return ".jpg";
@@ -617,7 +697,9 @@ namespace PLX5S.BUSINESS.Services.BU
         {
             try
             {
-                var diem = _dbContext.TblBuPoint.FirstOrDefault(x => x.DoiTuongId == point.DoiTuongId && x.KiKhaoSatId == point.KiKhaoSatId && x.SurveyId == point.SurveyId);
+                var diem = _dbContext.TblBuPoint.Where(x => x.DoiTuongId == point.DoiTuongId && x.KiKhaoSatId == point.KiKhaoSatId)
+                                                .OrderByDescending(x => x.CreateDate)
+                                                .FirstOrDefault();
                 if (diem == null)
                 {
                     point.Code = Guid.NewGuid().ToString();
@@ -726,6 +808,14 @@ namespace PLX5S.BUSINESS.Services.BU
                 var now = DateTime.Now;
                 //var now = new DateTime(2025, 12, 20);
 
+                var existHeader = _dbContext.TblBuEvaluateHeader.Any(x => x.Code == data.Header.Code);
+                if (existHeader)
+                {
+                    Status = false;
+                    MessageObject.Message = "Không sử dụng lại 'Bản nháp'!!";
+                    return;
+                }
+
                 var user = _dbContext.TblAdAccount.FirstOrDefault(x => x.UserName == data.Header.AccountUserName);
                 if (user.ChucVuId == null)
                 {
@@ -733,6 +823,7 @@ namespace PLX5S.BUSINESS.Services.BU
                     MessageObject.Message = "Bạn chưa được phân chức vụ!!";
                     return;
                 }
+
                 var ky = _dbContext.TblBuKiKhaoSat.FirstOrDefault(x => x.Id == data.Header.KiKhaoSatId);
                 if (ky.TrangThaiKi == TrangThaiKy.KhoiTao)
                 {
@@ -774,201 +865,162 @@ namespace PLX5S.BUSINESS.Services.BU
             }
         }
 
+        //public async Task HandlePointStore2(EvaluateFilter param)
+        //{
+        //    var now = DateTime.Now;
+        //    string description = "";
+        //    decimal tongDiem = 1;
 
-        public async Task HandlePointStore(EvaluateFilter param)
+        //    var headers = await _dbContext.TblBuEvaluateHeader
+        //        .Where(x => x.KiKhaoSatId == param.KiKhaoSatId &&
+        //                    x.DoiTuongId == param.DoiTuongId &&
+        //                    x.IsActive == true)
+        //        .ToListAsync();
+
+        //    var users = await _dbContext.TblAdAccount
+        //        .Where(u => param.LstData.Contains(u.UserName))
+        //        .ToListAsync();
+
+        //    var rolesInStore = users.Select(x => x.ChucVuId).Distinct().ToList();
+
+
+        //    // =============================
+        //    // 1) XÁC ĐỊNH NHÓM QUẢN LÝ
+        //    // =============================
+        //    List<string> groupRoles = new();
+
+        //    if (rolesInStore.Contains(RoleIds.CHT))
+        //        groupRoles.Add(RoleIds.CHT);
+        //    else if (rolesInStore.Contains(RoleIds.TK))
+        //        groupRoles.Add(RoleIds.TK);
+
+        //    groupRoles.Add(RoleIds.ATVSV);
+
+
+        //    // =============================
+        //    // 2) KIỂM TRA NHÓM QUẢN LÝ + ATVSV
+        //    // =============================
+        //    foreach (var roleId in groupRoles)
+        //    {
+        //        var roleUsers = users.Where(u => u.ChucVuId == roleId).ToList();
+
+        //        if (CheckViolationByGroup(roleId, headers, now, out var reason))
+        //        {
+        //            tongDiem = 0;
+        //            description += reason;
+        //            goto TINH_DIEM;
+        //        }
+        //        else
+        //        {
+        //            description += reason;
+        //        }
+        //    }
+
+        //    // =============================
+        //    // 3) KIỂM TRA CHUYÊN QUẢN (CQ)
+        //    // =============================
+        //    var cqUsers = users.Where(u => u.ChucVuId == RoleIds.CQ).ToList();
+        //    var headerCQ = headers.Any(x => x.ChucVuId == RoleIds.CQ);
+        //    if (!headerCQ)
+        //    {
+        //        if (cqUsers.Any())
+        //        {
+        //            tongDiem = 0;
+        //            description += "Chuyên quản Chưa chấm | ";
+        //        }
+        //        else
+        //        {
+        //            description += "Thiếu chức vụ Chuyên quản | ";
+        //        }
+
+        //    }
+
+
+
+        //TINH_DIEM:
+
+        //    if (tongDiem > 0)
+        //        tongDiem = TinhDiemTong(headers);
+
+        //    await TinhTongLanCham(new TblBuPoint
+        //    {
+        //        KiKhaoSatId = param.KiKhaoSatId,
+        //        DoiTuongId = param.DoiTuongId,
+        //        SurveyId = param.SurveyId,
+        //        Point = tongDiem,
+        //        Description = description,
+        //        Length = headers.Count
+        //    });
+        //}
+
+        public async Task HandlePointStore3(EvaluateFilter param)
         {
             try
             {
-                var lstEvaHeader = await _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == param.KiKhaoSatId && x.DoiTuongId == param.DoiTuongId).ToListAsync();
-                var lstUser = _dbContext.TblAdAccount.Where(u => param.LstData.Contains(u.UserName)).ToList();
-                var checkViPham = lstEvaHeader.Any(x => x.IsActive == false);
-                var dateNow = DateTime.Now;
-                decimal tongChuyenVien = 0;
-                decimal tong = 1;
-                decimal tongPointUser = 0;
-                decimal count = 0;
-                decimal countChuyenVien = 0;
+                decimal tongDiem = 1;
+                var description = "";
+                var dot1 = 7;
+                var dot2 = 15;
+                var dot3 = 23;
 
-                if (checkViPham)
+                var lstUser = _dbContext.TblAdAccount.Where(x => param.LstData.Contains(x.ChucVuId)).ToList();
+                // kiểm tra đầy đủ chức vụ
+
+                var lstHeader = await _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == param.KiKhaoSatId && x.DoiTuongId == param.DoiTuongId).ToListAsync();
+
+                var cq = lstHeader.Any(x => x.ChucVuId == RoleIds.CQ);
+
+                var tt1 = lstHeader.Any(x => (x.ChucVuId == RoleIds.CHT || x.ChucVuId == RoleIds.TK) && DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot1));
+
+                var atvs2 = lstHeader.Any(x => x.ChucVuId == RoleIds.ATVSV && DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot2));
+
+                var tt3 = lstHeader.Any(x => (x.ChucVuId == RoleIds.CHT || x.ChucVuId == RoleIds.TK) && DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot3));
+
+                var atvs4 = lstHeader.Any(x => x.ChucVuId == RoleIds.ATVSV && DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot4));
+
+                if (!cq)
                 {
-                    tong = 0;
+                    tongDiem = 0;
+                    description += "Chuyên quản chưa chấm | ";
                 }
-                else
+                if (!tt1)
                 {
-                    foreach (var item in lstUser)
-                    {
-                        if (item.ChucVuId == "CHT" || item.ChucVuId == "TK")
-                        {
-                            bool dot1 = lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList().Any(x =>
-                                x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 1) &&
-                                x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 7));
-
-                            bool dot3 = lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList().Any(x =>
-                                x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 16) &&
-                                x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 23));
-
-                            if ((dateNow.Day < 16 && dot1) || (dateNow.Day >= 16 && dot1 && dot3))
-                            {
-                                foreach (var i in lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList())
-                                {
-                                    tongPointUser = tongPointUser + i.Point;
-                                    count++;
-                                }
-                            }
-                            else
-                            {
-                                tong = 0;
-                                break;
-                            }
-
-                        }
-                        else if (item.ChucVuId == "ATVSV")
-                        {
-                            bool dot2 = lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList().Any(x =>
-                                x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 8) &&
-                                x.UpdateDate <= new DateTime(dateNow.Year, dateNow.Month, 15));
-
-                            bool dot4 = lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList().Any(x =>
-                                x.UpdateDate >= new DateTime(dateNow.Year, dateNow.Month, 24));
-
-                            if (dateNow.Day <= 7 || (dateNow.Day >= 8 && dateNow.Day <= 23 && dot2) || (dateNow.Day >= 24 && dot4 && dot2))
-                            {
-                                foreach (var i in lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList())
-                                {
-                                    tongPointUser = tongPointUser + i.Point;
-                                    count++;
-                                }
-                            }
-                            else
-                            {
-                                tong = 0;
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            foreach (var i in lstEvaHeader.Where(x => x.AccountUserName == item.UserName).ToList())
-                            {
-                                tongChuyenVien = tongChuyenVien + i.Point;
-                                countChuyenVien++;
-                            }
-                        }
-
-                    }
-                    if (count == 0 || countChuyenVien == 0)
-                    {
-                        tong = 0;
-                    }
-                    else
-                    {
-                        tongChuyenVien = tongChuyenVien / (countChuyenVien);
-                        tongPointUser = tongPointUser / count;
-
-                        tong = (tong * (tongPointUser + tongChuyenVien)) / 2;
-                    }
+                    tongDiem = 0;
+                    description += "Thủ trưởng chưa chấm đợt (1-7) | ";
                 }
+                if (!atvs2)
+                {
+                    tongDiem = 0;
+                    description += "An toàn vệ sinh viên chưa chấm đợt (8-15)  | ";
+                }
+                if (!tt3)
+                {
+                    tongDiem = 0;
+                    description += "Thủ trưởng chưa chấm đợt (16-23) | ";
+                }
+                if (!atvs4)
+                {
+                    tongDiem = 0;
+                    description += "An toàn vệ sinh viên chưa chấm đợt (24-30)";
+                }
+
+                if (tongDiem > 0)
+                    tongDiem = TinhDiemTong(lstHeader);
+
                 await TinhTongLanCham(new TblBuPoint
                 {
-                    Code = "",
-                    DoiTuongId = param.DoiTuongId,
                     KiKhaoSatId = param.KiKhaoSatId,
-                    Length = countChuyenVien + count,
+                    DoiTuongId = param.DoiTuongId,
                     SurveyId = param.SurveyId,
-                    Point = tong,
+                    Point = tongDiem,
+                    Description = description,
+                    Length = lstHeader.Count
                 });
             }
             catch (Exception ex)
             {
-                this.Status = false;
+                return;
             }
-        }
-
-        public async Task HandlePointStore2(EvaluateFilter param)
-        {
-            var now = DateTime.Now;
-            string description = "";
-            decimal tongDiem = 1;
-
-            var headers = await _dbContext.TblBuEvaluateHeader
-                .Where(x => x.KiKhaoSatId == param.KiKhaoSatId &&
-                            x.DoiTuongId == param.DoiTuongId &&
-                            x.IsActive == true)
-                .ToListAsync();
-
-            var users = await _dbContext.TblAdAccount
-                .Where(u => param.LstData.Contains(u.UserName))
-                .ToListAsync();
-
-            var rolesInStore = users.Select(x => x.ChucVuId).Distinct().ToList();
-
-
-            // =============================
-            // 1) XÁC ĐỊNH NHÓM QUẢN LÝ
-            // =============================
-            List<string> groupRoles = new();
-
-            if (rolesInStore.Contains(RoleIds.CHT))
-                groupRoles.Add(RoleIds.CHT);
-            else if (rolesInStore.Contains(RoleIds.TK))
-                groupRoles.Add(RoleIds.TK);
-
-            groupRoles.Add(RoleIds.ATVSV);
-
-            // =============================
-            // 3) KIỂM TRA CHUYÊN QUẢN (CQ)
-            // =============================
-            var cqUsers = users.Where(u => u.ChucVuId == RoleIds.CQ).ToList();
-            var headerCQ = headers.Any(x => x.ChucVuId == RoleIds.CQ);
-            if (!headerCQ)
-            {
-                if (cqUsers.Any())
-                {
-                    tongDiem = 0;
-                    description += "Chuyên quản Chưa chấm | ";
-                }
-                else
-                {
-                    description += "Thiếu chức vụ Chuyên quản | ";
-                }
-
-            }
-
-
-            // =============================
-            // 2) KIỂM TRA NHÓM QUẢN LÝ + ATVSV
-            // =============================
-            foreach (var roleId in groupRoles)
-            {
-                var roleUsers = users.Where(u => u.ChucVuId == roleId).ToList();
-
-                if (CheckViolationByGroup(roleId, headers, now, out var reason))
-                {
-                    tongDiem = 0;
-                    description += reason;
-                    goto TINH_DIEM;
-                }
-                else
-                {
-                    description += reason;
-                }
-            }
-
-
-
-        TINH_DIEM:
-
-            if (tongDiem > 0)
-                tongDiem = TinhDiemTong(headers);
-
-            await TinhTongLanCham(new TblBuPoint
-            {
-                KiKhaoSatId = param.KiKhaoSatId,
-                DoiTuongId = param.DoiTuongId,
-                SurveyId = param.SurveyId,
-                Point = tongDiem,
-                Description = description,
-                Length = headers.Count
-            });
         }
 
 
@@ -992,46 +1044,46 @@ namespace PLX5S.BUSINESS.Services.BU
             return (diemQuanLy + diemChuyenVien) / 2;
         }
 
-        private bool CheckViolationByGroup(string roleId, List<TblBuEvaluateHeader> allHeaders, DateTime now, out string description)
-        {
-            description = string.Empty;
+        //private bool CheckViolationByGroup(string roleId, List<TblBuEvaluateHeader> allHeaders, DateTime now, out string description)
+        //{
+        //    description = string.Empty;
 
-            // Không có rule → không vi phạm
-            if (!DotChamHelper.BatBuocTheoChucVu.TryGetValue(roleId, out var batBuocDots))
-                return false;
+        //    // Không có rule → không vi phạm
+        //    if (!DotChamHelper.BatBuocTheoChucVu.TryGetValue(roleId, out var batBuocDots))
+        //        return false;
 
-            var nowDot = DotChamHelper.GetDot(now);
+        //    var nowDot = DotChamHelper.GetDot(now);
 
-            // Những đợt bắt buộc đã qua
-            var requiredDots = batBuocDots.Where(d => d <= nowDot).ToList();
+        //    // Những đợt bắt buộc đã qua
+        //    var requiredDots = batBuocDots.Where(d => d <= nowDot).ToList();
 
-            // Lấy tất cả headers của role này (một hoặc nhiều người)
-            var headersOfRole = allHeaders
-                .Where(x => x.ChucVuId == roleId && x.UpdateDate != null)
-                .ToList();
+        //    // Lấy tất cả headers của role này (một hoặc nhiều người)
+        //    var headersOfRole = allHeaders
+        //        .Where(x => x.ChucVuId == roleId && x.UpdateDate != null)
+        //        .ToList();
 
-            // Danh sách đợt đã có người trong nhóm chấm
-            var dotsDaCham = headersOfRole
-                .Select(x => DotChamHelper.GetDot(x.UpdateDate.Value))
-                .Distinct()
-                .ToList();
+        //    // Danh sách đợt đã có người trong nhóm chấm
+        //    var dotsDaCham = headersOfRole
+        //        .Select(x => DotChamHelper.GetDot(x.UpdateDate.Value))
+        //        .Distinct()
+        //        .ToList();
 
-            // Kiểm tra thiếu đợt nào
-            var thieuDots = requiredDots
-                .Where(d => !dotsDaCham.Contains(d))
-                .ToList();
+        //    // Kiểm tra thiếu đợt nào
+        //    var thieuDots = requiredDots
+        //        .Where(d => !dotsDaCham.Contains(d))
+        //        .ToList();
 
-            if (thieuDots.Any())
-            {
-                var roleName = DotChamHelper.GetRoleName(roleId);
-                var dotNames = thieuDots.Select(d => $"Đợt {DotChamHelper.ToNumber(d)}");
+        //    if (thieuDots.Any())
+        //    {
+        //        var roleName = DotChamHelper.GetRoleName(roleId);
+        //        var dotNames = thieuDots.Select(d => $"Đợt {DotChamHelper.ToNumber(d)}");
 
-                description = $"{roleName} chấm thiếu: {string.Join(", ", dotNames)} | ";
-                return true;
-            }
+        //        description = $"{roleName} chấm thiếu: {string.Join(", ", dotNames)} | ";
+        //        return true;
+        //    }
 
-            return false;
-        }
+        //    return false;
+        //}
 
 
         public async Task<List<TblBuPoint>> GetPointStore(string kiKhaoSatid, string surveyId)
@@ -1081,8 +1133,8 @@ namespace PLX5S.BUSINESS.Services.BU
                                 ? lstWareHouse.FirstOrDefault(x => x.Id == i.DoiTuongId).Name
                                 : "";
                     var doiTuongId = lstInDoiTuong.FirstOrDefault(x => x.DoiTuongId == i.DoiTuongId && ky.SurveyMgmtId == x.SurveyMgmtId).Id;
-                    var isScore = dot.Dot == 0 ? false : !lstHeader.Any(x => x.UpdateDate >= dot.FDate && x.UpdateDate <= dot.EDate && x.DoiTuongId == doiTuongId);
-                    var scored = dot.Dot == 0 ? false : lstHeader.Any(x => x.UpdateDate >= dot.FDate && x.UpdateDate <= dot.EDate && x.DoiTuongId == doiTuongId);
+                    var isScore = dot.Dot == 0 ? false : !lstHeader.Any(x => x.UpdateDate >= dot.FDate && x.UpdateDate <= dot.EDate.Date.AddDays(1).AddTicks(-1) && x.DoiTuongId == doiTuongId);
+                    var scored = dot.Dot == 0 ? false : lstHeader.Any(x => x.UpdateDate >= dot.FDate && x.UpdateDate <= dot.EDate.Date.AddDays(1).AddTicks(-1) && x.DoiTuongId == doiTuongId);
 
                     result.LstDoiTuong.Add(new DoiTuong()
                     {
@@ -1094,7 +1146,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         FDate = ky.StartDate,
                         EndDate = ky.EndDate,
                         Type = survey.DoiTuongId,
-                        Point = lstPoint.FirstOrDefault(y => y.DoiTuongId == lstInDoiTuong.FirstOrDefault(x => x.DoiTuongId == i.DoiTuongId).Id)?.Point ?? 0,
+                        Point = lstPoint.Where(y => y.DoiTuongId == lstInDoiTuong.FirstOrDefault(x => x.DoiTuongId == i.DoiTuongId)?.Id).OrderByDescending(y => y.CreateDate).FirstOrDefault()?.Point ?? 0,
                         IsScore = isScore,
                         TimeText = FormatToMonthYear(ky.EndDate),
                         Description = GetChamDiemStatus(ky.EndDate, now, scored, user.ChucVuId),

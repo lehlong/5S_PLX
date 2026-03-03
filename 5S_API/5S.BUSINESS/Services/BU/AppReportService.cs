@@ -20,6 +20,7 @@ using PLX5S.BUSINESS.Extentions;
 using PLX5S.BUSINESS.Models;
 using PLX5S.CORE;
 using PLX5S.CORE.Entities.BU;
+using PLX5S.CORE.Statics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,8 +64,11 @@ namespace PLX5S.BUSINESS.Services.BU
                 var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
                 var ky = inputKy.Result.KiKhaoSat;
                 var result = new List<KetQuaChamDiem>();
-                var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
-                if (filterReport.SurveyId == "DT1")
+                var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).OrderBy(x => x.UpdateDate).ToList();
+                var lstHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).OrderBy(x => x.UpdateDate).ToList();
+                var lstAccount = _dbContext.TblAdAccount.OrderBy(x => x.UserName).ToList();
+
+                if (filterReport.SurveyId == DoiTuongType.CuaHang)
                 {
                     var lstDoiTuong = inputKy.Result.lstInputStore.ToList();
 
@@ -75,13 +79,33 @@ namespace PLX5S.BUSINESS.Services.BU
 
                     foreach (var item in lstDoiTuong)
                     {
+                        List<string> lstPoints = new List<string>();
+                        List<string> lstPointExcel = new List<string>();
+
+
+                        var point = lstPoint
+                            .Where(x => x.DoiTuongId == item.Id)
+                            .OrderByDescending(x => x.CreateDate)
+                            .FirstOrDefault();
+
+                        var points = lstHeader
+                            .Where(x => x.DoiTuongId == item.Id)
+                            .ToList();
+
+                        foreach (var p in points)
+                        {
+                            lstPoints.Add($"<b>{lstAccount.FirstOrDefault(x => x.UserName == p.AccountUserName).FullName}</b>: {p.Point}đ ({p.UpdateDate:HH:mm dd/MM/yyyy})");
+                            lstPointExcel.Add($"{lstAccount.FirstOrDefault(x => x.UserName == p.AccountUserName).FullName}: {p.Point}đ ({p.UpdateDate:HH:mm dd/MM/yyyy})");
+                        }
                         var report = new KetQuaChamDiem()
                         {
                             stt = item.StoreId,
                             Name = item.Name,
-                            Length = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Length ?? 0,
-                            point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
-                            Description = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Description,
+                            Length = point?.Length ?? 0,
+                            point = point?.Point ?? 0,
+                            Description = point?.Description,
+                            ListPoint = lstPoints,
+                            ListPointExcel = string.Join("\n", lstPointExcel),
                             EvaluateFilter = new EvaluateFilter
                             {
                                 KiKhaoSatId = filterReport.KiKhaoSatId,
@@ -94,7 +118,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         result.Add(report);
                     }
                 }
-                else if (filterReport.SurveyId == "DT2")
+                else if (filterReport.SurveyId == DoiTuongType.Kho)
                 {
                     var lstDoiTuong = inputKy.Result.lstInputWareHouse.ToList();
 
@@ -105,13 +129,32 @@ namespace PLX5S.BUSINESS.Services.BU
 
                     foreach (var item in lstDoiTuong)
                     {
+                        List<string> lstPoints = new List<string>();
+                        List<string> lstPointExcel = new List<string>();
+
+                        var point = lstPoint
+                            .Where(x => x.DoiTuongId == item.Id)
+                            .OrderByDescending(x => x.CreateDate)
+                            .FirstOrDefault();
+
+                        var points = lstHeader
+                            .Where(x => x.DoiTuongId == item.Id)
+                            .ToList();
+
+                        foreach (var p in points)
+                        {
+                            lstPoints.Add($"<b>{lstAccount.FirstOrDefault(x => x.UserName == p.AccountUserName).FullName}</b>: {p.Point}đ ({p.UpdateDate:HH:mm dd/MM/yyyy})");
+                            lstPointExcel.Add($"{lstAccount.FirstOrDefault(x => x.UserName == p.AccountUserName).FullName}: {p.Point}đ ({p.UpdateDate:HH:mm dd/MM/yyyy})");
+                        }
                         var report = new KetQuaChamDiem()
                         {
                             stt = item.Id,
                             Name = item.Name,
-                            Length = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Length ?? 0,
-                            point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
-                            Description = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Description,
+                            Length = point?.Length ?? 0,
+                            point = point?.Point ?? 0,
+                            Description = point?.Description,
+                            ListPoint = lstPoints,
+                            ListPointExcel = string.Join("\n", lstPointExcel),
                             EvaluateFilter = new EvaluateFilter
                             {
                                 KiKhaoSatId = filterReport.KiKhaoSatId,
@@ -138,8 +181,8 @@ namespace PLX5S.BUSINESS.Services.BU
             try
             {
                 var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
-                var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.IsActive == true && x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
-                var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.IsActive == true && x.KiKhaoSatId == filterReport.KiKhaoSatId).OrderBy(x => x.UpdateDate).ToList();
+                var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).OrderBy(x => x.UpdateDate).ToList();
                 var result = new List<ThoiGianChamDiem>();
                 if (filterReport.SurveyId == "DT1")
                 {
@@ -152,14 +195,15 @@ namespace PLX5S.BUSINESS.Services.BU
 
                     foreach (var item in lstDoiTuong)
                     {
+                        var point = lstPoint.Where(x => x.DoiTuongId == item.Id).OrderByDescending(x => x.CreateDate).FirstOrDefault();
                         var report = new ThoiGianChamDiem()
                         {
                             stt = item.StoreId,
                             Name = item.Name,
-                            Cht = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "CHT").Select((x, index) => "L" + (index + 1) + " " + x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
-                            Atvsv = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV").Select((x, index) => "L" + (index + 1) + " " + x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
-                            ChuyenGia = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT").Select((x, index) => "L" + (index + 1) + "  " + x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
-                            Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
+                            Cht = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && (x.ChucVuId == RoleIds.CHT || x.ChucVuId == RoleIds.TK)).Select((x, index) => "L" + (index + 1) + " " + x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
+                            Atvsv = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == RoleIds.ATVSV).Select((x, index) => "L" + (index + 1) + " " + x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
+                            ChuyenGia = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == RoleIds.CQ).Select((x, index) => "L" + (index + 1) + "  " + x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
+                            Point = point?.Point ?? 0,
                         };
 
                         result.Add(report);
@@ -175,14 +219,15 @@ namespace PLX5S.BUSINESS.Services.BU
 
                     foreach (var item in lstDoiTuong)
                     {
+                        var point = lstPoint.Where(x => x.DoiTuongId == item.Id).OrderByDescending(x => x.CreateDate).FirstOrDefault();
                         var report = new ThoiGianChamDiem()
                         {
                             stt = item.WareHouseId,
                             Name = item.Name,
-                            Cht = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "CHT").Select((x, index) => "L" + (index + 1) + " " + x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
-                            Atvsv = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV").Select((x, index) => "L" + (index + 1) + " " + x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
-                            ChuyenGia = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT").Select((x, index) => "L" + (index + 1) + "  " + x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
-                            Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
+                            Cht = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && (x.ChucVuId == RoleIds.CHT || x.ChucVuId == RoleIds.TK)).Select((x, index) => "L" + (index + 1) + " " + x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
+                            Atvsv = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == RoleIds.ATVSV).Select((x, index) => "L" + (index + 1) + " " + x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
+                            ChuyenGia = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == RoleIds.CQ).Select((x, index) => "L" + (index + 1) + "  " + x.UpdateDate?.ToString("HH:mm dd-MM-yyyy")).ToList(),
+                            Point = point?.Point ?? 0,
                         };
 
                         result.Add(report);
@@ -201,8 +246,8 @@ namespace PLX5S.BUSINESS.Services.BU
             try
             {
                 var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
-                var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.IsActive == true && x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
-                var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.IsActive == true && x.KiKhaoSatId == filterReport.KiKhaoSatId).OrderBy(x => x.UpdateDate).ToList();
+                var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).OrderBy(x => x.UpdateDate).ToList();
                 var device = _dbContext.tblMdDevice.AsQueryable().ToList();
                 var result = new List<ThoiGianChamDiem>();
                 if (filterReport.SurveyId == "DT1")
@@ -217,6 +262,7 @@ namespace PLX5S.BUSINESS.Services.BU
 
                     foreach (var item in lstDoiTuong)
                     {
+                        var point = lstPoint.Where(x => x.DoiTuongId == item.Id).OrderByDescending(x => x.CreateDate).FirstOrDefault();
                         var report = new ThoiGianChamDiem()
                         {
                             stt = item.StoreId,
@@ -224,7 +270,7 @@ namespace PLX5S.BUSINESS.Services.BU
                             Cht = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "CHT").Select((x, index) => "L" + (index + 1) + " " + ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "Khác")).ToList(),
                             Atvsv = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV").Select((x, index) => "L" + (index + 1) + " " + ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "Khác")).ToList(),
                             ChuyenGia = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT").Select((x, index) => "L" + (index + 1) + " " + ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "Khác")).ToList(),
-                            Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
+                            Point = point?.Point ?? 0,
                         };
 
                         result.Add(report);
@@ -242,6 +288,7 @@ namespace PLX5S.BUSINESS.Services.BU
 
                     foreach (var item in lstDoiTuong)
                     {
+                        var point = lstPoint.Where(x => x.DoiTuongId == item.Id).OrderByDescending(x => x.CreateDate).FirstOrDefault();
                         var report = new ThoiGianChamDiem()
                         {
                             stt = item.WareHouseId,
@@ -249,7 +296,7 @@ namespace PLX5S.BUSINESS.Services.BU
                             Cht = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "CHT").Select((x, index) => "L" + (index + 1) + " " + ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "Khác")).ToList(),
                             Atvsv = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV").Select((x, index) => "L" + (index + 1) + " " + ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "Khác")).ToList(),
                             ChuyenGia = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT").Select((x, index) => "L" + (index + 1) + " " + ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "Khác")).ToList(),
-                            Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
+                            Point = point?.Point ?? 0,
                         };
 
                         result.Add(report);
@@ -268,8 +315,8 @@ namespace PLX5S.BUSINESS.Services.BU
             try
             {
                 var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
-                var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
-                var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).OrderBy(x => x.UpdateDate).ToList();
+                var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).OrderBy(x => x.UpdateDate).ToList();
                 var result = new List<TheoKhungThoiGian>();
                 if (filterReport.SurveyId == "DT1")
                 {
@@ -282,16 +329,30 @@ namespace PLX5S.BUSINESS.Services.BU
 
                     foreach (var item in lstDoiTuong)
                     {
+                        var point = lstPoint.Where(x => x.DoiTuongId == item.Id).OrderByDescending(x => x.CreateDate).FirstOrDefault();
                         var report = new TheoKhungThoiGian()
                         {
                             stt = item.StoreId,
                             Name = item.Name,
-                            Cht_T = lstEvaHeader.Count(x => x.IsActive == true && x.DoiTuongId == item.Id && x.ChucVuId == "CHT"),
-                            Cht_N = lstEvaHeader.Count(x => x.IsActive == false && x.DoiTuongId == item.Id && x.ChucVuId == "CHT"),
-                            Atvsv_T = lstEvaHeader.Count(x => x.IsActive == true && x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV"),
-                            Atvsv_N = lstEvaHeader.Count(x => x.IsActive == false && x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV"),
-                            ChuyenGia = lstEvaHeader.Count(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT"),
-                            Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
+                            Cht_T = lstEvaHeader.Count(x => x.DoiTuongId == item.Id
+                                && (x.ChucVuId == RoleIds.CHT || x.ChucVuId == RoleIds.TK)
+                                && (DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot1) || DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot3))),
+
+                            Cht_N = lstEvaHeader.Count(x => x.DoiTuongId == item.Id
+                                && (x.ChucVuId == RoleIds.CHT || x.ChucVuId == RoleIds.TK)
+                                && (DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot2) || DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot4))),
+
+                            Atvsv_T = lstEvaHeader.Count(x => x.DoiTuongId == item.Id
+                                && x.ChucVuId == RoleIds.ATVSV
+                                && (DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot2) || DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot4))),
+
+                            Atvsv_N = lstEvaHeader.Count(x => x.DoiTuongId == item.Id
+                                && x.ChucVuId == RoleIds.ATVSV
+                                && (DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot1) || DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot3))),
+
+                            ChuyenGia = lstEvaHeader.Count(x => x.ChucVuId == RoleIds.CQ),
+
+                            Point = point?.Point ?? 0,
                         };
 
                         result.Add(report);
@@ -308,16 +369,30 @@ namespace PLX5S.BUSINESS.Services.BU
 
                     foreach (var item in lstDoiTuong)
                     {
+                        var point = lstPoint.Where(x => x.DoiTuongId == item.Id).OrderByDescending(x => x.CreateDate).FirstOrDefault();
                         var report = new TheoKhungThoiGian()
                         {
                             stt = item.WareHouseId,
                             Name = item.Name,
-                            Cht_T = lstEvaHeader.Count(x => x.IsActive == true && x.DoiTuongId == item.Id && x.ChucVuId == "CHT"),
-                            Cht_N = lstEvaHeader.Count(x => x.IsActive == false && x.DoiTuongId == item.Id && x.ChucVuId == "CHT"),
-                            Atvsv_T = lstEvaHeader.Count(x => x.IsActive == true && x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV"),
-                            Atvsv_N = lstEvaHeader.Count(x => x.IsActive == false && x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV"),
-                            ChuyenGia = lstEvaHeader.Count(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT"),
-                            Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
+                            Cht_T = lstEvaHeader.Count(x => x.DoiTuongId == item.Id
+                                && (x.ChucVuId == RoleIds.CHT || x.ChucVuId == RoleIds.TK)
+                                && (DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot1) || DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot3))),
+
+                            Cht_N = lstEvaHeader.Count(x => x.DoiTuongId == item.Id
+                                && (x.ChucVuId == RoleIds.CHT || x.ChucVuId == RoleIds.TK)
+                                && (DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot2) || DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot4))),
+
+                            Atvsv_T = lstEvaHeader.Count(x => x.DoiTuongId == item.Id
+                                && x.ChucVuId == RoleIds.ATVSV
+                                && (DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot2) || DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot4))),
+
+                            Atvsv_N = lstEvaHeader.Count(x => x.DoiTuongId == item.Id
+                                && x.ChucVuId == RoleIds.ATVSV
+                                && (DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot1) || DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot3))),
+
+                            ChuyenGia = lstEvaHeader.Count(x => x.ChucVuId == RoleIds.CQ),
+
+                            Point = point?.Point ?? 0,
                         };
 
                         result.Add(report);
@@ -339,10 +414,10 @@ namespace PLX5S.BUSINESS.Services.BU
             {
                 var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
                 var lstTieuChi = _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId && x.IsGroup == false).ToList();
-                var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).OrderBy(x => x.UpdateDate).ToList();
                 var lstEvaValue = _dbContext.TblBuEvaluateValue.Where(x => x.FeedBack != "").ToList();
                 var lstChucVu = _dbContext.tblMdChucVu.OrderBy(x => x.Id).ToList();
-                var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).OrderBy(x => x.UpdateDate).ToList();
                 var lstAccount = _dbContext.TblAdAccount.OrderBy(x => x.UserName).ToList();
                 var result = new List<TongHopYKienDeXuat>();
 
@@ -438,9 +513,9 @@ namespace PLX5S.BUSINESS.Services.BU
             {
                 var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
                 var lstTieuChi = _dbContext.TblBuTieuChi.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId && x.IsGroup == false).ToList();
-                var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).OrderBy(x => x.UpdateDate).ToList();
                 var lstEvaValue = _dbContext.TblBuEvaluateImage.Where(x => x.FilePath != "").ToList();
-                var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).OrderBy(x => x.UpdateDate).ToList();
                 var lstChucVu = _dbContext.tblMdChucVu.OrderBy(x => x.Id).ToList();
                 var lstAccount = _dbContext.TblAdAccount.OrderBy(x => x.UserName).ToList();
                 var result = new List<BaoCaoHinhAnh>();
@@ -549,6 +624,17 @@ namespace PLX5S.BUSINESS.Services.BU
             return style;
         }
 
+        public string GetXepLoai(decimal point)
+        {
+            if (point >= 95)
+                return "Tốt";
+            if (point >= 90 && point < 95)
+                return "Khá";
+            if (point >= 80 && point < 90)
+                return "Trung bình";
+            return "Kém";
+        }
+
         public async Task<string> ExportExcel(string ReportName, FilterReport filterReport)
         {
             try
@@ -604,9 +690,10 @@ namespace PLX5S.BUSINESS.Services.BU
                         ExcelNPOIExtention.SetCellValueText(row, 0, i.stt, styles.Text);
                         ExcelNPOIExtention.SetCellValueText(row, 1, i.Name, styles.Text);
                         ExcelNPOIExtention.SetCellValueNumber(row, 2, i.Length, styles.Number);
-                        ExcelNPOIExtention.SetCellValueNumber(row, 3, i.point, styles.Number);
-                        ExcelNPOIExtention.SetCellValueText(row, 4, "", styles.Text);
-                        ExcelNPOIExtention.SetCellValueText(row, 5, i.Description, styles.Text);
+                        ExcelNPOIExtention.SetCellValueText(row, 3, i.ListPointExcel, styles.Text);
+                        ExcelNPOIExtention.SetCellValueNumber(row, 4, i.point, styles.Number);
+                        ExcelNPOIExtention.SetCellValueText(row, 5, GetXepLoai(i.point ?? 0), styles.Text);
+                        ExcelNPOIExtention.SetCellValueText(row, 6, i.Description, styles.Text);
 
                         startIndex++;
                     }
@@ -637,8 +724,8 @@ namespace PLX5S.BUSINESS.Services.BU
                     };
 
                     var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
-                    var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.IsActive == true && x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
-                    var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                    var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.IsActive == true && x.KiKhaoSatId == filterReport.KiKhaoSatId).OrderBy(x => x.UpdateDate).ToList();
+                    var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).OrderBy(x => x.UpdateDate).ToList();
                     var device = _dbContext.tblMdDevice.AsQueryable().ToList();
                     var result = new List<ThoiGianChamDiem>();
                     if (filterReport.SurveyId == "DT1")
@@ -653,6 +740,7 @@ namespace PLX5S.BUSINESS.Services.BU
 
                         foreach (var item in lstDoiTuong)
                         {
+                            var point = lstPoint.Where(x => x.DoiTuongId == item.Id).OrderByDescending(x => x.CreateDate).FirstOrDefault();
                             var report = new ThoiGianChamDiem()
                             {
                                 stt = item.StoreId,
@@ -660,7 +748,7 @@ namespace PLX5S.BUSINESS.Services.BU
                                 Cht = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "CHT").Select((x, index) => ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "Khác")).ToList(),
                                 Atvsv = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV").Select((x, index) => ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "Khác")).ToList(),
                                 ChuyenGia = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT").Select((x, index) => ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "Khác")).ToList(),
-                                Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
+                                Point = point?.Point ?? 0,
                             };
 
                             result.Add(report);
@@ -678,6 +766,7 @@ namespace PLX5S.BUSINESS.Services.BU
 
                         foreach (var item in lstDoiTuong)
                         {
+                            var point = lstPoint.Where(x => x.DoiTuongId == item.Id).OrderByDescending(x => x.CreateDate).FirstOrDefault();
                             var report = new ThoiGianChamDiem()
                             {
                                 stt = item.WareHouseId,
@@ -685,7 +774,7 @@ namespace PLX5S.BUSINESS.Services.BU
                                 Cht = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "CHT").Select((x, index) => ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "Khác")).ToList(),
                                 Atvsv = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId == "ATVSV").Select((x, index) => ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "Khác")).ToList(),
                                 ChuyenGia = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT").Select((x, index) => ((device.FirstOrDefault(y => y.Id == x.DeviceId)?.MainDevice == true) ? "Chính" : "Khác")).ToList(),
-                                Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
+                                Point = point?.Point ?? 0,
                             };
 
                             result.Add(report);
@@ -994,8 +1083,8 @@ namespace PLX5S.BUSINESS.Services.BU
                     };
 
                     var inputKy = _kiKhaoSatService.GetInput(filterReport.KiKhaoSatId);
-                    var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.IsActive == true && x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
-                    var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).ToList();
+                    var lstEvaHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.IsActive == true && x.KiKhaoSatId == filterReport.KiKhaoSatId).OrderBy(x => x.UpdateDate).ToList();
+                    var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).OrderBy(x => x.UpdateDate).ToList();
                     var device = _dbContext.tblMdDevice.AsQueryable().ToList();
                     var result = new List<ThoiGianChamDiem>();
                     if (filterReport.SurveyId == "DT1")
@@ -1007,9 +1096,10 @@ namespace PLX5S.BUSINESS.Services.BU
                             lstDoiTuong = lstDoiTuong.Where(x => x.Id == filterReport.DoiTuongId).ToList();
                         }
 
-
                         foreach (var item in lstDoiTuong)
                         {
+                            var point = lstPoint.Where(x => x.DoiTuongId == item.Id).OrderByDescending(x => x.CreateDate).FirstOrDefault();
+
                             var report = new ThoiGianChamDiem()
                             {
                                 stt = item.StoreId,
@@ -1024,7 +1114,7 @@ namespace PLX5S.BUSINESS.Services.BU
                                 ChuyenGia = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT")
                             .Select((x, index) => (x.UpdateDate?.ToString("HH:mm dd/MM/yyyy") ?? ""))
                          .ToList(),
-                                Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0
+                                Point = point?.Point ?? 0
 
                             };
 
@@ -1043,6 +1133,9 @@ namespace PLX5S.BUSINESS.Services.BU
 
                         foreach (var item in lstDoiTuong)
                         {
+                            var point = lstPoint.Where(x => x.DoiTuongId == item.Id).OrderByDescending(x => x.CreateDate).FirstOrDefault();
+
+
                             var report = new ThoiGianChamDiem()
                             {
                                 stt = item.WareHouseId,
@@ -1056,7 +1149,7 @@ namespace PLX5S.BUSINESS.Services.BU
                                 ChuyenGia = lstEvaHeader.Where(x => x.DoiTuongId == item.Id && x.ChucVuId != "ATVSV" && x.ChucVuId != "CHT")
                             .Select((x, index) => (x.UpdateDate?.ToString("HH:mm dd/MM/yyyy") ?? ""))
                          .ToList(),
-                                Point = lstPoint.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0
+                                Point = point?.Point ?? 0
                             };
 
                             result.Add(report);

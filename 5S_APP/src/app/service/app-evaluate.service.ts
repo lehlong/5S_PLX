@@ -26,6 +26,9 @@ export class AppEvaluateService {
   getNotifications(): Observable<any> {
     return this.commonService.get('AppEvaluate/GetNotification')
   }
+  speedTest(): Observable<any> {
+    return this.commonService.get('AppEvaluate/SpeedTest')
+  }
   buildDataTreeForApp(kiKhaoSatId: any, doiTuongId: any): Observable<any> {
     return this.commonService.get(`AppEvaluate/BuildDataTreeForApp?kiKhaoSatId=${kiKhaoSatId}&doiTuongId=${doiTuongId}`)
   }
@@ -35,7 +38,7 @@ export class AppEvaluateService {
   }
 
   insertEvaluate2(params: any): Observable<any> {
-    return this.commonService.post(`AppEvaluate/InsertEvaluate2`, params, false)
+    return this.commonService.post(`AppEvaluate/InsertEvaluate2`, params, false, 'Đang đồng bộ Điểm ...')
   }
 
   tinhTongLanCham(params: any): Observable<any> { 
@@ -52,6 +55,10 @@ export class AppEvaluateService {
 
   uploadFile(params: any){
     return this.commonService.post(`AppEvaluate/UploadFile`, params, false)
+  }
+  
+  uploadSingleFileOff(params: any){
+    return this.commonService.post(`AppEvaluate/UploadSingleFileOff`, params, false, '', false, false)
   }
   
   uploadFileOffline(params: any){

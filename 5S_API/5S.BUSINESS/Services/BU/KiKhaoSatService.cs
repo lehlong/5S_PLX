@@ -35,6 +35,7 @@ namespace PLX5S.BUSINESS.Services.BU
         Task<KiKhaoSatModel> GetInput(string idKi);
         Task UpdateKhaoSatTrangThai(TblBuKiKhaoSat kiKhaoSat);
         Task<PagedResponseDto> SearchKiKhaoSat(FilterKiKhaoSat filter);
+        Task<List<TblBuKiKhaoSat>> GetAll(string surveyId);
         //Task AutoCreateKy();
     }
     public class KikhaosatService : GenericService<TblBuKiKhaoSat, KiKhaoSatDto>, IKikhaosatService
@@ -77,6 +78,24 @@ namespace PLX5S.BUSINESS.Services.BU
                 return null;
             }
         }
+
+
+        public async Task<List<TblBuKiKhaoSat>> GetAll(string surveyId)
+        {
+            try
+            {
+                var query = _dbContext.TblBuKiKhaoSat.Where(x => x.SurveyMgmtId == surveyId).ToList();
+                
+                return query;
+            }
+            catch (Exception ex)
+            {
+                Status = false;
+                Exception = ex;
+                return null;
+            }
+        }
+
         public override async Task<PagedResponseDto> Search(BaseFilter filter)
         {
             try

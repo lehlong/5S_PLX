@@ -44,7 +44,7 @@ export class SurveyMgmtComponent {
     surveyMgmt: {},
   };
 
-  constructor(
+  constructor( 
     private _service: SurveyMgmtService,
     private _storeService: StoreService,
     private _accountService: AccountService,

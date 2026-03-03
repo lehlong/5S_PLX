@@ -181,6 +181,33 @@ namespace PLX5S.API.Controllers.BU
             return Ok(transferObject);
         }
 
+        [HttpPost("UploadSingleFileOff")]
+        public async Task<IActionResult> UploadSingleFileOff([FromForm] FileModel file)
+        {
+            var transferObject = new TransferObject();
+            var data = await _service.UploadSingleFileOff(file);
+            if (_service.Status)
+            {
+                transferObject.Data = data;
+                transferObject.Status = true;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
+
+        [HttpGet("SpeedTest")]
+        public IActionResult SpeedTest()
+        {
+            var data = new byte[200 * 1024]; // 200KB
+            new Random().NextBytes(data);
+            return File(data, "application/octet-stream");
+        }
+
         [HttpPost("UploadFileOffline")]
         public async Task<IActionResult> UploadFileOffline([FromForm] List<FileModel> files)
         {
@@ -224,7 +251,7 @@ namespace PLX5S.API.Controllers.BU
         {
             var transferObject = new TransferObject();
             //await _service.HandlePointStore(param);
-            await _service.HandlePointStore2(param);
+            await _service.HandlePointStore3(param);
             if (_service.Status)
             {
                 transferObject.Status = true;

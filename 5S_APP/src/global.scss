@@ -552,71 +552,166 @@ $spacing-unit: 0.25rem;
 
 
 
-
-
-
-
-
-
 /// Loading
-// /// /* --- Custom Loader --- */
 .custom-loading .loading-wrapper {
   background: none !important;
   box-shadow: none !important;
-  // width: 120px;
-  // height: 120px
   padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end; 
+  gap: 6px;
+
+  min-height: 140px; /* để text không đè lên logo */
 }
 
-/* Logo 5S */
+/* ======= Logo (giữ nguyên size) ======= */
 .custom-loading .loading-wrapper::before {
   content: "";
   width: 70px;
   height: 70px;
+
   background-image: url('assets/img/logo.png');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+
+  position: absolute;
+  top: 40%;        /* canh giữa */
+  left: 50%;
+  transform: translate(-50%, -50%);
   z-index: 3;
 }
 
-/* SVG nét đứt – render mượt trên mọi hệ điều hành */
+/* ======= Vòng xoay (giữ nguyên size) ======= */
 .custom-loading .loading-wrapper::after {
   content: "";
   width: 80px;
   height: 80px;
+
   position: absolute;
-  top: -5px;
-  left: -5px;
+  top: 40%;        /* trùng tâm với logo */
+  left: 50%;
+  transform: translate(-50%, -50%);
+
   background-repeat: no-repeat;
   background-position: center;
   background-image: url("data:image/svg+xml;utf8,\
 <svg width='80' height='80' xmlns='http://www.w3.org/2000/svg'>\
   <circle cx='40' cy='40' r='37' \
-    stroke='white' \
-    stroke-width='6' \
-    fill='none' \
-    stroke-dasharray='8 15' \
-    stroke-linecap='round' />\
+    stroke='white' stroke-width='6' fill='none' \
+    stroke-dasharray='8 15' stroke-linecap='round' />\
 </svg>");
+
   animation: spin 3.2s linear infinite;
   z-index: 1;
 }
 
-/* Xoay SVG */
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
+/* ======= Message (text) không vỡ layout ======= */
+.custom-loading .loading-content {
+    max-width: 90%;
+    /* width: 219%; */
+    text-align: center;
+    font-size: 14px;
+    color: white;
+    bottom: 0px;
+    left: 50%;
+    word-wrap: break-word;
+    justify-content: center;
+    overflow-wrap: break-word;
+    line-break: anywhere;
 }
+
+/* Animation */
+@keyframes spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+
+
+
+// /// Loading
+// // /// /* --- Custom Loader --- */
+// .custom-loading .loading-wrapper {
+//   background: none !important;
+//   box-shadow: none !important;
+//   // width: 120px;
+//   // height: 120px
+//   padding: 0;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   position: relative;
+//   flex-direction: column; 
+
+//   justify-content: flex-end;  /* đẩy message xuống dưới */
+//   gap: 5px;
+// }
+
+// /* Logo 5S */
+// .custom-loading .loading-wrapper::before {
+//   // position: absolute; /* quan trọng */
+//   content: "";
+//   width: 70px;
+//   height: 70px;
+//   background-image: url('assets/img/logo.png');
+//   background-size: contain;
+//   background-repeat: no-repeat;
+//   background-position: center;
+//   z-index: 3;
+// }
+
+// /* SVG nét đứt – render mượt trên mọi hệ điều hành */
+// .custom-loading .loading-wrapper::after {
+//   content: "";
+//   width: 80px;
+//   height: 80px;
+//   position: absolute;
+//   text-align: center;
+//   // top: 50%;
+//   // left: 50%;
+//   top: -5%;
+//   left: 10%;
+//   background-repeat: no-repeat;
+//   background-position: center;
+//   background-image: url("data:image/svg+xml;utf8,\
+// <svg width='80' height='80' xmlns='http://www.w3.org/2000/svg'>\
+//   <circle cx='40' cy='40' r='37' \
+//     stroke='white' \
+//     stroke-width='6' \
+//     fill='none' \
+//     stroke-dasharray='8 15' \
+//     stroke-linecap='round' />\
+// </svg>");
+//   animation: spin 3.2s linear infinite;
+//   z-index: 1;
+// }
+
+
+// .custom-loading .loading-content {
+//   max-width: 100%;
+//   position: absolute;
+//   margin-top: 90px;     /* cách logo */
+//   text-align: center;
+//   font-size: 14px;
+//   color: white;
+//   word-wrap: break-word;  /* tránh vỡ layout */
+// }
+
+// /* Xoay SVG */
+// @keyframes spin {
+//   from {
+//     transform: rotate(0deg);
+//   }
+
+//   to {
+//     transform: rotate(360deg);
+//   }
+// }
 
 
 
@@ -638,6 +733,7 @@ $spacing-unit: 0.25rem;
 .custom-toast .toast-message {
   padding: 14px 18px !important;
 }
+
 .toast-row {
   display: flex;
   align-items: center;
