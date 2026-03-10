@@ -11,6 +11,7 @@ import { environment } from 'src/environments/environment';
 import { Preferences } from '@capacitor/preferences';
 import { ConfigService } from 'src/app/service/config.service';
 import { Capacitor } from '@capacitor/core';
+import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -120,7 +121,7 @@ export class LoginComponent implements OnInit {
           'warehouseCode',
           response?.accountInfo?.warehouseCode
         );
-        this.subscribeToTestTopic('PLX5S_NOTI');
+        // this.subscribeToTestTopic('PLX5S_NOTI');
 
         await this.initPush()
         
@@ -192,43 +193,75 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  async initPush() {
-    console.log('Requesting permission...');
-    let permStatus = await PushNotifications.requestPermissions();
+  // async initPush() {
+  //   console.log('Requesting permission...');
+  //   let permStatus = await PushNotifications.requestPermissions();
 
-    if (permStatus.receive === 'granted') {
-      console.log('Permission granted');
-      PushNotifications.register();
-    } else {
-      console.log('Permission not granted');
+  //   if (permStatus.receive === 'granted') {
+  //     console.log('Permission granted');
+  //     PushNotifications.register();
+  //   } else {
+  //     console.log('Permission not granted');
+  //     return;
+  //   }
+
+  //   // Khi đã đăng ký thành công
+  //   PushNotifications.addListener('registration',
+  //     (token: Token) => {
+  //       console.log('Firebase Token: ', token.value);
+
+  //       // Gửi token lên server .NET của bạn để lưu theo user
+  //       this.saveFirebaseTokenToServer(token.value);
+  //     }
+  //   );
+
+  //   // Khi có lỗi
+  //   PushNotifications.addListener('registrationError',
+  //     (error) => {
+  //       console.error('Error on registration: ', error);
+  //     }
+  //   );
+
+  //   // Khi nhận FCM ở foreground
+  //   PushNotifications.addListener('pushNotificationReceived',
+  //     (notification) => {
+  //       console.log('Push received: ', notification);
+  //     }
+  //   );
+  // }
+
+  async initPush() {
+    // 1. Xin quyền thông báo (Android tự granted, iOS cần xác nhận)
+    const permStatus = await PushNotifications.requestPermissions();
+    if (permStatus.receive !== 'granted') {
+      console.warn('Permission not granted!');
       return;
     }
 
-    // Khi đã đăng ký thành công
-    PushNotifications.addListener('registration',
-      (token: Token) => {
-        console.log('Firebase Token: ', token.value);
+    // 2. Đăng ký nhận push
+    await PushNotifications.register();
 
-        // Gửi token lên server .NET của bạn để lưu theo user
-        this.saveFirebaseTokenToServer(token.value);
-      }
-    );
+    // 3. Lấy FCM Token để gửi về server
+    const fcmToken = await FirebaseMessaging.getToken();
+    console.log("FCM Token:", fcmToken.token);
 
-    // Khi có lỗi
-    PushNotifications.addListener('registrationError',
-      (error) => {
-        console.error('Error on registration: ', error);
-      }
-    );
+    this.saveFirebaseTokenToServer(fcmToken.token);
 
-    // Khi nhận FCM ở foreground
-    PushNotifications.addListener('pushNotificationReceived',
-      (notification) => {
-        console.log('Push received: ', notification);
-      }
-    );
+    // 4. Lắng nghe thông báo khi app đang mở
+    PushNotifications.addListener('pushNotificationReceived', (notification) => {
+      console.log('Notification received:', notification);
+    });
+
+    // 5. Lắng nghe khi user bấm vào thông báo
+    PushNotifications.addListener('pushNotificationActionPerformed', (action) => {
+      console.log('Notification action:', action);
+    });
+
+    // 6. Lắng nghe lỗi đăng ký
+    PushNotifications.addListener('registrationError', (err) => {
+      console.error('Registration error:', err);
+    });
   }
-
   saveFirebaseTokenToServer(token: string) {
     // gọi API POST lưu token theo từng UserId
   }
