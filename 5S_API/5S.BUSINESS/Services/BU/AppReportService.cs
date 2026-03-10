@@ -350,7 +350,7 @@ namespace PLX5S.BUSINESS.Services.BU
                                 && x.ChucVuId == RoleIds.ATVSV
                                 && (DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot1) || DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot3))),
 
-                            ChuyenGia = lstEvaHeader.Count(x => x.ChucVuId == RoleIds.CQ),
+                            ChuyenGia = lstEvaHeader.Count(x => x.DoiTuongId == item.Id && x.ChucVuId == RoleIds.CQ),
 
                             Point = point?.Point ?? 0,
                         };
@@ -390,7 +390,7 @@ namespace PLX5S.BUSINESS.Services.BU
                                 && x.ChucVuId == RoleIds.ATVSV
                                 && (DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot1) || DotChamHelper.IsInDotCham((DateTime)x.UpdateDate, DotCham.Dot3))),
 
-                            ChuyenGia = lstEvaHeader.Count(x => x.ChucVuId == RoleIds.CQ),
+                            ChuyenGia = lstEvaHeader.Count(x => x.DoiTuongId == item.Id && x.ChucVuId == RoleIds.CQ),
 
                             Point = point?.Point ?? 0,
                         };

@@ -61,8 +61,9 @@ export class NewsComponent implements OnInit {
   };
   buttons = [
     { label: 'Tất cả', value: 'all' },
-    { label: 'Cửa hàng', value: 'store' },
-    { label: 'Kho', value: 'warehouse' },
+    { label: 'Tôi chấm', value: 'toiCham' },
+    // { label: 'Cửa hàng', value: 'store' },
+    // { label: 'Kho', value: 'warehouse' },
     { label: 'Chưa chấm', value: 'chuaCham' },
   ];
   constructor(

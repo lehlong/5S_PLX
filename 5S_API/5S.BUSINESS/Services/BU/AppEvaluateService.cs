@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using Common;
+using DocumentFormat.OpenXml.Office2013.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using FirebaseAdmin.Auth;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using NPOI.SS.Formula.Functions;
+using Org.BouncyCastle.Utilities.Collections;
 using PLX5S.BUSINESS.Common;
 using PLX5S.BUSINESS.Dtos.BU;
 using PLX5S.BUSINESS.Models;
@@ -14,6 +17,7 @@ using PLX5S.CORE.Entities.BU;
 using PLX5S.CORE.Statics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
+using SkiaSharp;
 using System.Data;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
@@ -37,6 +41,7 @@ namespace PLX5S.BUSINESS.Services.BU
         Task<List<TblBuNotification>> GetNotification();
         Task HandlePointStore3(EvaluateFilter param);
         Task<HomeModel> GetDataHome(string userName);
+        Task<HomeModel> GetDataHome2(string userName);
         Task<List<TblBuEvaluateImage>> UploadFileOffline(List<FileModel> files);
     }
 
@@ -144,8 +149,35 @@ namespace PLX5S.BUSINESS.Services.BU
                 parentNode.Children ??= [];
                 parentNode.Children.Add(item);
             }
-            return rootNode;
+            //return rootNode;
+            var filteredRoot = FilterGroupsWithoutLeaf(rootNode);
 
+            // Nếu root không còn leaf ⇒ trả null hoặc tree rỗng
+            return filteredRoot;
+
+        }
+        private TieuChiDto FilterGroupsWithoutLeaf(TieuChiDto node)
+        {
+            // Nếu có children thì xử lý từng child trước
+            if (node.Children != null && node.Children.Any())
+            {
+                node.Children = node.Children
+                    .Select(child => FilterGroupsWithoutLeaf(child))
+                    .Where(child => child != null)
+                    .ToList();
+            }
+
+            // Nếu node là leaf (IsGroup = false) → GIỮ
+            if (node.IsGroup == false)
+                return node;
+
+            // Nếu node là group (IsGroup = true)
+            // Một group chỉ được giữ lại nếu có ít nhất 1 child tồn tại sau khi lọc
+            if (node.Children != null && node.Children.Any())
+                return node;
+
+            // Group không có leaf → bỏ
+            return null;
         }
 
         public async Task<List<TieuChiDto>> GetAllTieuChiLeaves(string kiKhaoSatId, string doiTuongId)
@@ -474,7 +506,8 @@ namespace PLX5S.BUSINESS.Services.BU
                     EvaluateHeaderCode = file.EvaluateHeaderCode,
                     TieuChiCode = file.TieuChiCode,
                     KinhDo = ToDecimal(file.KinhDo),
-                    ViDo = ToDecimal(file.ViDo)
+                    ViDo = ToDecimal(file.ViDo),
+                    Date = file.Date,
                 };
             }
             catch (Exception ex)
@@ -1166,6 +1199,78 @@ namespace PLX5S.BUSINESS.Services.BU
                 return null;
             }
         }
+
+
+        public async Task<HomeModel> GetDataHome2(string userName)
+        {
+            try
+            {
+                var result = new HomeModel();
+                var now = DateTime.Now;
+                //var now = new DateTime(2026, 01, 8);
+                var lstdata = new List<Object>();
+                var lstSurvey = _dbContext.TblBuSurveyMgmt.OrderBy(x => x.Id).ToList();
+
+                var user = _dbContext.TblAdAccount.FirstOrDefault(x => x.UserName == userName);
+                var dot = GetDotInfo(now, user.ChucVuId);
+
+                var lstKy = _dbContext.TblBuKiKhaoSat.Where(x => x.TrangThaiKi == "2" && x.EndDate.Month == now.Month).ToList();
+                var lstChamDiem = _dbContext.TblBuInputChamDiem.Where(x => lstKy.Select(x => x.Id).Contains(x.KiKhaoSatId)).ToList();
+
+                var lstHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.AccountUserName == userName && lstKy.Select(x => x.Id).Contains(x.KiKhaoSatId)).ToList();
+                var lstPoint = _dbContext.TblBuPoint.Where(x => lstKy.Select(x => x.Id).Contains(x.KiKhaoSatId)).ToList();
+
+                var lstInDoiTuong = _dbContext.TblBuInputDoiTuong.Where(x => lstSurvey.Select(x => x.Id).Contains(x.SurveyMgmtId) && x.IsActive == true).ToList();
+
+                var lstStore = _dbContext.tblMdStore.OrderBy(x => x.Id).ToList();
+                var lstWareHouse = _dbContext.TblMdWareHouse.OrderBy(x => x.Id).ToList();
+
+                foreach (var d in lstInDoiTuong)
+                {
+                    //var doiTuong = lstInDoiTuong.FirstOrDefault(x => x.DoiTuongId == i.DoiTuongId && ky.SurveyMgmtId == x.SurveyMgmtId);
+
+                    var ky = lstKy.FirstOrDefault(x => x.SurveyMgmtId == d.SurveyMgmtId);
+                    if (ky == null)
+                        continue;
+
+                    var survey = lstSurvey.FirstOrDefault(x => x.Id == d.SurveyMgmtId);
+
+                    var doiTuongName = survey.DoiTuongId == "DT1"
+                            ? lstStore.FirstOrDefault(x => x.Id == d.DoiTuongId).Name
+                            : survey.DoiTuongId == "DT2"
+                                ? lstWareHouse.FirstOrDefault(x => x.Id == d.DoiTuongId).Name
+                                : "";
+                    var isScore = dot.Dot == 0 ? false : !lstHeader.Any(x => x.UpdateDate >= dot.FDate && x.UpdateDate <= dot.EDate.Date.AddDays(1).AddTicks(-1) && x.DoiTuongId == d.DoiTuongId);
+                    var scored = dot.Dot == 0 ? false : lstHeader.Any(x => x.UpdateDate >= dot.FDate && x.UpdateDate <= dot.EDate.Date.AddDays(1).AddTicks(-1) && x.DoiTuongId == d.DoiTuongId);
+
+                    result.LstDoiTuong.Add(new DoiTuong
+                    {
+                        Id = d.Id,
+                        Name = doiTuongName,
+                        KiKhaoSatCode = ky.Code,
+                        KiKhaoSatId = ky.Id,
+                        KiKhaoSatName = ky.Name,
+                        FDate = ky.StartDate,
+                        EndDate = ky.EndDate,
+                        Type = survey.DoiTuongId,
+                        Point = lstPoint.Where(y => y.DoiTuongId == lstInDoiTuong.FirstOrDefault(x => x.DoiTuongId == d.DoiTuongId)?.Id).OrderByDescending(y => y.CreateDate).FirstOrDefault()?.Point ?? 0,
+                        IsScore = isScore,
+                        TimeText = FormatToMonthYear(ky.EndDate),
+                        Description = GetChamDiemStatus(ky.EndDate, now, scored, user.ChucVuId),
+                        Scored = scored,
+                        LstChamDiem = lstChamDiem.Where(x => x.DoiTuongId == d.DoiTuongId).Select(x => x.UserName).ToList()
+                    });
+                }
+
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
 
         public static DotInfo GetDotInfo(DateTime date, string? chucVuId = null)
         {

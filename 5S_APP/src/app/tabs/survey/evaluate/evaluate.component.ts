@@ -419,12 +419,6 @@ export class EvaluateComponent implements OnInit {
     this.autoSave()
   }
 
-  // autoSave() {
-  //   this._storageService.set(
-  //     this.doiTuong.id + '_' + this.kiKhaoSat.code,
-  //     this.evaluate
-  //   );
-  // }
 
   async handleSave() {
     // let checkUpload = false
@@ -447,6 +441,16 @@ export class EvaluateComponent implements OnInit {
 
   async onSubmit() {
     if (!this.isEdit) return;
+
+    const isOnline = await this._networkSpeedS.checkConnection();
+
+    if (isOnline) {
+    }else{
+      this.messageService.show('Vui lòng kết nối mạng để nộp!!!', 'danger');
+      return
+      
+    }
+
     let allChecksPassed = true;
     let errorMessage: string[] = [];
 
@@ -497,7 +501,7 @@ export class EvaluateComponent implements OnInit {
       await alert.present();
       return;
     }
-    this._globalS.loadingShow('Đang đồng bộ Ảnh ...')
+    this._globalS.loadingShow('Đang đồng bộ dữ liệu lên server ...')
 
     const offlineFiles = this.evaluate.lstImages.filter((x: any) => x?.isBase64);
 
@@ -630,16 +634,16 @@ export class EvaluateComponent implements OnInit {
       const formData = new FormData();
       formData.append('file', blob, item.fileName);
       formData.append('KinhDo', item.kinhDo);
+      formData.append('Date', item.date);
       formData.append('ViDo', item.viDo);
       formData.append('FileName', item.fileName);
       formData.append('Type', item.type);
       formData.append('TieuChiCode', item.tieuChiCode);
       formData.append('EvaluateHeaderCode', item.evaluateHeaderCode);
 
-      var result = await firstValueFrom(this._service.uploadSingleFileOff(formData));
+      const result = await firstValueFrom(this._service.uploadSingleFileOff(formData));
 
       item.isBase64 = false;
-
 
       const index = this.evaluate.lstImages.findIndex((x: any) => x.code === item.code);
 
@@ -773,31 +777,21 @@ export class EvaluateComponent implements OnInit {
     const formData = new FormData();
     formData.append('file', file, file.name);
     const saved = await this.saveOffline(file, tieuChiCode, location);
-
-    // this._service.uploadFile(formData).subscribe({
-    //   next: (resp: any) => {
-    //     resp.evaluateHeaderCode = this.headerId
-    //     resp.tieuChiCode = tieuChiCode
-    //     resp.kinhDo = location.lng
-    //     resp.viDo = location.lat
-
-    //     this.evaluate.lstImages.push(resp)
-    //     this.autoSave()
-
-    //     this.cdr.detectChanges();
-    //   },
-
-    //   error: async (err) => {
-    //     const saved = await this.saveOffline(file, tieuChiCode, location);
-
-    //     console.log("File đã lưu:", saved);
-    //   }
-    // })
   }
 
   ////////// Camera chụp ảnh
   async openCamera(code: any) {
     try {
+      // ---- Kiểm tra quyền GPS trước ----
+      const gpsAllowed = await this.checkLocationPermission();
+
+      if (!gpsAllowed) {
+        // Không cho chụp ảnh
+        await this.messageService.show("Vui lòng bật quyền truy cập vị trí để chụp ảnh", 'warning');
+        return;
+      }
+
+      // ---- BẮT ĐẦU CHỤP ẢNH ----
       const photo = await Camera.getPhoto({
         quality: 70,
         resultType: CameraResultType.Uri,
@@ -815,40 +809,7 @@ export class EvaluateComponent implements OnInit {
       // ==== Lấy toạ độ ====
       const location = await this.getLocation();
 
-      // =================================================
-      // 1. Có mạng → Upload trực tiếp lên server
-      // =================================================
-      // if (navigator.onLine) {
-      //   const formData = new FormData();
-      //   const ext = blob.type.split('/')[1];
-      //   formData.append('file', blob, `${Date.now()}.${ext}`);
-
-      //   this._service.uploadFile(formData).subscribe({
-      //     next: async (resp: any) => {
-
-      //       resp.evaluateHeaderCode = this.headerId;
-      //       resp.tieuChiCode = code;
-      //       resp.viDo = location.lat;
-      //       resp.kinhDo = location.lng;
-
-      //       this.evaluate.lstImages.push(resp);
-
-      //       this.autoSave();
-      //       this.cdr.detectChanges();
-      //     },
-
-      //     error: async () => {
-      //       console.warn("Upload lỗi → Lưu offline");
-      //       await this.saveOffline(blob, code, location);
-      //     }
-      //   });
-
-      //   return;
-      // }
-
-      // =================================================
-      // 2. Không có mạng → Lưu offline
-      // =================================================
+      // ===== Lưu offline =================
       await this.saveOffline(blob, code, location);
 
     } catch (err) {
@@ -856,7 +817,23 @@ export class EvaluateComponent implements OnInit {
     }
   }
 
+  private async checkLocationPermission(): Promise<boolean> {
+    try {
+      const status = await Geolocation.checkPermissions();
 
+      // Nếu đã được cấp quyền → OK
+      if (status.location === 'granted') {
+        return true;
+      }
+
+      // Chưa cấp → yêu cầu quyền
+      const request = await Geolocation.requestPermissions();
+
+      return request.location === 'granted';
+    } catch {
+      return false;
+    }
+  }
 
   // dowload file về máy 
   async downloadFile(doc: any) {
@@ -865,8 +842,6 @@ export class EvaluateComponent implements OnInit {
 
     await this._systemFileS.downloadFile(url, fileName);
   }
-
-
 
 
 

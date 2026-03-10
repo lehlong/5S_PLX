@@ -183,7 +183,7 @@ namespace PLX5S.BUSINESS.Services.BackgroundHangfire
                 //var now = new DateTime(2026, 3, 3);
                 var lastDay = LastDayOfMonth(now);
 
-                if (now.Day == 3)
+                if (now.Day == 7)
                 {
                     var noti = _dbContext.TblBuNotification.FirstOrDefault(x => x.CreateDate.Value.Day == now.Day &&
                                                                                 x.CreateDate.Value.Month == now.Month &&

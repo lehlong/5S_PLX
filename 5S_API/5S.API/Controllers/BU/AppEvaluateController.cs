@@ -308,7 +308,7 @@ namespace PLX5S.API.Controllers.BU
         public async Task<IActionResult> GetDataHome([FromQuery] string userName)
         {
             var transferObject = new TransferObject();
-            var data = await _service.GetDataHome(userName);
+            var data = await _service.GetDataHome2(userName);
             if (_service.Status)
             {
                 transferObject.Data = data;

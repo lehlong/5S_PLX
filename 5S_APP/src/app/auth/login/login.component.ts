@@ -4,7 +4,7 @@ import { GlobalService } from '../../service/global.service';
 import { AuthService } from 'src/app/service/auth.service';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { MessageService } from 'src/app/service/message.service';
-import { PushNotifications } from '@capacitor/push-notifications';
+import { PushNotifications, Token } from '@capacitor/push-notifications';
 import { Device } from '@capacitor/device';
 import { FCM } from '@capacitor-community/fcm';
 import { environment } from 'src/environments/environment';
@@ -25,7 +25,7 @@ export class LoginComponent implements OnInit {
     private authService: AuthService,
     private messageService: MessageService,
     private configService: ConfigService
-  ) {}
+  ) { }
   customUrl: string = '';
   private clickTimeout: any;
   clickCount = 0;
@@ -72,6 +72,7 @@ export class LoginComponent implements OnInit {
     await this.configService.setApiUrl(this.customUrl);
   }
   async processLogin() {
+
     this.isLogin = true;
     const { value } = await Preferences.get({ key: 'apiUrl' });
     if (this.customUrl === '' || this.customUrl === '/api') {
@@ -106,7 +107,7 @@ export class LoginComponent implements OnInit {
     }
 
     this.authService.login(this.model).subscribe({
-      next: (response) => {
+      next: async (response) => {
         localStorage.setItem('token', response.accessToken);
         localStorage.setItem('refreshToken', response.refreshToken);
         this.globalService.setUserInfo(response.accountInfo);
@@ -121,6 +122,8 @@ export class LoginComponent implements OnInit {
         );
         this.subscribeToTestTopic('PLX5S_NOTI');
 
+        await this.initPush()
+        
         const userName = response?.accountInfo?.userName;
         if (userName) {
           this.globalService.setUserName(userName);
@@ -155,15 +158,6 @@ export class LoginComponent implements OnInit {
     this.showPassword = !this.showPassword;
   }
 
-  // async subscribeToTestTopic(topic: string) {
-  //   try {
-  //     await FCM.subscribeTo({ topic: topic });
-  //     console.log('Đã đăng ký topic', topic);
-  //   } catch (error: any) {
-  //     console.error('Lỗi đăng ký topic:', error);
-  //   }
-  // }
-
   async subscribeToTestTopic(topic: string) {
     if (Capacitor.getPlatform() !== 'web') {
       try {
@@ -196,6 +190,47 @@ export class LoginComponent implements OnInit {
         // alert('Error registering push notifications: ' + error);
       }
     }
+  }
+
+  async initPush() {
+    console.log('Requesting permission...');
+    let permStatus = await PushNotifications.requestPermissions();
+
+    if (permStatus.receive === 'granted') {
+      console.log('Permission granted');
+      PushNotifications.register();
+    } else {
+      console.log('Permission not granted');
+      return;
+    }
+
+    // Khi đã đăng ký thành công
+    PushNotifications.addListener('registration',
+      (token: Token) => {
+        console.log('Firebase Token: ', token.value);
+
+        // Gửi token lên server .NET của bạn để lưu theo user
+        this.saveFirebaseTokenToServer(token.value);
+      }
+    );
+
+    // Khi có lỗi
+    PushNotifications.addListener('registrationError',
+      (error) => {
+        console.error('Error on registration: ', error);
+      }
+    );
+
+    // Khi nhận FCM ở foreground
+    PushNotifications.addListener('pushNotificationReceived',
+      (notification) => {
+        console.log('Push received: ', notification);
+      }
+    );
+  }
+
+  saveFirebaseTokenToServer(token: string) {
+    // gọi API POST lưu token theo từng UserId
   }
 
   showUrl() {

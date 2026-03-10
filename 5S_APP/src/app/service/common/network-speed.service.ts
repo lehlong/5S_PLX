@@ -27,4 +27,14 @@ export class NetworkSpeedService {
         const speedMbps = (fileSize / duration) / 1024 / 1024;
         return Number(speedMbps.toFixed(2));
     }
+
+    async checkConnection(): Promise<boolean> {
+        try {
+            const url = this.baseUrl + "/AppEvaluate/SpeedTest";
+            const response = await fetch(url, { method: 'HEAD', cache: "no-cache" });
+            return response.ok;
+        } catch {
+            return false;
+        }
+    }
 }

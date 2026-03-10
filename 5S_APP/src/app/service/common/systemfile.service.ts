@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
 import { MessageService } from '../message.service';
+import { GlobalService } from '../global.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ export class FileOfflineService {
 
   constructor(
     private messageService: MessageService,
-
+    private _globalS : GlobalService
   ) { }
 
   // =========================================================
@@ -154,7 +155,8 @@ export class FileOfflineService {
       evaluateHeaderCode: '',
       tieuChiCode: '',
       viDo: '0',
-      kinhDo: '0'
+      kinhDo: '0',
+      date: this._globalS.formatDateToSendServer(new Date())
     };
   }
 

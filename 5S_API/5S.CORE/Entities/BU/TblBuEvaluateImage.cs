@@ -39,5 +39,8 @@ namespace PLX5S.CORE.Entities.BU
 
         [Column("TYPE", TypeName = "NVARCHAR(150)")]
         public string? Type { get; set; }
+
+        [Column("DATE")]
+        public DateTime? Date { get; set; }
     }
 }

@@ -12,6 +12,7 @@ namespace PLX5S.BUSINESS.Models
     {
         public string? KinhDo { get; set; }
         public string? ViDo { get; set; }
+        public DateTime? Date { get; set; }
         public IFormFile file { get; set; }
         public string Type { get; set; }
         public string FileName { get; set; }

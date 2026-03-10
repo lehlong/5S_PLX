@@ -73,7 +73,18 @@ ion-segment-content {
 ::ng-deep .item-inner {
   padding-right: 0 !important;
 }
-
+.horizontal-scroll-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: 12px; /* tuỳ chọn */
+  width: 100%;
+}
+.horizontal-scroll-buttons ion-button {
+  width: 100%;
+  --padding-start: 0;
+  --padding-end: 0;
+  justify-content: center;
+}
 ion-button.custom {
   white-space: nowrap;
   overflow: hidden;

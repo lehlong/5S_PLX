@@ -58,11 +58,11 @@
               <div class="ion-padding" slot="content">
                 <p style="color: red; margin: 0">
                   <ion-radio-group [(ngModel)]="node.pointId" (ionChange)="setDiem(node, $event)">
-                    <ng-container *ngFor="let diem of node.diemTieuChi; trackBy: trackByKey">
-                      <ion-item>
-                        <ion-label style="pointer-events: none">{{
-                          diem.moTa
-                          }}</ion-label>
+                    <ng-container *ngFor="let diem of node.diemTieuChi; trackBy: trackByKey" >
+                      <ion-item style="background-color: #1890ff;">
+                        <ion-label style="pointer-events: none; background: none;">
+                          {{ diem.moTa }}
+                        </ion-label>
                         <ion-radio slot="end" [value]="diem.id" [disabled]="!isEdit"></ion-radio>
                       </ion-item>
                     </ng-container>
@@ -82,9 +82,9 @@
                       <input [disabled]="!isEdit" class="file" #fileInput type="file"
                         (change)="onFileSelected($event, node.code)"
                         accept="image/*,video/*,.pdf,.doc,.docx,.xlsx,.txt,.mp4" />
-                      <ion-button fill="clear" [disabled]="!isEdit">
+                      <!-- <ion-button fill="clear" [disabled]="!isEdit">
                         <ion-icon name="document-outline" slot="icon-only"></ion-icon>
-                      </ion-button>
+                      </ion-button> -->
 
                       <ion-button fill="clear" [disabled]="!isEdit" style="z-index: 1000000"
                         (click)="openCamera(node.code)">
@@ -106,14 +106,14 @@
                       let img of filterImage(node)?.images;
                       trackBy: trackByKey
                     ">
-                    <ion-img *ngIf="img.type !== 'mp4' && img.type !== '.mp4'" [src]="getThumbPath(img)" class="image-preview"
-                      (click)="openFullScreen(img)"></ion-img>
+                    <ion-img *ngIf="img.type !== 'mp4' && img.type !== '.mp4'" [src]="getThumbPath(img)"
+                      class="image-preview" (click)="openFullScreen(img)"></ion-img>
 
-                    <video *ngIf="img.type == 'mp4' || img.type == '.mp4'" [src]="getFilePath(img)" class="image-preview"
-                      (click)="openFullScreen(img)" controls style="max-width: 100%"></video>
+                    <video *ngIf="img.type == 'mp4' || img.type == '.mp4'" [src]="getFilePath(img)"
+                      class="image-preview" (click)="openFullScreen(img)" controls style="max-width: 100%"></video>
 
                     <div style="opacity: 0.5; text-align: center; font-size: 13px">
-                      {{ img.createDate | date : "HH:mm dd/MM/yyyy" }}
+                      {{ img.date ? (img.date | date:'HH:mm dd/MM/yyyy') : (img.createDate | date:'HH:mm dd/MM/yyyy') }}
                     </div>
 
                     <ion-button *ngIf="isEdit" fill="clear" class="delete-btn" size="small" (click)="deleteImage2(img)">
@@ -125,8 +125,7 @@
                 <!-- Hiển thị tài liệu -->
                 <div *ngIf="!node.isGroup && filterImage(node)?.documents.length > 0" class="file-wrapper"
                   style="width: 100%">
-                  <div class="image-preview"
-                    *ngFor="let doc of filterImage(node)?.documents;trackBy: trackByKey"
+                  <div class="image-preview" *ngFor="let doc of filterImage(node)?.documents;trackBy: trackByKey"
                     style="height: 50px; width: 100%">
                     <div class="file-preview">
                       <ion-chip class="chip">
@@ -148,7 +147,7 @@
                           (click)="deleteImage2(doc)">
                           <ion-icon name="close-circle" slot="icon-only"></ion-icon>
                         </ion-button>
-                        
+
                         <ion-button fill="clear" class="delete-btn-file" *ngIf="!isEdit" size="small"
                           (click)="downloadFile(doc)">
                           <ion-icon name="download-outline"></ion-icon>
