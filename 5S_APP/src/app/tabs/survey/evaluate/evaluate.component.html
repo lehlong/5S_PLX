@@ -38,8 +38,8 @@
       <ng-container *ngFor="let node of nodes; trackBy: trackByKey">
         <ion-accordion [value]="node.key" [ngClass]="{ 'border-link': node.id === selectedAccordionId }">
           <ion-item slot="header" color="light" id="{{ node.id }}">
-            <ion-label class="d-flex">
-              <div [ngClass]="{ 'pd-10': node.number,  }">
+            <ion-label class="d-flex" [ngClass]="{'fw-600': !node.number  }">
+              <div [ngClass]="{ 'pe-2': node.number}">
                 {{ node.number ? node.number + "." : "" }}
               </div>
               <ion-label [innerHTML]="node.title | highlightSearch : searchKeyword"></ion-label>
@@ -58,8 +58,10 @@
               <div class="ion-padding" slot="content">
                 <p style="color: red; margin: 0">
                   <ion-radio-group [(ngModel)]="node.pointId" (ionChange)="setDiem(node, $event)">
-                    <ng-container *ngFor="let diem of node.diemTieuChi; trackBy: trackByKey" >
-                      <ion-item style="background-color: #1890ff;">
+                    <ng-container *ngFor="let diem of node.diemTieuChi; trackBy: trackByKey">
+                      <ion-item [ngClass]="node.pointId === diem.id
+                              ? (diem.diem === 0 ? 'bg-red' : 'bg-blue')
+                              : ''">
                         <ion-label style="pointer-events: none; background: none;">
                           {{ diem.moTa }}
                         </ion-label>
@@ -95,7 +97,7 @@
                 </p>
 
                 <div *ngIf="node.isImg" style="margin-top: 10px">
-                  <label style="color: #ffc409">{{ node.report }}</label>
+                  <label style="color: #ffad09">{{ node.report }}</label>
                   <p *ngIf="hasEnoughImages(node.code, node)" style="color: #c5000f">
                     (*) Tiêu chí này bắt buộc chọn {{ node.numberImg }} hình ảnh
                   </p>
@@ -177,7 +179,7 @@
 
     <ion-tab-button (click)="onSubmit()" style="color: #003da5">
       <ion-icon name="paper-plane"></ion-icon>
-      <ion-label>NỘP</ion-label>
+      <ion-label>GỬI KẾT QUẢ</ion-label>
     </ion-tab-button>
   </ion-tab-bar>
 </ion-footer>
@@ -192,13 +194,12 @@
             chọn
           </ion-label>
           <ion-label style="align-items: center; margin: 0" class="d-flex">
-            <span style="background-color: rgb(220, 220, 220)" class="circle"></span>Chưa trả lời
+            <span style="background-color: rgb(220, 220, 220)" class="circle"></span>Chưa chấm
           </ion-label>
         </ion-item>
         <ion-item lines="none" style="--min-height: 27px; align-items: center; display: flex">
           <ion-label style="align-items: center; margin: 0" class="d-flex">
-            <span style="background-color: #1890ff" class="circle"></span>Đã trả
-            lời
+            <span style="background-color: #1890ff" class="circle"></span>Đã chấm điểm
           </ion-label>
           <ion-label style="align-items: center; margin: 0" class="d-flex">
             <span style="background-color: #ff4d4f" class="circle"></span>Không
@@ -256,67 +257,46 @@
   <!-- </div> -->
 </ion-menu>
 
+<!-- Ảnh full screen overlay -->
+<div class="image-overlay" *ngIf="isImageOverlayOpen" (click)="closeFullScreen()">
 
-
-<!-- View image full screen modal -->
-<ion-modal [backdropDismiss]="false" [isOpen]="isImageModalOpen" [canDismiss]="true">
-  <ng-template>
-    <ion-content class="full-image-content">
-      <ion-button class="btnLeft" fill="clear" color="danger" *ngIf="isEdit" (click)="confirmDeleteImage()">
-        <ion-icon name="trash-outline" slot="end"></ion-icon>
+  <!-- Nút cố định -->
+  <div class="overlay-buttons" (click)="$event.stopPropagation()">
+    <div>
+      <ion-button fill="clear" color="danger" *ngIf="isEdit" (click)="confirmDeleteImage(); $event.stopPropagation()">
+        <ion-icon name="trash-outline"></ion-icon>
       </ion-button>
-      <ion-button class="btnRight" (click)="closeFullScreen()" fill="clear" color="dark"><ion-icon
-          name="close"></ion-icon></ion-button>
-      <div class="zoom-wrapper" (mousedown)="onDragStart($event)" (mousemove)="onDragMove($event)"
-        (mouseup)="onDragEnd()" (mouseleave)="onDragEnd()" (touchstart)="onDragStart($event)"
-        (touchmove)="onDragMove($event)" (touchend)="onDragEnd()">
-        <div class="full-image-container">
-          <img #zoomImg [src]="selectedImage.filePath" class="full-image" (click)="zoomOnClick($event)"
-            draggable="false" />
-        </div>
+    </div>
+
+    <div>
+      <ion-button fill="clear" color="light" (click)="openMapModal(); $event.stopPropagation()">
+        <ion-icon name="map-outline"></ion-icon>
+      </ion-button>
+
+      <ion-button fill="clear" color="light" (click)="closeFullScreen(); $event.stopPropagation()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Zoom Wrapper -->
+  <div class="zoom-wrapper" (click)="$event.stopPropagation()" (mousedown)="onDragStart($event)"
+    (mousemove)="onDragMove($event)" (mouseup)="onDragEnd()" (mouseleave)="onDragEnd()"
+    (touchstart)="onDragStart($event)" (touchmove)="onDragMove($event)" (touchend)="onDragEnd()">
+
+    <div class="full-image-container" (click)="$event.stopPropagation()">
+      <img #zoomImg [src]="selectedImage.filePath" class="full-image"
+        (click)="zoomOnClick($event); $event.stopPropagation()" draggable="false" />
+    </div>
+
+  </div>
+</div>
+<ion-modal #modal [initialBreakpoint]="0.75" [breakpoints]="[0.75, 1]" handle="fade">
+  <ng-template>
+    <ion-content>
+      <div id="map" style="height: 75vh;" (touchstart)="disableModalSwipe()" (touchend)="enableModalSwipe()"
+        (mousedown)="disableModalSwipe()" (mouseup)="enableModalSwipe()">
       </div>
-      <div id="map" style="height: 75vh"></div>
     </ion-content>
   </ng-template>
 </ion-modal>
-
-
-<!-- <ion-content fullscreen *ngIf="isImageModalOpen">
-  <ng-template> -->
-<!-- <div class="d-flex justify-space-between">
-      <ion-button class="delete-button" fill="clear" color="danger" *ngIf="isEdit" (click)="confirmDeleteImage()">
-        <ion-icon name="trash-outline" slot="end"></ion-icon>
-      </ion-button>
-      <ion-button (click)="closeFullScreen()" fill="clear" color="dark"><ion-icon name="close"></ion-icon></ion-button>
-    </div> -->
-<!-- <ion-content class="full-image-content">
-      <ion-button style="
-          background-color: #fff;
-          position: fixed;
-          top: 50%;
-          transform: translateY(-50%);
-          left: 10px;
-          z-index: 1000;
-        " class="delete-button" fill="clear" color="danger" *ngIf="isEdit" (click)="confirmDeleteImage()">
-        <ion-icon name="trash-outline" slot="end"></ion-icon>
-      </ion-button>
-      <ion-button style="
-          background-color: #fff;
-          position: fixed;
-          top: 50%;
-          transform: translateY(-50%);
-          right: 10px;
-          z-index: 1000;
-        " (click)="closeFullScreen()" fill="clear" color="dark"><ion-icon name="close"></ion-icon></ion-button>
-      <div *ngIf="selectedImage.type === 'img'" class="zoom-wrapper" (mousedown)="onDragStart($event)"
-        (mousemove)="onDragMove($event)" (mouseup)="onDragEnd()" (mouseleave)="onDragEnd()"
-        (touchstart)="onDragStart($event)" (touchmove)="onDragMove($event)" (touchend)="onDragEnd()">
-        <div class="full-image-container">
-          <img #zoomImg [src]="selectedImage.filePath" class="full-image" (click)="zoomOnClick($event)"
-            draggable="false" />
-        </div>
-      </div>
-      <div id="map" style="height: 75vh"></div>
-    </ion-content>
-  </ng-template>
-</ion-content> -->

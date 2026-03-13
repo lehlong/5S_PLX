@@ -12,10 +12,12 @@
       <!-- <ion-icon  name="notifications-outline"></ion-icon>  -->
       Thông báo</h4>
 
-    <div class="noti-item" *ngFor="let noti of lstData">
-      <div class="noti-title">{{ noti.title }}</div>
-      <i class="noti-content">{{ noti.body }}</i>
-      <i class="noti-time">{{ noti.createDate | date : "HH:mm dd/MM/yyyy"}}</i>
+    <div class="noti-item" *ngFor="let noti of lstData" [ngClass]="{'bg-gray': (!noti.isRead && noti.isRead != null)}">
+      <div  (click)="readNoti(noti)">
+        <div class="noti-title">{{ noti.title }}</div>
+        <i class="noti-content">{{ noti.body }}</i>
+        <i class="noti-time t-end">{{ noti.createDate | date : "HH:mm dd/MM/yyyy"}}</i>
+      </div>
     </div>
   </div>
 </ion-content>

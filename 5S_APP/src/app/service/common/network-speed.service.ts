@@ -31,7 +31,7 @@ export class NetworkSpeedService {
     async checkConnection(): Promise<boolean> {
         try {
             const url = this.baseUrl + "/AppEvaluate/SpeedTest";
-            const response = await fetch(url, { method: 'HEAD', cache: "no-cache" });
+            const response = await fetch(url, { method: 'GET', cache: "no-cache" });
             return response.ok;
         } catch {
             return false;

@@ -9,6 +9,7 @@ export class AuthService {
   private authEndpoints = {
     login: 'Auth/LoginMobile',
     register: 'auth/register',
+    saveUserTokenNoti: 'auth/SaveUserTokenNoti',
     forgotPassword: 'auth/forgot-password',
     resetPassword: 'auth/reset-password',
     getRightOfUser: 'Right/getRightOfUser',
@@ -34,6 +35,10 @@ export class AuthService {
 
   register(data: any): Observable<any> {
     return this.commonService.post(this.authEndpoints.register, data);
+  }
+
+  saveUserTokenNoti(data: any): Observable<any> {
+    return this.commonService.post(this.authEndpoints.saveUserTokenNoti, data, false);
   }
 
   forgotPassword(email: string): Observable<any> {

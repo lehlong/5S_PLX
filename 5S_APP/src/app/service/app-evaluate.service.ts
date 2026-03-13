@@ -23,8 +23,12 @@ export class AppEvaluateService {
   BuildInputEvaluate(kiKhaoSatId: any, doiTuongId: any, deviceID: string): Observable<any> {
     return this.commonService.get(`AppEvaluate/BuildInputEvaluate?kiKhaoSatId=${kiKhaoSatId}&doiTuongId=${doiTuongId}&deviceID=${deviceID}`)
   }
-  getNotifications(): Observable<any> {
-    return this.commonService.get('AppEvaluate/GetNotification')
+  getNotifications(param: any): Observable<any> {
+    return this.commonService.get(`AppEvaluate/GetNotification?userName=${param}`)
+  }
+  
+  readNoti(param: any): Observable<any> {
+    return this.commonService.post('AppEvaluate/ReadNoti', param, false)
   }
   speedTest(): Observable<any> {
     return this.commonService.get('AppEvaluate/SpeedTest')

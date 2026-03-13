@@ -157,6 +157,39 @@ export class GlobalService {
       this.loading = null;
     }
   }
+  // private loadingCounter = 0;
+
+  // async loadingShow(message: string = '') {
+  //   this.loadingCounter++;
+
+  //   if (this.loadingCounter === 1) {
+  //     this.loading = await this.loadingCtrl.create({
+  //       message: message,
+  //       spinner: null,
+  //       cssClass: 'custom-loading',
+  //       backdropDismiss: false,
+  //       showBackdrop: true,
+  //     });
+
+  //     await this.loading.present();
+  //   }
+  //   console.log("+", this.loadingCounter);
+
+  // }
+
+  // async loadingHide() {
+  //   this.loadingCounter = Math.max(0, this.loadingCounter - 1);
+  //   console.log( "-", this.loadingCounter);
+
+  //   if (this.loadingCounter === 0 && this.loading) {
+  //     try {
+  //       await new Promise(resolve => setTimeout(resolve, 500));
+
+  //       await this.loading.dismiss();
+  //     } catch { }
+  //     this.loading = null;
+  //   }
+  // }
 
   formatDateToSendServer(date: any): string {
     if (!date) return '';

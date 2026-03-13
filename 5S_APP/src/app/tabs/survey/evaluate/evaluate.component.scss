@@ -146,17 +146,6 @@
   border-radius: 5px;
 }
 
-.pd-10 {
-  // border: 1px solid;
-  // border-radius: 50%;
-  height: 30px;
-  // width: 10px;
-  display: flex;
-  padding-right: 10px;
-  // justify-content: center;
-  // align-items: center;
-}
-
 .images-wrapper {
   position: relative;
   display: inline-block;
@@ -280,83 +269,68 @@
   font-weight: bold;
 }
 
-//css zoom
-.zoom-wrapper {
-  width: 100%;
-  height: calc(100vh - 425px);
-  /* trừ phần map */
-  overflow: auto;
-  /* 👈 Cho phép scroll/pan */
-  touch-action: auto;
-  /* 👈 Cho phép kéo bằng cảm ứng */
-  -webkit-overflow-scrolling: touch;
-  /* Cho mượt trên iOS */
+
+
+
+ion-modal {
+  --width: 100vw !important;
+  // --height: 100vh !important;
+  --border-radius: 0 !important;
+}
+
+/* FULL overlay */
+.image-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Nút cố định */
+.overlay-buttons {
+  position: fixed;
+  top: 25px;
+  right: 10px;
+  display: flex;
+  gap: 12px;
+  z-index: 1000000000;
+  
+  width: 95%;
+  justify-content: space-between;
+  ion-button{
+    background: rgba(0, 0, 0, 0.9);
+  }
+}
+.bg-red {
+  color: #F32013;
+
+}
+
+.bg-blue {
+  color: #0000FF;
+}
+
+ion-item {
+  --background: transparent !important;  // ⭐ Không đè nền div
 }
 
 .full-image-container {
-  position: relative;
-  /* ✅ Cho phép translate */
-  overflow: hidden;
-  /* ✅ Ẩn phần ngoài khi kéo */
-  max-width: 100%;
-  max-height: 100%;
   width: 100%;
   height: 100%;
-  touch-action: none;
-  /* ✅ Tránh zoom/pan mặc định trên di động */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  img{
+    z-index: 10000000;
+
+  }
 }
 
 .full-image {
-  transition: transform 0.3s ease;
-  transform-origin: center;
-  cursor: zoom-in;
-  user-select: none;
-  pointer-events: all;
-  will-change: transform;
-}
-
-.full-image.zoomed {
-  cursor: grab;
-}
-
-.file-preview {
-  // width: 93vw;
-
-  .chip {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 4px 8px;
-    border-radius: 8px;
-    background: #f5f5f5;
-    margin: 5px 0;
-  }
-
-  .icon {
-    margin: 0 2px;
-    color: #3c3c3c
-  }
-
-  .fileName {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    overflow: hidden;
-  }
-
-  a {
-    text-decoration: none;
-    color: #000;
-    font-weight: 500;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .date {
-    font-size: 12px;
-    opacity: 0.6;
-    margin-top: 2px;
-    margin-left: 5px;
-  }
+  max-width: 100%;
+  max-height: 100%;
+  transform-origin: center center;
 }

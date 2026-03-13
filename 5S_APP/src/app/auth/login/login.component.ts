@@ -11,7 +11,8 @@ import { environment } from 'src/environments/environment';
 import { Preferences } from '@capacitor/preferences';
 import { ConfigService } from 'src/app/service/config.service';
 import { Capacitor } from '@capacitor/core';
-import { FirebaseMessaging } from '@capacitor-firebase/messaging';
+import { PushNotificationService } from 'src/app/service/common/push-notification.service';
+// import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -25,7 +26,8 @@ export class LoginComponent implements OnInit {
     private globalService: GlobalService,
     private authService: AuthService,
     private messageService: MessageService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private _pushNotiS: PushNotificationService
   ) { }
   customUrl: string = '';
   private clickTimeout: any;
@@ -34,6 +36,7 @@ export class LoginComponent implements OnInit {
   info: any = {};
   deviceId: string = '';
   isLogin: boolean = false;
+  listeners: { remove: () => void }[] = [];
   model = {
     userName: '',
     password: '',
@@ -121,10 +124,6 @@ export class LoginComponent implements OnInit {
           'warehouseCode',
           response?.accountInfo?.warehouseCode
         );
-        // this.subscribeToTestTopic('PLX5S_NOTI');
-
-        await this.initPush()
-        
         const userName = response?.accountInfo?.userName;
         if (userName) {
           this.globalService.setUserName(userName);
@@ -132,8 +131,10 @@ export class LoginComponent implements OnInit {
         this.authService
           .getRightOfUser({ userName: response?.accountInfo?.userName })
           .subscribe({
-            next: (rights) => {
-              this.registerPushNotifications();
+            next: async (rights) => {
+              // this.registerPushNotifications();
+              this.initPush(response?.accountInfo?.userName)
+
               this.globalService.setRightData(JSON.stringify(rights || []));
               this.router.navigate(['/home'], { replaceUrl: true });
             },
@@ -172,98 +173,32 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  async registerPushNotifications() {
-    let permStatus = await PushNotifications.checkPermissions();
-    // alert('permStatus: ' + permStatus);
 
-    if (permStatus.receive === 'prompt') {
-      permStatus = await PushNotifications.requestPermissions();
+  initPush(userName: any) {
+    const tokenNoti = localStorage.getItem("tokenNoti")
+    console.log(tokenNoti);
+    if (!tokenNoti) {
+      this._pushNotiS.initialize()
+      FCM.getToken().then(token => {
+        if (token?.token) {
+          this.saveFirebaseTokenToServer(token.token, userName);
+          localStorage.setItem('tokenNoti', token.token)
+        } else {
+          console.warn("Không lấy được token!");
+        }
+      });
     }
-    if (permStatus.receive !== 'granted') {
-      // alert('Push notifications permission denied');
-    }
-    if (permStatus.receive === 'granted') {
-      try {
-        await PushNotifications.register();
-        // alert('Push notifications registered successfully');
-      } catch (error) {
-        console.error('Error registering push notifications:', error);
-        // alert('Error registering push notifications: ' + error);
+  }
+  saveFirebaseTokenToServer(token: any, userName: string) {
+    console.log('qqqqqqqqqqqqqqqqq', token);
+    this.authService.saveUserTokenNoti({
+      id: '',
+      userName: userName,
+      token: token ?? ""
+    }).subscribe({
+      next: (resp) => {
       }
-    }
-  }
-
-  // async initPush() {
-  //   console.log('Requesting permission...');
-  //   let permStatus = await PushNotifications.requestPermissions();
-
-  //   if (permStatus.receive === 'granted') {
-  //     console.log('Permission granted');
-  //     PushNotifications.register();
-  //   } else {
-  //     console.log('Permission not granted');
-  //     return;
-  //   }
-
-  //   // Khi đã đăng ký thành công
-  //   PushNotifications.addListener('registration',
-  //     (token: Token) => {
-  //       console.log('Firebase Token: ', token.value);
-
-  //       // Gửi token lên server .NET của bạn để lưu theo user
-  //       this.saveFirebaseTokenToServer(token.value);
-  //     }
-  //   );
-
-  //   // Khi có lỗi
-  //   PushNotifications.addListener('registrationError',
-  //     (error) => {
-  //       console.error('Error on registration: ', error);
-  //     }
-  //   );
-
-  //   // Khi nhận FCM ở foreground
-  //   PushNotifications.addListener('pushNotificationReceived',
-  //     (notification) => {
-  //       console.log('Push received: ', notification);
-  //     }
-  //   );
-  // }
-
-  async initPush() {
-    // 1. Xin quyền thông báo (Android tự granted, iOS cần xác nhận)
-    const permStatus = await PushNotifications.requestPermissions();
-    if (permStatus.receive !== 'granted') {
-      console.warn('Permission not granted!');
-      return;
-    }
-
-    // 2. Đăng ký nhận push
-    await PushNotifications.register();
-
-    // 3. Lấy FCM Token để gửi về server
-    const fcmToken = await FirebaseMessaging.getToken();
-    console.log("FCM Token:", fcmToken.token);
-
-    this.saveFirebaseTokenToServer(fcmToken.token);
-
-    // 4. Lắng nghe thông báo khi app đang mở
-    PushNotifications.addListener('pushNotificationReceived', (notification) => {
-      console.log('Notification received:', notification);
-    });
-
-    // 5. Lắng nghe khi user bấm vào thông báo
-    PushNotifications.addListener('pushNotificationActionPerformed', (action) => {
-      console.log('Notification action:', action);
-    });
-
-    // 6. Lắng nghe lỗi đăng ký
-    PushNotifications.addListener('registrationError', (err) => {
-      console.error('Registration error:', err);
-    });
-  }
-  saveFirebaseTokenToServer(token: string) {
-    // gọi API POST lưu token theo từng UserId
+    })
   }
 
   showUrl() {
@@ -281,4 +216,5 @@ export class LoginComponent implements OnInit {
       clearTimeout(this.clickTimeout);
     }
   }
+
 }

@@ -11,6 +11,9 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { ConfigService } from 'src/app/service/config.service';
 import { PaginationResult } from 'src/app/models/base.model';
 import { GlobalService } from 'src/app/service/global.service';
+import { PushNotificationService } from 'src/app/service/common/push-notification.service';
+import { FCM } from '@capacitor-community/fcm';
+import { AuthService } from 'src/app/service/auth.service';
 interface UserInfo {
   fullName: string;
   phoneNumber: string;
@@ -71,7 +74,9 @@ export class NewsComponent implements OnInit {
     private router: Router,
     private loadingController: LoadingController,
     private configService: ConfigService,
-    private globalS : GlobalService
+    private globalS: GlobalService,
+    private _pushNotiS: PushNotificationService,
+    private authService: AuthService,
   ) { }
 
   ngOnInit() {
@@ -152,10 +157,41 @@ export class NewsComponent implements OnInit {
       this.dataHome = this.dataHomeAll.filter((x: any) => x.type === 'DT2');
     } else if (value === 'chuaCham') {
       this.dataHome = this.dataHomeAll.filter((x: any) => x.isScore === true);
+    } else if (value === 'toiCham') {
+      this.dataHome = this.dataHomeAll.filter((x: any) => x.description != "");
     }
     this.selected = value;
   }
 
+  initPush(userName: any) {
+    const tokenNoti = localStorage.getItem("tokenNoti")
+    console.log(tokenNoti);
+    if (tokenNoti == null) {
+      this._pushNotiS.initialize()
+      FCM.getToken().then(token => {
+        console.log(token);
+        
+        if (token?.token) {
+          this.saveFirebaseTokenToServer(token.token, userName);
+          localStorage.setItem('tokenNoti', token.token)
+        } else {
+          console.warn("Không lấy được token!");
+        }
+      });
+    }
+  }
+
+  saveFirebaseTokenToServer(token: any, userName: string) {
+    console.log('qqqqqqqqqqqqqqqqq', token);
+    this.authService.saveUserTokenNoti({
+      id: '',
+      userName: userName,
+      token: token ?? ""
+    }).subscribe({
+      next: (resp) => {
+      }
+    })
+  }
   getDataHome() {
     this._service.getDataHome(this.userInfo.userName).subscribe({
       next: (data: any) => {
@@ -174,13 +210,13 @@ export class NewsComponent implements OnInit {
         this.chuaChamLength = `(${sortedList.filter((x: any) => x.isScore === true).length
           })`;
         this.select(this.selected);
-
+        this.initPush(this.userInfo.userName)
         this.dataHomeStore = sortedList.filter((x: any) => x.type === 'DT1');
         this.dataHomeWareHouse = sortedList.filter((x: any) => x.type === 'DT2');
         this.dataHomeChuaCham = sortedList.filter((x: any) => x.isScore === true);
       }
     })
-}
+  }
 
 
   navigateItem(item: any) {

@@ -14,6 +14,7 @@ import {
   switchMap,
   filter,
   take,
+  timeout,
 } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
@@ -79,7 +80,7 @@ export class CommonService {
         map(this.handleApiResponse),
         catchError((error) => {
           return this.handleError(error, () =>
-            this.get<T>(endpoint, params, showLoading)
+            this.getMap<T>(endpoint, params, showLoading)
           );
         }),
         finalize(() => {
@@ -106,7 +107,7 @@ export class CommonService {
       }),
       catchError((error) =>
         this.handleError(error, () =>
-          this.post<T>(endpoint, data, showSuccess, '', showLoading)
+          this.postMap<T>(endpoint, data, showSuccess, showLoading)
         )
       ),
       finalize(() => this.globalService.loadingHide()) // Giảm bộ đếm khi hoàn thành
@@ -146,7 +147,7 @@ export class CommonService {
         map(this.handleApiResponse),
         catchError((error) => {
           return this.handleError(error, () =>
-            this.get<T>(endpoint, params, showLoading)
+            this.getTms<T>(endpoint, params, showLoading)
           );
         }),
         finalize(() => {
@@ -155,7 +156,9 @@ export class CommonService {
       );
   }
 
-  get<T>(endpoint: string, params?: { [key: string]: any }, showLoading: boolean = true): Observable<T> {
+  get<T>(endpoint: string, params: any = {}, showLoading: boolean = true): Observable<T> {
+    params['_ts'] = new Date().getTime(); // <--- chống cache
+
     let httpParams = new HttpParams();
     if (params) {
       Object.keys(params).forEach((key) => {
@@ -176,6 +179,7 @@ export class CommonService {
     return this.http
       .get<any>(`${this.baseUrl}/${endpoint}`, { params: httpParams })
       .pipe(
+        timeout(15000),
         tap((response) => {
           if (response.status == false) {
             this.showError(response.messageObject.message);
@@ -210,11 +214,10 @@ export class CommonService {
         )
       ),
       finalize(() => {
-        if(autoClose){
+        if (autoClose) {
           this.globalService.loadingHide()
         }
-      }
-    ) // Giảm bộ đếm khi hoàn thành
+      }) // Giảm bộ đếm khi hoàn thành
     );
   }
 
@@ -378,7 +381,7 @@ export class CommonService {
       );
   }
 
-  private showSuccess(message: string , type:'success' | 'danger' | 'warning' | 'primary' = 'primary'): void {
+  private showSuccess(message: string, type: 'success' | 'danger' | 'warning' | 'primary' = 'primary'): void {
     // this.message.create('success', message)
     this.messService.show(message, 'success')
   }
@@ -432,8 +435,7 @@ export class CommonService {
         }
 
       } else {
-        console.log(error);
-        if (!error.message.includes ('failure during parsing')) {
+        if (!error.message.includes('failure during parsing')) {
           this.showError("Đường dẫn API không hợp lệ !!", 'danger')
         }
         errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;

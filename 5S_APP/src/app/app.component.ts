@@ -15,7 +15,7 @@ import { PushNotifications } from '@capacitor/push-notifications';
 export class AppComponent implements OnDestroy {
   private darkModeMediaQuery: MediaQueryList;
   private mediaQueryListener: ((e: MediaQueryListEvent) => void) | undefined;
-
+  
   constructor(
     private platform: Platform,
     private storage: Storage,
@@ -70,36 +70,5 @@ export class AppComponent implements OnDestroy {
         this.mediaQueryListener
       );
     }
-  }
-
-  initializePush() {
-    PushNotifications.requestPermissions().then((result) => {
-      if (result.receive === 'granted') {
-        PushNotifications.register();
-      }
-    });
-
-    PushNotifications.addListener('registration', (token) => {
-      console.log('Push registration success, token:', token.value);
-      // Gửi token lên server nếu cần
-    });
-
-    PushNotifications.addListener('registrationError', (error) => {
-      console.error('Push registration error:', error);
-    });
-
-    PushNotifications.addListener(
-      'pushNotificationReceived',
-      (notification) => {
-        console.log('Push received: ', notification);
-      }
-    );
-
-    PushNotifications.addListener(
-      'pushNotificationActionPerformed',
-      (notification) => {
-        console.log('Push action performed', notification);
-      }
-    );
   }
 }

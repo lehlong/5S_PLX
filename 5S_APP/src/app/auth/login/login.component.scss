@@ -185,9 +185,9 @@ a {
   font-weight: 500;
 }
 .form-login {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  // display: flex;
+  // flex-direction: column;
+  // gap: 10px;
 }
 .input-wrapper {
   display: flex;
@@ -207,7 +207,7 @@ a {
   }
 }
 .ion-valid.sc-ion-input-md-h {
-  --highlight-color: transparent;
+  --highlight-color: none;
 }
 ion-footer {
   box-shadow: none !important;
@@ -252,7 +252,7 @@ ion-input {
   font-size: 16px !important;
 }
 ion-input.custom {
-  --color: #000;
+  // --color: #000;
 }
 ion-icon {
   color: #000;
@@ -266,4 +266,14 @@ ion-checkbox {
 }
 ion-checkbox::part(container) {
   border: 1px solid #4a7def;
+}
+
+
+ion-input input {
+  caret-color: #000 !important;
+  animation: caretBlink 1s steps(1) infinite;
+}
+
+@keyframes caretBlink {
+  50% { caret-color: transparent; }
 }

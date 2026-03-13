@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { navigate } from 'ionicons/icons';
 import { AppEvaluateService } from 'src/app/service/app-evaluate.service';
 import { SharedModule } from 'src/app/shared/shared.module';
 
@@ -12,28 +14,41 @@ import { SharedModule } from 'src/app/shared/shared.module';
 export class NotificationsComponent implements OnInit {
 
   lstData: any = [];
+  account: any
 
   constructor(
     private _service: AppEvaluateService,
-
+    private router: Router,
   ) { }
 
   ngOnInit() {
+    this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
     this.getNotifications();
-   }
+  }
 
 
   getNotifications() {
-    this._service.getNotifications().subscribe({
+    this._service.getNotifications(this.account.userName).subscribe({
       next: (data) => {
-
-        console.log(data);
         this.lstData = data;
       }
     }
     );
-    // Logic to fetch notifications
-    console.log('Fetching notifications...');
+  }
+
+  readNoti(noti: any) {
+    console.log(noti);
+    this._service.readNoti(noti).subscribe({
+      next: () => {
+        this.getNotifications()
+      }
+    })
+
+    if (noti.link) {
+      this.router.navigate([`home`]);
+    }
+
+
   }
 
 }

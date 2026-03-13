@@ -38,6 +38,7 @@ import { NetworkSpeedService } from 'src/app/service/common/network-speed.servic
 })
 export class EvaluateComponent implements OnInit {
   @ViewChild('zoomImg') zoomImg!: ElementRef;
+  @ViewChild('modal') mapModal: any;
   @ViewChild('accordionGroup', { static: true })
   private currentScale = 1
   @ViewChild('fileInput', { static: false })
@@ -232,6 +233,8 @@ export class EvaluateComponent implements OnInit {
 
           this.dataTree.leaves = this.lstTieuChi;
           this.dataTree.tree = this.treeData;
+          console.log(result);
+          
           if (this.isEdit) {
             localStorage.setItem(key, JSON.stringify(this.dataTree));
           }
@@ -431,6 +434,7 @@ export class EvaluateComponent implements OnInit {
     //     return
     //   }
     // }
+
     this.tinhTong()
     console.log('autoSave', this.evaluate);
     this.messageService.show(
@@ -444,11 +448,9 @@ export class EvaluateComponent implements OnInit {
 
     const isOnline = await this._networkSpeedS.checkConnection();
 
-    if (isOnline) {
-    }else{
+    if (!isOnline) {
       this.messageService.show('Vui lòng kết nối mạng để nộp!!!', 'danger');
       return
-      
     }
 
     let allChecksPassed = true;
@@ -501,7 +503,7 @@ export class EvaluateComponent implements OnInit {
       await alert.present();
       return;
     }
-    this._globalS.loadingShow('Đang đồng bộ dữ liệu lên server ...')
+    this._globalS.loadingShow('Đang đồng bộ dữ liệu <br/> lên server ...')
 
     const offlineFiles = this.evaluate.lstImages.filter((x: any) => x?.isBase64);
 
@@ -670,25 +672,21 @@ export class EvaluateComponent implements OnInit {
 
 
   //////// Views ảnh
-
   async openFullScreen(img: any) {
-    this.isImageModalOpen = true;
     this.selectedImage = { ...img }
 
     if (this.isEdit && img?.isBase64) {
-      this.selectedImage.filePath = await this._systemFileS.getViewUrl(this.selectedImage.filePath)
+      this.selectedImage.filePath = await this._systemFileS.getViewUrl(this.selectedImage.filePath);
     } else {
       this.selectedImage.filePath = this.apiFile + img.filePath;
     }
+    this.isImageOverlayOpen = true;  // mở trước
+
+    console.log(this.selectedImage);
+    this.cdr.detectChanges();
 
     this.longitude = img.kinhDo;
     this.latitude = img.viDo;
-
-    // this.selectedImage = filePath;
-    console.log(this.selectedImage);
-    setTimeout(() => {
-      this.initMap();
-    }, 300);
   }
 
   getFilePath(file: any) {
@@ -710,14 +708,40 @@ export class EvaluateComponent implements OnInit {
   }
 
   closeFullScreen() {
-    this.isImageModalOpen = false;
+    this.isImageOverlayOpen = false
   }
 
+  isImageOverlayOpen = false;
+
+  openMapModal() {
+    this.mapModal.present();
+
+    setTimeout(() => {
+      this.initMap();
+    }, 300);
+  }
+  @ViewChild('modal') modal!: HTMLIonModalElement;
+
+  disableModalSwipe() {
+    if (!this.modal) return;
+    this.modal.canDismiss = false;     // ❗ Chặn vuốt modal
+    this.modal.backdropBreakpoint = 1; // ❗ Không cho modal rớt xuống khi kéo map
+  }
+
+  enableModalSwipe() {
+    if (!this.modal) return;
+    this.modal.canDismiss = true;      // bật lại
+    this.modal.backdropBreakpoint = 0.5;
+  }
+
+
+  
+  
   deleteImage() {
     if (!this.isEdit) return;
 
     const index = this.evaluate?.lstImages.findIndex(
-      (img: any) => img.filePath === this.selectedImage.filePath
+      (img: any) => img.filePath === this.selectedImage.filePath || img.code === this.selectedImage.code
     );
     if (index > -1) {
       this.evaluate?.lstImages.splice(index, 1);
@@ -751,7 +775,7 @@ export class EvaluateComponent implements OnInit {
           role: 'destructive',
           handler: () => {
             this.deleteImage();
-            this.closeFullScreen()
+            // this.closeFullScreen()
           },
         },
       ],

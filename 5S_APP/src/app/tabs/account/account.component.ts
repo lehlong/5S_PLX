@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { LoginComponent } from 'src/app/auth/login/login.component';
+import { PushNotificationService } from 'src/app/service/common/push-notification.service';
 import { StorageService } from 'src/app/service/storage.service';
 import { SharedModule } from 'src/app/shared/shared.module';
 
@@ -24,8 +26,9 @@ export class AccountComponent implements OnInit {
   };
   constructor(
     private router: Router,
-    private _storageService: StorageService
-  ) {}
+    private _storageService: StorageService,
+    private _pushNotiS: PushNotificationService
+  ) { }
 
   ngOnInit() {
     this.loadUserInfo();
@@ -47,9 +50,12 @@ export class AccountComponent implements OnInit {
     this.apiUrl = localStorage.getItem('CapacitorStorage.apiUrl');
     localStorage.clear();
     sessionStorage.clear();
+    this._pushNotiS.clear()
     localStorage.setItem('CapacitorStorage.apiUrl', this.apiUrl);
     this.router.navigate(['/login']).then(() => {
       window.location.reload();
     });
   }
+
+
 }
