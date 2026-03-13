@@ -126,6 +126,7 @@ export class GlobalService {
   }
 
   private isCreatingLoading = false;
+  loadingTimeout: any = null;
 
   async loadingShow(message: string = '') {
     if (this.loading || this.isCreatingLoading) return;
@@ -141,22 +142,61 @@ export class GlobalService {
     this.isCreatingLoading = false;
 
     await this.loading.present();
+
+    this.loadingTimeout = setTimeout(() => {
+      this.forceCloseLoading();
+    }, 10000);
   }
 
   async loadingHide() {
+    await this.forceCloseLoading();
+  }
+
+  private async forceCloseLoading() {
+    if (!this.loading) return;
+
     try {
-      if (this.loading) {
+      await new Promise(r => setTimeout(r, 700));
 
-        // Delay 500ms
-        await new Promise(resolve => setTimeout(resolve, 700));
+      await this.loading.dismiss(null, "");
 
-        await this.loading.dismiss();
-        this.loading = null;
-      }
     } catch (e) {
+      // overlay có thể đã bị dismiss trước - không sao
+    } finally {
       this.loading = null;
     }
+
   }
+  // async loadingHide() {
+  //   try {
+  //     if (this.loading) {
+
+  //       // Delay 500ms
+  //       await new Promise(resolve => setTimeout(resolve, 700));
+
+  //       await this.loading.dismiss();
+  //       this.loading = null;
+  //     }
+  //   } catch (e) {
+  //     this.loading = null;
+  //   }
+  // }
+  // async loadingHide() {
+  //   if (!this.loading) return;
+
+  //   try {
+  //     await new Promise(r => setTimeout(r, 700));
+
+  //     const id = this.loading.id;
+
+  //     await this.loading.dismiss(null, "");
+
+  //   } catch (e) {
+  //     // overlay có thể đã bị dismiss trước - không sao
+  //   } finally {
+  //     this.loading = null;
+  //   }
+  // }
   // private loadingCounter = 0;
 
   // async loadingShow(message: string = '') {
