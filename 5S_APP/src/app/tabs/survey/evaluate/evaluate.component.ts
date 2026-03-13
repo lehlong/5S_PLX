@@ -503,7 +503,7 @@ export class EvaluateComponent implements OnInit {
       await alert.present();
       return;
     }
-    this._globalS.loadingShow('Đang đồng bộ dữ liệu <br/> lên server ...')
+    this._globalS.loadingShow('Đang đồng bộ dữ liệu <br/> lên server ...', false)
 
     const offlineFiles = this.evaluate.lstImages.filter((x: any) => x?.isBase64);
 

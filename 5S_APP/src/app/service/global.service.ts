@@ -128,7 +128,7 @@ export class GlobalService {
   private isCreatingLoading = false;
   loadingTimeout: any = null;
 
-  async loadingShow(message: string = '') {
+  async loadingShow(message: string = '', outoTimeout = true) {
     if (this.loading || this.isCreatingLoading) return;
 
     this.isCreatingLoading = true;
@@ -142,10 +142,11 @@ export class GlobalService {
     this.isCreatingLoading = false;
 
     await this.loading.present();
-
-    this.loadingTimeout = setTimeout(() => {
-      this.forceCloseLoading();
-    }, 10000);
+    if(outoTimeout){
+      this.loadingTimeout = setTimeout(() => {
+        this.forceCloseLoading();
+      }, 10000);
+    }
   }
 
   async loadingHide() {
