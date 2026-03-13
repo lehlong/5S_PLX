@@ -148,7 +148,7 @@ export class GlobalService {
       if (this.loading) {
 
         // Delay 500ms
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 700));
 
         await this.loading.dismiss();
         this.loading = null;
