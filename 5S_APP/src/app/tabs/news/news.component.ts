@@ -196,11 +196,8 @@ export class NewsComponent implements OnInit {
     this._service.getDataHome(this.userInfo.userName).subscribe({
       next: (data: any) => {
         this.fullData = data;
-        console.log(this.fullData);
 
-        const sortedList = [...data.lstDoiTuong].sort((a: any, b: any) => {
-          return b.isScore === true ? 1 : -1;
-        });
+        const sortedList = [...data.lstDoiTuong]
 
         this.dataHomeAll = sortedList;
         this.storeLength = `(${sortedList.filter((x: any) => x.type === 'DT1').length
@@ -211,9 +208,9 @@ export class NewsComponent implements OnInit {
           })`;
         this.select(this.selected);
         this.initPush(this.userInfo.userName)
-        this.dataHomeStore = sortedList.filter((x: any) => x.type === 'DT1');
-        this.dataHomeWareHouse = sortedList.filter((x: any) => x.type === 'DT2');
-        this.dataHomeChuaCham = sortedList.filter((x: any) => x.isScore === true);
+        // this.dataHomeStore = sortedList.filter((x: any) => x.type === 'DT1');
+        // this.dataHomeWareHouse = sortedList.filter((x: any) => x.type === 'DT2');
+        // this.dataHomeChuaCham = sortedList.filter((x: any) => x.isScore === true);
       }
     })
   }
