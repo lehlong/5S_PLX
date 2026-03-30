@@ -4,7 +4,7 @@ import {
   HttpErrorResponse,
   HttpParams,
 } from '@angular/common/http';
-import { Observable, throwError, BehaviorSubject } from 'rxjs';
+import { Observable, throwError, BehaviorSubject, of } from 'rxjs';
 
 import {
   catchError,
@@ -66,26 +66,18 @@ export class CommonService {
         }
       });
     }
-    if (showLoading) {
-      this.globalService.loadingShow(); // Tăng bộ đếm
-    }
+    if (showLoading) { this.globalService.loadingShow(); }
     return this.http
       .get<any>(`${this.urlMap}/${endpoint}`, { params: httpParams })
       .pipe(
         tap((response) => {
-          if (response.status == false) {
-            this.showError(response.messageObject.message);
-          }
-        }), // Log phản hồi API
+          if (response.status == false) { this.showError(response.messageObject.message); }
+        }),
         map(this.handleApiResponse),
         catchError((error) => {
-          return this.handleError(error, () =>
-            this.getMap<T>(endpoint, params, showLoading)
-          );
+          return this.handleError(error, () => this.getMap<T>(endpoint, params, showLoading));
         }),
-        finalize(() => {
-          this.globalService.loadingHide();
-        })
+        finalize(() => { this.globalService.loadingHide(); })
       );
   }
 
@@ -96,21 +88,17 @@ export class CommonService {
     showLoading: boolean = true
   ): Observable<T> {
     if (showLoading) {
-      this.globalService.loadingShow(); // Tăng bộ đếm
+      this.globalService.loadingShow();
     }
     return this.http.post<any>(`${this.urlMap}/${endpoint}`, data).pipe(
       map(this.handleApiResponse),
       tap(() => {
-        if (showSuccess) {
-          this.showSuccess('Thêm mới thông tin thành công');
-        }
+        if (showSuccess) { this.showSuccess('Thêm mới thông tin thành công'); }
       }),
       catchError((error) =>
-        this.handleError(error, () =>
-          this.postMap<T>(endpoint, data, showSuccess, showLoading)
-        )
+        this.handleError(error, () => this.postMap<T>(endpoint, data, showSuccess, showLoading))
       ),
-      finalize(() => this.globalService.loadingHide()) // Giảm bộ đếm khi hoàn thành
+      finalize(() => this.globalService.loadingHide())
     );
   }
 
@@ -133,9 +121,8 @@ export class CommonService {
         }
       });
     }
-    if (showLoading) {
-      this.globalService.loadingShow(); // Tăng bộ đếm
-    }
+    if (showLoading) { this.globalService.loadingShow(); }
+
     return this.http
       .get<any>(`${this.tmsUrl}/${endpoint}`, { params: httpParams })
       .pipe(
@@ -146,13 +133,9 @@ export class CommonService {
         }), // Log phản hồi API
         map(this.handleApiResponse),
         catchError((error) => {
-          return this.handleError(error, () =>
-            this.getTms<T>(endpoint, params, showLoading)
-          );
+          return this.handleError(error, () => this.getTms<T>(endpoint, params, showLoading));
         }),
-        finalize(() => {
-          this.globalService.loadingHide();
-        })
+        finalize(() => { this.globalService.loadingHide(); })
       );
   }
 
@@ -164,106 +147,81 @@ export class CommonService {
       Object.keys(params).forEach((key) => {
         if (params[key] !== null && params[key] !== undefined) {
           if (Array.isArray(params[key])) {
-            params[key].forEach((value: any) => {
-              httpParams = httpParams.append(key, value);
-            });
+            params[key].forEach((value: any) => { httpParams = httpParams.append(key, value); });
           } else {
             httpParams = httpParams.append(key, params[key]);
           }
         }
       });
     }
-    if (showLoading) {
-      this.globalService.loadingShow(); // Tăng bộ đếm
-    }
-    return this.http
-      .get<any>(`${this.baseUrl}/${endpoint}`, { params: httpParams })
+    if (showLoading) { this.globalService.loadingShow(); }
+
+    return this.http.get<any>(`${this.baseUrl}/${endpoint}`, { params: httpParams })
       .pipe(
         timeout(15000),
         tap((response) => {
-          if (response.status == false) {
-            this.showError(response.messageObject.message);
-          }
+          if (response.status == false) { this.showError(response.messageObject.message); }
         }), // Log phản hồi API
         map(this.handleApiResponse),
         catchError((error) => {
-          return this.handleError(error, () =>
-            this.get<T>(endpoint, params, showLoading)
-          );
+          return this.handleError(error, () => this.get<T>(endpoint, params, showLoading));
         }),
-        finalize(() => {
-          this.globalService.loadingHide()// Giảm bộ đếm khi hoàn thành
-        })
+        finalize(() => { this.globalService.loadingHide() })
       );
   }
 
   post<T>(endpoint: string, data: any, showSuccess: boolean = true, messageLoad: string = '', showLoading: boolean = true, autoClose: boolean = true): Observable<T> {
     if (showLoading) {
-      this.globalService.loadingShow(messageLoad); // Tăng bộ đếm
+      this.globalService.loadingShow(messageLoad);
     }
     return this.http.post<any>(`${this.baseUrl}/${endpoint}`, data).pipe(
       map(this.handleApiResponse),
       tap(() => {
-        if (showSuccess) {
-          this.showSuccess('Thêm mới thông tin thành công');
-        }
+        if (showSuccess) { this.showSuccess('Thêm mới thông tin thành công'); }
       }),
       catchError((error) =>
-        this.handleError(error, () =>
-          this.post<T>(endpoint, data, showSuccess, messageLoad, showLoading, autoClose)
-        )
+        this.handleError(error, () => this.post<T>(endpoint, data, showSuccess, messageLoad, showLoading, autoClose))
       ),
       finalize(() => {
-        if (autoClose) {
-          this.globalService.loadingHide()
-        }
+        if (autoClose) { this.globalService.loadingHide() }
       }) // Giảm bộ đếm khi hoàn thành
     );
   }
 
   put<T>(endpoint: string, data: any, showLoading: boolean = true): Observable<T> {
-    if (showLoading) {
-      this.globalService.loadingShow(); // Tăng bộ đếm
-    }
+    if (showLoading) { this.globalService.loadingShow(); }
+
     return this.http.put<any>(`${this.baseUrl}/${endpoint}`, data).pipe(
       map(this.handleApiResponse),
       tap(() => this.showSuccess('Cập nhật thông tin thành công', 'primary')),
       catchError((error) =>
         this.handleError(error, () => this.put<T>(endpoint, data, showLoading))
       ),
-      finalize(() => this.globalService.loadingHide()) // Giảm bộ đếm khi hoàn thành
+      finalize(() => this.globalService.loadingHide())
     );
   }
 
   delete<T>(endpoint: string, data: any = {}, showLoading: boolean = true): Observable<T> {
-    if (showLoading) {
-      this.globalService.loadingShow(); // Tăng bộ đếm
-    }
+    if (showLoading) { this.globalService.loadingShow() }
     return this.http.delete<any>(`${this.baseUrl}/${endpoint}`, data).pipe(
       map(this.handleApiResponse),
       tap(() => this.showSuccess('Xoá thành công')),
       catchError((error) =>
-        this.handleError(error, () =>
-          this.delete<T>(endpoint, data, showLoading)
-        )
+        this.handleError(error, () => this.delete<T>(endpoint, data, showLoading))
       ),
       finalize(() => this.globalService.loadingHide()) // Giảm bộ đếm khi hoàn thành
     );
   }
 
   deletes<T>(endpoint: string, data: string | number[], showLoading: boolean = true): Observable<T> {
-    if (showLoading) {
-      this.globalService.loadingShow(); // Tăng bộ đếm
-    }
+    if (showLoading) { this.globalService.loadingShow(); }
     return this.http
       .request<any>('delete', `${this.baseUrl}/${endpoint}`, { body: data })
       .pipe(
         map(this.handleApiResponse),
         tap(() => this.showSuccess('Xoá thành công')),
         catchError((error) =>
-          this.handleError(error, () =>
-            this.deletes<T>(endpoint, data, showLoading)
-          )
+          this.handleError(error, () => this.deletes<T>(endpoint, data, showLoading))
         ),
         finalize(() => this.globalService.loadingHide()) // Giảm bộ đếm khi hoàn thành
       );
@@ -293,9 +251,8 @@ export class CommonService {
       });
     }
 
-    if (showLoading) {
-      this.globalService.loadingShow(); // Tăng bộ đếm
-    }
+    if (showLoading) { this.globalService.loadingShow(); }
+
     return this.http
       .post<any>(`${this.baseUrl}/${endpoint}`, formData, {
         params: httpParams,
@@ -304,9 +261,7 @@ export class CommonService {
         map(this.handleApiResponse),
         tap(),
         catchError((error) =>
-          this.handleError(error, () =>
-            this.uploadFile(endpoint, file, paramsUrl, params, showLoading)
-          )
+          this.handleError(error, () => this.uploadFile(endpoint, file, paramsUrl, params, showLoading))
         ),
         finalize(() => this.globalService.loadingHide()) // Giảm bộ đếm khi hoàn thành
       );
@@ -338,9 +293,8 @@ export class CommonService {
       });
     }
 
-    if (showLoading) {
-      this.globalService.loadingShow(); // Tăng bộ đếm
-    }
+    if (showLoading) { this.globalService.loadingShow(); }
+
     return this.http
       .post<any>(`${this.baseUrl}/${endpoint}`, formData, {
         params: httpParams,
@@ -349,11 +303,9 @@ export class CommonService {
         map(this.handleApiResponse),
         tap(),
         catchError((error) =>
-          this.handleError(error, () =>
-            this.uploadFiles(endpoint, files, paramsUrl, params, showLoading)
-          )
+          this.handleError(error, () => this.uploadFiles(endpoint, files, paramsUrl, params, showLoading))
         ),
-        finalize(() => this.globalService.loadingHide()) // Giảm bộ đếm khi hoàn thành
+        finalize(() => this.globalService.loadingHide())
       );
   }
 
@@ -362,9 +314,9 @@ export class CommonService {
     params?: any,
     showLoading: boolean = true
   ): Observable<Blob> {
-    if (showLoading) {
-      this.globalService.loadingShow(); // Tăng bộ đếm
-    }
+
+    if (showLoading) { this.globalService.loadingShow(); }
+
     return this.http
       .get(`${this.baseUrl}/${endpoint}`, {
         params: params,
@@ -373,76 +325,118 @@ export class CommonService {
       .pipe(
         tap(),
         catchError((error) =>
-          this.handleError(error, () =>
-            this.downloadFile(endpoint, params, showLoading)
-          )
+          this.handleError(error, () => this.downloadFile(endpoint, params, showLoading))
         ),
-        finalize(() => this.globalService.loadingHide()) // Giảm bộ đếm khi hoàn thành          
+        finalize(() => this.globalService.loadingHide())      
       );
   }
 
   private showSuccess(message: string, type: 'success' | 'danger' | 'warning' | 'primary' = 'primary'): void {
-    // this.message.create('success', message)
     this.messService.show(message, 'success')
   }
   private showError(mess: string, type: any = 'warning'): void {
     this.messService.show(mess, type)
   }
 
+  // private handleError = (
+  //   error: HttpErrorResponse,
+  //   retryCallback: () => Observable<any>
+  // ): Observable<any> => {
+  //   let errorMessage = 'Unknown error!';
+  //   if (error.error instanceof ErrorEvent) {
+  //     errorMessage = `Error: ${error.error.message}`;
+  //   } else {
+  //     if (error.status === 401) {
+  //       if (!this.refreshTokenInProgress) {
+  //         this.refreshTokenInProgress = true;
+  //         this.refreshTokenSubject.next(null);
+
+  //         return this.refreshToken().pipe(
+  //           switchMap(({ data }: any) => {
+  //             this.refreshTokenInProgress = false;
+  //             this.refreshTokenSubject.next(data);
+  //             localStorage.setItem('token', data?.accessToken);
+  //             localStorage.setItem('refreshToken', data?.refreshToken);
+  //             return retryCallback();
+  //           }),
+  //           catchError((refreshError) => {
+  //             this.refreshTokenInProgress = false;
+  //             localStorage.clear();
+  //             this.router.navigate(['/login']);
+  //             return throwError(refreshError);
+  //           })
+  //         );
+  //       } else {
+  //         return this.refreshTokenSubject.pipe(
+  //           filter((result: any) => result !== null),
+  //           take(1),
+  //           switchMap(() => retryCallback())
+  //         );
+  //       }
+  //     }
+  //     if (error.error && error.error.messageObject) {
+  //       if (error.error.messageObject.messageDetail) {
+  //         console.log(error.error.messageObject.messageDetail);
+  //         errorMessage = error.error.messageObject.messageDetail;
+  //         this.showError(errorMessage)
+  //       } else {
+  //         errorMessage = `MSG${error.error.messageObject.code} ${error.error.message}`;
+  //       }
+
+  //     } else {
+  //       if (!error.message.includes('failure during parsing')) {
+  //         this.showError("Đường dẫn API không hợp lệ !!", 'danger')
+  //       }
+  //       errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+  //     }
+  //   }
+  //   return throwError(errorMessage)
+  // };
+
   private handleError = (
     error: HttpErrorResponse,
-    retryCallback: () => Observable<any>
+    retryCallback: () => Observable<any>,
   ): Observable<any> => {
-    let errorMessage = 'Unknown error!';
-    if (error.error instanceof ErrorEvent) {
-      errorMessage = `Error: ${error.error.message}`;
-    } else {
-      if (error.status === 401) {
-        if (!this.refreshTokenInProgress) {
-          this.refreshTokenInProgress = true;
-          this.refreshTokenSubject.next(null);
-
-          return this.refreshToken().pipe(
-            switchMap(({ data }: any) => {
-              this.refreshTokenInProgress = false;
-              this.refreshTokenSubject.next(data);
-              localStorage.setItem('token', data?.accessToken);
-              localStorage.setItem('refreshToken', data?.refreshToken);
-              return retryCallback();
-            }),
-            catchError((refreshError) => {
-              this.refreshTokenInProgress = false;
-              localStorage.clear();
-              this.router.navigate(['/login']);
-              return throwError(refreshError);
-            })
-          );
-        } else {
-          return this.refreshTokenSubject.pipe(
-            filter((result: any) => result !== null),
-            take(1),
-            switchMap(() => retryCallback())
-          );
-        }
-      }
-      if (error.error && error.error.messageObject) {
-        if (error.error.messageObject.messageDetail) {
-          console.log(error.error.messageObject.messageDetail);
-          errorMessage = error.error.messageObject.messageDetail;
-          this.showError(errorMessage)
-        } else {
-          errorMessage = `MSG${error.error.messageObject.code} ${error.error.message}`;
-        }
-
-      } else {
-        if (!error.message.includes('failure during parsing')) {
-          this.showError("Đường dẫn API không hợp lệ !!", 'danger')
-        }
-        errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
-      }
+    if (error.status === 503) {
+      this.router.navigate(['maintain-server'])
     }
+    if (error.status === 401) {
+      if (!this.refreshTokenInProgress) {
+        this.refreshTokenInProgress = true
+        this.refreshTokenSubject.next(null)
+
+        return this.refreshToken().pipe(
+          switchMap(({ data }) => {
+            this.refreshTokenInProgress = false
+            this.refreshTokenSubject.next(data)
+            localStorage.setItem('token', data?.accessToken)
+            localStorage.setItem('refreshToken', data?.refreshToken)
+            return retryCallback()
+          }),
+          catchError(() => {
+            this.refreshTokenInProgress = false
+            localStorage.clear()
+            this.router.navigate(['/login'])
+            return throwError('Session expired')
+          })
+        )
+      }
+      return this.refreshTokenSubject.pipe(
+        filter(result => result !== null),
+        take(1),
+        switchMap(() => retryCallback())
+      )
+    }
+
+    const errorMessage = error.error?.messageObject
+      ? `${error.error.messageObject.message} - ${error.error.messageObject.messageDetail}`
+      : error.message
+
+    this.showError(errorMessage)
+    this.globalService.loadingHide()
+    // this._loading.setLoading(false);
     return throwError(errorMessage)
-  };
+  }
 
   private refreshToken(): Observable<any> {
     const refreshToken = localStorage.getItem('refreshToken');

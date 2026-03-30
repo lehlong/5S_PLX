@@ -121,7 +121,7 @@ export class CheckListComponent implements OnInit {
     this.lstHisEvaluate = [];
 
     if (data.name == 'Bản nháp') {
-      this._globalS.loadingShow()
+      // this._globalS.loadingShow()
       this.router.navigate([`survey/evaluate/draft/${data.code}`]);
     } else {
       this.router.navigate([`survey/evaluate/view/${data.code}`]);
@@ -129,7 +129,7 @@ export class CheckListComponent implements OnInit {
   }
 
   async navigateTo() {
-    this._globalS.loadingShow()
+    // this._globalS.loadingShow()
     this.lstHisEvaluate = [];
     let userInfo = JSON.parse(localStorage.getItem('UserInfo') ?? '');
     this.deviceID = userInfo?.deviceId || '';

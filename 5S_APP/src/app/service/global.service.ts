@@ -127,13 +127,14 @@ export class GlobalService {
 
   private isCreatingLoading = false;
   loadingTimeout: any = null;
+  private messageInterval: any = null;
 
   async loadingShow(message: string = '', outoTimeout = true) {
     if (this.loading || this.isCreatingLoading) return;
 
     this.isCreatingLoading = true;
     this.loading = await this.loadingCtrl.create({
-      message: message,
+      message: '',
       spinner: null,
       cssClass: 'custom-loading',
       backdropDismiss: false,
@@ -142,14 +143,48 @@ export class GlobalService {
     this.isCreatingLoading = false;
 
     await this.loading.present();
-    if(outoTimeout){
+
+    // ====== XỬ LÝ TÁCH MESSAGE & LUÂN PHIÊN ======
+    this.handleDualMessage(message);
+
+    // ====== Timeout auto close ======
+    if (outoTimeout) {
       this.loadingTimeout = setTimeout(() => {
         this.forceCloseLoading();
       }, 10000);
     }
   }
 
+  private handleDualMessage(message: string) {
+
+    // Tách message thành nhiều phần
+    const msgs = message.split('./.').map(m => m.trim()).filter(m => m.length > 0);
+    if (msgs.length === 0) return;
+
+    const el = document.querySelector('.custom-loading .loading-content') as HTMLElement;
+    if (!el) return;
+
+    let index = 0;
+
+    // Clear interval cũ
+    if (this.messageInterval) clearInterval(this.messageInterval);
+
+    // Thiết lập message đầu tiên
+    el.innerHTML = msgs[index];
+
+    // Luân phiên từng message mỗi 1.2s
+    this.messageInterval = setInterval(() => {
+      index = (index + 1) % msgs.length; // chạy vòng tròn
+      el.innerHTML = msgs[index];
+    }, 2200);
+  }
+
+
   async loadingHide() {
+    if (this.messageInterval) {
+      clearInterval(this.messageInterval);
+      this.messageInterval = null;
+    }
     await this.forceCloseLoading();
   }
 
@@ -168,69 +203,6 @@ export class GlobalService {
     }
 
   }
-  // async loadingHide() {
-  //   try {
-  //     if (this.loading) {
-
-  //       // Delay 500ms
-  //       await new Promise(resolve => setTimeout(resolve, 700));
-
-  //       await this.loading.dismiss();
-  //       this.loading = null;
-  //     }
-  //   } catch (e) {
-  //     this.loading = null;
-  //   }
-  // }
-  // async loadingHide() {
-  //   if (!this.loading) return;
-
-  //   try {
-  //     await new Promise(r => setTimeout(r, 700));
-
-  //     const id = this.loading.id;
-
-  //     await this.loading.dismiss(null, "");
-
-  //   } catch (e) {
-  //     // overlay có thể đã bị dismiss trước - không sao
-  //   } finally {
-  //     this.loading = null;
-  //   }
-  // }
-  // private loadingCounter = 0;
-
-  // async loadingShow(message: string = '') {
-  //   this.loadingCounter++;
-
-  //   if (this.loadingCounter === 1) {
-  //     this.loading = await this.loadingCtrl.create({
-  //       message: message,
-  //       spinner: null,
-  //       cssClass: 'custom-loading',
-  //       backdropDismiss: false,
-  //       showBackdrop: true,
-  //     });
-
-  //     await this.loading.present();
-  //   }
-  //   console.log("+", this.loadingCounter);
-
-  // }
-
-  // async loadingHide() {
-  //   this.loadingCounter = Math.max(0, this.loadingCounter - 1);
-  //   console.log( "-", this.loadingCounter);
-
-  //   if (this.loadingCounter === 0 && this.loading) {
-  //     try {
-  //       await new Promise(resolve => setTimeout(resolve, 500));
-
-  //       await this.loading.dismiss();
-  //     } catch { }
-  //     this.loading = null;
-  //   }
-  // }
 
   formatDateToSendServer(date: any): string {
     if (!date) return '';
