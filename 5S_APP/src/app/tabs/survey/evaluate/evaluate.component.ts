@@ -79,6 +79,8 @@ export class EvaluateComponent implements OnInit {
   account: any = {};
   longitude: number = 106.6297;
   latitude: number = 10.8231;
+  imageProcessingQueue: any[] = [];
+  private cachedLocation: any = null;
   daCham: any = 0;
   chuaCham: any = 0;
   isImageModalOpen = false;
@@ -149,7 +151,7 @@ export class EvaluateComponent implements OnInit {
 
     });
   }
-
+  //#region Build cây tree màn hình chấm điểm
   // ---------------------------
   // Load Tree / TieuChi chuẩn
   // ---------------------------
@@ -234,7 +236,7 @@ export class EvaluateComponent implements OnInit {
           this.dataTree.leaves = this.lstTieuChi;
           this.dataTree.tree = this.treeData;
           console.log(result);
-          
+
           if (this.isEdit) {
             localStorage.setItem(key, JSON.stringify(this.dataTree));
           }
@@ -290,32 +292,8 @@ export class EvaluateComponent implements OnInit {
     }
   }
 
-  private initMap(): void {
-    L.Icon.Default.mergeOptions({
-      iconRetinaUrl: 'assets/media/marker-icon.png',
-      iconUrl: 'assets/media/marker-icon.png',
-      shadowUrl: 'assets/media/marker-shadow.png',
-    });
-
-    const lat = this.latitude; // Vĩ độ động
-    const lng = this.longitude; // Kinh độ động
-
-    this.map = L.map('map').setView([lat, lng], 17);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
-      maxZoom: 19,
-    }).addTo(this.map);
-
-    L.marker([lat, lng]).addTo(this.map).openPopup();
-  }
-
   isActive(itemId: string): boolean {
     return this.currentSelect === itemId;
-  }
-
-  borderActive(data: any): any {
-    console.log('data-border', data.code);
   }
 
   isAnswered(data: any) {
@@ -358,8 +336,6 @@ export class EvaluateComponent implements OnInit {
     return imagesSelecting < node.numberImg;
   }
 
-
-
   filterImage(node: any) {
     if (node.isGroup == true) return;
 
@@ -385,6 +361,8 @@ export class EvaluateComponent implements OnInit {
       documents: documents,
     };
   }
+
+  //#region chấm điểm
 
   setDiem(data: any, event: any) {
     if (!this.isEdit) return;
@@ -442,6 +420,9 @@ export class EvaluateComponent implements OnInit {
       'success'
     );
   }
+
+
+  //#region Nộp lần chấm 
 
   async onSubmit() {
     if (!this.isEdit) return;
@@ -574,6 +555,7 @@ export class EvaluateComponent implements OnInit {
     return `${currentUrl}#${itemId}`;
   }
 
+  //#region Upload tất cả ảnh khi nộp
 
   async uploadOfflineFiles(files: any[]) {
     if (!files || files.length === 0) return true;
@@ -670,8 +652,194 @@ export class EvaluateComponent implements OnInit {
 
 
 
+  //#region Camera, chụp ảnh, sử lý ảnh
 
-  //////// Views ảnh
+  ////////// Camera chụp ảnh
+  async openCamera(code: any) {
+    try {
+      // ---- Kiểm tra quyền GPS trước ----
+      const gpsAllowed = await this.checkLocationPermission();
+
+      if (!gpsAllowed) {
+        // Không cho chụp ảnh
+        await this.messageService.show("Vui lòng bật quyền truy cập vị trí để chụp ảnh", 'warning');
+        return;
+      }
+
+      // ---- BẮT ĐẦU CHỤP ẢNH ----
+      const photo = await Camera.getPhoto({
+        quality: 70,
+        resultType: CameraResultType.Uri,
+        source: CameraSource.Camera,
+        correctOrientation: true,
+      });
+
+      if (!photo?.webPath) {
+        throw new Error("Không chụp được ảnh");
+      }
+
+      // ==== Chuyển ảnh sang Blob ====
+      const blob = await (await fetch(photo.webPath)).blob();
+
+      // ==== Giảm kích thước ảnh trước khi lưu ====
+      const resizedBlob = await this.resizeImage(blob, 1280);
+
+      // ==== Lấy toạ độ ====
+      const location = await this.getLocation();
+
+      // ===== Lưu offline =================
+      await this.saveOffline(resizedBlob, code, location);
+      // await this.saveOffline(blob, code, location);
+
+    } catch (err) {
+      console.error("Lỗi openCamera:", err);
+    }
+  }
+
+  private async checkLocationPermission(): Promise<boolean> {
+    try {
+      const status = await Geolocation.checkPermissions();
+
+      // Nếu đã được cấp quyền → OK
+      if (status.location === 'granted') {
+        return true;
+      }
+
+      // Chưa cấp → yêu cầu quyền
+      const request = await Geolocation.requestPermissions();
+
+      return request.location === 'granted';
+    } catch {
+      return false;
+    }
+  }
+
+  // dowload file về máy 
+  async downloadFile(doc: any) {
+    const url = this.getFilePath(doc); // link server
+    const fileName = doc.fileName;
+
+    await this._systemFileS.downloadFile(url, fileName);
+  }
+
+
+
+  /////////// lưu file offline ở local
+
+  async saveOffline(blob: Blob, code: any, location: any) {
+    const folder = `images/${this.doiTuong.id}_${this.kiKhaoSat.code}`;
+
+    const saved = await this._systemFileS.saveFile(blob, folder);
+
+    // Thêm các trường cần thiết
+    saved.evaluateHeaderCode = this.headerId;
+    saved.tieuChiCode = code;
+    saved.viDo = location.lat.toString();
+    saved.kinhDo = location.lng.toString();
+
+    this.evaluate.lstImages.push(saved);
+
+    this.autoSave();
+    this.cdr.detectChanges();
+
+    console.log("Đã lưu offline:", saved);
+  }
+
+  private async getLocation(): Promise<{ lat: number, lng: number }> {
+    try {
+      // Nếu có cache < 150s thì dùng lại
+      if (this.cachedLocation && Date.now() - this.cachedLocation.t < 150000) {
+        return {
+          lat: this.cachedLocation.lat,
+          lng: this.cachedLocation.lng
+        };
+      }
+
+      // Lấy GPS
+      const pos = await Geolocation.getCurrentPosition({
+        enableHighAccuracy: false,
+        timeout: 1500,
+        maximumAge: 30000,
+      });
+
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+
+      // Cache lại
+      this.cachedLocation = {
+        lat, lng, t: Date.now()
+      };
+
+      return { lat, lng };
+
+    } catch {
+      // Nếu lỗi GPS → trả tọa độ mặc định hoặc null
+      return {
+        lat: 0,
+        lng: 0
+      };
+    }
+  }
+
+  async resizeImage(blob: Blob, maxWidth: number): Promise<Blob> {
+
+    // console.log("📌 Ảnh GỐC:");
+    // console.log("   - Dung lượng:", (blob.size / 1024 / 1024).toFixed(2), "MB");
+
+    const originalImg = new Image();
+    originalImg.src = URL.createObjectURL(blob);
+
+    await new Promise(resolve => { originalImg.onload = resolve });
+
+    // console.log("   - Kích thước:", originalImg.width + " x " + originalImg.height);
+
+    // Tính scale giữ nguyên tỷ lệ
+    const scale = maxWidth / originalImg.width;
+    const newWidth = maxWidth;
+    const newHeight = originalImg.height * scale;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = newWidth;
+    canvas.height = newHeight;
+
+    const ctx = canvas.getContext('2d')!;
+    ctx.drawImage(originalImg, 0, 0, newWidth, newHeight);
+
+    const resizedBlob: Blob = await new Promise((resolve: any) =>
+      canvas.toBlob(resolve, 'image/jpeg', 0.8)
+    ) as Blob;
+
+    // console.log("📌 Ảnh SAU RESIZE:");
+    // console.log("   - Kích thước:", newWidth + " x " + newHeight);
+    // console.log("   - Dung lượng:", (resizedBlob.size / 1024 / 1024).toFixed(2), "MB");
+
+    return resizedBlob;
+  }
+
+
+
+  //#region View ảnh và xem tọa độ
+
+  private initMap(): void {
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: 'assets/media/marker-icon.png',
+      iconUrl: 'assets/media/marker-icon.png',
+      shadowUrl: 'assets/media/marker-shadow.png',
+    });
+
+    const lat = this.latitude; // Vĩ độ động
+    const lng = this.longitude; // Kinh độ động
+
+    this.map = L.map('map').setView([lat, lng], 17);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19,
+    }).addTo(this.map);
+
+    L.marker([lat, lng]).addTo(this.map).openPopup();
+  }
+
   async openFullScreen(img: any) {
     this.selectedImage = { ...img }
 
@@ -735,8 +903,8 @@ export class EvaluateComponent implements OnInit {
   }
 
 
-  
-  
+
+
   deleteImage() {
     if (!this.isEdit) return;
 
@@ -803,136 +971,7 @@ export class EvaluateComponent implements OnInit {
     const saved = await this.saveOffline(file, tieuChiCode, location);
   }
 
-  ////////// Camera chụp ảnh
-  async openCamera(code: any) {
-    try {
-      // ---- Kiểm tra quyền GPS trước ----
-      const gpsAllowed = await this.checkLocationPermission();
-
-      if (!gpsAllowed) {
-        // Không cho chụp ảnh
-        await this.messageService.show("Vui lòng bật quyền truy cập vị trí để chụp ảnh", 'warning');
-        return;
-      }
-
-      // ---- BẮT ĐẦU CHỤP ẢNH ----
-      const photo = await Camera.getPhoto({
-        quality: 70,
-        resultType: CameraResultType.Uri,
-        source: CameraSource.Camera,
-        correctOrientation: true,
-      });
-
-      if (!photo?.webPath) {
-        throw new Error("Không chụp được ảnh");
-      }
-
-      // ==== Chuyển ảnh sang Blob ====
-      const blob = await (await fetch(photo.webPath)).blob();
-
-      // ==== Lấy toạ độ ====
-      const location = await this.getLocation();
-
-      // ===== Lưu offline =================
-      await this.saveOffline(blob, code, location);
-
-    } catch (err) {
-      console.error("Lỗi openCamera:", err);
-    }
-  }
-
-  private async checkLocationPermission(): Promise<boolean> {
-    try {
-      const status = await Geolocation.checkPermissions();
-
-      // Nếu đã được cấp quyền → OK
-      if (status.location === 'granted') {
-        return true;
-      }
-
-      // Chưa cấp → yêu cầu quyền
-      const request = await Geolocation.requestPermissions();
-
-      return request.location === 'granted';
-    } catch {
-      return false;
-    }
-  }
-
-  // dowload file về máy 
-  async downloadFile(doc: any) {
-    const url = this.getFilePath(doc); // link server
-    const fileName = doc.fileName;
-
-    await this._systemFileS.downloadFile(url, fileName);
-  }
-
-
-
-  /////////// lưu file offline ở local
-
-  async saveOffline(blob: Blob, code: any, location: any) {
-    const folder = `images/${this.doiTuong.id}_${this.kiKhaoSat.code}`;
-
-    const saved = await this._systemFileS.saveFile(blob, folder);
-
-    // Thêm các trường cần thiết
-    saved.evaluateHeaderCode = this.headerId;
-    saved.tieuChiCode = code;
-    saved.viDo = location.lat.toString();
-    saved.kinhDo = location.lng.toString();
-
-    this.evaluate.lstImages.push(saved);
-
-    this.autoSave();
-    this.cdr.detectChanges();
-
-    console.log("Đã lưu offline:", saved);
-  }
-
-  imageProcessingQueue: any[] = [];
-  private cachedLocation: any = null;
-
-  private async getLocation(): Promise<{ lat: number, lng: number }> {
-    try {
-      // Nếu có cache < 150s thì dùng lại
-      if (this.cachedLocation && Date.now() - this.cachedLocation.t < 150000) {
-        return {
-          lat: this.cachedLocation.lat,
-          lng: this.cachedLocation.lng
-        };
-      }
-
-      // Lấy GPS
-      const pos = await Geolocation.getCurrentPosition({
-        enableHighAccuracy: false,
-        timeout: 1500,
-        maximumAge: 30000,
-      });
-
-      const lat = pos.coords.latitude;
-      const lng = pos.coords.longitude;
-
-      // Cache lại
-      this.cachedLocation = {
-        lat, lng, t: Date.now()
-      };
-
-      return { lat, lng };
-
-    } catch {
-      // Nếu lỗi GPS → trả tọa độ mặc định hoặc null
-      return {
-        lat: 0,
-        lng: 0
-      };
-    }
-  }
-
-
   ////////////////////Zoom
-
-
   zoomOnClick(event: MouseEvent | TouchEvent) {
     const currentTime = new Date().getTime();
     const tapInterval = currentTime - this.lastTapTime;
@@ -1050,18 +1089,7 @@ export class EvaluateComponent implements OnInit {
   }
 
 
-  // search
-
-  getAllAccount() {
-    this._authService.GetAllAccount().subscribe({
-      next: (data) => {
-        this.lstAccout = data;
-      },
-      error: (response) => {
-        console.log(response);
-      },
-    });
-  }
+  //#region Tìm kiếm tiêu chí
 
   onSearchChange() {
     this.removeHighlights();
@@ -1126,9 +1154,6 @@ export class EvaluateComponent implements OnInit {
       this.currentHighlights.push(el);
     }
   }
-
-  //////////
-
   openMenu() {
     if (this.lstTieuChi.length == 0) {
       // this.filterTieuChiLeaves(this.treeData)
@@ -1139,6 +1164,21 @@ export class EvaluateComponent implements OnInit {
     this.chuaCham = this.lstTieuChi.length - this.daCham;
   }
 
+
+  //#region Hàm phụ
+
+  // search
+
+  getAllAccount() {
+    this._authService.GetAllAccount().subscribe({
+      next: (data) => {
+        this.lstAccout = data;
+      },
+      error: (response) => {
+        console.log(response);
+      },
+    });
+  }
   getFullName(userName: string): string {
     const account = this.lstAccout.find(
       (acc: any) => acc.userName === userName
