@@ -15,6 +15,7 @@ namespace PLX5S.BUSINESS.Models
         public string? KiKhaoSatId { set; get; }
         public string? SurveyId { set; get; }
         public string? DoiTuongId { set; get; }
+        public bool? ChuyenQuanCham { set; get; } = false;
     }
 
 

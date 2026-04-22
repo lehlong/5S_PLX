@@ -2,3 +2,44 @@
 //     background-color: #008b45;
 //     border-color: #008b45;
 // }
+.checkbox-large .ant-checkbox {
+    width: 28px !important;
+    height: 28px !important;
+}
+
+.checkbox-large .ant-checkbox-inner {
+    width: 28px !important;
+    height: 28px !important;
+}
+
+.checkbox-large .ant-checkbox-input {
+    width: 28px !important;
+    height: 28px !important;
+}
+
+/* Tăng dấu check bên trong */
+.checkbox-large .ant-checkbox-inner::after {
+    width: 10px;
+    height: 18px;
+    top: 2px;
+    left: 8px;
+}
+
+::ng-deep span.ant-checkbox-inner {
+    height: 26px;
+    width: 26px;
+}
+
+::ng-deep .ant-checkbox-checked .ant-checkbox-inner::after {
+    position: absolute;
+    display: table;
+    border: 2px solid #fff;
+    border-top: 0;
+    border-left: 0;
+    transform: rotate(45deg) scale(1) translate(-50%, -50%);
+    opacity: 1;
+    transition: all .2s cubic-bezier(.12, .4, .29, 1.46) .1s;
+    content: "";
+    left: 8px;
+    text-align: center;
+}

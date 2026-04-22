@@ -65,7 +65,10 @@ namespace PLX5S.BUSINESS.Services.BU
                 var ky = inputKy.Result.KiKhaoSat;
                 var result = new List<KetQuaChamDiem>();
                 var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).OrderBy(x => x.UpdateDate).ToList();
-                var lstHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).OrderBy(x => x.UpdateDate).ToList();
+                var lstAllHeadr = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).OrderBy(x => x.UpdateDate).ToList();
+                var lstHeader =    filterReport.ChuyenQuanCham == true
+                                            ? lstAllHeadr.Where(x => x.ChucVuId == RoleIds.CQ).ToList()
+                                            : lstAllHeadr;
                 var lstAccount = _dbContext.TblAdAccount.OrderBy(x => x.UserName).ToList();
 
                 if (filterReport.SurveyId == DoiTuongType.CuaHang)

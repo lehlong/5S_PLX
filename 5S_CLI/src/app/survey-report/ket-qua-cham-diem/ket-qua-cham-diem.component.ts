@@ -35,6 +35,7 @@ export class KetQuaChamDiemComponent {
   survey: any = {}
   kiKhaosatId: any = null
   doiTuongId: any = null
+  chuyenQuanCham = false
   lstData: any = []
 
   constructor(
@@ -129,7 +130,7 @@ export class KetQuaChamDiemComponent {
   }
 
   exportExcel() {
-    this._appReportService.ExportExcel("KetQuaChamDiem", { surveyId: this.survey.doiTuongId, kiKhaoSatId: this.kiKhaosatId, doiTuongId: this.doiTuongId })
+    this._appReportService.ExportExcel("KetQuaChamDiem", { surveyId: this.survey.doiTuongId, kiKhaoSatId: this.kiKhaosatId, doiTuongId: this.doiTuongId, chuyenQuanCham: this.chuyenQuanCham })
       .subscribe({
         next: (data) => {
           console.log(data);
@@ -152,7 +153,7 @@ export class KetQuaChamDiemComponent {
   }
 
   getReport() {
-    this._appReportService.KetQuaChamDiem({ surveyId: this.survey.doiTuongId, kiKhaoSatId: this.kiKhaosatId, doiTuongId: this.doiTuongId }).subscribe({
+    this._appReportService.KetQuaChamDiem({ surveyId: this.survey.doiTuongId, kiKhaoSatId: this.kiKhaosatId, doiTuongId: this.doiTuongId, chuyenQuanCham: this.chuyenQuanCham }).subscribe({
       next: (data) => {
         this.lstData = data
       }

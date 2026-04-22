@@ -9,6 +9,7 @@ using PLX5S.BUSINESS.Dtos.AD;
 using PLX5S.BUSINESS.Dtos.Auth;
 using PLX5S.CORE;
 using PLX5S.CORE.Entities.AD;
+using PLX5S.CORE.Entities.BU;
 using PLX5S.CORE.Entities.MD;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -24,6 +25,7 @@ namespace PLX5S.BUSINESS.Services.Auth
         Task<AccountDto> GetAccount(string userName);
         Task ChangePassword(ChangePasswordDto changePasswordDto);
         Task<JWTTokenDto> RefreshToken(RefreshTokenDto refreshTokenDto);
+        Task SaveUserTokenNoti(TblBuUserTokenNoti data);
     }
 
     public class AuthService(AppDbContext dbContext, IMapper mapper, IConfiguration configuration) : GenericService<TblAdAccount, AccountDto>(dbContext, mapper), IAuthService
@@ -196,10 +198,7 @@ namespace PLX5S.BUSINESS.Services.Auth
                     //Status = false;
                     Mess = "Thiết bị không có quyền đăng nhập";
                     _dbContext.SaveChanges();
-
                 }
-
-
                 return Mess;
             }
             catch (Exception ex)
@@ -208,8 +207,6 @@ namespace PLX5S.BUSINESS.Services.Auth
 
                 return null;
             }
-
-
         }
         public async Task<AccountDto> GetAccount(string userName)
         {
@@ -264,7 +261,6 @@ namespace PLX5S.BUSINESS.Services.Auth
                 }
                 return null;
             }
-
         }
 
         private async Task<TblAdAccount> AuthenticationProcess(LoginDto loginInfo)
@@ -358,6 +354,35 @@ namespace PLX5S.BUSINESS.Services.Auth
 
             return new(refreshToken, expire);
         }
+
+
+        public async Task SaveUserTokenNoti(TblBuUserTokenNoti data)
+        {
+            try
+            {
+                if (data.UserName == null || data.Token == null)
+                    return;
+
+                var check = _dbContext.TblBuUserTokenNoti.Any(x => x.UserName == data.UserName && x.Token == data.Token);
+                if (check)
+                {
+                    return;
+                }
+                else 
+                {
+                    data.Id = Guid.NewGuid().ToString();
+
+                     _dbContext.TblBuUserTokenNoti.Add(data);
+
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                return;
+            }
+        }
+
 
 
     }

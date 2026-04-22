@@ -408,29 +408,73 @@ namespace PLX5S.BUSINESS.Services.BU
                 _dbContext.TblBuKiKhaoSat.Update(kiKhaoSat);
                 if (kiKhaoSat.TrangThaiKi == "2")
                 {
-                    _dbContext.TblBuNotification.Add(new TblBuNotification
+                    var lstNoti = new List<TblBuNotification>();
+                    var lstInChamDiem = _dbContext.TblBuInputChamDiem
+                                            .Where(x => x.KiKhaoSatId == kiKhaoSat.Id)
+                                            .GroupBy(x => x.UserName)
+                                            .Select(g => g.OrderByDescending(x => x.CreateDate).First())
+                                            .ToList();
+
+                    var survey = _dbContext.TblBuSurveyMgmt.FirstOrDefault(x => x.Id == kiKhaoSat.SurveyMgmtId);
+                    var lstTokenUserNoti = _dbContext.TblBuUserTokenNoti.Where(x => lstInChamDiem.Select(x => x.UserName).Contains(x.UserName) && x.Token != "").ToList();
+
+                    var body = $"{survey.Name} Kỳ khảo sát {kiKhaoSat.Name} đã được Mở";
+                    var title = "Kỳ khảo sát Mở";
+
+                    foreach (var i in lstInChamDiem)
                     {
-                        Code = Guid.NewGuid().ToString(),
-                        Title = "Kỳ khảo sát Mở",
-                        Body = $"Kỳ khảo sát {kiKhaoSat.Name} đã được mở",
-                        SurveyId = kiKhaoSat.SurveyMgmtId,
-                        KiKhaoSatId = kiKhaoSat.Id,
-                        Link = "",
-                    });
-                    await _firebaseNotificationService.SendToTopicAsync("PLX5S_NOTI", "Có kỳ khảo sát mới", $"Kỳ khảo sát {kiKhaoSat.Name} đã được Mở", new DataFireBase());
+                        lstNoti.Add(new TblBuNotification
+                        {
+                            Code = Guid.NewGuid().ToString(),
+                            Title = title,
+                            Body = body,
+                            SurveyId = kiKhaoSat.SurveyMgmtId,
+                            KiKhaoSatId = kiKhaoSat.Id,
+                            Link = "",
+                            IsRead = false,
+                            IsSend = true,
+                            UserName = i.UserName
+                        });
+                    }
+
+                    await _dbContext.TblBuNotification.AddRangeAsync(lstNoti);
+
+                    await _firebaseNotificationService.SendToTokenListAsync(lstTokenUserNoti.Select(x => x.Token).ToList(), title, body);
                 }
                 else if (kiKhaoSat.TrangThaiKi == "0")
                 {
-                    _dbContext.TblBuNotification.Add(new TblBuNotification
+                    var lstNoti = new List<TblBuNotification>();
+                    var lstInChamDiem = _dbContext.TblBuInputChamDiem
+                                            .Where(x => x.KiKhaoSatId == kiKhaoSat.Id)
+                                            .GroupBy(x => x.UserName)
+                                            .Select(g => g.OrderByDescending(x => x.CreateDate).First())
+                                            .ToList();
+
+                    var survey = _dbContext.TblBuSurveyMgmt.FirstOrDefault(x => x.Id == kiKhaoSat.SurveyMgmtId);
+                    var lstTokenUserNoti = _dbContext.TblBuUserTokenNoti.Where(x => lstInChamDiem.Select(x => x.UserName).Contains(x.UserName) && x.Token != "").ToList();
+
+                    var body = $"{survey.Name} Kỳ khảo sát {kiKhaoSat.Name} đã Đóng";
+                    var title = "Kỳ khảo sát Đóng";
+
+                    foreach (var i in lstInChamDiem)
                     {
-                        Code = Guid.NewGuid().ToString(),
-                        Title = "Kỳ khảo sát Đóng",
-                        Body = $"Kỳ khảo sát {kiKhaoSat.Name} đã Đóng",
-                        SurveyId = kiKhaoSat.SurveyMgmtId,
-                        KiKhaoSatId = kiKhaoSat.Id,
-                        Link = "",
-                    });
-                    await _firebaseNotificationService.SendToTopicAsync("PLX5S_NOTI", "Đóng kỳ khảo sát", $"Kỳ khảo sát {kiKhaoSat.Name} đã được Đóng", new DataFireBase());
+                        lstNoti.Add(new TblBuNotification
+                        {
+                            Code = Guid.NewGuid().ToString(),
+                            Title = title,
+                            Body = body,
+                            SurveyId = kiKhaoSat.SurveyMgmtId,
+                            KiKhaoSatId = kiKhaoSat.Id,
+                            Link = "",
+                            IsRead = false,
+                            IsSend = true,
+                            UserName = i.UserName
+                        });
+                    }
+
+                    await _dbContext.TblBuNotification.AddRangeAsync(lstNoti);
+
+                    await _firebaseNotificationService.SendToTokenListAsync(lstTokenUserNoti.Select(x => x.Token).ToList(), title, body);
                 }
 
                 await _dbContext.SaveChangesAsync();

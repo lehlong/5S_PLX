@@ -22,6 +22,15 @@ namespace PLX5S.CORE.Entities.BU
         [Column("BODY", TypeName = "NVARCHAR(1050)")]
         public string? Body { get; set; }
 
+        [Column("IS_SEND")]
+        public bool? IsSend { get; set; }
+
+        [Column("IS_READ")]
+        public bool? IsRead { get; set; }
+
+        [Column("USER_NAME", TypeName = "NVARCHAR(100)")]
+        public string? UserName { get; set; }
+
         [Column("KI_KHAO_SAT_ID", TypeName = "NVARCHAR(100)")]
         public string? KiKhaoSatId { get; set; }
 

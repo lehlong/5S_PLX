@@ -5,6 +5,7 @@ using PLX5S.API.AppCode.Enum;
 using PLX5S.API.AppCode.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Common;
+using PLX5S.CORE.Entities.BU;
 
 namespace PLX5S.API.Controllers.Auth
 {
@@ -88,6 +89,24 @@ namespace PLX5S.API.Controllers.Auth
                 transferObject.Status = false;
                 transferObject.MessageObject.MessageType = MessageType.Error;
                 transferObject.GetMessage("0104", _service);
+            }
+            return Ok(transferObject);
+        }
+
+
+        [HttpPost("SaveUserTokenNoti")]
+        public async Task<IActionResult> SaveUserTokenNoti([FromBody] TblBuUserTokenNoti data)
+        {
+            var transferObject = new TransferObject();
+            await _service.SaveUserTokenNoti(data);
+            if (_service.Status)
+            {
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage(_service.MessageObject.Code, _service);
             }
             return Ok(transferObject);
         }

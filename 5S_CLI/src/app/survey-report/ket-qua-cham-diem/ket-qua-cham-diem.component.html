@@ -23,7 +23,7 @@
   <nz-page-header-content class="main-content2">
     <ng-container>
       <div nz-row [nzGutter]="12">
-        <div nz-col [nzXs]="24" [nzMd]="6">
+        <div nz-col [nzXs]="24" [nzMd]="5">
           <nz-form-item style="display: block">
             <h4>Cuộc Khảo Sát</h4>
             <nz-form-control nzErrorTip="Không được để trống">
@@ -36,7 +36,7 @@
           </nz-form-item>
         </div>
 
-        <div nz-col [nzXs]="24" [nzMd]="6">
+        <div nz-col [nzXs]="24" [nzMd]="5">
           <nz-form-item style="display: block">
             <h4>Kỳ Chấm Điểm</h4>
             <nz-form-control nzErrorTip="Không được để trống">
@@ -49,7 +49,7 @@
           </nz-form-item>
         </div>
 
-        <div nz-col [nzXs]="24" [nzMd]="6">
+        <div nz-col [nzXs]="24" [nzMd]="5">
           <nz-form-item style="display: block">
             <h4>Đối tượng</h4>
             <nz-form-control nzErrorTip="Không được để trống">
@@ -60,7 +60,13 @@
             </nz-form-control>
           </nz-form-item>
         </div>
-
+        
+        <div nz-col [nzXs]="24" [nzMd]="3">
+          <nz-form-item style="display: block">
+            <h4>Chuyên quản Chấm</h4>
+            <label nz-checkbox [(ngModel)]="chuyenQuanCham" class="checkbox-large"></label>
+          </nz-form-item>
+        </div>
         <div nz-col [nzXs]="24" [nzMd]="6">
           <h4>'</h4>
           <div class="">

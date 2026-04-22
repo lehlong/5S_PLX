@@ -9,6 +9,8 @@ export class KyKhaoSatService {
   constructor(private commonService: CommonService) {}
 
   search(params: any): Observable<any> {
+    params.sortColumn = "startDate";
+    params.isDescending = true;
     return this.commonService.get('KiKhaoSat/Search', params)
   }
 

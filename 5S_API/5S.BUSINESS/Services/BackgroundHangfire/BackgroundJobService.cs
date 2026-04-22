@@ -1,8 +1,10 @@
 ﻿using Dtos.AD;
+using PLX5S.BUSINESS.Common.Enum;
 using PLX5S.BUSINESS.Models;
 using PLX5S.BUSINESS.Services.BU;
 using PLX5S.CORE;
 using PLX5S.CORE.Entities.BU;
+using PLX5S.CORE.Statics;
 using Services.AD;
 using System;
 using System.Collections.Generic;
@@ -182,9 +184,14 @@ namespace PLX5S.BUSINESS.Services.BackgroundHangfire
                 var now = DateTime.Now;
                 //var now = new DateTime(2026, 3, 3);
                 var lastDay = LastDayOfMonth(now);
+                var Notis = new List<TblBuNotification>();
 
                 if (now.Day == 7)
                 {
+                    var lstUserATVSV = _dbContext.TblAdAccount.Where(x => x.ChucVuId == RoleIds.ATVSV).ToList();
+
+                    var lstTokenNoti = _dbContext.TblBuUserTokenNoti.Where(x => lstUserATVSV.Select(x => x.UserName).Contains(x.UserName)).ToList();
+
                     var noti = _dbContext.TblBuNotification.FirstOrDefault(x => x.CreateDate.Value.Day == now.Day &&
                                                                                 x.CreateDate.Value.Month == now.Month &&
                                                                                 x.CreateDate.Value.Year == now.Year);
@@ -192,22 +199,34 @@ namespace PLX5S.BUSINESS.Services.BackgroundHangfire
                     {
                         return;
                     }
-                    var newNoti = new TblBuNotification
-                    {
-                        Code = Guid.NewGuid().ToString(),
-                        Title = "Đến thời gian chấm điểm 5S",
-                        Body = $"Kính báo chuẩn bị đến thời gian chấm điểm của An toàn vệ sinh viên, từ ngày 08-15/{now.Month}",
-                    };
 
-                    _dbContext.TblBuNotification.Add(newNoti);
+                    foreach (var item in lstUserATVSV)
+                    {
+                        Notis.Add(new TblBuNotification
+                        {
+                            Code = Guid.NewGuid().ToString(),
+                            Title = "Đến thời gian chấm điểm 5S",
+                            Body = $"Kính báo chuẩn bị đến thời gian chấm điểm của An toàn vệ sinh viên, từ ngày 08-15/{now.Month}",
+                            UserName = item.UserName,
+                            IsRead = false,
+                            IsSend = true,
+                        });
+                    }
+                    _dbContext.TblBuNotification.AddRange(Notis);
+
                     _dbContext.SaveChanges();
 
-                    await _firebaseNotificationService.SendToTopicAsync("PLX5S_NOTI", "Đến thời gian chấm điểm 5S", $"chuẩn bị đến thời gian chấm điểm của An toàn vệ sinh viên", new DataFireBase());
+                    await _firebaseNotificationService.SendToTokenListAsync(lstTokenNoti.Select(x => x.Token).ToList(), "Đến thời gian chấm điểm 5S", $"huẩn bị đến thời gian chấm điểm của An toàn vệ sinh viên");
 
                 }
 
                 if (now.Day == 15)
                 {
+                    var lstUserTT = _dbContext.TblAdAccount.Where(x => x.ChucVuId == RoleIds.CHT || x.ChucVuId == RoleIds.TK).ToList();
+
+                    var lstTokenNotiTK = _dbContext.TblBuUserTokenNoti.Where(x => lstUserTT.Where(x => x.ChucVuId == RoleIds.TK).Select(x => x.UserName).Contains(x.UserName)).ToList();
+                    var lstTokenNotiCHT = _dbContext.TblBuUserTokenNoti.Where(x => lstUserTT.Where(x => x.ChucVuId == RoleIds.CHT).Select(x => x.UserName).Contains(x.UserName)).ToList();
+
                     var noti = _dbContext.TblBuNotification.FirstOrDefault(x => x.CreateDate.Value.Day == now.Day &&
                                                                                 x.CreateDate.Value.Month == now.Month &&
                                                                                 x.CreateDate.Value.Year == now.Year);
@@ -216,20 +235,34 @@ namespace PLX5S.BUSINESS.Services.BackgroundHangfire
                         return;
                     }
 
-                    var newNoti = new TblBuNotification
-                    {
-                        Code = Guid.NewGuid().ToString(),
-                        Title = "Đến thời gian chấm điểm 5S",
-                        Body = $"Kính báo chuẩn bị đến thời gian chấm điểm của Cửa hàng trưởng, từ ngày 16-23/{now.Month}",
-                    };
 
-                    _dbContext.TblBuNotification.Add(newNoti);
+                    foreach (var item in lstUserTT)
+                    {
+                        var chucVu = item.ChucVuId == RoleIds.CHT ? "Cửa Hàng Trưởng" : "Trưởng Kho";
+                        Notis.Add(new TblBuNotification
+                        {
+                            Code = Guid.NewGuid().ToString(),
+                            Title = "Đến thời gian chấm điểm 5S",
+                            Body = $"Kính báo chuẩn bị đến thời gian chấm điểm của {chucVu}, từ ngày 16-23/{now.Month}",
+                            UserName = item.UserName,
+                            IsRead = false,
+                            IsSend = true,
+                        });
+                    }
+                    _dbContext.TblBuNotification.AddRange(Notis);
+
                     _dbContext.SaveChanges();
-                    await _firebaseNotificationService.SendToTopicAsync("PLX5S_NOTI", "Đến thời gian chấm điểm 5S", $"chuẩn bị đến thời gian chấm điểm của Cửa hàng trưởng", new DataFireBase());
+                    
+                    await _firebaseNotificationService.SendToTokenListAsync(lstTokenNotiTK.Select(x => x.Token).ToList(), "Đến thời gian chấm điểm 5S", $"huẩn bị đến thời gian chấm điểm của Trưởng Kho");
+                    await _firebaseNotificationService.SendToTokenListAsync(lstTokenNotiCHT.Select(x => x.Token).ToList(), "Đến thời gian chấm điểm 5S", $"huẩn bị đến thời gian chấm điểm của Cửa Hàng Trưởng");
                 }
 
                 if (now.Day == 23)
                 {
+                    var lstUserATVSV = _dbContext.TblAdAccount.Where(x => x.ChucVuId == RoleIds.ATVSV).ToList();
+
+                    var lstTokenNoti = _dbContext.TblBuUserTokenNoti.Where(x => lstUserATVSV.Select(x => x.UserName).Contains(x.UserName)).ToList();
+
                     var noti = _dbContext.TblBuNotification.FirstOrDefault(x => x.CreateDate.Value.Day == now.Day &&
                                                                                 x.CreateDate.Value.Month == now.Month &&
                                                                                 x.CreateDate.Value.Year == now.Year);
@@ -237,6 +270,7 @@ namespace PLX5S.BUSINESS.Services.BackgroundHangfire
                     {
                         return;
                     }
+
                     var newNoti = new TblBuNotification
                     {
                         Code = Guid.NewGuid().ToString(),
@@ -246,11 +280,17 @@ namespace PLX5S.BUSINESS.Services.BackgroundHangfire
                     
                     _dbContext.TblBuNotification.Add(newNoti);
                     _dbContext.SaveChanges();
-                    await _firebaseNotificationService.SendToTopicAsync("PLX5S_NOTI", "Đến thời gian chấm điểm 5S", $"chuẩn bị đến thời gian chấm điểm của An toàn vệ sinh viên", new DataFireBase());
+
+                    await _firebaseNotificationService.SendToTokenListAsync(lstTokenNoti.Select(x => x.Token).ToList(), "Đến thời gian chấm điểm 5S", $"huẩn bị đến thời gian chấm điểm của An toàn vệ sinh viên");
                 }
 
                 if (now.Day == lastDay.Day)
                 {
+                    var lstUserTT = _dbContext.TblAdAccount.Where(x => x.ChucVuId == RoleIds.CHT || x.ChucVuId == RoleIds.TK).ToList();
+
+                    var lstTokenNotiTK = _dbContext.TblBuUserTokenNoti.Where(x => lstUserTT.Where(x => x.ChucVuId == RoleIds.TK).Select(x => x.UserName).Contains(x.UserName)).ToList();
+                    var lstTokenNotiCHT = _dbContext.TblBuUserTokenNoti.Where(x => lstUserTT.Where(x => x.ChucVuId == RoleIds.CHT).Select(x => x.UserName).Contains(x.UserName)).ToList();
+
                     var noti = _dbContext.TblBuNotification.FirstOrDefault(x => x.CreateDate.Value.Day == now.Day &&
                                                                                 x.CreateDate.Value.Month == now.Month &&
                                                                                 x.CreateDate.Value.Year == now.Year);
@@ -259,17 +299,26 @@ namespace PLX5S.BUSINESS.Services.BackgroundHangfire
                         return;
                     }
 
-                    var newNoti = new TblBuNotification
+
+                    foreach (var item in lstUserTT)
                     {
-                        Code = Guid.NewGuid().ToString(),
-                        Title = "Đến thời gian chấm điểm 5S",
-                        Body = $"Kính báo chuẩn bị đến thời gian chấm điểm của Cửa hàng trưởng, từ ngày 01-07/{now.Month + 1}",
-                        CreateDate = now
-                    };
-                    
-                    _dbContext.TblBuNotification.Add(newNoti);
+                        var chucVu = item.ChucVuId == RoleIds.CHT ? "Cửa Hàng Trưởng" : "Trưởng Kho";
+                        Notis.Add(new TblBuNotification
+                        {
+                            Code = Guid.NewGuid().ToString(),
+                            Title = "Đến thời gian chấm điểm 5S",
+                            Body = $"Kính báo chuẩn bị đến thời gian chấm điểm của {chucVu}, từ ngày 01-07/{now.Month}",
+                            UserName = item.UserName,
+                            IsRead = false,
+                            IsSend = true,
+                        });
+                    }
+                    _dbContext.TblBuNotification.AddRange(Notis);
+
                     _dbContext.SaveChanges();
-                    await _firebaseNotificationService.SendToTopicAsync("PLX5S_NOTI", "Đến thời gian chấm điểm 5S", $"chuẩn bị đến thời gian chấm điểm của Cửa hàng trưởng", new DataFireBase());
+
+                    await _firebaseNotificationService.SendToTokenListAsync(lstTokenNotiTK.Select(x => x.Token).ToList(), "Đến thời gian chấm điểm 5S", $"huẩn bị đến thời gian chấm điểm của Trưởng Kho");
+                    await _firebaseNotificationService.SendToTokenListAsync(lstTokenNotiCHT.Select(x => x.Token).ToList(), "Đến thời gian chấm điểm 5S", $"huẩn bị đến thời gian chấm điểm của Cửa Hàng Trưởng");
                 }
 
             }

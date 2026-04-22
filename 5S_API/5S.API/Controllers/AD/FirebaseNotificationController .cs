@@ -1,5 +1,6 @@
 ﻿using Common;
 using Dtos.AD;
+using Google.Apis.Auth.OAuth2.Requests;
 using Microsoft.AspNetCore.Mvc;
 using PLX5S.API.AppCode.Enum;
 using Services.AD;
@@ -127,6 +128,27 @@ namespace PLX5S.API.Controllers.AD
             var result = await _firebaseService.SendToTopicTestAsync(request.Title, request.Body);
 
             if (result.Success)
+            {
+                transferObject.Data = result;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.MessageObject.Message = result.Message;
+            }
+
+            return Ok(transferObject);
+        }
+
+
+        [HttpPost("SendToTokenListAsync")]
+        public async Task<IActionResult> SendToTokenListAsync([FromBody] SendToListTokenRequest request)
+        {
+            var transferObject = new TransferObject();
+            var result = await _firebaseService.SendToTokenListAsync(request.Tokens, request.Title, request.Body);
+
+            if (transferObject.Status)
             {
                 transferObject.Data = result;
             }

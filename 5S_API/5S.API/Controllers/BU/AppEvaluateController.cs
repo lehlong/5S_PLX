@@ -78,10 +78,10 @@ namespace PLX5S.API.Controllers.BU
 
 
         [HttpGet("GetNotification")]
-        public async Task<IActionResult> GetNotification()
+        public async Task<IActionResult> GetNotification([FromQuery] string? userName)
         {
             var transferObject = new TransferObject();
-            var result = await _service.GetNotification();
+            var result = await _service.GetNotification(userName);
             if (_service.Status)
             {
                 transferObject.Data = result;
@@ -95,6 +95,8 @@ namespace PLX5S.API.Controllers.BU
             }
             return Ok(transferObject);
         }
+
+
 
         [HttpGet("BuildInputEvaluate")]
         public async Task<IActionResult> BuildInputEvaluate([FromQuery] string kiKhaoSatId, string doiTuongId, string deviceId)
@@ -116,6 +118,23 @@ namespace PLX5S.API.Controllers.BU
             return Ok(transferObject);
         }
 
+        [HttpPost("ReadNoti")]
+        public async Task<IActionResult> ReadNoti([FromBody] TblBuNotification noti)
+        {
+            var transferObject = new TransferObject();
+            await _service.ReadNoti(noti);
+            if (_service.Status)
+            {
+                transferObject.Status = true;
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0001", _service);
+            }
+            return Ok(transferObject);
+        }
 
 
 

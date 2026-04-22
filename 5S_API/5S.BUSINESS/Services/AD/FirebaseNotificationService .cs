@@ -27,6 +27,8 @@ namespace Services.AD
         Task<FirebaseNotificationResponseDto> SendToTokenAsync(string token, string title, string body);
         Task<FirebaseNotificationResponseDto> TestConnectionAsync();
         Task<FirebaseNotificationResponseDto> SendToTopicTestAsync(string title, string body);
+        Task<FirebaseNotificationResponseDto> SendToTokenListAsync(
+    List<string> tokens, string title, string body, Dictionary<string, string>? data = null);
     }
 
     public class FirebaseNotificationService : IFirebaseNotificationService
@@ -41,50 +43,48 @@ namespace Services.AD
             _logger = logger;
             InitializeFirebase();
         }
-
         private void InitializeFirebase()
         {
             try
             {
-                if (FirebaseApp.DefaultInstance == null)
-                {
-                    GoogleCredential credential;
-                    if (!string.IsNullOrEmpty(_firebaseSettings.CredentialPath) &&
-                        File.Exists(_firebaseSettings.CredentialPath))
-                    {
-                        credential = GoogleCredential.FromFile(_firebaseSettings.CredentialPath);
-                    }
-                    else
-                    {
-                        credential = GoogleCredential.FromJson(JsonSerializer.Serialize(new
-                        {
-                            type = "service_account",
-                            project_id = _firebaseSettings.ProjectId,
-                            private_key_id = _firebaseSettings.PrivateKeyId,
-                            private_key = _firebaseSettings.PrivateKey,
-                            client_email = _firebaseSettings.ClientEmail,
-                            client_id = _firebaseSettings.ClientId,
-                            auth_uri = _firebaseSettings.AuthUri,
-                            token_uri = _firebaseSettings.TokenUri,
-                            auth_provider_x509_cert_url = _firebaseSettings.AuthProviderX509CertUrl,
-                            client_x509_cert_url = _firebaseSettings.ClientX509CertUrl
-                        }));
-                    }
-
-                    _firebaseApp = FirebaseApp.Create(new AppOptions
-                    {
-                        Credential = credential,
-                        ProjectId = _firebaseSettings.ProjectId
-                    });
-                }
-                else
+                if (FirebaseApp.DefaultInstance != null)
                 {
                     _firebaseApp = FirebaseApp.DefaultInstance;
+                    return;
                 }
+
+                // Fix private key
+                string fixedPrivateKey = _firebaseSettings.PrivateKey.Replace("\\n", "\n");
+
+                // Build JSON service account
+                var json = JsonSerializer.Serialize(new
+                {
+                    type = "service_account",
+                    project_id = _firebaseSettings.ProjectId,
+                    private_key_id = _firebaseSettings.PrivateKeyId,
+                    private_key = fixedPrivateKey,
+                    client_email = _firebaseSettings.ClientEmail,
+                    client_id = _firebaseSettings.ClientId,
+                    auth_uri = _firebaseSettings.AuthUri,
+                    token_uri = _firebaseSettings.TokenUri,
+                    auth_provider_x509_cert_url = _firebaseSettings.AuthProviderX509CertUrl,
+                    client_x509_cert_url = _firebaseSettings.ClientX509CertUrl
+                });
+
+                GoogleCredential credential = GoogleCredential.FromJson(json);
+
+                // ❗❗ KHÔNG cần CreateScoped() → FirebaseAdmin 3.2.0 tự làm
+                // if (credential.IsCreateScopedRequired) credential = credential.CreateScoped(...)
+
+                _firebaseApp = FirebaseApp.Create(new AppOptions
+                {
+                    Credential = credential,
+                    ProjectId = _firebaseSettings.ProjectId
+                });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Lỗi khởi tạo Firebase: {ex.Message}");
+                _logger.LogError(ex, "🔥 Lỗi khởi tạo Firebase");
             }
         }
 
@@ -206,6 +206,88 @@ namespace Services.AD
         //    };
         //    return await SendNotificationAsync(notification);
         //}
+
+        public async Task<FirebaseNotificationResponseDto> SendToTokenListAsync(
+    List<string> tokens, string title, string body, Dictionary<string, string>? data = null)
+        {
+            try
+            {
+                if (_firebaseApp == null)
+                {
+                    return new FirebaseNotificationResponseDto
+                    {
+                        Success = false,
+                        Message = "Firebase chưa được khởi tạo"
+                    };
+                }
+
+                var messaging = FirebaseMessaging.GetMessaging(_firebaseApp);
+
+                // FCM giới hạn 500 tokens mỗi batch
+                var batches = tokens.Chunk(500).ToList();
+                var allResults = new List<object>();
+
+                foreach (var batch in batches)
+                {
+                    var message = new MulticastMessage
+                    {
+                        Tokens = batch.ToList(),
+                        Notification = new Notification
+                        {
+                            Title = title,
+                            Body = body
+                        },
+                        Data = data ?? new Dictionary<string, string>(),
+                        Android = new AndroidConfig
+                        {
+                            Priority = Priority.High,
+                            Notification = new AndroidNotification
+                            {
+                                Sound = "default",
+                                ChannelId = "default"
+                            }
+                        },
+                        Apns = new ApnsConfig
+                        {
+                            Aps = new Aps
+                            {
+                                Sound = "default"
+                            }
+                        }
+                    };
+
+                    // Quan trọng: Google khuyến nghị dùng phương thức này
+                    var response = await messaging.SendEachForMulticastAsync(message);
+
+                    for (int i = 0; i < response.Responses.Count; i++)
+                    {
+                        var item = response.Responses[i];
+                        allResults.Add(new
+                        {
+                            Token = batch[i],
+                            Success = item.IsSuccess,
+                            Error = item.Exception?.Message
+                        });
+                    }
+                }
+
+                return new FirebaseNotificationResponseDto
+                {
+                    Success = true,
+                    Message = "Gửi danh sách token thành công",
+                    Data = allResults
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Lỗi gửi thông báo danh sách token");
+                return new FirebaseNotificationResponseDto
+                {
+                    Success = false,
+                    Message = ex.Message
+                };
+            }
+        }
 
         public async Task<FirebaseNotificationResponseDto> SendToTopicAsync(string topic, string title, string body, object? data)
         {

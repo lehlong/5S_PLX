@@ -28,6 +28,7 @@ namespace Dtos.AD
         public bool Success { get; set; }
         public string? Message { get; set; }
         public string? MessageId { get; set; }
+        public object? Data { set; get; }
     }
 
     public class SendToTopicRequest
@@ -53,6 +54,14 @@ namespace Dtos.AD
     public class SendToTokenRequest
     {
         public string Token { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+        public string Body { get; set; } = string.Empty;
+    }
+
+
+    public class SendToListTokenRequest
+    {
+        public List<string>? Tokens { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Body { get; set; } = string.Empty;
     }

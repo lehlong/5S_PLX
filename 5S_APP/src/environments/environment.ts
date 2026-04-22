@@ -7,7 +7,7 @@ export const environment = {
   // apiMap: 'http://localhost:5203/api',
   // apiFile: 'http://localhost:5203/'
   // sửa cả apiFile trong evaluate.ts
-  baseApi: 'https://5s.plxna.com.vn',
+  baseApi: 'https://5s.plxna.com.vn/api',
   get apiUrl() {
     return `${this.baseApi}/api`;
   },

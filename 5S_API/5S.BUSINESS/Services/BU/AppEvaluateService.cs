@@ -18,6 +18,7 @@ using PLX5S.CORE.Statics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using SkiaSharp;
+using System;
 using System.Data;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
@@ -38,7 +39,8 @@ namespace PLX5S.BUSINESS.Services.BU
         Task<EvaluateModel> GetResultEvaluate(string code);
         Task TinhTongLanCham(TblBuPoint point);
         Task<List<TblBuPoint>> GetPointStore(string kiKhaoSatid, string surveyId);
-        Task<List<TblBuNotification>> GetNotification();
+        Task<List<TblBuNotification>> GetNotification(string? userName);
+        Task ReadNoti(TblBuNotification noti);
         Task HandlePointStore3(EvaluateFilter param);
         Task<HomeModel> GetDataHome(string userName);
         Task<HomeModel> GetDataHome2(string userName);
@@ -276,11 +278,11 @@ namespace PLX5S.BUSINESS.Services.BU
             }
         }
 
-        public async Task<List<TblBuNotification>> GetNotification()
+        public async Task<List<TblBuNotification>> GetNotification(string? userName)
         {
             try
             {
-                return _dbContext.TblBuNotification.OrderByDescending(x => x.CreateDate).ToList();
+                return _dbContext.TblBuNotification.Where(x => x.UserName == userName).OrderByDescending(x => x.CreateDate).ToList();
             }
             catch (Exception ex)
             {
@@ -289,6 +291,20 @@ namespace PLX5S.BUSINESS.Services.BU
             }
         }
 
+
+        public async Task ReadNoti(TblBuNotification noti)
+        {
+            try
+            {
+                noti.IsRead = true;
+                _dbContext.TblBuNotification.Update(noti);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                this.Status = false;
+            }
+        }
 
 
         public async Task<TblBuEvaluateImage> HandelFile(TblBuEvaluateImage request)
@@ -1074,7 +1090,7 @@ namespace PLX5S.BUSINESS.Services.BU
             if (diemQuanLy == 0 && diemChuyenVien == 0)
                 return 0;
 
-            return (diemQuanLy + diemChuyenVien) / 2;
+            return (diemQuanLy * 0.35m) + (diemChuyenVien * 0.65m);
         }
 
         //private bool CheckViolationByGroup(string roleId, List<TblBuEvaluateHeader> allHeaders, DateTime now, out string description)
@@ -1220,28 +1236,27 @@ namespace PLX5S.BUSINESS.Services.BU
                 var lstHeader = _dbContext.TblBuEvaluateHeader.Where(x => x.AccountUserName == userName && lstKy.Select(x => x.Id).Contains(x.KiKhaoSatId)).ToList();
                 var lstPoint = _dbContext.TblBuPoint.Where(x => lstKy.Select(x => x.Id).Contains(x.KiKhaoSatId)).ToList();
 
-                var lstInDoiTuong = _dbContext.TblBuInputDoiTuong.Where(x => lstSurvey.Select(x => x.Id).Contains(x.SurveyMgmtId) && x.IsActive == true).ToList();
+                var lstInDoiTuong = _dbContext.TblBuInputDoiTuong.Where(x => lstSurvey.Select(x => x.Id).Contains(x.SurveyMgmtId) && x.IsActive == true).OrderBy(x => x.DoiTuongId).ToList();
 
                 var lstStore = _dbContext.tblMdStore.OrderBy(x => x.Id).ToList();
                 var lstWareHouse = _dbContext.TblMdWareHouse.OrderBy(x => x.Id).ToList();
 
                 foreach (var d in lstInDoiTuong)
                 {
-                    //var doiTuong = lstInDoiTuong.FirstOrDefault(x => x.DoiTuongId == i.DoiTuongId && ky.SurveyMgmtId == x.SurveyMgmtId);
-
                     var ky = lstKy.FirstOrDefault(x => x.SurveyMgmtId == d.SurveyMgmtId);
+
                     if (ky == null)
                         continue;
 
                     var survey = lstSurvey.FirstOrDefault(x => x.Id == d.SurveyMgmtId);
-
                     var doiTuongName = survey.DoiTuongId == "DT1"
                             ? lstStore.FirstOrDefault(x => x.Id == d.DoiTuongId).Name
                             : survey.DoiTuongId == "DT2"
                                 ? lstWareHouse.FirstOrDefault(x => x.Id == d.DoiTuongId).Name
                                 : "";
-                    var isScore = dot.Dot == 0 ? false : !lstHeader.Any(x => x.UpdateDate >= dot.FDate && x.UpdateDate <= dot.EDate.Date.AddDays(1).AddTicks(-1) && x.DoiTuongId == d.DoiTuongId);
-                    var scored = dot.Dot == 0 ? false : lstHeader.Any(x => x.UpdateDate >= dot.FDate && x.UpdateDate <= dot.EDate.Date.AddDays(1).AddTicks(-1) && x.DoiTuongId == d.DoiTuongId);
+                    var isScore = dot.Dot == 0 ? false : !lstHeader.Any(x => x.UpdateDate >= dot.FDate && x.UpdateDate <= dot.EDate.Date.AddDays(1).AddTicks(-1) && x.DoiTuongId == d.Id);
+                    var isMember = lstChamDiem.Any(x => x.UserName == userName && x.DoiTuongId == d.DoiTuongId);
+                    var scored = dot.Dot == 0 ? false : lstHeader.Any(x => x.UpdateDate >= dot.FDate && x.UpdateDate <= dot.EDate.Date.AddDays(1).AddTicks(-1) && x.DoiTuongId == d.Id);
 
                     result.LstDoiTuong.Add(new DoiTuong
                     {
@@ -1254,15 +1269,19 @@ namespace PLX5S.BUSINESS.Services.BU
                         EndDate = ky.EndDate,
                         Type = survey.DoiTuongId,
                         Point = lstPoint.Where(y => y.DoiTuongId == lstInDoiTuong.FirstOrDefault(x => x.DoiTuongId == d.DoiTuongId)?.Id).OrderByDescending(y => y.CreateDate).FirstOrDefault()?.Point ?? 0,
-                        IsScore = isScore,
+                        IsScore = !isMember ? false : isScore,
                         TimeText = FormatToMonthYear(ky.EndDate),
-                        Description = GetChamDiemStatus(ky.EndDate, now, scored, user.ChucVuId),
-                        Scored = scored,
+                        Description = GetChamDiemStatus(ky.EndDate, now, scored, user.ChucVuId, isMember),
+                        Scored = !isMember ? true : scored,
                         LstChamDiem = lstChamDiem.Where(x => x.DoiTuongId == d.DoiTuongId).Select(x => x.UserName).ToList()
                     });
                 }
 
-
+                result.LanCham = lstHeader.Count();
+                result.ChuaCham = dot.Dot == 0 ? 0 : result.LstDoiTuong.Count(x => x.IsScore == true);
+                result.LstDoiTuong = result.LstDoiTuong
+                        .OrderBy(x => x.Name)
+                        .ToList();
                 return result;
             }
             catch (Exception ex)
@@ -1306,7 +1325,7 @@ namespace PLX5S.BUSINESS.Services.BU
             return $"T{month}/{year}";
         }
 
-        public string GetChamDiemStatus(DateTime eDate, DateTime now, bool scored, string chucVuId)
+        public string GetChamDiemStatus(DateTime eDate, DateTime now, bool scored, string chucVuId, bool isMember = true)
         {
             DateTime date = eDate;
             //DateTime now = new DateTime(2026, 1, 8);
@@ -1317,6 +1336,9 @@ namespace PLX5S.BUSINESS.Services.BU
             int dateMonth = date.Month;
             int dateYear = date.Year;
             int dateDay = now.Day;
+
+            if (!isMember)
+                return "";
 
             if (scored)
                 return "Đã chấm";
