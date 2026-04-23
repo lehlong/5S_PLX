@@ -7,7 +7,8 @@ export const environment = {
   // apiFile: 'http://sso.d2s.com.vn:1347/',
 
   //  apiMap: 'http://localhost:5203/api',
-  baseApi: 'https://5s.plxna.com.vn',
+  baseApi: 'https://5s.plxna.com.vn/api',
+  baseUrl: 'https://5s.plxna.com.vn/api',
   get apiUrl() {
     return `${this.baseApi}/api`;
   },
