@@ -523,7 +523,7 @@ namespace PLX5S.BUSINESS.Services.BU
                     TieuChiCode = file.TieuChiCode,
                     KinhDo = ToDecimal(file.KinhDo),
                     ViDo = ToDecimal(file.ViDo),
-                    Date = file.Date,
+                    Date = file.Date ?? DateTime.Now,
                 };
             }
             catch (Exception ex)
@@ -1341,10 +1341,10 @@ namespace PLX5S.BUSINESS.Services.BU
                 return "";
 
             if (scored)
-                return "Đã chấm";
+                return " ";
 
             if (dateMonth != currentMonth || dateYear != currentYear)
-                return "Ngoài thời gian chấm";
+                return " ";
 
             // CHT, TK, ATVSV
             if (chucVuId == RoleIds.CHT || chucVuId == RoleIds.TK || chucVuId == RoleIds.ATVSV)
@@ -1353,35 +1353,92 @@ namespace PLX5S.BUSINESS.Services.BU
                 if (dateDay >= 1 && dateDay <= 7 &&
                     (chucVuId == RoleIds.CHT || chucVuId == RoleIds.TK))
                 {
-                    return $"Trong thời gian (01-07/{currentMonth:00})";
+                    return $" ";
                 }
 
                 // CHT + TK → ngày 16–23
                 if (dateDay >= 16 && dateDay <= 23 &&
                     (chucVuId == RoleIds.CHT || chucVuId == RoleIds.TK))
                 {
-                    return $"Trong thời gian (15-23/{currentMonth:00})";
+                    return $" ";
                 }
 
                 // ATVSV → ngày 08–15
                 if (dateDay >= 8 && dateDay <= 15 && chucVuId == RoleIds.ATVSV)
                 {
-                    return $"Trong thời gian (08-15/{currentMonth:00})";
+                    return $" ";
                 }
 
                 // ATVSV → ngày 24–30
                 if (dateDay >= 24 && chucVuId == RoleIds.ATVSV)
                 {
-                    return $"Trong thời gian (24-30/{currentMonth:00})";
+                    return $" ";
                 }
 
-                return "Ngoài thời gian chấm";
+                return " ";
             }
             else
             {
-                return "Trong thời gian chấm";
+                return " ";
             }
         }
+        //public string GetChamDiemStatus(DateTime eDate, DateTime now, bool scored, string chucVuId, bool isMember = true)
+        //{
+        //    DateTime date = eDate;
+        //    //DateTime now = new DateTime(2026, 1, 8);
+        //    // nếu muốn dùng ngày hiện tại thực tế:
+
+        //    int currentMonth = now.Month;
+        //    int currentYear = now.Year;
+        //    int dateMonth = date.Month;
+        //    int dateYear = date.Year;
+        //    int dateDay = now.Day;
+
+        //    if (!isMember)
+        //        return "";
+
+        //    if (scored)
+        //        return "Đã chấm";
+
+        //    if (dateMonth != currentMonth || dateYear != currentYear)
+        //        return "Ngoài thời gian chấm";
+
+        //    // CHT, TK, ATVSV
+        //    if (chucVuId == RoleIds.CHT || chucVuId == RoleIds.TK || chucVuId == RoleIds.ATVSV)
+        //    {
+        //        // CHT + TK → ngày 01–07
+        //        if (dateDay >= 1 && dateDay <= 7 &&
+        //            (chucVuId == RoleIds.CHT || chucVuId == RoleIds.TK))
+        //        {
+        //            return $"Trong thời gian (01-07/{currentMonth:00})";
+        //        }
+
+        //        // CHT + TK → ngày 16–23
+        //        if (dateDay >= 16 && dateDay <= 23 &&
+        //            (chucVuId == RoleIds.CHT || chucVuId == RoleIds.TK))
+        //        {
+        //            return $"Trong thời gian (15-23/{currentMonth:00})";
+        //        }
+
+        //        // ATVSV → ngày 08–15
+        //        if (dateDay >= 8 && dateDay <= 15 && chucVuId == RoleIds.ATVSV)
+        //        {
+        //            return $"Trong thời gian (08-15/{currentMonth:00})";
+        //        }
+
+        //        // ATVSV → ngày 24–30
+        //        if (dateDay >= 24 && chucVuId == RoleIds.ATVSV)
+        //        {
+        //            return $"Trong thời gian (24-30/{currentMonth:00})";
+        //        }
+
+        //        return "Ngoài thời gian chấm";
+        //    }
+        //    else
+        //    {
+        //        return "Trong thời gian chấm";
+        //    }
+        //}
         //public async Task<HomeModel> CountViPham(HomeModel data, string chucVuId, DateTime now)
         //{
         //    var dot = DotChamHelper.GetDot2(now, chucVuId);     // dùng hàm enum DotCham có sẵn
