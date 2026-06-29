@@ -1,25 +1,26 @@
 ﻿using AutoMapper;
 using Common;
+using DocumentFormat.OpenXml.Office.CustomUI;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using Dtos.AD;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using NPOI.SS.Formula.Functions;
+using Org.BouncyCastle.Utilities.Collections;
 using PLX5S.BUSINESS.Common;
 using PLX5S.BUSINESS.Dtos.BU;
-using PLX5S.CORE.Entities.BU;
+using PLX5S.BUSINESS.Models;
 using PLX5S.CORE;
+using PLX5S.CORE.Entities.BU;
+using PLX5S.CORE.Statics;
+using Services.AD;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static PLX5S.BUSINESS.Services.BU.KikhaosatService;
-using Microsoft.IdentityModel.Tokens;
-using DocumentFormat.OpenXml.Office.CustomUI;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using PLX5S.BUSINESS.Models;
-using NPOI.SS.Formula.Functions;
-using Microsoft.AspNetCore.Hosting;
-using Services.AD;
-using Dtos.AD;
-using PLX5S.CORE.Statics;
 
 
 namespace PLX5S.BUSINESS.Services.BU
@@ -139,6 +140,10 @@ namespace PLX5S.BUSINESS.Services.BU
                 .Where(x => DoiTuongIds.Contains(x.Id))
                 .ToListAsync();
 
+            var lstMdOffice = await _dbContext.TblMdOffice
+                .Where(x => DoiTuongIds.Contains(x.Id))
+                .ToListAsync();
+
             var kiKhaoSat = new TblBuKiKhaoSat
             {
                 Id = Guid.NewGuid().ToString(),
@@ -176,11 +181,80 @@ namespace PLX5S.BUSINESS.Services.BU
                 SurveyMgmtId = surveyMgmtId,
             }).ToList();
 
+            var lstInputOffice = lstMdOffice.Select(x => new InputOffice
+            {
+                Id = x.Id,
+                PhoneNumber = x.PhoneNumber,
+                Name = x.Name,
+                ThuTruong = x.ThuTruong,
+                NguoiPhuTrach = x.NguoiPhuTrach,
+                ViDo = x.ViDo,
+                KinhDo = x.KinhDo,
+                TrangThai = x.TrangThai,
+                OfficeId = x.Id,
+                SurveyMgmtId = surveyMgmtId,
+            }).ToList();
+            
+            List<InputListDoiTuong>? lstDoituong;
+            Cols Columns; 
+
+            if (lstMdStore.Count > 0)
+            {
+                Columns = GetColumns(DoiTuongType.CuaHang);
+                lstDoituong = lstMdStore.Select(x => new InputListDoiTuong
+                {
+                    Id = x.Id,
+                    PhoneNumber = x.PhoneNumber,
+                    Name = x.Name,
+                    ThuTruong = x.CuaHangTruong,
+                    NguoiPhuTrach = x.NguoiPhuTrach,
+                    ViDo = x.ViDo,
+                    KinhDo = x.KinhDo,
+                    TrangThai = x.TrangThaiCuaHang,
+                    DoiTuongId  = x.Id,
+                    SurveyMgmtId = surveyMgmtId,
+                }).ToList();
+            }
+            else if (lstMdWareHouse.Count > 0)
+            {
+                Columns = GetColumns(DoiTuongType.Kho);
+                lstDoituong = lstMdWareHouse.Select(x => new InputListDoiTuong
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    ThuTruong = x.TruongKho,
+                    NguoiPhuTrach = x.NguoiPhuTrach,
+                    DoiTuongId = x.Id,
+                    SurveyMgmtId = surveyMgmtId,
+                }).ToList();
+            }
+            else
+            {
+                Columns = GetColumns(DoiTuongType.VanPhong);
+                lstDoituong = lstMdOffice.Select(x => new InputListDoiTuong
+                {
+                    Id = x.Id,
+                    PhoneNumber = x.PhoneNumber,
+                    Name = x.Name,
+                    ThuTruong = x.ThuTruong,
+                    NguoiPhuTrach = x.NguoiPhuTrach,
+                    ViDo = x.ViDo,
+                    KinhDo = x.KinhDo,
+                    TrangThai = x.TrangThai,
+                    DoiTuongId = x.Id,
+                    SurveyMgmtId = surveyMgmtId,
+                }).ToList();
+
+            }
+
             return new KiKhaoSatModel
             {
                 KiKhaoSat = kiKhaoSat,
+                Columns = Columns,
                 lstInputStore = lstInputStore,
-                lstInputWareHouse = lstInputWareHouse
+                lstInputWareHouse = lstInputWareHouse,
+                lstInputOffice = lstInputOffice,
+                lstInputDoiTuong = lstDoituong,
             };
         }
         public async Task Insert(KiKhaoSatModel data)
@@ -212,15 +286,14 @@ namespace PLX5S.BUSINESS.Services.BU
                 _dbContext.TblBuKiKhaoSat.Add(data.KiKhaoSat);
                 var lstInChamDiem = new List<TblBuInputChamDiem>();
 
-                foreach (var item in data.lstInputStore)
+                foreach (var item in data.lstInputDoiTuong)
                 {
                     foreach (var d in item.LstChamDiem)
                     {
                         lstInChamDiem.Add(new TblBuInputChamDiem
                         {
                             Id = Guid.NewGuid().ToString(),
-                            //InStoreId = item.Id,
-                            DoiTuongId = item.StoreId,
+                            DoiTuongId = item.DoiTuongId,
                             IsDeleted = false,
                             IsActive = true,
                             KiKhaoSatId = data.KiKhaoSat.Id,
@@ -228,22 +301,53 @@ namespace PLX5S.BUSINESS.Services.BU
                         });
                     }
                 }
-                foreach (var item in data.lstInputWareHouse)
-                {
-                    foreach (var d in item.LstChamDiem)
-                    {
-                        lstInChamDiem.Add(new TblBuInputChamDiem
-                        {
-                            Id = Guid.NewGuid().ToString(),
-                            DoiTuongId = item.WareHouseId,
-                            //InStoreId = item.Id,
-                            IsDeleted = false,
-                            IsActive = true,
-                            KiKhaoSatId = data.KiKhaoSat.Id,
-                            UserName = d
-                        });
-                    }
-                }
+                //foreach (var item in data.lstInputStore)
+                //{
+                //    foreach (var d in item.LstChamDiem)
+                //    {
+                //        lstInChamDiem.Add(new TblBuInputChamDiem
+                //        {
+                //            Id = Guid.NewGuid().ToString(),
+                //            //InStoreId = item.Id,
+                //            DoiTuongId = item.StoreId,
+                //            IsDeleted = false,
+                //            IsActive = true,
+                //            KiKhaoSatId = data.KiKhaoSat.Id,
+                //            UserName = d
+                //        });
+                //    }
+                //}
+                //foreach (var item in data.lstInputWareHouse)
+                //{
+                //    foreach (var d in item.LstChamDiem)
+                //    {
+                //        lstInChamDiem.Add(new TblBuInputChamDiem
+                //        {
+                //            Id = Guid.NewGuid().ToString(),
+                //            DoiTuongId = item.WareHouseId,
+                //            //InStoreId = item.Id,
+                //            IsDeleted = false,
+                //            IsActive = true,
+                //            KiKhaoSatId = data.KiKhaoSat.Id,
+                //            UserName = d
+                //        });
+                //    }
+                //}
+                //foreach (var item in data.lstInputOffice)
+                //{
+                //    foreach (var d in item.LstChamDiem)
+                //    {
+                //        lstInChamDiem.Add(new TblBuInputChamDiem
+                //        {
+                //            Id = Guid.NewGuid().ToString(),
+                //            DoiTuongId = item.OfficeId,
+                //            IsDeleted = false,
+                //            IsActive = true,
+                //            KiKhaoSatId = data.KiKhaoSat.Id,
+                //            UserName = d
+                //        });
+                //    }
+                //}
                 _dbContext.AddRange(lstInChamDiem);
 
                 await _dbContext.SaveChangesAsync();
@@ -324,6 +428,7 @@ namespace PLX5S.BUSINESS.Services.BU
             try
             {
                 var lstInputStore = new List<InputStore>();
+                var lstInputDoiTuong = new List<InputListDoiTuong>();
                 var lstInputWareHouse = new List<InputWarehouse>();
                 var ki = _dbContext.TblBuKiKhaoSat.AsNoTracking().Where(x => x.IsDeleted != true && x.Id == idKi).FirstOrDefault();
                 var survey = _dbContext.TblBuSurveyMgmt.FirstOrDefault(x => x.Id == ki.SurveyMgmtId);
@@ -355,9 +460,25 @@ namespace PLX5S.BUSINESS.Services.BU
                             Point = lstPointstore.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
                             LstChamDiem = lstChamDiem2.Select(x => x.UserName).ToList()
                         };
-                        
-                        lstInputStore.Add(inStore);
+                        var inDT = new InputListDoiTuong()
+                        {
+                            Id = item.Id,
+                            PhoneNumber = store.PhoneNumber,
+                            Name = store.Name,
+                            ThuTruong = store.CuaHangTruong,
+                            NguoiPhuTrach = store.NguoiPhuTrach,
+                            ViDo = store.ViDo,
+                            KinhDo = store.KinhDo,
+                            TrangThai = store.TrangThaiCuaHang,
+                            DoiTuongId = store.Id,
+                            SurveyMgmtId = ki.SurveyMgmtId,
+                            LstInChamDiem = lstChamDiem2,
+                            Point = lstPointstore.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
+                            LstChamDiem = lstChamDiem2.Select(x => x.UserName).ToList()
+                        };
 
+                        lstInputStore.Add(inStore);
+                        lstInputDoiTuong.Add(inDT);
                     }
                 }
                 if (survey.DoiTuongId == DoiTuongType.Kho)
@@ -381,16 +502,61 @@ namespace PLX5S.BUSINESS.Services.BU
                             Point = lstPointstore.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
                             LstChamDiem = lstChamDiem3.Select(x => x.UserName).ToList()
                         };
+                        var inDT = new InputListDoiTuong()
+                        {
+                            Id = item.Id,
+                            PhoneNumber = WareHouse.PhoneNumber,
+                            Name = WareHouse.Name,
+                            ThuTruong = WareHouse.TruongKho,
+                            NguoiPhuTrach = WareHouse.NguoiPhuTrach,
+                            TrangThai = WareHouse.TrangThaiKho,
+                            DoiTuongId = WareHouse.Id,
+                            SurveyMgmtId = ki.SurveyMgmtId,
+                            LstInChamDiem = lstChamDiem3,
+                            Point = lstPointstore.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
+                            LstChamDiem = lstChamDiem3.Select(x => x.UserName).ToList()
+                        };
+                        lstInputDoiTuong.Add(inDT);
                         lstInputWareHouse.Add(inWareHousee);
                     }
                 }
+                if (survey.DoiTuongId == DoiTuongType.VanPhong)
+                {
+                    var lstMdOffice = _dbContext.TblMdOffice.ToList();
+                    foreach (var item in lstInDoiTuong)
+                    {
+                        var office = lstMdOffice.Where(x => x.Id == item.DoiTuongId).FirstOrDefault();
 
+                        var lstChamDiem4 = lstChamDiem.Where(x => x.DoiTuongId == item.DoiTuongId).ToList();
+
+                        var inDT = new InputListDoiTuong()
+                        {
+                            Id = item.Id,
+                            PhoneNumber = office.PhoneNumber,
+                            Name = office.Name,
+                            ThuTruong = office.ThuTruong,
+                            NguoiPhuTrach = office.NguoiPhuTrach,
+                            ViDo = office.ViDo,
+                            KinhDo = office.KinhDo,
+                            TrangThai = office.TrangThai,
+                            DoiTuongId = office.Id,
+                            SurveyMgmtId = ki.SurveyMgmtId,
+                            LstInChamDiem = lstChamDiem4,
+                            Point = lstPointstore.FirstOrDefault(x => x.DoiTuongId == item.Id)?.Point ?? 0,
+                            LstChamDiem = lstChamDiem4.Select(x => x.UserName).ToList()
+                        };
+
+                        lstInputDoiTuong.Add(inDT);
+                    }
+                }
 
                 return new KiKhaoSatModel()
                 {
                     KiKhaoSat = ki,
+                    Columns = GetColumns(survey.DoiTuongId),
                     lstInputStore = lstInputStore.OrderBy(x => x.Name).ToList(),
-                    lstInputWareHouse = lstInputWareHouse.OrderBy(x => x.Name).ToList()
+                    lstInputWareHouse = lstInputWareHouse.OrderBy(x => x.Name).ToList(),
+                    lstInputDoiTuong = lstInputDoiTuong
                 };
             }
             catch (Exception ex)
@@ -400,6 +566,45 @@ namespace PLX5S.BUSINESS.Services.BU
             }
         }
 
+        public Cols GetColumns(string DoiTuongId)
+        {
+            if (DoiTuongId == DoiTuongType.CuaHang)
+            {
+                return new Cols
+                {
+                    DoiTuong = "Cửa hàng",
+                    DoiTuongId = DoiTuongId,
+                    DoiTuongChamDiem = "Tên cửa hàng",
+                    NguoiPhuTrach = "Người phụ trách",
+                    ThuTruong = "Cửa hàng trưởng",
+                };
+            }
+            else
+            if (DoiTuongId == DoiTuongType.Kho)
+            {
+                return new Cols
+                {
+                    DoiTuong = "Kho",
+                    DoiTuongId = DoiTuongId,
+                    DoiTuongChamDiem = "Tên Kho",
+                    NguoiPhuTrach = "Người phụ trách",
+                    ThuTruong = "Trưởng kho",
+                };
+            }
+            else
+            if (DoiTuongId == DoiTuongType.VanPhong)
+            {
+                return new Cols
+                {
+                    DoiTuong = "Văn phòng",
+                    DoiTuongId = DoiTuongId,
+                    DoiTuongChamDiem = "Tên văn phòng",
+                    NguoiPhuTrach = "Người phụ trách",
+                    ThuTruong = "Trưởng buống",
+                };
+            }
+            return null;
+        }
 
         public async Task UpdateKhaoSatTrangThai(TblBuKiKhaoSat kiKhaoSat)
         {
@@ -574,6 +779,15 @@ namespace PLX5S.BUSINESS.Services.BU
                         d.KiKhaoSatId = idKi;
                     }
                 }
+                foreach (var s in kiKhaoSat.lstInputDoiTuong)
+                {
+                    foreach (var d in s.LstInChamDiem)
+                    {
+                        d.Id = Guid.NewGuid().ToString();
+                        d.KiKhaoSatId = idKi;
+                    }
+                }
+
                 return kiKhaoSat;
             }
             catch (Exception ex)

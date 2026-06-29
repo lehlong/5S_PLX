@@ -178,6 +178,33 @@
       </tbody>
     </nz-table>
 
+    <nz-table *ngIf="dataInput.surveyMgmt.doiTuongId === 'DT3'" #rowSelectionTable nzShowSizeChanger
+      [nzData]="dataInput.inputDoiTuong" nzFooter=" " [nzFrontPagination]="'false'">
+      <thead>
+        <tr>
+          <th [(nzChecked)]="checked" [nzIndeterminate]="indeterminate" (nzCheckedChange)="onAllChecked($event)"></th>
+          <th>Mã</th>
+          <th>Tên văn phòng</th>
+          <th>Thủ Trưởng</th>
+          <th>Người phụ trách</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of rowSelectionTable.data">
+          <td [nzChecked]="data.doiTuong.isActive"
+            (nzCheckedChange)="onItemChecked(data.doiTuong.id, $event)">
+          </td>
+          <td>{{ data.doiTuong.doiTuongId }}</td>
+          <ng-container *ngFor="let item of lstOffice">
+            <ng-container *ngIf="item.id == data.doiTuong.doiTuongId">
+              <td>{{ item.name }}</td>
+              <td>{{ getNameByCodeAccount(item.thuTruong) }}</td>
+              <td>{{ getNameByCodeAccount(item.nguoiPhuTrach) }}</td>
+            </ng-container>
+          </ng-container>
+        </tr>
+      </tbody>
+    </nz-table>
     <!-- <nz-form-item>
         <nz-form-label>Trạng thái</nz-form-label>
         <nz-form-control>

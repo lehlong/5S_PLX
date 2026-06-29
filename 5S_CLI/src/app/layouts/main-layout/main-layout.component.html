@@ -73,22 +73,11 @@
     <div (click)="openMenuMobile()" class="menu-mobile">
       <nz-icon nzType="menu" nzTheme="outline" />
     </div>
-    <nz-drawer
-      [nzClosable]="false"
-      [nzVisible]="menuMobileVisible"
-      (nzOnClose)="closeMenuMobile()"
-      [nzPlacement]="'left'"
-      nzWidth="70%"
-      nzTitle="Danh mục hệ thống"
-    >
+    <nz-drawer [nzClosable]="false" [nzVisible]="menuMobileVisible" (nzOnClose)="closeMenuMobile()"
+      [nzPlacement]="'left'" nzWidth="70%" nzTitle="Danh mục hệ thống">
       <ng-container *nzDrawerContent>
         <ul nz-menu nzMode="inline" [nzInlineCollapsed]="isCollapsed">
-          <li
-            nz-menu-item
-            nz-tooltip
-            nzTooltipPlacement="right"
-            [routerLink]="'/'"
-          >
+          <li nz-menu-item nz-tooltip nzTooltipPlacement="right" [routerLink]="'/'">
             <nz-icon nzType="home" />
             <span>Trang chủ</span>
           </li>
@@ -117,17 +106,15 @@
               <li nz-menu-item [routerLink]="'master-data/ware-house'">
                 Danh sách kho Xăng Dầu
               </li>
+              <li nz-menu-item [routerLink]="'master-data/office'">
+                Danh sách văn phòng
+              </li>
               <li nz-menu-item [routerLink]="'master-data/doi-tuong'">
                 Danh sách đối tượng
               </li>
             </ul>
           </li>
-          <li
-            nz-menu-item
-            nz-tooltip
-            nzTooltipPlacement="right"
-            [routerLink]="'/survey-mgmt'"
-          >
+          <li nz-menu-item nz-tooltip nzTooltipPlacement="right" [routerLink]="'/survey-mgmt'">
             <nz-icon nzType="container" />
             <span>Quản lý khảo sát</span>
           </li>
@@ -136,44 +123,24 @@
               <li nz-menu-item [routerLink]="'survey-report/ket-qua-cham-diem'">
                 Báo Cáo Kết Quả Chấm Điểm 5S
               </li>
-              <li
-                nz-menu-item
-                [routerLink]="'survey-report/cham-diem-theo-khung-thoi-gian'"
-              >
+              <li nz-menu-item [routerLink]="'survey-report/cham-diem-theo-khung-thoi-gian'">
                 Báo Cáo Lần Chấm Điểm Theo Khung Thời Gian
               </li>
-              <li
-                nz-menu-item
-                [routerLink]="'survey-report/thoi-gian-cham-diem'"
-              >
+              <li nz-menu-item [routerLink]="'survey-report/thoi-gian-cham-diem'">
                 Báo Cáo Thời Gian Chấm Điểm
               </li>
-              <li
-                nz-menu-item
-                [routerLink]="'survey-report/thiet-bi-cham-diem'"
-              >
+              <li nz-menu-item [routerLink]="'survey-report/thiet-bi-cham-diem'">
                 Báo Cáo Thiết Bị Chấm Điểm
               </li>
-              <li
-                nz-menu-item
-                [routerLink]="'survey-report/hinh-anh-cham-diem'"
-              >
+              <li nz-menu-item [routerLink]="'survey-report/hinh-anh-cham-diem'">
                 Báo Cáo Hình Ảnh Chấm Điểm
               </li>
-              <li
-                nz-menu-item
-                [routerLink]="'survey-report/tong-hop-y-kien-de-xuat'"
-              >
+              <li nz-menu-item [routerLink]="'survey-report/tong-hop-y-kien-de-xuat'">
                 Báo Cáo Tổng Hợp Ý Kiến Đề Xuất
               </li>
             </ul>
           </li>
-          <li
-            nz-menu-item
-            nz-tooltip
-            nzTooltipPlacement="right"
-            [routerLink]="'/news'"
-          >
+          <li nz-menu-item nz-tooltip nzTooltipPlacement="right" [routerLink]="'/news'">
             <nz-icon nzType="file" />
             <span>Tin tức</span>
           </li>
@@ -222,6 +189,9 @@
         <li nz-menu-item [routerLink]="'master-data/ware-house'">
           Danh sách kho Xăng Dầu
         </li>
+        <li nz-menu-item [routerLink]="'master-data/office'">
+          Danh sách văn phòng
+        </li>
         <li nz-menu-item [routerLink]="'master-data/doi-tuong'">
           Danh sách đối tượng
         </li>
@@ -244,10 +214,7 @@
         <li nz-menu-item [routerLink]="'survey-report/ket-qua-cham-diem'">
           Báo Cáo Kết Quả Chấm Điểm 5S
         </li>
-        <li
-          nz-menu-item
-          [routerLink]="'survey-report/cham-diem-theo-khung-thoi-gian'"
-        >
+        <li nz-menu-item [routerLink]="'survey-report/cham-diem-theo-khung-thoi-gian'">
           Báo Cáo Lần Chấm Điểm Theo Khung Thời Gian
         </li>
         <li nz-menu-item [routerLink]="'survey-report/thoi-gian-cham-diem'">

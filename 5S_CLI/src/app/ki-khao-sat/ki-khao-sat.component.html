@@ -172,6 +172,43 @@
           <nz-icon nzType="usergroup-add" nzTheme="outline" class="m-0" />
           NGƯỜI CHẤM ĐIỂM
         </ng-template>
+
+
+        <nz-table class="auto-scroll-table" #headerTable [nzData]="inputKi.lstInputDoiTuong" [nzFrontPagination]="false"
+          [nzScroll]="{ y: 'calc(100vh - 244px)' }">
+          <thead>
+            <tr>
+              <th nzWidth="60px">STT</th>
+              <th nzWidth="160px" [nzAlign]="'left'"> Mã </th>
+              <th> {{ inputKi?.columns?.doiTuongChamDiem ?? 'Tên Đối Tượng' }} </th>
+              <th> {{ inputKi?.columns?.thuTruong ?? 'Thủ Trưởng' }} </th>
+              <th> {{ inputKi?.columns?.nguoiPhuTrach ?? 'Người Phụ Trách'}} </th>
+              <th nzWidth="460px"> Người Chấm Điểm </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of lstInputDoiTuongSearch; trackBy: trackByKey; let i = index">
+
+              <td>{{(paginationResult.currentPage - 1) * paginationResult.pageSize + i + 1}}</td>
+              <td nzAlign="center">
+                <a>{{ data.doiTuongId }}</a>
+              </td>
+              <td nzAlign="left">{{ data.name }}</td>
+              <td nzAlign="left">{{ getNameByCodeAccount(data.thuTruong) }}</td>
+              <td nzAlign="left">{{ getNameByCodeAccount(data.nguoiPhuTrach) }}</td>
+              <td nzAlign="center">
+                <nz-select style="width: 100%;" [nzMaxTagCount]="10" [nzMaxTagPlaceholder]="tagPlaceHolder"
+                  nzMode="multiple" nzPlaceHolder="Please select" [ngModelOptions]="{ standalone: true }"
+                  [(ngModel)]="data.lstChamDiem" (ngModelChange)="onChangeChamDiem($event, data)">
+                  <nz-option cdkScrollable *ngFor="let item of lstAccount; trackBy: trackByKey"
+                    [nzLabel]="item.fullName + getChucVu(item.chucVuId)" [nzValue]="item.userName">
+                  </nz-option>
+                </nz-select>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+        <!-- 
         <nz-table *ngIf="inputKi.lstInputStore?.length  != 0" class="auto-scroll-table" #headerTable
           [nzData]="inputKi.lstInputStore" [nzFrontPagination]="false" [nzScroll]="{ y: 'calc(100vh - 244px)' }">
           <thead>
@@ -235,13 +272,12 @@
                   [(ngModel)]="data.lstChamDiem" (ngModelChange)="onChangeChamDiem($event, data)">
                   <nz-option cdkScrollable *ngFor="let item of lstAccount; trackBy: trackByKey"
                     [nzLabel]="item.fullName + getChucVu(item.chucVuId)" [nzValue]="item.userName">
-                    <!-- [nzValue]="item.userName"> -->
                   </nz-option>
                 </nz-select>
               </td>
             </tr>
           </tbody>
-        </nz-table>
+        </nz-table> -->
       </nz-tab>
     </nz-tabset>
     <ng-template #tagPlaceHolder let-selectedList>and {{ selectedList.length }} more selected</ng-template>
@@ -252,22 +288,21 @@
   <nz-space>
     <ng-container *ngIf="edit">
       <ng-container *nzSpaceItem>
-        <button *ngIf="inputKi.kiKhaoSat.trangThaiKi == trangThaiKy.KhoiTao"
-          [nzLoading]="loading" nz-button nzType="default"
-          style="background-color: #04AA6D; color: white; border: none;" class="!flex !items-center"
+        <button *ngIf="inputKi.kiKhaoSat.trangThaiKi == trangThaiKy.KhoiTao" [nzLoading]="loading" nz-button
+          nzType="default" style="background-color: #04AA6D; color: white; border: none;" class="!flex !items-center"
           (click)="onUpdateKhaoSatTrangThai('2')">
-           <nz-icon nzType="pause" nzTheme="outline" />
+          <nz-icon nzType="pause" nzTheme="outline" />
           Mở kỳ
         </button>
-        <button *ngIf="inputKi.kiKhaoSat.trangThaiKi == trangThaiKy.KyMo" [nzLoading]="loading" nz-button nzType="default"
-          style="background-color: #722ed1; color: white; border: none;" class="!flex !items-center"
+        <button *ngIf="inputKi.kiKhaoSat.trangThaiKi == trangThaiKy.KyMo" [nzLoading]="loading" nz-button
+          nzType="default" style="background-color: #722ed1; color: white; border: none;" class="!flex !items-center"
           (click)="onUpdateKhaoSatTrangThai('0')">
           <nz-icon nzType="poweroff" nzTheme="outline" />
           Đóng kỳ
         </button>
       </ng-container>
-      <button [nzLoading]="loading" *nzSpaceItem [disabled]="inputKi.kiKhaoSat.trangThaiKi == trangThaiKy.KyDong" nz-button nzType="primary" class="!flex !items-center"
-        (click)="onUpdateKiKhaoSat()">
+      <button [nzLoading]="loading" *nzSpaceItem [disabled]="inputKi.kiKhaoSat.trangThaiKi == trangThaiKy.KyDong"
+        nz-button nzType="primary" class="!flex !items-center" (click)="onUpdateKiKhaoSat()">
         <span nz-icon nzType="save" nzTheme="outline"></span>Lưu
       </button>
     </ng-container>
@@ -315,8 +350,9 @@
                       <span nz-icon nzType="delete" nzTheme="outline" class="cursor-pointer"></span>
                     </button>
                   </ng-container>
-                  <span nz-icon (click)="openEditTree(node)" nzType="edit" nzTheme="outline" ></span>
-                  <span nz-icon (click)="openCreateTree(node)" nzType="plus-circle" nzTheme="twotone" class="ms-2"></span>
+                  <span nz-icon (click)="openEditTree(node)" nzType="edit" nzTheme="outline"></span>
+                  <span nz-icon (click)="openCreateTree(node)" nzType="plus-circle" nzTheme="twotone"
+                    class="ms-2"></span>
                 </div>
               </div>
             </ng-template>
@@ -358,7 +394,7 @@
               <td nzAlign="center">
                 <div>
                   <span nz-icon (click)="openUpdateLeaves(data)" nzType="edit" nzTheme="outline"
-                    class="me-2 cursor-pointer" ></span>  
+                    class="me-2 cursor-pointer"></span>
                   <button nz-popconfirm nzPopconfirmTitle="Bạn có chắc chắn muốn xóa không?"
                     style="border: none; background: none;" (nzOnConfirm)="deleteLeaves(data)"
                     nzPopconfirmPlacement="topRight" nz-button>

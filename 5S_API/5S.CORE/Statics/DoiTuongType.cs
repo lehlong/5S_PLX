@@ -10,6 +10,7 @@ namespace PLX5S.CORE.Statics
     {
         public const string CuaHang = "DT1";
         public const string Kho = "DT2";
+        public const string VanPhong = "DT3";
 
     }
 }

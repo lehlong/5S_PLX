@@ -27,6 +27,7 @@ namespace PLX5S.BUSINESS.Services.AD
         Task MainDevice(string id);
         Task EnableDevice(string id);
         void ResetPassword(string username);
+        Task EnableLatestDeviceForAllUsers();
     }
 
     public class AccountService(AppDbContext dbContext, IMapper mapper, IHubContext<RefreshServiceHub> hubContext) : GenericService<TblAdAccount, AccountDto>(dbContext, mapper), IAccountService
@@ -40,7 +41,7 @@ namespace PLX5S.BUSINESS.Services.AD
                 var query = _dbContext.TblAdAccount
                 .Include(x => x.Account_AccountGroups)
                 .ThenInclude(x => x.AccountGroup)
-               // .Include(x => x.OrganizeCode)
+                // .Include(x => x.OrganizeCode)
                 .AsQueryable();
 
                 if (!string.IsNullOrWhiteSpace(filter.KeyWord))
@@ -158,7 +159,7 @@ namespace PLX5S.BUSINESS.Services.AD
                                         .ThenInclude(x => x.ListAccountGroupRight)
                                         .Include(x => x.AccountRights)
                                         .ThenInclude(x => x.Right)
-                                       // .Include(x=>x.Partner)
+                                        // .Include(x=>x.Partner)
                                         .FirstOrDefaultAsync(x => x.UserName == Id as string);
 
 
@@ -418,7 +419,7 @@ namespace PLX5S.BUSINESS.Services.AD
         {
             try
             {
-                var listDevice =  _dbContext.tblMdDevice.OrderByDescending(x => x.CreateDate).Where(x => x.UserName == username).AsQueryable();
+                var listDevice = _dbContext.tblMdDevice.OrderByDescending(x => x.CreateDate).Where(x => x.UserName == username).AsQueryable();
                 return _mapper.Map<IList<DeviceDto>>(await listDevice.ToListAsync());
             }
             catch (Exception ex)
@@ -433,15 +434,15 @@ namespace PLX5S.BUSINESS.Services.AD
             try
             {
                 var Device = _dbContext.tblMdDevice.FirstOrDefault(x => x.Id.ToString() == id);
-                Device.EnableLogin = Device.EnableLogin ? false:true;
-                  _dbContext.tblMdDevice.Update(Device);
+                Device.EnableLogin = Device.EnableLogin ? false : true;
+                _dbContext.tblMdDevice.Update(Device);
                 await _dbContext.SaveChangesAsync();
             }
             catch (Exception ex)
             {
                 Status = false;
                 Exception = ex;
-                
+
             }
         }
         public async Task MainDevice(string id)
@@ -451,7 +452,7 @@ namespace PLX5S.BUSINESS.Services.AD
                 var lstDevice = new List<TblMdDevice>();
                 var Device = _dbContext.tblMdDevice.FirstOrDefault(x => x.Id.ToString() == id);
 
-                var lstdevice = _dbContext.tblMdDevice.Where(x => x.UserName == Device.UserName && x.Id!=Device.Id).ToList();
+                var lstdevice = _dbContext.tblMdDevice.Where(x => x.UserName == Device.UserName && x.Id != Device.Id).ToList();
                 foreach (var device in lstdevice)
                 {
                     device.MainDevice = false;
@@ -459,7 +460,7 @@ namespace PLX5S.BUSINESS.Services.AD
                 }
                 _dbContext.tblMdDevice.UpdateRange(lstDevice);
                 Device.MainDevice = true;
-                 _dbContext.tblMdDevice.Update(Device);
+                _dbContext.tblMdDevice.Update(Device);
                 await _dbContext.SaveChangesAsync();
 
             }
@@ -486,5 +487,39 @@ namespace PLX5S.BUSINESS.Services.AD
 
             }
         }
+
+        public async Task EnableLatestDeviceForAllUsers()
+        {
+            // Lấy thiết bị mới nhất của từng tài khoản
+            var latestDevices = await _dbContext.tblMdDevice
+            .GroupBy(x => x.UserName)
+            .Select(g => g.OrderByDescending(x => x.CreateDate).FirstOrDefault())
+            .ToListAsync();
+
+            foreach (var device in latestDevices)
+            {
+                if (device == null) continue;
+
+                 //Bỏ quyền thiết bị khác của cùng tài khoản
+                var userDevices = await _dbContext.tblMdDevice
+                    .Where(x => x.UserName == device.UserName)
+                    .ToListAsync();
+
+                foreach (var item in userDevices)
+                {
+                    item.MainDevice = false;
+                    //item.EnableLogin = false;
+                }
+
+                // Cấp quyền cho thiết bị mới nhất
+                device.MainDevice = true;
+                device.EnableLogin = true;
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+        }
+
+
     }
 }

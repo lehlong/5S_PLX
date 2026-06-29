@@ -5,11 +5,13 @@ using PLX5S.BUSINESS.Dtos.AD;
 using PLX5S.BUSINESS.Filter.AD;
 using PLX5S.BUSINESS.Services.AD;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PLX5S.API.Controllers.MD
 {
     [ApiController]
     [Route("api/[controller]")]
+    //[Authorize]
     public class AccountController(IAccountService service) : ControllerBase
     {
         public readonly IAccountService _service = service;
@@ -94,6 +96,26 @@ namespace PLX5S.API.Controllers.MD
         {
             var transferObject = new TransferObject();
             await _service.Update(account);
+            if (_service.Status)
+            {
+                transferObject.Status = true;
+                transferObject.MessageObject.MessageType = MessageType.Success;
+                transferObject.GetMessage("0103", _service);
+            }
+            else
+            {
+                transferObject.Status = false;
+                transferObject.MessageObject.MessageType = MessageType.Error;
+                transferObject.GetMessage("0104", _service);
+            }
+            return Ok(transferObject);
+        }
+
+        [HttpPut("EnableLatestDeviceForAllUsers")]
+        public async Task<IActionResult> EnableLatestDeviceForAllUsers()
+        {
+            var transferObject = new TransferObject();
+            await _service.EnableLatestDeviceForAllUsers();
             if (_service.Status)
             {
                 transferObject.Status = true;

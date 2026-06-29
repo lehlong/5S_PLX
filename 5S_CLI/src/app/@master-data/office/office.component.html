@@ -1,0 +1,223 @@
+<nz-page-header nzBackIcon>
+  <nz-page-header-title>NHÓM VĂN PHÒNG</nz-page-header-title>
+  <nz-page-header-subtitle>Danh sách nhóm văn phòng</nz-page-header-subtitle>
+  <nz-page-header-extra>
+    <div class="flex-grow-2 flex">
+      <nz-space>
+        <app-input-clear placeholder="Tìm kiếm" (enterEvent)="search()" [(value)]="filter.keyWord"></app-input-clear>
+        <button (click)="search()" class="flex !items-center !border-l-0 gray-btn" nzType="default" nz-button
+          nzType="default">
+          <span nz-icon nzType="search"></span>
+        </button>
+        <button (click)="reset()" class="flex !items-center !border-l-0 gray-btn" nzType="default" nz-button
+          nzType="default">
+          <span nz-icon nzType="redo"></span>
+        </button>
+      </nz-space>
+      <button (click)="openCreate()" class="!flex !items-center space-btn" nzType="primary" nz-button>
+        <span nz-icon nzType="plus-circle"></span> Thêm mới
+      </button>
+    </div>
+  </nz-page-header-extra>
+  <nz-page-header-content class="main-content">
+    <nz-table class="auto-scroll-table" #headerTable [nzData]="paginationResult.data" [nzFrontPagination]="false"
+      [nzScroll]="{x: '1000px', y: 'calc(100vh - 276px)' }">
+      <thead>
+        <tr>
+          <th nzWidth="60px">STT</th>
+          <th [nzSortFn]="true" nzWidth="160px" (nzSortOrderChange)="onSortChange('name', $event)">
+            Mã
+          </th>
+          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('name', $event)">
+            Tên của văn phòng
+          </th>
+          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('cuaHangTruong', $event)">
+            Thủ trưởng
+          </th>
+          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('nguoiPhuTrach', $event)">
+            Người Phụ trách
+          </th>
+          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('phoneNumber', $event)">
+            Số điện thoại
+          </th>
+          <!-- <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('KinhDo', $event)">
+            Kinh Độ
+          </th>
+          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('ViDo', $event)">
+            Vĩ Độ
+          </th> -->
+          <th [nzSortFn]="true" (nzSortOrderChange)="onSortChange('isActive', $event)" nzAlign="center">
+            Trạng thái
+          </th>
+          <!-- <th>Thao tác</th> -->
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of headerTable.data; let i = index" (dblclick)="openEdit(data)">
+          <td>
+            {{
+            (paginationResult.currentPage - 1) * paginationResult.pageSize +
+            i +
+            1
+            }}
+          </td>
+          <td nzAlign="center">
+            <a (click)="openEdit(data)">{{ data.id }}</a>
+          </td>
+          <td>{{ data.name }}</td>
+          <td>{{ getNameByCodeAccount(data.thuTruong) }}</td>
+          <td>{{ getNameByCodeAccount(data.nguoiPhuTrach) }}</td>
+          <td nzAlign="center">{{ data.phoneNumber }}</td>
+          <td nzAlign="center">
+            <nz-tag nzColor="success" *ngIf="data.trangThaiCuaHang">
+              <nz-icon nzType="check-circle" />
+              <span>Hoạt động</span>
+            </nz-tag>
+            <nz-tag nzColor="error" *ngIf="!data.trangThai">
+              <nz-icon nzType="close-circle" />
+              <span>Không hoạt động</span>
+            </nz-tag>
+          </td>
+          <!-- <td nzAlign="center"> -->
+             <!-- <button (click)="openEdit(data)" style="margin-right: 10px;" nz-button nzType="default">
+              <span nz-icon nzType="edit"></span> Sửa
+            </button> -->
+            <!-- <button nz-popconfirm nzPopconfirmTitle="Bạn chắc chắn muốn xóa!!" class="!flex !items-center"
+               nzType="default" nz-button (nzOnConfirm)="deleteItem(data.id)">
+              <span nz-icon nzType="delete" nzTheme="outline" style="cursor:pointer;"></span>
+            </button> -->
+          <!-- </td> -->
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-page-header-content>
+  <nz-page-header-content class="footer-content">
+    <div *ngIf="paginationResult.data" class="flex justify-end p-[10px] border-t border-custom-gray border-solid">
+      <nz-pagination nzShowSizeChanger [nzPageIndex]="filter.currentPage" [nzTotal]="paginationResult.totalRecord"
+        [nzPageSize]="filter.pageSize" (nzPageIndexChange)="pageIndexChange($event)"
+        (nzPageSizeChange)="pageSizeChange($event)"></nz-pagination>
+    </div>
+  </nz-page-header-content>
+</nz-page-header>
+
+<!--Create Update-->
+<nz-drawer [nzMask]="!edit" [nzWidth]="'80%'" [nzVisible]="visible" nzPlacement="right"
+  [nzTitle]="edit ? ' Chỉnh sửa  ' : ' Tạo mới  '" [nzExtra]="extra" (nzOnClose)="close()">
+  <ng-container *nzDrawerContent>
+    <div class="">
+    <form nz-form nzLayout="vertical" [formGroup]="validateForm" (ngSubmit)="submitForm()">
+      <div nz-row [nzGutter]="12">
+        <div nz-col [nzXs]="24" [nzMd]="12">
+          <app-input-clear placeholder="Nhập mã văn phòng " [required]="true" label="Mã "
+            [control]="$any(validateForm).controls['id']" [required]="true"
+            [disabled]="edit ? true : false"></app-input-clear>
+        </div>
+        <div nz-col [nzXs]="24" [nzMd]="12">
+          <app-input-clear placeholder="Nhập tên văn phòng " [required]="true" label="Tên văn phòng"
+            [control]="$any(validateForm).controls['name']" [required]="true"></app-input-clear>
+        </div>
+        <div nz-col [nzXs]="24" [nzMd]="12">
+          <app-input-clear placeholder="Nhập tên kinh độ "  label="Kinh độ"
+            [control]="$any(validateForm).controls['kinhDo']" ></app-input-clear>
+        </div>
+        <div nz-col [nzXs]="24" [nzMd]="12">
+          <app-input-clear placeholder="Nhập tên vĩ độ " label="Vĩ độ"
+            [control]="$any(validateForm).controls['viDo']"></app-input-clear>
+        </div>
+        <div nz-col [nzXs]="24" [nzMd]="12">
+          <app-input-clear placeholder="Nhập số điện thoại" label="Số điện thoại"
+            [control]="$any(validateForm).controls['phoneNumber']"></app-input-clear>
+        </div>
+
+        <div nz-col [nzXs]="24" [nzMd]="12">
+          <nz-form-item>
+            <nz-form-label>* Trạng thái</nz-form-label>
+            <nz-form-control nzErrorTip="Không được để trống">
+              <nz-select nzShowSearch nzAllowClear placeholder="Chọn trạng thái"
+                formControlName="trangThai">
+                <nz-option [nzLabel]="'Không hoạt động'" [nzValue]="false"></nz-option>
+                <nz-option [nzLabel]="'Hoạt động'" [nzValue]="true"></nz-option>
+
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzXs]="24" [nzMd]="24">
+          <app-input-clear placeholder="Nhập địa chỉ" label="Địa chỉ"
+            [control]="$any(validateForm).controls['address']"></app-input-clear>
+        </div>
+        <div nz-col [nzXs]="24" [nzMd]="12">
+          <nz-form-item>
+            <nz-form-label>* Chọn thủ trưởng</nz-form-label>
+            <nz-form-control nzErrorTip="Không được để trống">
+              <nz-select nzShowSearch nzAllowClear placeholder="Chọn thủ trưởng" formControlName="thuTruong">
+                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.userName + '- ' + item.fullName"
+                  [nzValue]="item.userName">
+                </nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzXs]="24" [nzMd]="12">
+          <nz-form-item>
+            <nz-form-label>* Người phụ trách</nz-form-label>
+            <nz-form-control nzErrorTip="Không được để trống">
+              <nz-select nzShowSearch nzAllowClear placeholder="Chọn người phụ trách" formControlName="nguoiPhuTrach">
+                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.userName + '- ' + item.fullName"
+                  [nzValue]="item.userName">
+                </nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzXs]="24" [nzMd]="24">
+          <nz-form-item>
+            <nz-form-label>* ATVSV</nz-form-label>
+            <nz-form-control nzErrorTip="Không được để trống">
+              <nz-select [nzMaxTagCount]="3" [nzMaxTagPlaceholder]="tagPlaceHolder" nzMode="multiple"
+                nzPlaceHolder="Please select" formControlName="ATVSV" [(ngModel)]="lstATVSV">
+                <nz-option cdkScrollable *ngFor="let item of lstAccount" [nzLabel]="item.userName + '- ' + item.fullName"
+                  [nzValue]="item.userName">
+                </nz-option>
+              </nz-select>
+              <ng-template #tagPlaceHolder let-selectedList>and {{ selectedList.length }} more selected</ng-template>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+
+      </div>
+
+      <nz-form-item>
+        <nz-form-label>Trạng thái</nz-form-label>
+        <nz-form-control>
+          <nz-radio-group formControlName="isActive">
+            <label nz-radio [nzValue]="true">Hoạt động</label>
+            <label nz-radio [nzValue]="false">Không hoạt động</label>
+          </nz-radio-group>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+    </div>
+  </ng-container>
+</nz-drawer>
+<ng-template #extra>
+  <nz-space>
+    <ng-container *ngIf="edit">
+      <button [nzLoading]="loading" *nzSpaceItem nz-button nzType="primary" class="!flex !items-center"
+        (click)="submitForm()">
+        <span nz-icon nzType="save" nzTheme="outline"></span>Lưu
+      </button>
+    </ng-container>
+    <ng-container *ngIf="!edit">
+      <button [nzLoading]="loading" *nzSpaceItem nz-button nzType="primary" class="!flex !items-center"
+        (click)="submitForm()">
+        <span nz-icon nzType="save" nzTheme="outline"></span>Lưu
+      </button>
+    </ng-container>
+    <button *nzSpaceItem nz-button nzType="default" nzType="primary" class="!flex !items-center" nzDanger
+      (click)="close()">
+      <span nz-icon nzType="close-circle" nzTheme="outline"></span>Huỷ
+    </button>
+  </nz-space>
+</ng-template>
+s

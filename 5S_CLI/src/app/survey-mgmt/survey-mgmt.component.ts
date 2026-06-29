@@ -12,6 +12,7 @@ import { DoiTuongService } from '../service/master-data/doi-tuong.service';
 import { AccountService } from '../service/system-manager/account.service';
 import { Router } from '@angular/router';
 import { WareHouseService } from '../service/master-data/ware-house.service';
+import { OfficeService } from '../service/master-data/office.service';
 
 @Component({
   selector: 'app-survey-mgmt',
@@ -31,6 +32,7 @@ export class SurveyMgmtComponent {
   loading: boolean = false;
   lstStore: any = [];
   lstKho: any = [];
+  lstOffice: any = [];
   lstAccount: any = [];
   lstInputStore: any = [];
   lstDoiTuong: any = [];
@@ -47,6 +49,7 @@ export class SurveyMgmtComponent {
   constructor( 
     private _service: SurveyMgmtService,
     private _storeService: StoreService,
+    private _officeService: OfficeService,
     private _accountService: AccountService,
     private _doiTuongService: DoiTuongService,
     private _khoService: WareHouseService,
@@ -76,6 +79,7 @@ export class SurveyMgmtComponent {
     this.getAllDoiTuong();
     this.getAllAccount();
     this.getAllKho();
+    this.getAllOffice()
     this.updateDrawerWidth();
     window.addEventListener('resize', () => this.updateDrawerWidth());
   }
@@ -129,6 +133,20 @@ export class SurveyMgmtComponent {
     this._khoService.getAll().subscribe({
       next: (data) => {
         this.lstKho = data;
+      },
+      error: (response) => {
+        console.log(response);
+      },
+    });
+  }
+
+  getAllOffice() {
+    this.isSubmit = false;
+    this.isStore = true;
+    this.isKho = false;
+    this._officeService.getAll().subscribe({
+      next: (data) => {
+        this.lstOffice = data;
       },
       error: (response) => {
         console.log(response);

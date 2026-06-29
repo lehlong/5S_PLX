@@ -130,6 +130,7 @@ namespace PLX5S.CORE
         public DbSet<TblMdChucVu> tblMdChucVu { get; set; }
         public DbSet<TblMdDoiTuong> tblMdDoituong { get; set; }
         public DbSet<TblMdStore> tblMdStore { get; set; }
+        public DbSet<TblMdOffice> TblMdOffice { get; set; }
         public DbSet<TblMdWareHouse> TblMdWareHouse { get; set; }
         public DbSet<TblMdAtvsv> tblMdAtvsv { get; set; }
         public DbSet<TblMdDevice> tblMdDevice { get; set; }

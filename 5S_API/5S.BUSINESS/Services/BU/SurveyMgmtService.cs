@@ -60,7 +60,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 var id = Guid.NewGuid().ToString();
                 var atvst = await _dbContext.tblMdAtvsv.Where(x => x.IsActive == true).ToListAsync();
 
-                if (doiTuongId == "DT1") 
+                if (doiTuongId == "DT1")
                 {
                     var lstStore = _dbContext.tblMdStore.Where(x => x.IsActive == true).OrderBy(x => x.Id).ToList();
 
@@ -87,7 +87,8 @@ namespace PLX5S.BUSINESS.Services.BU
 
                         lstInDoiTuong.Add(inDT);
                     }
-                }else if (doiTuongId == "DT2")
+                }
+                else if (doiTuongId == "DT2")
                 {
                     var lstWareHouse = _dbContext.TblMdWareHouse.Where(x => x.IsActive == true).ToList();
 
@@ -116,10 +117,38 @@ namespace PLX5S.BUSINESS.Services.BU
                         lstInDoiTuong.Add(inDT);
                     }
                 }
+                else if (doiTuongId == "DT3")
+                {
+                    //var lstWareHouse = _dbContext.TblMdWareHouse.Where(x => x.IsActive == true).ToList();
+                    var lstOffice = _dbContext.TblMdOffice.Where(x => x.IsActive == true).ToList();
 
+                    foreach (var s in lstOffice)
+                    {
+                        var idSt = Guid.NewGuid().ToString();
+
+                        var inDT = new InputDoiTuong()
+                        {
+                            DoiTuong = new TblBuInputDoiTuong()
+                            {
+                                Id = idSt,
+                                DoiTuongId = s.Id,
+                                SurveyMgmtId = id,
+                                IsActive = false
+                            },
+                            Atvsvs = atvst.Where(x => x.StoreId == s.Id).Select(x => new TblBuInputAtvsv()
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Name = x.Name,
+                                InputDoiTuongId = idSt
+                            }).ToList()
+                        };
+
+                        lstInDoiTuong.Add(inDT);
+                    }
+                }
                 return new SurveyMgmtModel
                 {
-                    SurveyMgmt =  new TblBuSurveyMgmt
+                    SurveyMgmt = new TblBuSurveyMgmt
                     {
                         Id = id,
                         Name = "",
@@ -153,12 +182,12 @@ namespace PLX5S.BUSINESS.Services.BU
                         _dbContext.TblBuInputAtvsv.AddRange(item.Atvsvs);
                     }
                 }
-                 
+
                 _dbContext.TblBuSurveyMgmt.Add(dataInput.SurveyMgmt);
 
                 await _dbContext.SaveChangesAsync();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Status = false;
                 Exception = ex;
@@ -237,6 +266,36 @@ namespace PLX5S.BUSINESS.Services.BU
                         }
                     }
                 }
+                else if (survey.DoiTuongId == "DT3")
+                {
+                    var lstOffice = _dbContext.TblMdOffice.Where(x => x.IsActive == true).ToList();
+
+                    foreach (var s in lstOffice)
+                    {
+                        var check = lstInDoiTuong.FirstOrDefault(x => x.DoiTuongId == s.Id);
+                        if (check != null)
+                        {
+                            InputDoiTuong.Add(new InputDoiTuong
+                            {
+                                DoiTuong = check,
+                                Atvsvs = lstInAtvsv.Where(x => x.InputDoiTuongId == check.Id).ToList()
+                            });
+                        }
+                        else
+                        {
+                            InputDoiTuong.Add(new InputDoiTuong
+                            {
+                                DoiTuong = new TblBuInputDoiTuong()
+                                {
+                                    Id = (fId--).ToString(),
+                                    DoiTuongId = s.Id,
+                                    SurveyMgmtId = id,
+                                    IsActive = false
+                                },
+                            });
+                        }
+                    }
+                }
                 return new SurveyMgmtModel
                 {
                     SurveyMgmt = survey,
@@ -264,7 +323,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         _dbContext.TblBuInputDoiTuong.Add(item.DoiTuong);
 
                     }
-                    else 
+                    else
                     {
                         _dbContext.TblBuInputDoiTuong.Update(item.DoiTuong);
 

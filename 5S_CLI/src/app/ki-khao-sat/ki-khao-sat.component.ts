@@ -342,12 +342,8 @@ export class KiKhaoSatComponent {
   }
 
   setDataKy() {
-    this.lstAllDoiTuong =
-      this.inputKi.lstInputStore.length > 0
-        ? this.inputKi.lstInputStore : this.inputKi.lstInputWareHouse.length > 0
-          ? this.inputKi.lstInputWareHouse : [];
+    this.lstAllDoiTuong = this.inputKi.lstInputDoiTuong
     this.lstInputDoiTuongSearch = this.lstAllDoiTuong;
-
   }
 
   onClick(node: any) {

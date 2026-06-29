@@ -162,8 +162,8 @@ namespace PLX5S.BUSINESS.Services.Auth
                     }
                     else
                     {
-                        //Status = false; 
-                        Status = true;
+                        Status = false;
+                        //Status = true;
 
                         Mess = "Thiết bị không có quyền đăng nhập";
                     }
@@ -180,6 +180,10 @@ namespace PLX5S.BUSINESS.Services.Auth
                 }
                 else
                 {
+                    // Kiểm tra người dùng đã có thiết bị nào chưa
+                    bool isFirstDevice = !_dbContext.tblMdDevice
+                        .Any(x => x.UserName == loginInfo.UserName);
+
                     var newDevice = new TblMdDevice()
                     {
                         Id = Guid.NewGuid().ToString(),
@@ -190,14 +194,25 @@ namespace PLX5S.BUSINESS.Services.Auth
                         Model = loginInfo.Model,
                         Manufacturer = loginInfo.Manufacturer,
                         OsVersion = loginInfo.osVersion,
-                        MainDevice = false,
-                        EnableLogin = false
+
+                        // Nếu là thiết bị đầu tiên thì tự động cấp quyền
+                        MainDevice = isFirstDevice,
+                        EnableLogin = isFirstDevice
                     };
+
                     _dbContext.tblMdDevice.Add(newDevice);
-                    Status = true;
-                    //Status = false;
-                    Mess = "Thiết bị không có quyền đăng nhập";
                     _dbContext.SaveChanges();
+
+                    if (isFirstDevice)
+                    {
+                        Status = true;
+                        Mess = "Thiết bị đầu tiên được cấp quyền đăng nhập";
+                    }
+                    else
+                    {
+                        Status = false;
+                        Mess = "Thiết bị không có quyền đăng nhập";
+                    }
                 }
                 return Mess;
             }
@@ -368,11 +383,11 @@ namespace PLX5S.BUSINESS.Services.Auth
                 {
                     return;
                 }
-                else 
+                else
                 {
                     data.Id = Guid.NewGuid().ToString();
 
-                     _dbContext.TblBuUserTokenNoti.Add(data);
+                    _dbContext.TblBuUserTokenNoti.Add(data);
 
                     await _dbContext.SaveChangesAsync();
                 }

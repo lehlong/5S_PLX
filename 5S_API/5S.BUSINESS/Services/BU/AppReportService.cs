@@ -66,7 +66,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 var result = new List<KetQuaChamDiem>();
                 var lstPoint = _dbContext.TblBuPoint.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).OrderBy(x => x.UpdateDate).ToList();
                 var lstAllHeadr = _dbContext.TblBuEvaluateHeader.Where(x => x.KiKhaoSatId == filterReport.KiKhaoSatId).OrderBy(x => x.UpdateDate).ToList();
-                var lstHeader =    filterReport.ChuyenQuanCham == true
+                var lstHeader = filterReport.ChuyenQuanCham == true
                                             ? lstAllHeadr.Where(x => x.ChucVuId == RoleIds.CQ).ToList()
                                             : lstAllHeadr;
                 var lstAccount = _dbContext.TblAdAccount.OrderBy(x => x.UserName).ToList();
@@ -694,7 +694,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         ExcelNPOIExtention.SetCellValueText(row, 1, i.Name, styles.Text);
                         ExcelNPOIExtention.SetCellValueNumber(row, 2, i.Length, styles.Number);
                         ExcelNPOIExtention.SetCellValueText(row, 3, i.ListPointExcel, styles.Text);
-                        ExcelNPOIExtention.SetCellValueNumber(row, 4, i.point, styles.Number);
+                        ExcelNPOIExtention.SetCellValueNumber(row, 4, i.point, styles.DecimalNumber);
                         ExcelNPOIExtention.SetCellValueText(row, 5, GetXepLoai(i.point ?? 0), styles.Text);
                         ExcelNPOIExtention.SetCellValueText(row, 6, i.Description, styles.Text);
 
@@ -877,9 +877,9 @@ namespace PLX5S.BUSINESS.Services.BU
                             string value = f < i.ChuyenGia.Count() ? i.ChuyenGia[f] : "";
                             ExcelNPOIExtention.SetCellValueText(row, maxCellCHt + maxCellATVSV + 2 + f, value, styles.Number);
                         }
-                        ExcelNPOIExtention.SetCellValueNumber(row, maxCellCHt + maxCellATVSV + maxCellTCG5s + 2, i.Point, styles.Number);
+                        ExcelNPOIExtention.SetCellValueNumber(row, maxCellCHt + maxCellATVSV + maxCellTCG5s + 2, i.Point, styles.DecimalNumber);
                         ExcelNPOIExtention.SetCellValueText(row, maxCellCHt + maxCellATVSV + maxCellTCG5s + 3, i.Cht.Count() + i.Atvsv.Count() + i.ChuyenGia.Count(), styles.Text);
-                        ExcelNPOIExtention.SetCellValueText(row, maxCellCHt + maxCellATVSV + maxCellTCG5s + 4, i.Cht.Count() + i.Atvsv.Count() + i.ChuyenGia.Count() > 80 ? "Tốt" : i.Cht.Count() + i.Atvsv.Count() + i.ChuyenGia.Count() <= 30 ? "Kém" : "Khá", styles.Text);
+                        ExcelNPOIExtention.SetCellValueText(row, maxCellCHt + maxCellATVSV + maxCellTCG5s + 4, GetXepLoai(i.Cht.Count() + i.Atvsv.Count() + i.ChuyenGia.Count()), styles.Text);
 
                         startIndex++;
                     }
@@ -925,7 +925,7 @@ namespace PLX5S.BUSINESS.Services.BU
                         ExcelNPOIExtention.SetCellValueNumber(row, 6, i.ChuyenGia, styles.DecimalNumber);
                         ExcelNPOIExtention.SetCellValueNumber(row, 7, i.Cht_T + i.Cht_N + i.Atvsv_N + i.Atvsv_T + i.ChuyenGia, styles.DecimalNumber);
                         ExcelNPOIExtention.SetCellValueNumber(row, 8, i.Point, styles.DecimalNumber);
-                        ExcelNPOIExtention.SetCellValueText(row, 9, i.Point > 80 ? "Tốt" : i.Point <= 30 ? "kém" : "Khá", styles.Text);
+                        ExcelNPOIExtention.SetCellValueText(row, 9, GetXepLoai(i.Point ?? 0), styles.Text);
 
                         startIndex++;
                     }
@@ -1246,21 +1246,21 @@ namespace PLX5S.BUSINESS.Services.BU
                         for (int e = 0; e < maxCellCHt; e++)
                         {
                             string value = e < i.Cht.Count() ? i.Cht[e] : "";
-                            ExcelNPOIExtention.SetCellValueText(row, 2 + e, value, styles.Number);
+                            ExcelNPOIExtention.SetCellValueText(row, 2 + e, value, styles.DecimalNumber);
                         }
                         for (int f = 0; f < maxCellATVSV; f++)
                         {
                             string value = f < i.Atvsv.Count() ? i.Atvsv[f] : "";
-                            ExcelNPOIExtention.SetCellValueText(row, maxCellCHt + 2 + f, value, styles.Number);
+                            ExcelNPOIExtention.SetCellValueText(row, maxCellCHt + 2 + f, value, styles.DecimalNumber);
                         }
                         for (int f = 0; f < maxCellTCG5s; f++)
                         {
                             string value = f < i.ChuyenGia.Count() ? i.ChuyenGia[f] : "";
-                            ExcelNPOIExtention.SetCellValueText(row, maxCellCHt + maxCellATVSV + 2 + f, value, styles.Number);
+                            ExcelNPOIExtention.SetCellValueText(row, maxCellCHt + maxCellATVSV + 2 + f, value, styles.DecimalNumber);
                         }
-                        ExcelNPOIExtention.SetCellValueNumber(row, maxCellCHt + maxCellATVSV + maxCellTCG5s + 2, i.Point, styles.Number);
+                        ExcelNPOIExtention.SetCellValueNumber(row, maxCellCHt + maxCellATVSV + maxCellTCG5s + 2, i.Point, styles.DecimalNumber);
                         ExcelNPOIExtention.SetCellValueText(row, maxCellCHt + maxCellATVSV + maxCellTCG5s + 3, i.Cht.Count() + i.Atvsv.Count() + i.ChuyenGia.Count(), styles.Text);
-                        ExcelNPOIExtention.SetCellValueText(row, maxCellCHt + maxCellATVSV + maxCellTCG5s + 4, i.Cht.Count() + i.Atvsv.Count() + i.ChuyenGia.Count() > 80 ? "Tốt" : i.Cht.Count() + i.Atvsv.Count() + i.ChuyenGia.Count() <= 30 ? "Kém" : "Khá", styles.Text);
+                        ExcelNPOIExtention.SetCellValueText(row, maxCellCHt + maxCellATVSV + maxCellTCG5s + 4, GetXepLoai(i.Cht.Count() + i.Atvsv.Count() + i.ChuyenGia.Count()), styles.Text);
 
                         startIndex++;
                     }
@@ -1292,6 +1292,7 @@ namespace PLX5S.BUSINESS.Services.BU
                 return null;
             }
         }
+
         public static void InsertImageIntoCell(XSSFWorkbook workbook, ISheet sheet, int row, int col, byte[] imageBytes)
         {
             // Xác định loại ảnh tự động
