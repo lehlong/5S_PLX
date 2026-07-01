@@ -118,18 +118,25 @@ export class ListComponent implements OnInit {
   getAllDoiTuong() {
     this._service.getInputKiKhaoSat(this.filter.filterKiKhaoSat.id).subscribe({
       next: (data) => {
-        if (data.lstInputStore.length != 0) {
-          this.filter.filterKiKhaoSat.doiTuong = 'Cửa hàng';
-          this.doiTuong = 'Cửa hàng';
-          this.lstDoiTuong = data.lstInputStore;
-          this.lstSearchDoiTuong = data.lstInputStore;
-          return;
-        } else if (data.lstInputWareHouse.length != 0) {
-          this.filter.filterKiKhaoSat.doiTuong = 'Kho xăng dầu';
-          this.doiTuong = 'Kho xăng dầu';
-          this.lstDoiTuong = data.lstInputWareHouse;
-          this.lstSearchDoiTuong = data.lstInputWareHouse;
-        }
+
+        this.filter.filterKiKhaoSat.doiTuong = data.columns.doiTuong;
+        this.lstDoiTuong = data.lstInputDoiTuong;
+        this.lstSearchDoiTuong = data.lstInputDoiTuong;
+        this.doiTuong = data.columns.doiTuong;
+
+
+        // if (data.lstInputStore.length != 0) {
+        //   this.filter.filterKiKhaoSat.doiTuong = 'Cửa hàng';
+        //   this.doiTuong = 'Cửa hàng';
+        //   this.lstDoiTuong = data.lstInputStore;
+        //   this.lstSearchDoiTuong = data.lstInputStore;
+        //   return;
+        // } else if (data.lstInputWareHouse.length != 0) {
+        //   this.filter.filterKiKhaoSat.doiTuong = 'Kho xăng dầu';
+        //   this.doiTuong = 'Kho xăng dầu';
+        //   this.lstDoiTuong = data.lstInputWareHouse;
+        //   this.lstSearchDoiTuong = data.lstInputWareHouse;
+        // }
         this.lstSearchDoiTuongFiltered = [...this.lstSearchDoiTuong];
       },
       error: (response) => {
@@ -166,25 +173,34 @@ export class ListComponent implements OnInit {
 
     this._service.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
       next: (data) => {
-        if (data.lstInputStore.length != 0) {
-          this.lstSearchDoiTuong = data.lstInputStore;
-          this.lstSearchChamDiem = Array.from(
-            new Map(
-              this.lstSearchDoiTuong
-                .flatMap((store: any) => store.lstInChamDiem || [])
-                .map((item: any) => [item.userName, item])
-            ).values()
-          );
-        } else if (data.lstInputWareHouse.length != 0) {
-          this.lstSearchDoiTuong = data.lstInputWareHouse;
-          this.lstSearchChamDiem = Array.from(
-            new Map(
-              this.lstSearchDoiTuong
-                .flatMap((wareHouse: any) => wareHouse.lstInChamDiem || [])
-                .map((item: any) => [item.userName, item])
-            ).values()
-          );
-        }
+        this.lstSearchDoiTuong = data.lstInputDoiTuong;
+        this.lstSearchChamDiem = Array.from(
+          new Map(
+            this.lstSearchDoiTuong
+              .flatMap((dt: any) => dt.lstInChamDiem || [])
+              .map((item: any) => [item.userName, item])
+          ).values()
+        );
+
+        // if (data.lstInputStore.length != 0) {
+        //   this.lstSearchDoiTuong = data.lstInputStore;
+        //   this.lstSearchChamDiem = Array.from(
+        //     new Map(
+        //       this.lstSearchDoiTuong
+        //         .flatMap((store: any) => store.lstInChamDiem || [])
+        //         .map((item: any) => [item.userName, item])
+        //     ).values()
+        //   );
+        // } else if (data.lstInputWareHouse.length != 0) {
+        //   this.lstSearchDoiTuong = data.lstInputWareHouse;
+        //   this.lstSearchChamDiem = Array.from(
+        //     new Map(
+        //       this.lstSearchDoiTuong
+        //         .flatMap((wareHouse: any) => wareHouse.lstInChamDiem || [])
+        //         .map((item: any) => [item.userName, item])
+        //     ).values()
+        //   );
+        //
         this.lstSearchDoiTuongFiltered = [...this.lstSearchDoiTuong];
         this.lstSearchChamDiemFiltered = [...this.lstSearchChamDiem];
 
@@ -195,10 +211,12 @@ export class ListComponent implements OnInit {
       },
     });
   }
+
   selectSearchStore(item: any) {
     this.filter.filterDoiTuong = item;
     console.log('Selected store:', this.filter.filterDoiTuong);
     this.lstSearchChamDiem = item.lstInChamDiem;
+    this.lstSearchChamDiemFiltered = [...this.lstSearchChamDiem];
     this.accordionValue = null
   }
 
@@ -218,7 +236,8 @@ export class ListComponent implements OnInit {
 
   onFilter() {
     this.filter.filterKiKhaoSat = this.inputSearchKiKhaoSat;
-
+    console.log(this.filter);
+    
     this.lstDoiTuong = this.lstSearchDoiTuong
       .filter(
         (s: any) =>
@@ -277,6 +296,8 @@ export class ListComponent implements OnInit {
   }
   onSearchNguoiChamChange() {
     const keyword = this.searchNguoiChamKeyword?.toLowerCase() || '';
+    console.log(this.lstSearchChamDiem);
+    
     if (!keyword) {
       this.lstSearchChamDiemFiltered = [...this.lstSearchChamDiem];
     } else {

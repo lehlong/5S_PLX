@@ -68,7 +68,7 @@ export class ThietBiChamDiemComponent implements OnInit {
   }
 
   getAllKyKhaoSat() {
-    this._kyKhaoSatService.search({ }).subscribe({
+    this._kyKhaoSatService.search({}).subscribe({
       next: (data) => {
         this.lstKiKhaoSat = data.data;
       },
@@ -92,11 +92,13 @@ export class ThietBiChamDiemComponent implements OnInit {
     this.filter.filterKiKhaoSat = kiKhaoSat;
     this._kyKhaoSatService.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
       next: (data) => {
-        if (data.lstInputStore.length != 0) {
-          this.lstSearchDoiTuong = data.lstInputStore;
-        } else if (data.lstInputWareHouse.length != 0) {
-          this.lstSearchDoiTuong = data.lstInputWareHouse;
-        }
+        this.lstSearchDoiTuong = data.lstInputDoiTuong;
+
+        // if (data.lstInputStore.length != 0) {
+        //   this.lstSearchDoiTuong = data.lstInputStore;
+        // } else if (data.lstInputWareHouse.length != 0) {
+        //   this.lstSearchDoiTuong = data.lstInputWareHouse;
+        // }
         this.filter.filterDoiTuong = {};
       },
       error: (response) => {

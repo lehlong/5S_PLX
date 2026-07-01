@@ -15,7 +15,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
   standalone: true,
 })
 export class TongHopYKienDeXuatComponent implements OnInit {
-   filter: any = {
+  filter: any = {
     filterKiKhaoSat: {},
     filterDoiTuong: {},
     filterSurvey: {},
@@ -36,7 +36,7 @@ export class TongHopYKienDeXuatComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private _surveyService: SurveyService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('UserInfo') ?? '');
@@ -72,7 +72,7 @@ export class TongHopYKienDeXuatComponent implements OnInit {
   }
 
   getAllKyKhaoSat() {
-    this._kyKhaoSatService.search({ }).subscribe({
+    this._kyKhaoSatService.search({}).subscribe({
       next: (data) => {
         this.lstKiKhaoSat = data.data;
       },
@@ -96,11 +96,13 @@ export class TongHopYKienDeXuatComponent implements OnInit {
     this.filter.filterKiKhaoSat = kiKhaoSat;
     this._kyKhaoSatService.getInputKiKhaoSat(kiKhaoSat.id).subscribe({
       next: (data) => {
-        if (data.lstInputStore.length != 0) {
-          this.lstSearchDoiTuong = data.lstInputStore;
-        } else if (data.lstInputWareHouse.length != 0) {
-          this.lstSearchDoiTuong = data.lstInputWareHouse;
-        }
+        this.lstSearchDoiTuong = data.lstInputDoiTuong;
+
+        // if (data.lstInputStore.length != 0) {
+        //   this.lstSearchDoiTuong = data.lstInputStore;
+        // } else if (data.lstInputWareHouse.length != 0) {
+        //   this.lstSearchDoiTuong = data.lstInputWareHouse;
+        // }
         this.filter.filterDoiTuong = {};
       },
       error: (response) => {

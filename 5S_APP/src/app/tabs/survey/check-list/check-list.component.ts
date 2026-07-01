@@ -108,7 +108,8 @@ export class CheckListComponent implements OnInit {
       this.kiKhaoSat?.trangThaiKi !== '2' ||
       (date.getMonth() + 1) !== currentMonth
     )
-      return false;
+    console.log();
+    
     if (this.account.allowScoring) return true;
     return (
       this.doiTuong.lstChamDiem?.some(
