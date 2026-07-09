@@ -26,7 +26,6 @@ import { MessageService } from './message.service';
   providedIn: 'root',
 })
 export class CommonService {
-  private baseUrl = environment.apiUrl;
   private urlMap = environment.apiMap;
   private tmsUrl = environment.tmsUrl;
   private refreshTokenInProgress = false;
@@ -41,11 +40,12 @@ export class CommonService {
     private messService: MessageService,
     private configService: ConfigService
   ) {
-    this.configService.apiUrl$.subscribe((url) => {
-      this.baseUrl = url;
-    });
   }
 
+  // Helper để lấy baseUrl động
+  private get baseUrl(): string {
+    return this.configService.getApiEndpoint();
+  }
 
   getMap<T>(
     endpoint: string,

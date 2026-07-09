@@ -39,8 +39,8 @@ export class NewsComponent implements OnInit {
   dataChucVu: any;
   paginationResult = new PaginationResult()
   formattedDate: string = '';
-  storeLength: string = '(0)';
-  wareHouseLength: string = '(0)';
+  // storeLength: string = '(0)';
+  // wareHouseLength: string = '(0)';
   chuaChamLength: string = '(0)';
   selected: string = 'all';
   userInfo: UserInfo = {
@@ -196,14 +196,14 @@ export class NewsComponent implements OnInit {
     this._service.getDataHome(this.userInfo.userName).subscribe({
       next: (data: any) => {
         this.fullData = data;
-
+        console.log('dataHome', data);
         const sortedList = [...data.lstDoiTuong]
 
         this.dataHomeAll = sortedList;
-        this.storeLength = `(${sortedList.filter((x: any) => x.type === 'DT1').length
-          })`;
-        this.wareHouseLength = `(${sortedList.filter((x: any) => x.type === 'DT2').length
-          })`;
+        // this.storeLength = `(${sortedList.filter((x: any) => x.type === 'DT1').length
+        //   })`;
+        // this.wareHouseLength = `(${sortedList.filter((x: any) => x.type === 'DT2').length
+        //   })`;
         this.chuaChamLength = `(${sortedList.filter((x: any) => x.isScore === true).length
           })`;
         this.select(this.selected);

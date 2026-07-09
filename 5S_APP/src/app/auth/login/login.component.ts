@@ -47,15 +47,10 @@ export class LoginComponent implements OnInit {
     osVersion: '',
     manufacturer: '',
   };
-  async ngOnInit() {
-    const { value } = await Preferences.get({ key: 'apiUrl' });
-    if (value) {
-      this.customUrl = value;
-    } else {
-      this.customUrl = environment.apiUrl;
-      await Preferences.set({ key: 'apiUrl', value: this.customUrl });
-      this.configService.setApiUrl(this.customUrl);
-    }
+  ngOnInit() {
+    // Lấy URL hiện tại từ service, đã được load từ Preferences hoặc environment
+    this.customUrl = this.configService.getApiUrlSync();
+
     this.logDeviceID();
     this.logDeviceInfo();
   }
@@ -77,8 +72,10 @@ export class LoginComponent implements OnInit {
   }
   async processLogin() {
 
+    // Lưu lại URL mới nhất trước khi đăng nhập
+    await this.configService.setApiUrl(this.customUrl);
+
     this.isLogin = true;
-    const { value } = await Preferences.get({ key: 'apiUrl' });
     if (this.customUrl === '' || this.customUrl === '/api') {
       this.messageService.show(
         'Vui lòng nhập cấu hình đường dẫn url',
@@ -86,9 +83,6 @@ export class LoginComponent implements OnInit {
       );
       this.isLogin = false;
       return;
-    }
-    if (value && value.trim() !== '') {
-      this.configService.setApiUrl(value.trim());
     }
 
     this.model.deviceId = this.deviceId;

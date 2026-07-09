@@ -7,7 +7,7 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root',
 })
 export class ConfigService {
-  private apiUrlSubject = new BehaviorSubject<any>(environment.baseApi);
+  private apiUrlSubject = new BehaviorSubject<string>(environment.baseApi);
   apiUrl$ = this.apiUrlSubject.asObservable();
 
   constructor() {
@@ -29,5 +29,9 @@ export class ConfigService {
 
   getApiUrlSync(): string {
     return this.apiUrlSubject.value; // luôn có string (từ environment hoặc Preferences)
+  }
+
+  getApiEndpoint(): string {
+    return `${this.getApiUrlSync()}/api`;
   }
 }
