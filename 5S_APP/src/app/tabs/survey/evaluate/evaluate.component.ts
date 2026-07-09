@@ -118,7 +118,9 @@ export class EvaluateComponent implements OnInit {
   async ngOnInit() {
     this.route.paramMap.subscribe(async (params) => {
       const api = localStorage.getItem('CapacitorStorage.apiUrl') ?? '';
-      this.apiFile = api.replace(/\/api$/, '/') + '/';
+      console.log(api);
+      
+      this.apiFile = api.replace(/\/api$/, '') + '/';
       this.account = JSON.parse(localStorage.getItem('UserInfo') ?? '');
 
       const filter = JSON.parse(localStorage.getItem('filterCS') ?? '{}');

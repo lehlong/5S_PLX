@@ -30,8 +30,18 @@ export class ConfigService {
   getApiUrlSync(): string {
     return this.apiUrlSubject.value; // luôn có string (từ environment hoặc Preferences)
   }
-
+  
   getApiEndpoint(): string {
-    return `${this.getApiUrlSync()}/api`;
+    let apiUrl = this.getApiUrlSync().trim();
+
+    // Xóa dấu / ở cuối (nếu có)
+    apiUrl = apiUrl.replace(/\/+$/, '');
+
+    // Nếu chưa có /api thì thêm vào
+    if (!apiUrl.endsWith('/api')) {
+      apiUrl += '/api';
+    }
+
+    return apiUrl;
   }
 }
